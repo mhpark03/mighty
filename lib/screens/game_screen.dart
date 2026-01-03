@@ -230,30 +230,28 @@ class _GameScreenState extends State<GameScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                for (final card in sortedHand)
-                  Container(
-                    margin: const EdgeInsets.only(right: 2),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: (bestSuit != null && card.suit == bestSuit)
-                            ? Colors.amber
-                            : Colors.transparent,
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(4),
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children: [
+              for (final card in sortedHand)
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: (bestSuit != null && card.suit == bestSuit)
+                          ? Colors.amber
+                          : Colors.transparent,
+                      width: 2,
                     ),
-                    child: CardWidget(
-                      card: card,
-                      width: 40,
-                      height: 60,
-                    ),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-              ],
-            ),
+                  child: CardWidget(
+                    card: card,
+                    width: 36,
+                    height: 54,
+                  ),
+                ),
+            ],
           ),
         ],
       ),
