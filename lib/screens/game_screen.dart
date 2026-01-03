@@ -5,6 +5,7 @@ import '../models/card.dart';
 import '../models/player.dart';
 import '../models/game_state.dart';
 import '../services/game_controller.dart';
+import '../services/ai_player.dart';
 import '../widgets/card_widget.dart';
 import 'bidding_dialog.dart';
 import 'kitty_dialog.dart';
@@ -117,28 +118,145 @@ class _GameScreenState extends State<GameScreen> {
 
     return Column(
       children: [
-        Expanded(
+        // 비딩 정보 헤더
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.black38,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 l10n.biddingPhase,
                 style: const TextStyle(
-                  fontSize: 24,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 8),
               _buildBiddingInfo(state),
-              const SizedBox(height: 20),
               if (state.currentBidder == 0 && !controller.isProcessing)
-                _buildBiddingControls(controller),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: _buildBiddingControls(controller),
+                ),
             ],
           ),
         ),
-        _buildPlayerHand(controller),
+        // DEBUG: 모든 플레이어 카드 및 계산 결과
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              children: [
+                for (int i = 0; i < 5; i++)
+                  _buildPlayerDebugInfo(state.players[i], i == 0),
+              ],
+            ),
+          ),
+        ),
       ],
+    );
+  }
+
+  Widget _buildPlayerDebugInfo(Player player, bool isHuman) {
+    final aiPlayer = AIPlayer();
+    final bestSuit = aiPlayer.findBestSuit(player.hand);
+    final strength = aiPlayer.evaluateHandStrength(player.hand, bestSuit);
+
+    // 카드를 무늬별로 정렬
+    final sortedHand = List<PlayingCard>.from(player.hand);
+    sortedHand.sort((a, b) {
+      if (a.isJoker) return -1;
+      if (b.isJoker) return 1;
+      if (a.suit != b.suit) {
+        return a.suit!.index.compareTo(b.suit!.index);
+      }
+      return b.rankValue.compareTo(a.rankValue);
+    });
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: isHuman ? Colors.blue.withValues(alpha: 0.3) : Colors.black26,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isHuman ? Colors.blue : Colors.transparent,
+          width: 2,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                player.name,
+                style: TextStyle(
+                  color: isHuman ? Colors.lightBlueAccent : Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '기루다: ${bestSuit != null ? _getSuitSymbol(bestSuit) : "없음"}',
+                  style: const TextStyle(color: Colors.amber, fontSize: 12),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: strength >= 13
+                      ? Colors.green.withValues(alpha: 0.3)
+                      : Colors.red.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '강도: $strength ${strength >= 13 ? "(비딩가능)" : "(패스)"}',
+                  style: TextStyle(
+                    color: strength >= 13 ? Colors.lightGreen : Colors.redAccent,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final card in sortedHand)
+                  Container(
+                    margin: const EdgeInsets.only(right: 2),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: (bestSuit != null && card.suit == bestSuit)
+                            ? Colors.amber
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: CardWidget(
+                      card: card,
+                      width: 40,
+                      height: 60,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -488,25 +606,6 @@ class _GameScreenState extends State<GameScreen> {
               l10n.friend,
               style: const TextStyle(color: Colors.blue, fontSize: 10),
             ),
-          // DEBUG: AI 카드 표시
-          const SizedBox(height: 4),
-          SizedBox(
-            height: 45,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (final card in player.hand)
-                    CardWidget(
-                      card: card,
-                      width: 28,
-                      height: 42,
-                    ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );

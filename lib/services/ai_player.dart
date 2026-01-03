@@ -8,10 +8,10 @@ class AIPlayer {
     final hand = player.hand;
 
     // 1. 먼저 최적의 기루다를 선택
-    Suit? bestSuit = _findBestSuit(hand);
+    Suit? bestSuit = findBestSuit(hand);
 
     // 2. 선택된 기루다를 기준으로 핸드 강도 계산
-    int strength = _evaluateHandStrength(hand, bestSuit);
+    int strength = evaluateHandStrength(hand, bestSuit);
 
     // 3. 비딩 결정
     if (state.currentBid != null) {
@@ -37,7 +37,8 @@ class AIPlayer {
     );
   }
 
-  int _evaluateHandStrength(List<PlayingCard> hand, Suit? giruda) {
+  // Public method for debugging
+  int evaluateHandStrength(List<PlayingCard> hand, Suit? giruda) {
     int strength = 0;
 
     // 마이티 판별 (기루다가 스페이드면 다이아A, 아니면 스페이드A)
@@ -108,7 +109,8 @@ class AIPlayer {
     return strength;
   }
 
-  Suit? _findBestSuit(List<PlayingCard> hand) {
+  // Public method for debugging
+  Suit? findBestSuit(List<PlayingCard> hand) {
     Map<Suit, int> suitStrength = {};
 
     for (final suit in Suit.values) {
