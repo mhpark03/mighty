@@ -33,28 +33,52 @@ class AIPlayer {
   }
 
   int _evaluateHandStrength(List<PlayingCard> hand, GameState state) {
-    int strength = 10;
+    int strength = 0;
 
     bool hasMighty = hand.any((c) => c.isMighty);
     bool hasJoker = hand.any((c) => c.isJoker);
 
+    // 마이티와 조커는 확실한 트릭
     if (hasMighty) strength += 3;
     if (hasJoker) strength += 2;
 
-    for (final card in hand) {
-      if (card.isJoker || card.isMighty) continue;
-      if (card.rank == Rank.ace) strength += 1;
-      if (card.rank == Rank.king) strength += 1;
+    // 각 무늬별로 고위 카드 평가
+    for (final suit in Suit.values) {
+      final suitCards = hand.where((c) => !c.isJoker && c.suit == suit).toList();
+      if (suitCards.isEmpty) continue;
+
+      // 해당 무늬의 A, K, Q, J 보유 확인
+      bool hasAce = suitCards.any((c) => c.rank == Rank.ace && !c.isMighty);
+      bool hasKing = suitCards.any((c) => c.rank == Rank.king);
+      bool hasQueen = suitCards.any((c) => c.rank == Rank.queen);
+      bool hasJack = suitCards.any((c) => c.rank == Rank.jack);
+
+      int highCards = 0;
+      if (hasAce) highCards++;
+      if (hasKing) highCards++;
+      if (hasQueen) highCards++;
+      if (hasJack) highCards++;
+
+      // 고위 카드 개수에 따른 점수
+      if (highCards >= 3) {
+        // A-K-Q 또는 A-K-J 등 3장 이상이면 강력
+        strength += highCards + 2;
+      } else if (highCards == 2) {
+        // A-K, A-Q 등 2장이면 좋음
+        strength += 2;
+      } else if (hasAce || hasKing) {
+        // A 또는 K 1장만 있으면 약간의 점수
+        strength += 1;
+      }
+
+      // 같은 무늬 장수 보너스 (고위 카드가 있을 때만)
+      if (highCards >= 2 && suitCards.length >= 5) {
+        strength += suitCards.length - 4;
+      }
     }
 
-    Map<Suit, int> suitCounts = {};
-    for (final card in hand) {
-      if (card.isJoker) continue;
-      suitCounts[card.suit!] = (suitCounts[card.suit!] ?? 0) + 1;
-    }
-
-    int maxSuitCount = suitCounts.values.fold(0, max);
-    if (maxSuitCount >= 5) strength += maxSuitCount - 4;
+    // 기본 점수 추가 (최소한의 베이스)
+    strength += 8;
 
     return strength;
   }
@@ -64,13 +88,34 @@ class AIPlayer {
 
     for (final suit in Suit.values) {
       int strength = 0;
-      final suitCards = hand.where((c) => !c.isJoker && c.suit == suit);
+      final suitCards = hand.where((c) => !c.isJoker && c.suit == suit).toList();
 
-      for (final card in suitCards) {
-        strength += card.rankValue;
+      if (suitCards.isEmpty) {
+        suitStrength[suit] = 0;
+        continue;
       }
 
-      strength += suitCards.length * 2;
+      // 고위 카드 확인
+      bool hasAce = suitCards.any((c) => c.rank == Rank.ace && !c.isMighty);
+      bool hasKing = suitCards.any((c) => c.rank == Rank.king);
+      bool hasQueen = suitCards.any((c) => c.rank == Rank.queen);
+      bool hasJack = suitCards.any((c) => c.rank == Rank.jack);
+
+      // 고위 카드에 높은 가중치
+      if (hasAce) strength += 10;
+      if (hasKing) strength += 8;
+      if (hasQueen) strength += 6;
+      if (hasJack) strength += 4;
+
+      // 장수 보너스 (고위 카드가 있을 때 더 가치 있음)
+      int highCardCount = (hasAce ? 1 : 0) + (hasKing ? 1 : 0) +
+                          (hasQueen ? 1 : 0) + (hasJack ? 1 : 0);
+      if (highCardCount >= 2) {
+        strength += suitCards.length * 3;
+      } else {
+        strength += suitCards.length;
+      }
+
       suitStrength[suit] = strength;
     }
 
