@@ -148,8 +148,27 @@ class _GameScreenState extends State<GameScreen> {
             padding: const EdgeInsets.all(8),
             child: Column(
               children: [
-                for (int i = 0; i < 5; i++)
-                  _buildPlayerDebugInfo(state.players[i], i == 0),
+                // 플레이어 (나)
+                _buildPlayerDebugInfo(state.players[0], true),
+                const SizedBox(height: 8),
+                // AI 1~4를 2x2 그리드로 표시
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: _buildPlayerDebugInfo(state.players[1], false)),
+                    const SizedBox(width: 8),
+                    Expanded(child: _buildPlayerDebugInfo(state.players[2], false)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: _buildPlayerDebugInfo(state.players[3], false)),
+                    const SizedBox(width: 8),
+                    Expanded(child: _buildPlayerDebugInfo(state.players[4], false)),
+                  ],
+                ),
               ],
             ),
           ),
