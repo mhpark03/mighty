@@ -488,6 +488,25 @@ class _GameScreenState extends State<GameScreen> {
               l10n.friend,
               style: const TextStyle(color: Colors.blue, fontSize: 10),
             ),
+          // DEBUG: AI 카드 표시
+          const SizedBox(height: 4),
+          SizedBox(
+            height: 45,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final card in player.hand)
+                    CardWidget(
+                      card: card,
+                      width: 28,
+                      height: 42,
+                    ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
