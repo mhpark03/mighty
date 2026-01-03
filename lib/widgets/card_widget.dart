@@ -76,61 +76,47 @@ class CardWidget extends StatelessWidget {
     final color = card.isRed ? Colors.red : Colors.black;
 
     return Padding(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(2),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Align(
             alignment: Alignment.topLeft,
-            child: Column(
-              children: [
-                Text(
-                  card.rankSymbol,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-                Text(
-                  card.suitSymbol,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: color,
-                  ),
-                ),
-              ],
+            child: Text(
+              '${card.rankSymbol}\n${card.suitSymbol}',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: color,
+                height: 1.0,
+              ),
             ),
           ),
-          Text(
-            card.suitSymbol,
-            style: TextStyle(
-              fontSize: 28,
-              color: color,
+          Expanded(
+            child: Center(
+              child: Text(
+                card.suitSymbol,
+                style: TextStyle(
+                  fontSize: 22,
+                  color: color,
+                ),
+              ),
             ),
           ),
           Align(
             alignment: Alignment.bottomRight,
             child: RotatedBox(
               quarterTurns: 2,
-              child: Column(
-                children: [
-                  Text(
-                    card.rankSymbol,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
-                  ),
-                  Text(
-                    card.suitSymbol,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: color,
-                    ),
-                  ),
-                ],
+              child: Text(
+                '${card.rankSymbol}\n${card.suitSymbol}',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                  height: 1.0,
+                ),
               ),
             ),
           ),
@@ -152,15 +138,16 @@ class CardWidget extends StatelessWidget {
       child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               '🃏',
-              style: TextStyle(fontSize: 32),
+              style: TextStyle(fontSize: 24),
             ),
             Text(
               'JOKER',
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 8,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
