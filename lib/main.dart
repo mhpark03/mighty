@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'l10n/generated/app_localizations.dart';
 import 'services/game_controller.dart';
 import 'screens/game_screen.dart';
 
@@ -15,8 +17,20 @@ class MightyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => GameController(),
       child: MaterialApp(
-        title: '마이티',
+        title: 'Mighty',
         debugShowCheckedModeBanner: false,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('ko'),
+          Locale('en'),
+          Locale('ja'),
+          Locale('zh'),
+        ],
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.green,

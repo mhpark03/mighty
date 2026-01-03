@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/generated/app_localizations.dart';
 import '../models/card.dart';
 import '../models/game_state.dart';
 
@@ -51,8 +52,10 @@ class _BiddingDialogState extends State<BiddingDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AlertDialog(
-      title: const Text('비딩'),
+      title: Text(l10n.bid),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -61,16 +64,16 @@ class _BiddingDialogState extends State<BiddingDialog> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.2),
+                  color: Colors.amber.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '현재 최고 비딩: ${widget.currentBid}',
+                  l10n.highestBid(widget.currentBid.toString()),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             const SizedBox(height: 16),
-            const Text('트릭 수', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(l10n.tricks, style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -91,14 +94,14 @@ class _BiddingDialogState extends State<BiddingDialog> {
               ],
             ),
             const SizedBox(height: 16),
-            const Text('기루다', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(l10n.giruda, style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
                 ChoiceChip(
-                  label: const Text('♠ 스페이드'),
+                  label: Text('♠ ${l10n.spade}'),
                   selected: _selectedSuit == Suit.spade && !_noGiruda,
                   onSelected: (selected) {
                     setState(() {
@@ -108,9 +111,9 @@ class _BiddingDialogState extends State<BiddingDialog> {
                   },
                 ),
                 ChoiceChip(
-                  label: const Text(
-                    '♦ 다이아',
-                    style: TextStyle(color: Colors.red),
+                  label: Text(
+                    '♦ ${l10n.diamond}',
+                    style: const TextStyle(color: Colors.red),
                   ),
                   selected: _selectedSuit == Suit.diamond && !_noGiruda,
                   onSelected: (selected) {
@@ -121,9 +124,9 @@ class _BiddingDialogState extends State<BiddingDialog> {
                   },
                 ),
                 ChoiceChip(
-                  label: const Text(
-                    '♥ 하트',
-                    style: TextStyle(color: Colors.red),
+                  label: Text(
+                    '♥ ${l10n.heart}',
+                    style: const TextStyle(color: Colors.red),
                   ),
                   selected: _selectedSuit == Suit.heart && !_noGiruda,
                   onSelected: (selected) {
@@ -134,7 +137,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
                   },
                 ),
                 ChoiceChip(
-                  label: const Text('♣ 클럽'),
+                  label: Text('♣ ${l10n.club}'),
                   selected: _selectedSuit == Suit.club && !_noGiruda,
                   onSelected: (selected) {
                     setState(() {
@@ -144,7 +147,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
                   },
                 ),
                 ChoiceChip(
-                  label: const Text('노기루다'),
+                  label: Text(l10n.noGiruda),
                   selected: _noGiruda,
                   onSelected: (selected) {
                     setState(() {
@@ -161,7 +164,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
       actions: [
         TextButton(
           onPressed: widget.onPass,
-          child: const Text('패스'),
+          child: Text(l10n.pass),
         ),
         ElevatedButton(
           onPressed: _isValidBid
@@ -173,7 +176,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
                   ));
                 }
               : null,
-          child: const Text('비딩'),
+          child: Text(l10n.bid),
         ),
       ],
     );

@@ -1,0 +1,108 @@
+{
+  "@@locale": "ko",
+  "appTitle": "마이티",
+  "gameSubtitle": "한국의 전통 트릭테이킹 카드 게임",
+  "startGame": "게임 시작",
+  "newGame": "새 게임",
+  "biddingPhase": "비딩 단계",
+  "currentBidder": "현재 비딩: {name}",
+  "@currentBidder": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "noBidYet": "아직 비딩 없음",
+  "highestBid": "최고 비딩: {bid}",
+  "@highestBid": {
+    "placeholders": {
+      "bid": {"type": "String"}
+    }
+  },
+  "bid": "비딩",
+  "bidButton": "비딩하기",
+  "pass": "패스",
+  "tricks": "트릭 수",
+  "giruda": "기루다",
+  "noGiruda": "노기루다",
+  "spade": "스페이드",
+  "diamond": "다이아몬드",
+  "heart": "하트",
+  "club": "클럽",
+  "selectKitty": "키티 선택",
+  "selectKittyDesc": "버릴 카드 3장을 선택하세요 (선택됨: {count}/3)",
+  "@selectKittyDesc": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "receivedKitty": "받은 키티:",
+  "myCards": "내 카드:",
+  "changeGiruda": "기루다 변경 (선택사항):",
+  "confirm": "확인",
+  "declareFriend": "프렌드 선언",
+  "friendDeclarationType": "프렌드 선언 방식:",
+  "byCard": "카드로 지정",
+  "firstTrickFriend": "초구 프렌드",
+  "firstTrickFriendDesc": "첫 트릭을 따는 사람",
+  "nthTrickFriend": "N번째 트릭 프렌드",
+  "noFriend": "노프렌드",
+  "noFriendDesc": "혼자 플레이",
+  "declare": "선언",
+  "suit": "무늬:",
+  "rank": "숫자:",
+  "selectedCard": "선택한 카드: {card}",
+  "@selectedCard": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "trickNumber": "트릭 번호:",
+  "playCard": "카드를 내세요",
+  "yourTurn": "당신의 차례입니다",
+  "playerTurn": "{name}의 차례",
+  "@playerTurn": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "contract": "계약",
+  "trick": "트릭",
+  "friend": "프렌드",
+  "declarer": "주공",
+  "cards": "카드: {count}",
+  "@cards": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "aiSelectingKitty": "AI가 키티를 선택하고 있습니다...",
+  "aiDeclaringFriend": "AI가 프렌드를 선언하고 있습니다...",
+  "declarerTeamWins": "주공 팀 승리!",
+  "defenderTeamWins": "수비 팀 승리!",
+  "declarerTeamPoints": "주공 팀: {points}점",
+  "@declarerTeamPoints": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "defenderTeamPoints": "수비 팀: {points}점",
+  "@defenderTeamPoints": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "targetPoints": "목표: {points}점",
+  "@targetPoints": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "score": "점수",
+  "points": "{points}점",
+  "@points": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "player": "플레이어"
+}

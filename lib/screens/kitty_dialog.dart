@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/generated/app_localizations.dart';
 import '../models/card.dart';
 import '../widgets/card_widget.dart';
 
@@ -45,6 +46,8 @@ class _KittyDialogState extends State<KittyDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Dialog(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
@@ -52,17 +55,17 @@ class _KittyDialogState extends State<KittyDialog> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const Text(
-              '키티 선택',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Text(
+              l10n.selectKitty,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              '버릴 카드 3장을 선택하세요 (선택됨: ${_selectedDiscards.length}/3)',
+              l10n.selectKittyDesc(_selectedDiscards.length),
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 16),
-            const Text('받은 키티:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(l10n.receivedKitty, style: const TextStyle(fontWeight: FontWeight.bold)),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: widget.kitty
@@ -79,7 +82,7 @@ class _KittyDialogState extends State<KittyDialog> {
                   .toList(),
             ),
             const SizedBox(height: 16),
-            const Text('내 카드:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(l10n.myCards, style: const TextStyle(fontWeight: FontWeight.bold)),
             Expanded(
               child: SingleChildScrollView(
                 child: Wrap(
@@ -98,8 +101,8 @@ class _KittyDialogState extends State<KittyDialog> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text('기루다 변경 (선택사항):',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(l10n.changeGiruda,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -137,7 +140,7 @@ class _KittyDialogState extends State<KittyDialog> {
                   }),
                 ),
                 ChoiceChip(
-                  label: const Text('노기루다'),
+                  label: Text(l10n.noGiruda),
                   selected: _noGiruda,
                   onSelected: (_) => setState(() {
                     _noGiruda = true;
@@ -161,9 +164,9 @@ class _KittyDialogState extends State<KittyDialog> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               ),
-              child: const Text(
-                '확인',
-                style: TextStyle(fontSize: 18, color: Colors.black),
+              child: Text(
+                l10n.confirm,
+                style: const TextStyle(fontSize: 18, color: Colors.black),
               ),
             ),
           ],

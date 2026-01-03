@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/generated/app_localizations.dart';
 import '../models/card.dart';
 import '../models/game_state.dart';
 
@@ -24,41 +25,21 @@ class _FriendDialogState extends State<FriendDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AlertDialog(
-      title: const Text('프렌드 선언'),
+      title: Text(l10n.declareFriend),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('프렌드 선언 방식:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(l10n.friendDeclarationType, style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            RadioListTile<String>(
-              title: const Text('카드로 지정'),
-              value: 'card',
-              groupValue: _selectedType,
-              onChanged: (value) => setState(() => _selectedType = value!),
-            ),
-            RadioListTile<String>(
-              title: const Text('초구 프렌드'),
-              subtitle: const Text('첫 트릭을 따는 사람'),
-              value: 'first',
-              groupValue: _selectedType,
-              onChanged: (value) => setState(() => _selectedType = value!),
-            ),
-            RadioListTile<String>(
-              title: const Text('N번째 트릭 프렌드'),
-              value: 'trick',
-              groupValue: _selectedType,
-              onChanged: (value) => setState(() => _selectedType = value!),
-            ),
-            RadioListTile<String>(
-              title: const Text('노프렌드'),
-              subtitle: const Text('혼자 플레이'),
-              value: 'none',
-              groupValue: _selectedType,
-              onChanged: (value) => setState(() => _selectedType = value!),
-            ),
+            _buildRadioOption('card', l10n.byCard, null),
+            _buildRadioOption('first', l10n.firstTrickFriend, l10n.firstTrickFriendDesc),
+            _buildRadioOption('trick', l10n.nthTrickFriend, null),
+            _buildRadioOption('none', l10n.noFriend, l10n.noFriendDesc),
             const SizedBox(height: 16),
             if (_selectedType == 'card') _buildCardSelector(),
             if (_selectedType == 'trick') _buildTrickSelector(),
@@ -88,17 +69,50 @@ class _FriendDialogState extends State<FriendDialog> {
             }
             widget.onDeclare(declaration);
           },
-          child: const Text('선언'),
+          child: Text(l10n.declare),
         ),
       ],
     );
   }
 
+  Widget _buildRadioOption(String value, String title, String? subtitle) {
+    return InkWell(
+      onTap: () => setState(() => _selectedType = value),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          children: [
+            Radio<String>(
+              value: value,
+              groupValue: _selectedType,
+              onChanged: (v) => setState(() => _selectedType = v!),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title),
+                  if (subtitle != null)
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildCardSelector() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('무늬:', style: TextStyle(fontWeight: FontWeight.bold)),
+        Text(l10n.suit, style: const TextStyle(fontWeight: FontWeight.bold)),
         Wrap(
           spacing: 8,
           children: [
@@ -125,7 +139,7 @@ class _FriendDialogState extends State<FriendDialog> {
           ],
         ),
         const SizedBox(height: 8),
-        const Text('숫자:', style: TextStyle(fontWeight: FontWeight.bold)),
+        Text(l10n.rank, style: const TextStyle(fontWeight: FontWeight.bold)),
         Wrap(
           spacing: 4,
           runSpacing: 4,
@@ -142,7 +156,7 @@ class _FriendDialogState extends State<FriendDialog> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.blue.withOpacity(0.1),
+            color: Colors.blue.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -151,7 +165,7 @@ class _FriendDialogState extends State<FriendDialog> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '선택한 카드: ${_getSuitSymbol(_selectedSuit)}${_rankToString(_selectedRank)}',
+                  l10n.selectedCard('${_getSuitSymbol(_selectedSuit)}${_rankToString(_selectedRank)}'),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -163,10 +177,12 @@ class _FriendDialogState extends State<FriendDialog> {
   }
 
   Widget _buildTrickSelector() {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('트릭 번호:', style: TextStyle(fontWeight: FontWeight.bold)),
+        Text(l10n.trickNumber, style: const TextStyle(fontWeight: FontWeight.bold)),
         Wrap(
           spacing: 8,
           children: [

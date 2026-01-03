@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/generated/app_localizations.dart';
 import '../models/card.dart';
 import '../models/player.dart';
 import '../models/game_state.dart';
@@ -21,12 +22,14 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<GameController>(
       builder: (context, controller, child) {
         return Scaffold(
           backgroundColor: Colors.green[800],
           appBar: AppBar(
-            title: const Text('마이티'),
+            title: Text(l10n.appTitle),
             backgroundColor: Colors.green[900],
             actions: [
               IconButton(
@@ -69,22 +72,24 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildWaitingScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            '마이티',
-            style: TextStyle(
+          Text(
+            l10n.appTitle,
+            style: const TextStyle(
               fontSize: 48,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            '한국의 전통 트릭테이킹 카드 게임',
-            style: TextStyle(
+          Text(
+            l10n.gameSubtitle,
+            style: const TextStyle(
               fontSize: 18,
               color: Colors.white70,
             ),
@@ -96,9 +101,9 @@ class _GameScreenState extends State<GameScreen> {
               backgroundColor: Colors.amber,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
             ),
-            child: const Text(
-              '게임 시작',
-              style: TextStyle(fontSize: 20, color: Colors.black),
+            child: Text(
+              l10n.startGame,
+              style: const TextStyle(fontSize: 20, color: Colors.black),
             ),
           ),
         ],
@@ -107,6 +112,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildBiddingScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
     final state = controller.state;
 
     return Column(
@@ -115,9 +121,9 @@ class _GameScreenState extends State<GameScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                '비딩 단계',
-                style: TextStyle(
+              Text(
+                l10n.biddingPhase,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -137,6 +143,8 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildBiddingInfo(GameState state) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -146,19 +154,19 @@ class _GameScreenState extends State<GameScreen> {
       child: Column(
         children: [
           Text(
-            '현재 비딩: ${state.players[state.currentBidder].name}',
+            l10n.currentBidder(state.players[state.currentBidder].name),
             style: const TextStyle(color: Colors.white, fontSize: 18),
           ),
           const SizedBox(height: 8),
           if (state.currentBid != null)
             Text(
-              '최고 비딩: ${state.currentBid}',
+              l10n.highestBid(state.currentBid.toString()),
               style: const TextStyle(color: Colors.amber, fontSize: 16),
             )
           else
-            const Text(
-              '아직 비딩 없음',
-              style: TextStyle(color: Colors.white70, fontSize: 16),
+            Text(
+              l10n.noBidYet,
+              style: const TextStyle(color: Colors.white70, fontSize: 16),
             ),
         ],
       ),
@@ -166,15 +174,17 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildBiddingControls(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+
     return ElevatedButton(
       onPressed: () => _showBiddingDialog(controller),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.amber,
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
       ),
-      child: const Text(
-        '비딩하기',
-        style: TextStyle(fontSize: 18, color: Colors.black),
+      child: Text(
+        l10n.bidButton,
+        style: const TextStyle(fontSize: 18, color: Colors.black),
       ),
     );
   }
@@ -198,13 +208,15 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildKittyScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (controller.state.declarerId != 0) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'AI가 키티를 선택하고 있습니다...',
-            style: TextStyle(color: Colors.white, fontSize: 20),
+          Text(
+            l10n.aiSelectingKitty,
+            style: const TextStyle(color: Colors.white, fontSize: 20),
           ),
           const SizedBox(height: 20),
           const CircularProgressIndicator(color: Colors.white),
@@ -223,9 +235,9 @@ class _GameScreenState extends State<GameScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               ),
-              child: const Text(
-                '키티 선택하기',
-                style: TextStyle(fontSize: 18, color: Colors.black),
+              child: Text(
+                l10n.selectKitty,
+                style: const TextStyle(fontSize: 18, color: Colors.black),
               ),
             ),
           ),
@@ -252,13 +264,15 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildFriendScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (controller.state.declarerId != 0) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'AI가 프렌드를 선언하고 있습니다...',
-            style: TextStyle(color: Colors.white, fontSize: 20),
+          Text(
+            l10n.aiDeclaringFriend,
+            style: const TextStyle(color: Colors.white, fontSize: 20),
           ),
           const SizedBox(height: 20),
           const CircularProgressIndicator(color: Colors.white),
@@ -277,9 +291,9 @@ class _GameScreenState extends State<GameScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               ),
-              child: const Text(
-                '프렌드 선언하기',
-                style: TextStyle(fontSize: 18, color: Colors.black),
+              child: Text(
+                l10n.declareFriend,
+                style: const TextStyle(fontSize: 18, color: Colors.black),
               ),
             ),
           ),
@@ -319,19 +333,21 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildGameInfo(GameState state) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: Colors.black26,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildInfoItem('기루다', state.giruda != null
+          _buildInfoItem(l10n.giruda, state.giruda != null
               ? _getSuitSymbol(state.giruda!)
-              : '노기루다'),
-          _buildInfoItem('계약', '${state.currentBid?.tricks ?? 0}'),
-          _buildInfoItem('트릭', '${state.tricksPlayed}/10'),
+              : l10n.noGiruda),
+          _buildInfoItem(l10n.contract, '${state.currentBid?.tricks ?? 0}'),
+          _buildInfoItem(l10n.trick, '${state.tricksPlayed}/10'),
           if (state.friendRevealed && state.friend != null)
-            _buildInfoItem('프렌드', state.friend!.name),
+            _buildInfoItem(l10n.friend, state.friend!.name),
         ],
       ),
     );
@@ -370,19 +386,18 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildPlayArea(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
     final state = controller.state;
     final trick = state.currentTrick;
 
     return Stack(
       children: [
-        // AI 플레이어 위치 표시
         Positioned(
           top: 10,
           left: 0,
           right: 0,
           child: _buildTopPlayers(state),
         ),
-        // 가운데 플레이 영역
         Center(
           child: Container(
             width: 300,
@@ -395,7 +410,6 @@ class _GameScreenState extends State<GameScreen> {
             child: _buildTrickCards(trick, state),
           ),
         ),
-        // 현재 플레이어 표시
         Positioned(
           bottom: 10,
           left: 0,
@@ -408,7 +422,9 @@ class _GameScreenState extends State<GameScreen> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                controller.isHumanTurn ? '당신의 차례입니다' : '${state.players[state.currentPlayer].name}의 차례',
+                controller.isHumanTurn
+                    ? l10n.yourTurn
+                    : l10n.playerTurn(state.players[state.currentPlayer].name),
                 style: TextStyle(
                   color: controller.isHumanTurn ? Colors.black : Colors.white,
                   fontWeight: FontWeight.bold,
@@ -432,6 +448,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildPlayerIndicator(Player player, GameState state, int index) {
+    final l10n = AppLocalizations.of(context)!;
     final isCurrentPlayer = state.currentPlayer == index;
     final isDeclarer = player.isDeclarer;
     final isFriend = player.isFriend && state.friendRevealed;
@@ -458,18 +475,18 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           Text(
-            '카드: ${player.hand.length}',
+            l10n.cards(player.hand.length),
             style: const TextStyle(color: Colors.white70, fontSize: 12),
           ),
           if (isDeclarer)
-            const Text(
-              '주공',
-              style: TextStyle(color: Colors.red, fontSize: 10),
+            Text(
+              l10n.declarer,
+              style: const TextStyle(color: Colors.red, fontSize: 10),
             ),
           if (isFriend)
-            const Text(
-              '프렌드',
-              style: TextStyle(color: Colors.blue, fontSize: 10),
+            Text(
+              l10n.friend,
+              style: const TextStyle(color: Colors.blue, fontSize: 10),
             ),
         ],
       ),
@@ -477,11 +494,13 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildTrickCards(Trick? trick, GameState state) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (trick == null || trick.cards.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          '카드를 내세요',
-          style: TextStyle(color: Colors.white70, fontSize: 16),
+          l10n.playCard,
+          style: const TextStyle(color: Colors.white70, fontSize: 16),
         ),
       );
     }
@@ -562,6 +581,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildGameEndScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
     final state = controller.state;
 
     return Center(
@@ -576,7 +596,7 @@ class _GameScreenState extends State<GameScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              state.declarerWon ? '주공 팀 승리!' : '수비 팀 승리!',
+              state.declarerWon ? l10n.declarerTeamWins : l10n.defenderTeamWins,
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -585,21 +605,21 @@ class _GameScreenState extends State<GameScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              '주공 팀: ${state.declarerTeamPoints}점',
+              l10n.declarerTeamPoints(state.declarerTeamPoints),
               style: const TextStyle(fontSize: 18),
             ),
             Text(
-              '수비 팀: ${state.defenderTeamPoints}점',
+              l10n.defenderTeamPoints(state.defenderTeamPoints),
               style: const TextStyle(fontSize: 18),
             ),
             Text(
-              '목표: ${state.currentBid?.tricks ?? 0}점',
+              l10n.targetPoints(state.currentBid?.tricks ?? 0),
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 24),
-            const Text(
-              '점수',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              l10n.score,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             for (final player in state.players)
@@ -609,10 +629,10 @@ class _GameScreenState extends State<GameScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${player.name} ${player.isDeclarer ? "(주공)" : player.isFriend ? "(프렌드)" : ""}',
+                      '${player.name} ${player.isDeclarer ? "(${l10n.declarer})" : player.isFriend ? "(${l10n.friend})" : ""}',
                     ),
                     Text(
-                      '${state.getPlayerScore(player.id)}점',
+                      l10n.points(state.getPlayerScore(player.id)),
                       style: TextStyle(
                         color: state.getPlayerScore(player.id) >= 0
                             ? Colors.green
@@ -634,9 +654,9 @@ class _GameScreenState extends State<GameScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               ),
-              child: const Text(
-                '새 게임',
-                style: TextStyle(fontSize: 18, color: Colors.black),
+              child: Text(
+                l10n.newGame,
+                style: const TextStyle(fontSize: 18, color: Colors.black),
               ),
             ),
           ],
