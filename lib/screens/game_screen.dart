@@ -787,19 +787,20 @@ class _GameScreenState extends State<GameScreen> {
   bool _kittyDialogShown = false;
 
   void _showKittyDialog(GameController controller) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => KittyDialog(
-        hand: controller.humanPlayer.hand,
-        kitty: controller.state.kitty,
-        currentGiruda: controller.state.giruda,
-        gameState: controller.state,
-        onConfirm: (discards, newGiruda) {
-          Navigator.pop(context);
-          _kittyDialogShown = false;
-          controller.humanSelectKitty(discards, newGiruda);
-        },
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => KittySelectionScreen(
+          hand: controller.humanPlayer.hand,
+          kitty: controller.state.kitty,
+          currentGiruda: controller.state.giruda,
+          gameState: controller.state,
+          onConfirm: (discards, newGiruda) {
+            Navigator.pop(context);
+            _kittyDialogShown = false;
+            controller.humanSelectKitty(discards, newGiruda);
+          },
+        ),
       ),
     );
   }
