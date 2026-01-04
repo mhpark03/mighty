@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../models/card.dart';
+import '../models/player.dart';
+import '../models/game_state.dart';
+import '../services/ai_player.dart';
 import '../widgets/card_widget.dart';
 
 class KittyDialog extends StatefulWidget {
   final List<PlayingCard> hand;
   final List<PlayingCard> kitty;
   final Suit? currentGiruda;
+  final GameState gameState;
   final Function(List<PlayingCard>, Suit?) onConfirm;
 
   const KittyDialog({
@@ -14,6 +18,7 @@ class KittyDialog extends StatefulWidget {
     required this.hand,
     required this.kitty,
     required this.currentGiruda,
+    required this.gameState,
     required this.onConfirm,
   });
 
@@ -26,6 +31,12 @@ class _KittyDialogState extends State<KittyDialog> {
   final Set<PlayingCard> _selectedDiscards = {};
   Suit? _selectedGiruda;
   bool _noGiruda = false;
+
+  // 추천 결과
+  final AIPlayer _aiPlayer = AIPlayer();
+  late List<PlayingCard> _recommendedDiscards;
+  late Suit? _recommendedGiruda;
+  late bool _recommendedNoGiruda;
 
   @override
   void initState() {
@@ -42,6 +53,42 @@ class _KittyDialogState extends State<KittyDialog> {
 
     _selectedGiruda = widget.currentGiruda;
     _noGiruda = widget.currentGiruda == null;
+
+    // AI 추천 계산
+    _calculateRecommendation();
+  }
+
+  void _calculateRecommendation() {
+    // 임시 Player 객체 생성 (AI 로직 사용을 위해)
+    final tempPlayer = Player(id: 0, name: 'temp', type: PlayerType.human);
+    tempPlayer.hand.clear();
+    tempPlayer.hand.addAll(widget.hand);
+
+    // 1. 13장으로 기루다 변경 여부 결정
+    _recommendedGiruda = _aiPlayer.decideGirudaChange(
+      tempPlayer,
+      widget.gameState,
+      widget.kitty,
+    );
+
+    _recommendedNoGiruda = _recommendedGiruda == null && widget.currentGiruda != null;
+
+    // 2. 최종 기루다를 기준으로 버릴 카드 선택
+    _recommendedDiscards = _aiPlayer.selectKittyCardsWithGiruda(
+      tempPlayer,
+      widget.gameState,
+      widget.kitty,
+      _recommendedGiruda,
+    );
+  }
+
+  void _applyRecommendation() {
+    setState(() {
+      _selectedDiscards.clear();
+      _selectedDiscards.addAll(_recommendedDiscards);
+      _selectedGiruda = _recommendedGiruda;
+      _noGiruda = _recommendedNoGiruda;
+    });
   }
 
   @override
@@ -81,7 +128,10 @@ class _KittyDialogState extends State<KittyDialog> {
                       ))
                   .toList(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            // AI 추천 영역
+            _buildRecommendationSection(),
+            const SizedBox(height: 12),
             Text(l10n.myCards, style: const TextStyle(fontWeight: FontWeight.bold)),
             Expanded(
               child: SingleChildScrollView(
@@ -171,6 +221,172 @@ class _KittyDialogState extends State<KittyDialog> {
         ),
       ),
     );
+  }
+
+  Widget _buildRecommendationSection() {
+    final isGirudaChangeRecommended = _recommendedGiruda != widget.currentGiruda;
+    String girudaText;
+    if (_recommendedNoGiruda) {
+      girudaText = '노기루다';
+    } else if (_recommendedGiruda != null) {
+      girudaText = _getSuitSymbol(_recommendedGiruda!);
+    } else {
+      girudaText = '유지';
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blue.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blue, width: 1),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.lightbulb, color: Colors.blue, size: 20),
+              const SizedBox(width: 8),
+              const Text(
+                'AI 추천',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // 추천 버릴 카드
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('버릴 카드: ', style: TextStyle(fontSize: 12)),
+              ..._recommendedDiscards.map((card) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: _buildMiniCard(card),
+                  )),
+            ],
+          ),
+          const SizedBox(height: 4),
+          // 추천 기루다
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('기루다: ', style: TextStyle(fontSize: 12)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: isGirudaChangeRecommended
+                      ? Colors.orange.withValues(alpha: 0.2)
+                      : Colors.grey.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  girudaText,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: isGirudaChangeRecommended ? Colors.orange[800] : null,
+                  ),
+                ),
+              ),
+              if (isGirudaChangeRecommended) ...[
+                const SizedBox(width: 4),
+                Text(
+                  '(목표 +2)',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.orange[700],
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          // 추천 적용 버튼
+          ElevatedButton.icon(
+            onPressed: _applyRecommendation,
+            icon: const Icon(Icons.auto_fix_high, size: 16),
+            label: const Text('추천 적용'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniCard(PlayingCard card) {
+    if (card.isJoker) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        decoration: BoxDecoration(
+          color: Colors.purple[100],
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.purple),
+        ),
+        child: const Text('🃏', style: TextStyle(fontSize: 14)),
+      );
+    }
+
+    final isRed = card.suit == Suit.diamond || card.suit == Suit.heart;
+    final suitSymbol = _getSuitSymbol(card.suit!);
+    String rank;
+    switch (card.rank) {
+      case Rank.ace:
+        rank = 'A';
+        break;
+      case Rank.king:
+        rank = 'K';
+        break;
+      case Rank.queen:
+        rank = 'Q';
+        break;
+      case Rank.jack:
+        rank = 'J';
+        break;
+      case Rank.ten:
+        rank = '10';
+        break;
+      default:
+        rank = '${card.rankValue}';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: Colors.grey),
+      ),
+      child: Text(
+        '$suitSymbol$rank',
+        style: TextStyle(
+          color: isRed ? Colors.red : Colors.black,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  String _getSuitSymbol(Suit suit) {
+    switch (suit) {
+      case Suit.spade:
+        return '♠';
+      case Suit.diamond:
+        return '♦';
+      case Suit.heart:
+        return '♥';
+      case Suit.club:
+        return '♣';
+    }
   }
 
   void _toggleCard(PlayingCard card) {

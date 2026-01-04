@@ -682,6 +682,7 @@ class _GameScreenState extends State<GameScreen> {
         hand: controller.humanPlayer.hand,
         kitty: controller.state.kitty,
         currentGiruda: controller.state.giruda,
+        gameState: controller.state,
         onConfirm: (discards, newGiruda) {
           Navigator.pop(context);
           _kittyDialogShown = false;
