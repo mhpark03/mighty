@@ -176,9 +176,14 @@ class GameController extends ChangeNotifier {
     // 트릭이 완료되었는지 확인
     if (_state.tricks.length > trickCountBefore && _state.phase == GamePhase.playing) {
       _lastCompletedTrick = _state.tricks.last;
-      _waitingForTrickConfirm = true;
+      // 사용자가 다음 선공이면 확인 없이 바로 카드 선택 가능
+      if (_state.currentPlayer == 0) {
+        _waitingForTrickConfirm = false;
+      } else {
+        _waitingForTrickConfirm = true;
+      }
       notifyListeners();
-      return; // 사용자 확인 대기
+      return; // 사용자 확인 대기 또는 카드 선택 대기
     }
 
     notifyListeners();
@@ -191,7 +196,11 @@ class GameController extends ChangeNotifier {
   void humanPlayCard(PlayingCard card, {Suit? jokerCallSuit}) {
     if (_state.currentPlayer != 0) return;
     if (!_state.canPlayCard(card, humanPlayer)) return;
-    if (_waitingForTrickConfirm) return;
+    // 사용자가 선공일 때는 확인 대기 중이 아니므로 카드 낼 수 있음
+    if (_waitingForTrickConfirm && _state.currentPlayer != 0) return;
+
+    // 이전 트릭 표시 정리
+    _lastCompletedTrick = null;
 
     // 조커 콜 선언 (선공 시에만)
     if (jokerCallSuit != null && isLeadingTrick) {
@@ -206,9 +215,14 @@ class GameController extends ChangeNotifier {
     // 트릭이 완료되었는지 확인
     if (_state.tricks.length > trickCountBefore && _state.phase == GamePhase.playing) {
       _lastCompletedTrick = _state.tricks.last;
-      _waitingForTrickConfirm = true;
+      // 사용자가 다음 선공이면 확인 없이 바로 카드 선택 가능
+      if (_state.currentPlayer == 0) {
+        _waitingForTrickConfirm = false;
+      } else {
+        _waitingForTrickConfirm = true;
+      }
       notifyListeners();
-      return; // 사용자 확인 대기
+      return; // 사용자 확인 대기 또는 카드 선택 대기
     }
 
     notifyListeners();
@@ -217,6 +231,10 @@ class GameController extends ChangeNotifier {
       _processAIPlayIfNeeded();
     }
   }
+
+  // 사용자가 다음 선공인지 확인 (트릭 완료 후)
+  bool get isHumanLeaderAfterTrick =>
+      _lastCompletedTrick != null && _state.currentPlayer == 0 && !_waitingForTrickConfirm;
 
   // 트릭 확인 후 다음 단계 진행
   void confirmTrick() {

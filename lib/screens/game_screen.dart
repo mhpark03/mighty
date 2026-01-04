@@ -520,7 +520,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget _buildPlayingScreen(GameController controller) {
     final state = controller.state;
 
-    // 트릭 완료 대기 중이면 타이머 시작
+    // 트릭 완료 대기 중이면 타이머 시작 (사용자가 선공이 아닐 때만)
     if (controller.waitingForTrickConfirm && !_timerRunning) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _startTrickTimer(controller);
@@ -539,13 +539,101 @@ class _GameScreenState extends State<GameScreen> {
             Expanded(
               child: _buildPlayArea(controller),
             ),
+            // 사용자 선공 시 이전 트릭 정보 표시
+            if (controller.isHumanLeaderAfterTrick)
+              _buildPreviousTrickInfo(controller),
             _buildPlayerHand(controller),
           ],
         ),
-        // 트릭 완료 시 오버레이
+        // 트릭 완료 시 오버레이 (사용자가 선공이 아닐 때만)
         if (controller.waitingForTrickConfirm)
           _buildTrickConfirmOverlay(controller),
       ],
+    );
+  }
+
+  Widget _buildPreviousTrickInfo(GameController controller) {
+    final trick = controller.lastCompletedTrick;
+    if (trick == null) return const SizedBox.shrink();
+
+    final winner = controller.state.players[trick.winnerId ?? 0];
+    final isDeclarerTeam = winner.isDeclarer || winner.isFriend;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: isDeclarerTeam ? Colors.blue[900] : Colors.red[900],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDeclarerTeam ? Colors.blue[400]! : Colors.red[400]!,
+          width: 2,
+        ),
+      ),
+      child: Row(
+        children: [
+          // 이전 트릭 카드들
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Text(
+                    '이전: ',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                  for (int i = 0; i < trick.cards.length; i++) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      decoration: trick.playerOrder[i] == trick.winnerId
+                          ? BoxDecoration(
+                              border: Border.all(color: Colors.amber, width: 1),
+                              borderRadius: BorderRadius.circular(4),
+                            )
+                          : null,
+                      child: CardWidget(
+                        card: trick.cards[i],
+                        width: 30,
+                        height: 45,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          // 승자 정보
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.amber,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '${winner.name} 승',
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // 카드 선택 안내
+          const Text(
+            '카드를 선택하세요',
+            style: TextStyle(
+              color: Colors.amber,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
