@@ -229,10 +229,17 @@ class AIPlayer {
     bool hasJokerCallCard = hand.any((c) =>
         c.suit == jokerCallCard.suit && c.rank == jokerCallCard.rank);
 
+    // 기루다 K 보유 확인
+    bool hasGirudaKing = false;
+    if (state.giruda != null) {
+      final girudaKing = PlayingCard(suit: state.giruda!, rank: Rank.king);
+      hasGirudaKing = hand.any((c) => c.suit == girudaKing.suit && c.rank == girudaKing.rank);
+    }
+
     // === 노 프렌드 조건 체크 ===
 
-    // 조건 1: 마이티 + 조커 + 기루다 A + 기루다 외 A 1개 이상 → 노 프렌드
-    if (hasMighty && hasJoker && hasGirudaAce && nonGirudaAceCount >= 1) {
+    // 조건 1: 마이티 + 조커 + 기루다 A + 기루다 K + 기루다 외 A 1개 이상 → 노 프렌드
+    if (hasMighty && hasJoker && hasGirudaAce && hasGirudaKing && nonGirudaAceCount >= 1) {
       return FriendDeclaration.noFriend();
     }
 
