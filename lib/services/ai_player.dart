@@ -117,7 +117,8 @@ class AIPlayer {
       int strength = 0;
       final suitCards = hand.where((c) => !c.isJoker && c.suit == suit).toList();
 
-      if (suitCards.isEmpty) {
+      // 같은 무늬가 4장 이상이어야 기루다 후보 (3장 이하는 제외)
+      if (suitCards.length <= 3) {
         suitStrength[suit] = 0;
         continue;
       }
