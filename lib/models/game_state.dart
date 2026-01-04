@@ -198,6 +198,60 @@ class GameState {
   // 모두 패스했는지 확인
   bool get allPassed => passedPlayers.every((p) => p);
 
+  // 공개된 점수 카드 목록 (완료된 트릭 + 현재 트릭)
+  List<PlayingCard> get playedPointCards {
+    List<PlayingCard> pointCards = [];
+
+    // 완료된 트릭에서 점수 카드 수집
+    for (final trick in tricks) {
+      for (final card in trick.cards) {
+        if (card.isPointCard || card.isJoker) {
+          pointCards.add(card);
+        }
+      }
+    }
+
+    // 현재 트릭에서 점수 카드 수집
+    if (currentTrick != null) {
+      for (final card in currentTrick!.cards) {
+        if (card.isPointCard || card.isJoker) {
+          pointCards.add(card);
+        }
+      }
+    }
+
+    return pointCards;
+  }
+
+  // 무늬별 공개된 점수 카드
+  Map<Suit, List<PlayingCard>> get playedPointCardsBySuit {
+    Map<Suit, List<PlayingCard>> result = {
+      Suit.spade: [],
+      Suit.diamond: [],
+      Suit.heart: [],
+      Suit.club: [],
+    };
+
+    for (final card in playedPointCards) {
+      if (!card.isJoker && card.suit != null) {
+        result[card.suit]!.add(card);
+      }
+    }
+
+    // 각 무늬 내에서 랭크 순으로 정렬 (높은 것부터)
+    for (final suit in Suit.values) {
+      result[suit]!.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+    }
+
+    return result;
+  }
+
+  // 조커가 공개되었는지
+  bool get isJokerPlayed => playedPointCards.any((c) => c.isJoker);
+
+  // 마이티가 공개되었는지
+  bool get isMightyPlayed => playedPointCards.any((c) => c == mighty);
+
   bool get isNoGiruda => giruda == null;
 
   PlayingCard get mighty {

@@ -485,11 +485,122 @@ class _GameScreenState extends State<GameScreen> {
     return Column(
       children: [
         _buildGameInfo(state),
-        const SizedBox(height: 8),
+        _buildPlayedPointCards(state),
+        const SizedBox(height: 4),
         Expanded(
           child: _buildPlayArea(controller),
         ),
         _buildPlayerHand(controller),
+      ],
+    );
+  }
+
+  Widget _buildPlayedPointCards(GameState state) {
+    final pointCardsBySuit = state.playedPointCardsBySuit;
+    final isJokerPlayed = state.isJokerPlayed;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      color: Colors.black45,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '공개된 점수 카드',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Row(
+            children: [
+              // 조커 표시
+              if (isJokerPlayed)
+                Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.purple[700],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    '🃏',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ),
+              // 각 무늬별 점수 카드
+              for (final suit in Suit.values) ...[
+                _buildSuitPointCards(suit, pointCardsBySuit[suit]!, state),
+                const SizedBox(width: 8),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuitPointCards(Suit suit, List<PlayingCard> cards, GameState state) {
+    final suitSymbol = _getSuitSymbol(suit);
+    final isRed = suit == Suit.diamond || suit == Suit.heart;
+    final suitColor = isRed ? Colors.red[300]! : Colors.white;
+
+    // 해당 무늬의 마이티인지 확인
+    final mighty = state.mighty;
+
+    String cardString = cards.map((c) {
+      String rank;
+      switch (c.rank) {
+        case Rank.ace:
+          rank = 'A';
+          break;
+        case Rank.king:
+          rank = 'K';
+          break;
+        case Rank.queen:
+          rank = 'Q';
+          break;
+        case Rank.jack:
+          rank = 'J';
+          break;
+        case Rank.ten:
+          rank = '10';
+          break;
+        default:
+          rank = '${c.rankValue}';
+      }
+      // 마이티면 강조
+      if (c == mighty) {
+        return '[$rank]';
+      }
+      return rank;
+    }).join(' ');
+
+    if (cardString.isEmpty) {
+      cardString = '-';
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          suitSymbol,
+          style: TextStyle(
+            color: suitColor,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(width: 2),
+        Text(
+          cardString,
+          style: TextStyle(
+            color: cards.isEmpty ? Colors.grey : Colors.white,
+            fontSize: 11,
+          ),
+        ),
       ],
     );
   }

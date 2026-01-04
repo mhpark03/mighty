@@ -447,7 +447,16 @@ class AIPlayer {
         // 주공이 위험한 상황인지 확인
         bool declarerInDanger = _isDeclarerInDanger(state, currentWinnerId);
 
-        // 트릭에 점수 카드가 많거나 주공이 지고 있을 때 프렌드 카드 사용
+        // 조건 1: 주공이 두 번째 순서에서 낮은 카드를 냈을 때 (신호)
+        if (_declarerPlayedLowAsSecond(state)) {
+          // 프렌드 카드로 이길 수 있으면 사용
+          if (currentWinningCard != null &&
+              state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
+            return friendCard;
+          }
+        }
+
+        // 조건 2: 트릭에 점수 카드가 많거나 주공이 지고 있을 때 프렌드 카드 사용
         int pointCardsInTrick = state.currentTrick!.cards
             .where((c) => c.isPointCard).length;
 
@@ -459,7 +468,7 @@ class AIPlayer {
           }
         }
 
-        // 마지막 트릭(10번째)이거나 주공팀 점수가 부족할 때 프렌드 공개
+        // 조건 3: 마지막 트릭(10번째)이거나 주공팀 점수가 부족할 때 프렌드 공개
         if (state.currentTrickNumber >= 8 && declarerInDanger) {
           if (currentWinningCard != null &&
               state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
@@ -547,6 +556,27 @@ class AIPlayer {
 
     // 수비팀이 이기고 있으면 주공 위험
     return true;
+  }
+
+  // 주공이 두 번째 순서에서 낮은 카드를 냈는지 확인 (프렌드에게 신호)
+  bool _declarerPlayedLowAsSecond(GameState state) {
+    if (state.currentTrick == null) return false;
+    if (state.currentTrick!.cards.length < 2) return false;
+
+    // 두 번째로 낸 플레이어가 주공인지 확인
+    if (state.currentTrick!.playerOrder.length < 2) return false;
+    int secondPlayerId = state.currentTrick!.playerOrder[1];
+    if (secondPlayerId != state.declarerId) return false;
+
+    // 주공이 낸 카드 (두 번째 카드)
+    final declarerCard = state.currentTrick!.cards[1];
+
+    // 낮은 카드인지 확인 (9 이하, 점수 카드 아님, 조커/마이티 아님)
+    if (declarerCard.isJoker || declarerCard.isMighty) return false;
+    if (declarerCard.isPointCard) return false;
+
+    // 낮은 카드 (2-9)를 냈으면 신호로 판단
+    return declarerCard.rankValue <= 9;
   }
 
   PlayingCard? _findCurrentWinningCard(GameState state) {
