@@ -27,12 +27,13 @@ class FriendSelectionScreen extends StatefulWidget {
 class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
   String _selectedType = 'card';
   PlayingCard? _selectedCard;
+  Suit _selectedSuit = Suit.spade;
 
   // AI 추천
   final AIPlayer _aiPlayer = AIPlayer();
   late FriendDeclaration _recommendedDeclaration;
 
-  // 선택 가능한 모든 카드 목록 (53장 - 내 손패 10장 = 43장)
+  // 선택 가능한 모든 카드 목록
   late List<PlayingCard> _allSelectableCards;
 
   @override
@@ -46,18 +47,15 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
   void _initSelectableCards() {
     _allSelectableCards = [];
 
-    // 모든 카드 생성 (조커 포함)
+    // 모든 카드 생성 (조커 제외)
     for (final suit in Suit.values) {
       for (final rank in Rank.values) {
         _allSelectableCards.add(PlayingCard(suit: suit, rank: rank));
       }
     }
-    _allSelectableCards.add(PlayingCard.joker());
 
-    // 무늬 순서로 정렬 (스페이드, 다이아, 하트, 클럽, 조커)
+    // 무늬 순서로 정렬 (스페이드, 다이아, 하트, 클럽)
     _allSelectableCards.sort((a, b) {
-      if (a.isJoker) return 1;
-      if (b.isJoker) return -1;
       if (a.suit != b.suit) {
         return a.suit!.index.compareTo(b.suit!.index);
       }
@@ -77,9 +75,6 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
     if (_recommendedDeclaration.isNoFriend) {
       _selectedType = 'none';
       _selectedCard = null;
-    } else if (_recommendedDeclaration.isFirstTrickWinner) {
-      _selectedType = 'firstTrick';
-      _selectedCard = null;
     } else if (_recommendedDeclaration.card != null) {
       final card = _recommendedDeclaration.card!;
       if (card.isJoker) {
@@ -88,11 +83,30 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
       } else if (card.isMighty) {
         _selectedType = 'mighty';
         _selectedCard = card;
+      } else if (card == _getJokerCallCard()) {
+        _selectedType = 'jokerCall';
+        _selectedCard = card;
       } else {
         _selectedType = 'card';
         _selectedCard = card;
+        _selectedSuit = card.suit!;
       }
     }
+  }
+
+  // 조커콜 카드 가져오기 (기루다가 클럽이면 ♠3, 아니면 ♣3)
+  PlayingCard _getJokerCallCard() {
+    final giruda = widget.gameState.giruda;
+    if (giruda == Suit.club) {
+      return PlayingCard(suit: Suit.spade, rank: Rank.three);
+    } else {
+      return PlayingCard(suit: Suit.club, rank: Rank.three);
+    }
+  }
+
+  String _getJokerCallSymbol() {
+    final card = _getJokerCallCard();
+    return '${card.suitSymbol}${card.rankSymbol}';
   }
 
   bool _isCardInHand(PlayingCard card) {
@@ -104,9 +118,9 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
     final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // 카드 크기 계산 (한 줄에 7장)
-    final cardWidth = (screenWidth - 48) / 7;
-    final cardHeight = cardWidth * 1.4;
+    // 카드 크기 계산
+    final handCardWidth = (screenWidth - 48) / 5.5;
+    final handCardHeight = handCardWidth * 1.4;
 
     return Scaffold(
       backgroundColor: Colors.green[800],
@@ -137,7 +151,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                       ),
                     ),
                   ),
-                  _buildMyHandCards(cardWidth * 0.85, cardHeight * 0.85),
+                  _buildMyHandCards(handCardWidth, handCardHeight),
                 ],
               ),
             ),
@@ -179,8 +193,8 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: _buildQuickButton(
-                          'firstTrick',
-                          '${l10n.firstTrickFriend}\n🏆',
+                          'jokerCall',
+                          '${l10n.jokerCallTitle}\n${_getJokerCallSymbol()}',
                           Colors.blue,
                         ),
                       ),
@@ -200,7 +214,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
 
             const SizedBox(height: 12),
 
-            // 선택 가능한 카드 목록
+            // 카드로 지정 섹션
             Expanded(
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -223,8 +237,12 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                         ),
                       ),
                     ),
+                    // 무늬 선택 버튼들
+                    _buildSuitSelector(),
+                    const SizedBox(height: 12),
+                    // 선택된 무늬의 카드들 (3열)
                     Expanded(
-                      child: _buildSelectableCards(cardWidth * 0.9, cardHeight * 0.9),
+                      child: _buildCardGrid(),
                     ),
                   ],
                 ),
@@ -361,6 +379,8 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                   _selectedCard = widget.mighty;
                 } else if (type == 'joker') {
                   _selectedCard = PlayingCard.joker();
+                } else if (type == 'jokerCall') {
+                  _selectedCard = _getJokerCallCard();
                 } else {
                   _selectedCard = null;
                 }
@@ -409,104 +429,140 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
       return _isCardInHand(widget.mighty);
     } else if (type == 'joker') {
       return _isCardInHand(PlayingCard.joker());
+    } else if (type == 'jokerCall') {
+      return _isCardInHand(_getJokerCallCard());
     }
     return false;
   }
 
-  Widget _buildSelectableCards(double cardWidth, double cardHeight) {
-    // 무늬별로 그룹화 (조커 제외 - 위에 버튼으로 있음)
-    final spades = _allSelectableCards.where((c) => c.suit == Suit.spade && !c.isJoker).toList();
-    final diamonds = _allSelectableCards.where((c) => c.suit == Suit.diamond && !c.isJoker).toList();
-    final hearts = _allSelectableCards.where((c) => c.suit == Suit.heart && !c.isJoker).toList();
-    final clubs = _allSelectableCards.where((c) => c.suit == Suit.club && !c.isJoker).toList();
-
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildCardRow(spades, cardWidth, cardHeight, '♠'),
-          const SizedBox(height: 4),
-          _buildCardRow(diamonds, cardWidth, cardHeight, '♦'),
-          const SizedBox(height: 4),
-          _buildCardRow(hearts, cardWidth, cardHeight, '♥'),
-          const SizedBox(height: 4),
-          _buildCardRow(clubs, cardWidth, cardHeight, '♣'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCardRow(List<PlayingCard> cards, double cardWidth, double cardHeight, String label) {
+  Widget _buildSuitSelector() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        // 무늬 라벨
-        SizedBox(
-          width: 20,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: label == '♦' || label == '♥' ? Colors.red[300] : Colors.white70,
-            ),
-          ),
-        ),
-        // 카드들
-        Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: cards.map((card) {
-                final isInHand = _isCardInHand(card);
-                final isMighty = card == widget.mighty;
-                final isDisabled = isInHand || isMighty;
-                final isSelected = _selectedType == 'card' && _selectedCard == card;
-
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 1),
-                  child: GestureDetector(
-                    onTap: isDisabled
-                        ? null
-                        : () {
-                            setState(() {
-                              _selectedType = 'card';
-                              _selectedCard = card;
-                            });
-                          },
-                    child: Opacity(
-                      opacity: isDisabled ? 0.3 : 1.0,
-                      child: Container(
-                        width: cardWidth,
-                        height: cardHeight,
-                        decoration: BoxDecoration(
-                          color: card.isJoker ? Colors.purple : Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: isSelected ? Colors.amber : (isDisabled ? Colors.grey : Colors.grey[400]!),
-                            width: isSelected ? 3 : 1,
-                          ),
-                          boxShadow: isSelected
-                              ? [BoxShadow(color: Colors.amber.withValues(alpha: 0.5), blurRadius: 8)]
-                              : null,
-                        ),
-                        child: _buildMiniCard(card),
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ),
+        _buildSuitButton(Suit.spade, '♠', false),
+        _buildSuitButton(Suit.diamond, '♦', true),
+        _buildSuitButton(Suit.heart, '♥', true),
+        _buildSuitButton(Suit.club, '♣', false),
       ],
     );
   }
 
-  Widget _buildMiniCard(PlayingCard card) {
-    if (card.isJoker) {
-      return const Center(
-        child: Text('🃏', style: TextStyle(fontSize: 16)),
-      );
-    }
+  Widget _buildSuitButton(Suit suit, String symbol, bool isRed) {
+    final isSelected = _selectedSuit == suit;
 
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedSuit = suit;
+        });
+      },
+      child: Container(
+        width: 60,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? Colors.amber : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            symbol,
+            style: TextStyle(
+              fontSize: 24,
+              color: isSelected
+                  ? (isRed ? Colors.red : Colors.black)
+                  : (isRed ? Colors.red[300] : Colors.white70),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardGrid() {
+    // 선택된 무늬의 카드들만 필터링
+    final cards = _allSelectableCards
+        .where((c) => c.suit == _selectedSuit)
+        .toList();
+
+    // 3열로 나누기 (A-K-Q-J / 10-9-8-7 / 6-5-4-3-2)
+    final row1 = cards.where((c) =>
+        c.rank == Rank.ace || c.rank == Rank.king ||
+        c.rank == Rank.queen || c.rank == Rank.jack).toList();
+    final row2 = cards.where((c) =>
+        c.rank == Rank.ten || c.rank == Rank.nine ||
+        c.rank == Rank.eight || c.rank == Rank.seven).toList();
+    final row3 = cards.where((c) =>
+        c.rank == Rank.six || c.rank == Rank.five ||
+        c.rank == Rank.four || c.rank == Rank.three || c.rank == Rank.two).toList();
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = (screenWidth - 80) / 5;
+    final cardHeight = cardWidth * 1.4;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildCardGridRow(row1, cardWidth, cardHeight),
+        const SizedBox(height: 8),
+        _buildCardGridRow(row2, cardWidth, cardHeight),
+        const SizedBox(height: 8),
+        _buildCardGridRow(row3, cardWidth, cardHeight),
+      ],
+    );
+  }
+
+  Widget _buildCardGridRow(List<PlayingCard> cards, double cardWidth, double cardHeight) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: cards.map((card) {
+        final isInHand = _isCardInHand(card);
+        final isMighty = card == widget.mighty;
+        final isJokerCall = card == _getJokerCallCard();
+        final isDisabled = isInHand || isMighty || isJokerCall;
+        final isSelected = _selectedType == 'card' && _selectedCard == card;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: GestureDetector(
+            onTap: isDisabled
+                ? null
+                : () {
+                    setState(() {
+                      _selectedType = 'card';
+                      _selectedCard = card;
+                    });
+                  },
+            child: Opacity(
+              opacity: isDisabled ? 0.3 : 1.0,
+              child: Container(
+                width: cardWidth,
+                height: cardHeight,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: isSelected ? Colors.amber : (isDisabled ? Colors.grey : Colors.grey[400]!),
+                    width: isSelected ? 3 : 1,
+                  ),
+                  boxShadow: isSelected
+                      ? [BoxShadow(color: Colors.amber.withValues(alpha: 0.5), blurRadius: 8)]
+                      : null,
+                ),
+                child: _buildMiniCard(card),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildMiniCard(PlayingCard card) {
     final color = card.isRed ? Colors.red : Colors.black;
     return Center(
       child: Column(
@@ -514,12 +570,12 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         children: [
           Text(
             card.suitSymbol,
-            style: TextStyle(fontSize: 10, color: color),
+            style: TextStyle(fontSize: 16, color: color),
           ),
           Text(
             card.rankSymbol,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -541,15 +597,12 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         return '${l10n.mighty} (${_getMightySymbol()})';
       case 'joker':
         return l10n.joker;
-      case 'firstTrick':
-        return l10n.firstTrickFriend;
+      case 'jokerCall':
+        return '${l10n.jokerCallTitle} (${_getJokerCallSymbol()})';
       case 'none':
         return l10n.noFriend;
       case 'card':
         if (_selectedCard != null) {
-          if (_selectedCard!.isJoker) {
-            return l10n.joker;
-          }
           return '${_selectedCard!.suitSymbol}${_selectedCard!.rankSymbol}';
         }
         return l10n.byCard;
@@ -574,8 +627,8 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
       case 'joker':
         declaration = FriendDeclaration.byCard(PlayingCard.joker());
         break;
-      case 'firstTrick':
-        declaration = FriendDeclaration.firstTrickWinner();
+      case 'jokerCall':
+        declaration = FriendDeclaration.byCard(_getJokerCallCard());
         break;
       case 'none':
         declaration = FriendDeclaration.noFriend();
