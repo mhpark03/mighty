@@ -4,6 +4,110 @@ import '../models/player.dart';
 import '../models/game_state.dart';
 
 class AIPlayer {
+  // 이미 플레이된 모든 카드 가져오기
+  List<PlayingCard> _getPlayedCards(GameState state) {
+    List<PlayingCard> playedCards = [];
+
+    // 완료된 트릭에서 카드 수집
+    for (final trick in state.tricks) {
+      playedCards.addAll(trick.cards);
+    }
+
+    // 현재 트릭에서 이미 나온 카드 수집
+    if (state.currentTrick != null) {
+      playedCards.addAll(state.currentTrick!.cards);
+    }
+
+    return playedCards;
+  }
+
+  // 특정 무늬에서 플레이된 카드 가져오기
+  List<PlayingCard> _getPlayedCardsOfSuit(GameState state, Suit suit) {
+    return _getPlayedCards(state)
+        .where((c) => !c.isJoker && c.suit == suit)
+        .toList();
+  }
+
+  // 카드의 실효 가치 계산 (오픈된 카드 고려)
+  // A가 오픈되면 K가 가장 높은 카드가 됨 -> K의 가치 = A의 가치
+  int _getEffectiveCardValue(PlayingCard card, GameState state) {
+    if (card.isJoker || card.isMighty) {
+      return 100; // 조커/마이티는 최고 가치
+    }
+
+    final suit = card.suit!;
+    final playedCardsOfSuit = _getPlayedCardsOfSuit(state, suit);
+
+    // 해당 무늬에서 이 카드보다 높은 카드 중 이미 나온 카드 수 계산
+    int higherCardsPlayed = 0;
+
+    // A(14), K(13), Q(12), J(11), 10(10) ... 순서
+    for (int rankValue = 14; rankValue > card.rankValue; rankValue--) {
+      Rank rank = _rankFromValue(rankValue);
+      bool isPlayed = playedCardsOfSuit.any((c) => c.rank == rank);
+      if (isPlayed) {
+        higherCardsPlayed++;
+      }
+    }
+
+    // 실효 가치 = 원래 가치 + 나간 상위 카드 수
+    // 예: A가 나갔으면 K의 실효 가치 = 13 + 1 = 14 (A와 동급)
+    return card.rankValue + higherCardsPlayed;
+  }
+
+  // rankValue로 Rank 찾기
+  Rank _rankFromValue(int value) {
+    switch (value) {
+      case 14: return Rank.ace;
+      case 13: return Rank.king;
+      case 12: return Rank.queen;
+      case 11: return Rank.jack;
+      case 10: return Rank.ten;
+      case 9: return Rank.nine;
+      case 8: return Rank.eight;
+      case 7: return Rank.seven;
+      case 6: return Rank.six;
+      case 5: return Rank.five;
+      case 4: return Rank.four;
+      case 3: return Rank.three;
+      default: return Rank.two;
+    }
+  }
+
+  // 해당 무늬에서 현재 가장 높은 카드인지 확인
+  bool _isHighestRemainingCard(PlayingCard card, GameState state, List<PlayingCard> hand) {
+    if (card.isJoker || card.isMighty) return true;
+
+    final suit = card.suit!;
+    final playedCardsOfSuit = _getPlayedCardsOfSuit(state, suit);
+
+    // 이 카드보다 높은 카드가 있는지 확인 (플레이되지 않은 카드 중)
+    for (int rankValue = 14; rankValue > card.rankValue; rankValue--) {
+      Rank rank = _rankFromValue(rankValue);
+
+      // 이미 플레이된 카드는 스킵
+      bool isPlayed = playedCardsOfSuit.any((c) => c.rank == rank);
+      if (isPlayed) continue;
+
+      // 내 손에 있는 카드는 스킵
+      bool inMyHand = hand.any((c) => !c.isJoker && c.suit == suit && c.rank == rank);
+      if (inMyHand) continue;
+
+      // 마이티 체크 (마이티가 나갔거나 내 손에 있으면 스킵)
+      final mightyCard = state.mighty;
+      if (!mightyCard.isJoker && mightyCard.suit == suit && mightyCard.rank == rank) {
+        bool mightyPlayed = _getPlayedCards(state).any((c) => c.isMighty);
+        bool mightyInHand = hand.any((c) => c.isMighty);
+        if (mightyPlayed || mightyInHand) continue;
+      }
+
+      // 아직 나오지 않은 더 높은 카드가 있음
+      return false;
+    }
+
+    return true;
+  }
+
   Bid decideBid(Player player, GameState state) {
     final hand = player.hand;
 
@@ -535,20 +639,33 @@ class AIPlayer {
       // === 방어팀 선공 전략 ===
       // 기루다를 아끼고, 다른 무늬의 높은 카드를 낸다
       // (주공이 높은 기루다를 많이 가지고 있을 가능성이 높으므로)
+      // 오픈된 카드를 고려하여 현재 가장 높은 카드를 선택
 
       // 기루다가 아닌 카드들
       final nonGirudaCards = playableCards.where((c) =>
           !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
 
       if (nonGirudaCards.isNotEmpty) {
-        // 높은 카드 순으로 정렬 (A, K, Q, J, 10...)
-        nonGirudaCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+        // 현재 가장 높은 카드인 것들을 찾기 (오픈된 카드 고려)
+        final highestRemainingCards = nonGirudaCards.where((c) =>
+            _isHighestRemainingCard(c, state, player.hand)).toList();
 
-        // 에이스나 킹이 있으면 그것을 낸다 (트릭을 딸 가능성 높음)
-        final highCards = nonGirudaCards.where((c) =>
-            c.rank == Rank.ace || c.rank == Rank.king).toList();
-        if (highCards.isNotEmpty) {
-          return highCards.first;
+        if (highestRemainingCards.isNotEmpty) {
+          // 가장 높은 실효 가치 카드 선택
+          highestRemainingCards.sort((a, b) =>
+              _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+          return highestRemainingCards.first;
+        }
+
+        // 높은 실효 가치 순으로 정렬 (오픈된 카드 고려)
+        nonGirudaCards.sort((a, b) =>
+            _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+
+        // 실효 가치가 A(14) 이상인 카드가 있으면 선택 (= 현재 가장 높은 카드)
+        final effectiveHighCards = nonGirudaCards.where((c) =>
+            _getEffectiveCardValue(c, state) >= 14).toList();
+        if (effectiveHighCards.isNotEmpty) {
+          return effectiveHighCards.first;
         }
 
         // 없으면 가장 높은 비기루다 카드
@@ -564,7 +681,8 @@ class AIPlayer {
       }
     }
 
-    // === 주공팀 또는 노기루다 선공 전략 (기존 로직) ===
+    // === 주공팀 또는 노기루다 선공 전략 ===
+    // 오픈된 카드를 고려하여 실효 가치가 높은 카드 선택
     playableCards.sort((a, b) {
       if (a.isMighty) return -1;
       if (b.isMighty) return 1;
@@ -574,7 +692,8 @@ class AIPlayer {
         if (a.suit != state.giruda && b.suit == state.giruda) return 1;
       }
 
-      return b.rankValue.compareTo(a.rankValue);
+      // 실효 가치 기준으로 정렬 (오픈된 카드 고려)
+      return _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state));
     });
 
     if (state.currentTrickNumber > 1) {
@@ -670,12 +789,13 @@ class AIPlayer {
     if (isAttackTeam && attackTeamWinning) {
       // 공격팀이 이기고 있으면 낮은 카드를 버려서 강한 카드 아끼기
 
-      // 높은 기루다 보유 확인 (A, K, Q)
+      // 높은 기루다 보유 확인 (실효 가치 기준: 현재 가장 높은 카드인지 확인)
       bool hasHighGiruda = false;
       if (state.giruda != null) {
+        // 기루다 중 실효 가치가 A(14) 이상인 카드 = 현재 가장 높은 카드
         hasHighGiruda = player.hand.any((c) =>
-            !c.isJoker && c.suit == state.giruda &&
-            (c.rank == Rank.ace || c.rank == Rank.king || c.rank == Rank.queen));
+            !c.isJoker && !c.isMighty && c.suit == state.giruda &&
+            _getEffectiveCardValue(c, state) >= 14);
       }
 
       // 마이티/조커 보유 확인
@@ -731,7 +851,8 @@ class AIPlayer {
         playableCards.where((c) => !c.isJoker && c.suit == leadSuit).toList();
 
     if (suitCards.isNotEmpty) {
-      suitCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+      // 실효 가치 기준으로 정렬 (오픈된 카드 고려)
+      suitCards.sort((a, b) => _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
 
       for (final card in suitCards) {
         if (currentWinningCard != null &&
