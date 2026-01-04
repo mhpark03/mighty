@@ -1378,12 +1378,12 @@ class _GameScreenState extends State<GameScreen> {
 
     if (card.isJoker) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
         decoration: BoxDecoration(
           color: Colors.purple[600],
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(3),
         ),
-        child: const Text('🃏', style: TextStyle(fontSize: 14)),
+        child: const Text('🃏', style: TextStyle(fontSize: 11)),
       );
     }
 
@@ -1411,16 +1411,16 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
       decoration: BoxDecoration(
         color: isMighty ? Colors.amber[700] : Colors.white,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(3),
       ),
       child: Text(
         '$suitSymbol$rank',
         style: TextStyle(
           color: isRed ? Colors.red[700] : Colors.black,
-          fontSize: 14,
+          fontSize: 11,
           fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
         ),
       ),
@@ -1476,7 +1476,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
               // 이전 트릭 카드들
               Wrap(
-                spacing: 8,
+                spacing: 4,
                 children: [
                   for (int i = 0; i < lastTrick.cards.length; i++)
                     Column(
@@ -1488,7 +1488,7 @@ class _GameScreenState extends State<GameScreen> {
                             color: lastTrick.playerOrder[i] == lastTrick.winnerId
                                 ? Colors.amber
                                 : Colors.white70,
-                            fontSize: 10,
+                            fontSize: 9,
                             fontWeight: lastTrick.playerOrder[i] == lastTrick.winnerId
                                 ? FontWeight.bold
                                 : FontWeight.normal,
@@ -1497,16 +1497,16 @@ class _GameScreenState extends State<GameScreen> {
                         Container(
                           decoration: lastTrick.playerOrder[i] == lastTrick.winnerId
                               ? BoxDecoration(
-                                  border: Border.all(color: Colors.amber, width: 2),
-                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.amber, width: 1),
+                                  borderRadius: BorderRadius.circular(3),
                                 )
                               : null,
                           child: Opacity(
                             opacity: 0.7,
                             child: CardWidget(
                               card: lastTrick.cards[i],
-                              width: 40,
-                              height: 56,
+                              width: 36,
+                              height: 50,
                             ),
                           ),
                         ),
@@ -1514,13 +1514,13 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               // 선공 안내
               Text(
                 l10n.leadPlayerSelectCard,
                 style: const TextStyle(
                   color: Colors.amber,
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
