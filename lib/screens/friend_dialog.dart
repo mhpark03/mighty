@@ -21,7 +21,6 @@ class _FriendDialogState extends State<FriendDialog> {
   String _selectedType = 'card';
   Suit _selectedSuit = Suit.spade;
   Rank _selectedRank = Rank.ace;
-  int _selectedTrick = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +36,9 @@ class _FriendDialogState extends State<FriendDialog> {
             Text(l10n.friendDeclarationType, style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             _buildRadioOption('card', l10n.byCard, null),
-            _buildRadioOption('first', l10n.firstTrickFriend, l10n.firstTrickFriendDesc),
-            _buildRadioOption('trick', l10n.nthTrickFriend, null),
             _buildRadioOption('none', l10n.noFriend, l10n.noFriendDesc),
             const SizedBox(height: 16),
             if (_selectedType == 'card') _buildCardSelector(),
-            if (_selectedType == 'trick') _buildTrickSelector(),
           ],
         ),
       ),
@@ -55,12 +51,6 @@ class _FriendDialogState extends State<FriendDialog> {
                 declaration = FriendDeclaration.byCard(
                   PlayingCard(suit: _selectedSuit, rank: _selectedRank),
                 );
-                break;
-              case 'first':
-                declaration = FriendDeclaration.firstTrickWinner();
-                break;
-              case 'trick':
-                declaration = FriendDeclaration.byTrick(_selectedTrick);
                 break;
               case 'none':
               default:
@@ -171,28 +161,6 @@ class _FriendDialogState extends State<FriendDialog> {
               ),
             ],
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTrickSelector() {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(l10n.trickNumber, style: const TextStyle(fontWeight: FontWeight.bold)),
-        Wrap(
-          spacing: 8,
-          children: [
-            for (int i = 1; i <= 10; i++)
-              ChoiceChip(
-                label: Text('$i'),
-                selected: _selectedTrick == i,
-                onSelected: (_) => setState(() => _selectedTrick = i),
-              ),
-          ],
         ),
       ],
     );

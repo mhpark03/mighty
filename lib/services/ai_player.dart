@@ -217,7 +217,8 @@ class AIPlayer {
       }
     }
 
-    return FriendDeclaration.firstTrickWinner();
+    // 마이티, 조커, 모든 에이스를 가지고 있으면 프렌드 없음
+    return FriendDeclaration.noFriend();
   }
 
   PlayingCard selectCard(Player player, GameState state) {
