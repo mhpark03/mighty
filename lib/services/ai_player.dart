@@ -227,6 +227,69 @@ class AIPlayer {
     return hand.take(3).toList();
   }
 
+  /// AI가 키티를 받은 후 기루다 변경 여부 결정
+  /// 최종 10장 카드로 계산하고, 목표 달성 가능 여부를 고려
+  Suit? decideGirudaChange(Player player, GameState state, List<PlayingCard> kitty, List<PlayingCard> discardCards) {
+    // 최종 10장 카드 (hand + kitty - discards)
+    final finalCards = [...player.hand, ...kitty]
+        .where((c) => !discardCards.contains(c))
+        .toList();
+
+    final targetTricks = state.currentBid?.tricks ?? 13;
+
+    // 현재 기루다로의 강도
+    final currentStrength = evaluateHandStrength(finalCards, state.giruda);
+
+    // 최적의 기루다 찾기
+    final bestSuit = findBestSuit(finalCards);
+    final bestStrength = evaluateHandStrength(finalCards, bestSuit);
+
+    // 노기루다 강도
+    final noGirudaStrength = evaluateHandStrength(finalCards, null);
+
+    // 기루다 변경 시 목표 +2 증가
+    final newTargetTricks = targetTricks + 2;
+
+    // 변경 조건:
+    // 1. 새 기루다 강도가 새 목표(+2) 이상이어야 함
+    // 2. 새 기루다 강도가 현재 기루다 강도보다 높아야 함
+    // 3. 현재 기루다로는 목표 달성이 어렵거나, 새 기루다가 훨씬 유리한 경우
+
+    // 현재 기루다로 목표 달성 가능 여부
+    bool currentCanAchieve = currentStrength >= targetTricks;
+
+    // 새 기루다로 새 목표(+2) 달성 가능 여부
+    bool newCanAchieve = bestStrength >= newTargetTricks;
+
+    // 노기루다로 새 목표(+2) 달성 가능 여부
+    bool noGirudaCanAchieve = noGirudaStrength >= newTargetTricks;
+
+    // 기루다 변경 결정
+    if (bestSuit != state.giruda && newCanAchieve) {
+      // 현재 기루다로 목표 달성 어렵고, 새 기루다로는 가능한 경우
+      if (!currentCanAchieve) {
+        return bestSuit;
+      }
+      // 새 기루다가 현재보다 3점 이상 강한 경우 (충분한 이득)
+      if (bestStrength >= currentStrength + 3) {
+        return bestSuit;
+      }
+    }
+
+    // 노기루다 고려
+    if (state.giruda != null && noGirudaCanAchieve) {
+      if (!currentCanAchieve) {
+        return null; // 노기루다
+      }
+      if (noGirudaStrength >= currentStrength + 3) {
+        return null; // 노기루다
+      }
+    }
+
+    // 변경하지 않음 (기존 기루다 유지)
+    return state.giruda;
+  }
+
   FriendDeclaration declareFriend(Player player, GameState state) {
     final hand = player.hand;
 

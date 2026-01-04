@@ -93,8 +93,15 @@ class GameController extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 1000));
 
     final declarer = _state.players[_state.declarerId!];
+
+    // 1. 먼저 버릴 카드 선택 (현재 기루다 기준)
     final discardCards = _aiPlayer.selectKittyCards(declarer, _state);
-    _state.selectKitty(discardCards, _state.giruda);
+
+    // 2. 최종 10장 카드로 기루다 변경 여부 결정
+    final newGiruda = _aiPlayer.decideGirudaChange(declarer, _state, _state.kitty, discardCards);
+
+    // 3. 키티 선택 완료 (기루다 변경 시 목표 +2 자동 적용)
+    _state.selectKitty(discardCards, newGiruda);
 
     _isProcessing = false;
     notifyListeners();
