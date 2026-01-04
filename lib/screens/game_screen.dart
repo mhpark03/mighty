@@ -1121,44 +1121,73 @@ class _GameScreenState extends State<GameScreen> {
     final isCurrentPlayer = state.currentPlayer == index;
     final isDeclarer = player.isDeclarer;
     final isFriend = player.isFriend && state.friendRevealed;
+    final isLeadPlayer = state.currentTrick != null &&
+        state.currentTrick!.leadPlayerId == index;
 
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: isCurrentPlayer ? Colors.amber.withValues(alpha: 0.3) : Colors.black26,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isDeclarer
-              ? Colors.red
-              : (isFriend ? Colors.blue : Colors.transparent),
-          width: 2,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isCurrentPlayer ? Colors.amber.withValues(alpha: 0.3) : Colors.black26,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isDeclarer
+                  ? Colors.red
+                  : (isFriend ? Colors.blue : Colors.transparent),
+              width: 2,
+            ),
+          ),
+          child: Column(
+            children: [
+              Text(
+                player.name,
+                style: TextStyle(
+                  color: isCurrentPlayer ? Colors.amber : Colors.white,
+                  fontWeight: isCurrentPlayer ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              Text(
+                l10n.cards(player.hand.length),
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+              if (isDeclarer)
+                Text(
+                  l10n.declarer,
+                  style: const TextStyle(color: Colors.red, fontSize: 10),
+                ),
+              if (isFriend)
+                Text(
+                  l10n.friend,
+                  style: const TextStyle(color: Colors.blue, fontSize: 10),
+                ),
+            ],
+          ),
         ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            player.name,
-            style: TextStyle(
-              color: isCurrentPlayer ? Colors.amber : Colors.white,
-              fontWeight: isCurrentPlayer ? FontWeight.bold : FontWeight.normal,
+        // 선공 표시
+        if (isLeadPlayer)
+          Positioned(
+            top: -8,
+            right: -8,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1),
+              ),
+              child: const Text(
+                '1',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
-          Text(
-            l10n.cards(player.hand.length),
-            style: const TextStyle(color: Colors.white70, fontSize: 12),
-          ),
-          if (isDeclarer)
-            Text(
-              l10n.declarer,
-              style: const TextStyle(color: Colors.red, fontSize: 10),
-            ),
-          if (isFriend)
-            Text(
-              l10n.friend,
-              style: const TextStyle(color: Colors.blue, fontSize: 10),
-            ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -1224,32 +1253,65 @@ class _GameScreenState extends State<GameScreen> {
     final hand = controller.humanPlayer.hand;
     final playableCards =
         controller.state.phase == GamePhase.playing ? controller.getPlayableCards() : hand;
+    final isLeadPlayer = controller.state.currentTrick != null &&
+        controller.state.currentTrick!.leadPlayerId == 0;
 
     return Container(
-      height: 120,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       color: Colors.black26,
-      child: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (final card in hand)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: CardWidget(
-                    card: card,
-                    width: 55,
-                    height: 80,
-                    isSelected: selectedCard == card,
-                    isPlayable: playableCards.contains(card),
-                    onTap: () => _onCardTap(card, controller),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 선공 표시
+          if (isLeadPlayer && controller.state.phase == GamePhase.playing)
+            Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.star, color: Colors.white, size: 14),
+                  SizedBox(width: 4),
+                  Text(
+                    '선공',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-            ],
+                ],
+              ),
+            ),
+          // 카드 목록
+          SizedBox(
+            height: 90,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (final card in hand)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: CardWidget(
+                        card: card,
+                        width: 55,
+                        height: 80,
+                        isSelected: selectedCard == card,
+                        isPlayable: playableCards.contains(card),
+                        onTap: () => _onCardTap(card, controller),
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
