@@ -913,6 +913,45 @@ class AIPlayer {
     }
 
     // === 주공팀 또는 노기루다 선공 전략 ===
+
+    // 상대에게 남은 기루다가 없으면 최상위 카드/조커 우선 (컷 당할 위험 없음)
+    if (state.giruda != null) {
+      final opponentGiruda = _getRemainingGirudaCount(state, player);
+
+      if (opponentGiruda == 0) {
+        // 상대 기루다 없음 → 조커/마이티/최상위 카드 우선
+        // 조커 사용 (첫 트릭, 마지막 트릭 제외)
+        if (state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
+          final joker = playableCards.where((c) => c.isJoker).toList();
+          if (joker.isNotEmpty) {
+            return joker.first;
+          }
+        }
+
+        // 마이티 사용 (첫 트릭 제외)
+        if (state.currentTrickNumber > 1) {
+          final mighty = playableCards.where((c) => c.isMighty).toList();
+          if (mighty.isNotEmpty) {
+            return mighty.first;
+          }
+        }
+
+        // 최상위 카드 (실효 가치 14 이상) 우선
+        final highestCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty &&
+            _getEffectiveCardValue(c, state) >= 14).toList();
+        if (highestCards.isNotEmpty) {
+          // 비기루다 최상위 우선 (기루다는 아껴둠)
+          final nonGirudaHighest = highestCards.where((c) =>
+              c.suit != state.giruda).toList();
+          if (nonGirudaHighest.isNotEmpty) {
+            return nonGirudaHighest.first;
+          }
+          return highestCards.first;
+        }
+      }
+    }
+
     // 오픈된 카드를 고려하여 실효 가치가 높은 카드 선택
     playableCards.sort((a, b) {
       if (a.isMighty) return -1;
