@@ -28,6 +28,31 @@ class AIPlayer {
         .toList();
   }
 
+  // 오픈된 기루다 수 계산
+  int _getPlayedGirudaCount(GameState state) {
+    if (state.giruda == null) return 0;
+    return _getPlayedCardsOfSuit(state, state.giruda!).length;
+  }
+
+  // 남은 기루다 수 계산 (전체 13장 - 오픈된 수 - 내 손에 있는 수)
+  int _getRemainingGirudaCount(GameState state, Player player) {
+    if (state.giruda == null) return 0;
+    final playedCount = _getPlayedGirudaCount(state);
+    final myCount = player.hand.where((c) =>
+        !c.isJoker && c.suit == state.giruda).length;
+    return 13 - playedCount - myCount;
+  }
+
+  // 기루다가 초반인지 확인 (오픈된 기루다가 4장 이하)
+  bool _isEarlyGirudaPhase(GameState state) {
+    return _getPlayedGirudaCount(state) <= 4;
+  }
+
+  // 기루다가 후반인지 확인 (오픈된 기루다가 7장 이상)
+  bool _isLateGirudaPhase(GameState state) {
+    return _getPlayedGirudaCount(state) >= 7;
+  }
+
   // 카드의 실효 가치 계산 (오픈된 카드 고려)
   // A가 오픈되면 K가 가장 높은 카드가 됨 -> K의 가치 = A의 가치
   int _getEffectiveCardValue(PlayingCard card, GameState state) {
@@ -602,30 +627,23 @@ class AIPlayer {
   }
 
   /// 조커 선공 시 부를 무늬 결정
-  /// 공격팀: 주공이 낮은 카드를 가지고 있을 확률이 높은 비기루다 무늬
+  /// 공격팀:
+  ///   - 조커가 프렌드 카드이고 초반(기루다 많이 남음): 기루다 호출 (주공의 낮은 기루다 제거)
+  ///   - 후반(기루다 많이 나감): 차상위 카드를 가진 무늬 호출 (주공의 컷 방지)
   /// 수비팀: 공격팀의 기루다를 줄이기 위해 기루다 (남은 기루다 수 고려)
   Suit selectJokerLeadSuit(Player player, GameState state) {
     bool isDefenseTeam = _isPlayerOnDefenseTeam(player, state);
     final playedCards = _getPlayedCards(state);
+    final playedGirudaCount = _getPlayedGirudaCount(state);
 
     if (isDefenseTeam) {
       // === 수비팀 조커 선공: 기루다 우선 고려 ===
       if (state.giruda != null) {
-        // 남은 기루다 수 계산
-        final playedGirudaCount = playedCards.where((c) =>
-            !c.isJoker && c.suit == state.giruda).length;
-        final totalGirudaCount = 13; // 한 무늬당 13장
-        final remainingGiruda = totalGirudaCount - playedGirudaCount;
-
-        // 내가 가진 기루다 수
-        final myGirudaCount = player.hand.where((c) =>
-            !c.isJoker && c.suit == state.giruda).length;
-
-        // 공격팀이 가지고 있을 기루다 수 추정
-        final attackTeamGiruda = remainingGiruda - myGirudaCount;
+        // 남은 기루다 수 추정 (공격팀이 가진)
+        final remainingGiruda = _getRemainingGirudaCount(state, player);
 
         // 공격팀이 기루다를 2장 이상 가지고 있을 것으로 추정되면 기루다 콜
-        if (attackTeamGiruda >= 2) {
+        if (remainingGiruda >= 2) {
           return state.giruda!;
         }
       }
@@ -633,12 +651,96 @@ class AIPlayer {
       // 기루다가 없거나 공격팀 기루다가 적으면, 공격팀이 없을 것 같은 무늬 선택
       return _selectSuitAttackTeamLacks(player, state, playedCards);
     } else {
-      // === 공격팀 조커 선공: 주공이 낮은 카드 가지고 있을 무늬 ===
-      // 선공이 유지되므로, 주공이 따라올 수 있는 무늬 중
-      // 낮은 카드를 낼 확률이 높은 무늬를 선택
+      // === 공격팀 조커 선공 ===
 
-      return _selectSuitDeclarerHasLowCards(player, state, playedCards);
+      // 조커가 프렌드 카드인지 확인
+      bool jokerIsFriendCard = state.friendDeclaration?.card?.isJoker ?? false;
+
+      if (state.giruda != null) {
+        // 조건 1: 조커가 프렌드 카드이고 초반(기루다 4장 이하 오픈)이면 기루다 호출
+        // → 주공의 낮은 기루다를 제거하여 기루다 정리
+        if (jokerIsFriendCard && _isEarlyGirudaPhase(state)) {
+          return state.giruda!;
+        }
+
+        // 조건 2: 후반(기루다 7장 이상 오픈)이면 주공이 컷으로 기루다 사용할 확률 높음
+        // → 기루다 호출하지 않고, 차상위 카드를 가진 무늬 호출
+        if (_isLateGirudaPhase(state)) {
+          return _selectSuitWithSecondHighestCard(player, state, playedCards);
+        }
+      }
+
+      // 기본: 차상위 카드를 가진 무늬 호출 (최상위는 선공 유지용으로 아낌)
+      return _selectSuitWithSecondHighestCard(player, state, playedCards);
     }
+  }
+
+  /// 차상위 카드를 가진 무늬 선택 (공격팀용)
+  /// 최상위 카드는 선공 유지용으로 아끼고, 차상위로 트릭을 따기 위함
+  Suit _selectSuitWithSecondHighestCard(Player player, GameState state, List<PlayingCard> playedCards) {
+    Map<Suit, int> suitScore = {};
+
+    for (final suit in Suit.values) {
+      if (suit == state.giruda) continue; // 기루다는 제외
+
+      int score = 0;
+
+      // 내가 가진 해당 무늬 카드들
+      final myCards = player.hand.where((c) =>
+          !c.isJoker && !c.isMighty && c.suit == suit).toList();
+
+      if (myCards.isEmpty) {
+        suitScore[suit] = -100; // 카드가 없으면 제외
+        continue;
+      }
+
+      // 각 카드의 실효 가치 계산
+      myCards.sort((a, b) =>
+          _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+
+      // 최상위 카드의 실효 가치
+      final highestValue = _getEffectiveCardValue(myCards.first, state);
+
+      // 최상위 카드가 현재 가장 높은 카드(14)가 아니면 점수 감소
+      // (다른 사람이 더 높은 카드 가지고 있을 수 있음)
+      if (highestValue < 14) {
+        score -= 5;
+      }
+
+      // 차상위 카드가 있으면 점수 증가
+      if (myCards.length >= 2) {
+        final secondValue = _getEffectiveCardValue(myCards[1], state);
+        // 차상위 카드 가치가 높을수록 좋음
+        score += secondValue;
+
+        // 차상위 카드가 실효 가치 12(Q급) 이상이면 보너스
+        if (secondValue >= 12) {
+          score += 5;
+        }
+      } else {
+        // 카드가 1장뿐이면 점수 감소
+        score -= 3;
+      }
+
+      // 해당 무늬가 많이 나왔으면 상대가 없을 확률 높음 → 점수 증가
+      final playedCount = playedCards.where((c) =>
+          !c.isJoker && c.suit == suit).length;
+      score += playedCount;
+
+      suitScore[suit] = score;
+    }
+
+    // 가장 점수가 높은 무늬 선택
+    Suit bestSuit = Suit.spade;
+    int bestScore = -100;
+    for (final entry in suitScore.entries) {
+      if (entry.value > bestScore) {
+        bestScore = entry.value;
+        bestSuit = entry.key;
+      }
+    }
+
+    return bestSuit;
   }
 
   /// 공격팀이 없을 것 같은 무늬 선택 (수비팀용)
