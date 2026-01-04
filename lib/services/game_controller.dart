@@ -29,10 +29,10 @@ class GameController extends ChangeNotifier {
   void _initializePlayers() {
     final players = [
       Player(id: 0, name: '플레이어', type: PlayerType.human),
-      Player(id: 1, name: 'AI 1', type: PlayerType.ai),
-      Player(id: 2, name: 'AI 2', type: PlayerType.ai),
-      Player(id: 3, name: 'AI 3', type: PlayerType.ai),
-      Player(id: 4, name: 'AI 4', type: PlayerType.ai),
+      Player(id: 1, name: '민준', type: PlayerType.ai),
+      Player(id: 2, name: '서연', type: PlayerType.ai),
+      Player(id: 3, name: '지호', type: PlayerType.ai),
+      Player(id: 4, name: '수빈', type: PlayerType.ai),
     ];
 
     _state = GameState(players: players);

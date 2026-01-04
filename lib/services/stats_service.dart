@@ -36,10 +36,10 @@ class StatsService extends ChangeNotifier {
   void _initDefaultStats() {
     _playerStats = [
       PlayerStats(name: '플레이어'),
-      PlayerStats(name: 'AI 1'),
-      PlayerStats(name: 'AI 2'),
-      PlayerStats(name: 'AI 3'),
-      PlayerStats(name: 'AI 4'),
+      PlayerStats(name: '민준'),
+      PlayerStats(name: '서연'),
+      PlayerStats(name: '지호'),
+      PlayerStats(name: '수빈'),
     ];
   }
 
