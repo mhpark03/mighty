@@ -200,24 +200,46 @@ class AIPlayer {
   FriendDeclaration declareFriend(Player player, GameState state) {
     final hand = player.hand;
 
+    // 1. 마이티가 없으면 마이티 소유자를 프렌드로
     bool hasMighty = hand.any((c) => c.isMighty);
     if (!hasMighty) {
       return FriendDeclaration.byCard(state.mighty);
     }
 
+    // 2. 조커가 없으면 조커 소유자를 프렌드로
     bool hasJoker = hand.any((c) => c.isJoker);
     if (!hasJoker) {
       return FriendDeclaration.byCard(PlayingCard.joker());
     }
 
-    for (final suit in Suit.values) {
-      final ace = PlayingCard(suit: suit, rank: Rank.ace);
-      if (!hand.contains(ace) && ace != state.mighty) {
-        return FriendDeclaration.byCard(ace);
+    // 3. 기루다 A-K-Q-J-10 순서로 체크
+    if (state.giruda != null) {
+      final girudaHighRanks = [Rank.ace, Rank.king, Rank.queen, Rank.jack, Rank.ten];
+      for (final rank in girudaHighRanks) {
+        final girudaCard = PlayingCard(suit: state.giruda!, rank: rank);
+        // 마이티가 아닌 경우에만 체크
+        if (girudaCard != state.mighty) {
+          bool hasCard = hand.any((c) => c.suit == girudaCard.suit && c.rank == girudaCard.rank);
+          if (!hasCard) {
+            return FriendDeclaration.byCard(girudaCard);
+          }
+        }
       }
     }
 
-    // 마이티, 조커, 모든 에이스를 가지고 있으면 프렌드 없음
+    // 4. 기루다 외 에이스 체크
+    for (final suit in Suit.values) {
+      if (suit == state.giruda) continue;  // 기루다는 이미 체크함
+      final ace = PlayingCard(suit: suit, rank: Rank.ace);
+      if (ace != state.mighty) {
+        bool hasAce = hand.any((c) => c.suit == ace.suit && c.rank == ace.rank);
+        if (!hasAce) {
+          return FriendDeclaration.byCard(ace);
+        }
+      }
+    }
+
+    // 5. 마이티, 조커, 기루다 고위카드, 모든 에이스를 가지고 있으면 프렌드 없음
     return FriendDeclaration.noFriend();
   }
 
