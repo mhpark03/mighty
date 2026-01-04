@@ -93,15 +93,16 @@ class _GameScreenState extends State<GameScreen> {
         return Scaffold(
           backgroundColor: Colors.green[800],
           appBar: AppBar(
-            title: Text(l10n.appTitle),
+            title: Text(l10n.appTitle, style: const TextStyle(color: Colors.white)),
             backgroundColor: Colors.green[900],
+            iconTheme: const IconThemeData(color: Colors.white),
             leading: IconButton(
-              icon: const Icon(Icons.close),
+              icon: const Icon(Icons.close, color: Colors.white),
               onPressed: () => _showExitDialog(controller),
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.refresh),
+                icon: const Icon(Icons.refresh, color: Colors.white),
                 onPressed: () {
                   controller.reset();
                   controller.startNewGame();
