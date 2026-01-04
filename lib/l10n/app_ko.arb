@@ -28,6 +28,10 @@
   "diamond": "다이아몬드",
   "heart": "하트",
   "club": "클럽",
+  "spadeName": "스페이드",
+  "diamondName": "다이아",
+  "heartName": "하트",
+  "clubName": "클로버",
   "selectKitty": "키티 선택",
   "selectKittyDesc": "버릴 카드 3장을 선택하세요 (선택됨: {count}/3)",
   "@selectKittyDesc": {
@@ -104,5 +108,77 @@
       "points": {"type": "int"}
     }
   },
-  "player": "플레이어"
+  "player": "플레이어",
+  "you": "당신",
+  "bidding": "비딩 중...",
+  "waiting": "대기",
+  "otherPlayerTurn": "다른 플레이어 차례입니다",
+  "yourCards": "당신의 카드",
+  "biddingTurn": "비딩 차례",
+  "bidWithAmount": "비딩 {amount}",
+  "@bidWithAmount": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "trickComplete": "트릭 {number} 완료",
+  "@trickComplete": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "winnerAnnouncement": "{name} 승리! ({team})",
+  "@winnerAnnouncement": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "team": {"type": "String"}
+    }
+  },
+  "attackTeam": "공격팀",
+  "defenseTeam": "방어팀",
+  "nextTrick": "다음 트릭",
+  "friendNone": "없음",
+  "firstTrick": "첫트릭",
+  "selectCardHint": "카드를 선택하세요 ↓",
+  "previousTrick": "이전 트릭",
+  "winShort": "승",
+  "leadPlayer": "선공",
+  "leadPlayerHint": "👆 선공입니다!",
+  "selectCardBelow": "아래에서 카드를 선택하세요",
+  "leadPlayerSelectCard": "👆 선공입니다! 카드를 선택하세요",
+  "jokerCallAnnouncement": "조커 콜! {suit}",
+  "@jokerCallAnnouncement": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "wonCards": "획득:",
+  "jokerCallTitle": "조커 콜",
+  "jokerCallQuestion": "{suit} 조커 콜을 선언하시겠습니까?",
+  "@jokerCallQuestion": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "no": "아니오",
+  "jokerCallButton": "{suit} 조커 콜!",
+  "@jokerCallButton": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "allPassedTitle": "모두 패스",
+  "allPassedMessage": "모든 플레이어가 패스했습니다.\n새 게임을 시작합니다.",
+  "girudaChangeWarning": "기루다 변경 시 목표 +2 증가",
+  "keep": "유지",
+  "aiRecommendation": "AI 추천",
+  "discardCards": "버릴 카드:",
+  "goalPlus2": "(목표 +2)",
+  "applyRecommendation": "추천 적용",
+  "nthTrickShort": "{n}트릭",
+  "@nthTrickShort": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  }
 }

@@ -187,7 +187,7 @@ class _KittyDialogState extends State<KittyDialog> {
                     const Icon(Icons.warning_amber, color: Colors.orange, size: 20),
                     const SizedBox(width: 8),
                     Text(
-                      '기루다 변경 시 목표 +2 증가',
+                      l10n.girudaChangeWarning,
                       style: TextStyle(
                         color: Colors.orange[800],
                         fontWeight: FontWeight.bold,
@@ -224,14 +224,15 @@ class _KittyDialogState extends State<KittyDialog> {
   }
 
   Widget _buildRecommendationSection() {
+    final l10n = AppLocalizations.of(context)!;
     final isGirudaChangeRecommended = _recommendedGiruda != widget.currentGiruda;
     String girudaText;
     if (_recommendedNoGiruda) {
-      girudaText = '노기루다';
+      girudaText = l10n.noGiruda;
     } else if (_recommendedGiruda != null) {
       girudaText = _getSuitSymbol(_recommendedGiruda!);
     } else {
-      girudaText = '유지';
+      girudaText = l10n.keep;
     }
 
     return Container(
@@ -249,9 +250,9 @@ class _KittyDialogState extends State<KittyDialog> {
             children: [
               const Icon(Icons.lightbulb, color: Colors.blue, size: 20),
               const SizedBox(width: 8),
-              const Text(
-                'AI 추천',
-                style: TextStyle(
+              Text(
+                l10n.aiRecommendation,
+                style: const TextStyle(
                   color: Colors.blue,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -264,7 +265,7 @@ class _KittyDialogState extends State<KittyDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('버릴 카드: ', style: TextStyle(fontSize: 12)),
+              Text(l10n.discardCards, style: const TextStyle(fontSize: 12)),
               ..._recommendedDiscards.map((card) => Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: _buildMiniCard(card),
@@ -276,7 +277,7 @@ class _KittyDialogState extends State<KittyDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('기루다: ', style: TextStyle(fontSize: 12)),
+              Text('${l10n.giruda}: ', style: const TextStyle(fontSize: 12)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -296,7 +297,7 @@ class _KittyDialogState extends State<KittyDialog> {
               if (isGirudaChangeRecommended) ...[
                 const SizedBox(width: 4),
                 Text(
-                  '(목표 +2)',
+                  l10n.goalPlus2,
                   style: TextStyle(
                     fontSize: 11,
                     color: Colors.orange[700],
@@ -310,7 +311,7 @@ class _KittyDialogState extends State<KittyDialog> {
           ElevatedButton.icon(
             onPressed: _applyRecommendation,
             icon: const Icon(Icons.auto_fix_high, size: 16),
-            label: const Text('추천 적용'),
+            label: Text(l10n.applyRecommendation),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,

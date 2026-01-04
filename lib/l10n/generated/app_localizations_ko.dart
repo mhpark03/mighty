@@ -67,6 +67,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get club => '클럽';
 
   @override
+  String get spadeName => '스페이드';
+
+  @override
+  String get diamondName => '다이아';
+
+  @override
+  String get heartName => '하트';
+
+  @override
+  String get clubName => '클로버';
+
+  @override
   String get selectKitty => '키티 선택';
 
   @override
@@ -192,4 +204,126 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get player => '플레이어';
+
+  @override
+  String get you => '당신';
+
+  @override
+  String get bidding => '비딩 중...';
+
+  @override
+  String get waiting => '대기';
+
+  @override
+  String get otherPlayerTurn => '다른 플레이어 차례입니다';
+
+  @override
+  String get yourCards => '당신의 카드';
+
+  @override
+  String get biddingTurn => '비딩 차례';
+
+  @override
+  String bidWithAmount(int amount) {
+    return '비딩 $amount';
+  }
+
+  @override
+  String trickComplete(int number) {
+    return '트릭 $number 완료';
+  }
+
+  @override
+  String winnerAnnouncement(String name, String team) {
+    return '$name 승리! ($team)';
+  }
+
+  @override
+  String get attackTeam => '공격팀';
+
+  @override
+  String get defenseTeam => '방어팀';
+
+  @override
+  String get nextTrick => '다음 트릭';
+
+  @override
+  String get friendNone => '없음';
+
+  @override
+  String get firstTrick => '첫트릭';
+
+  @override
+  String get selectCardHint => '카드를 선택하세요 ↓';
+
+  @override
+  String get previousTrick => '이전 트릭';
+
+  @override
+  String get winShort => '승';
+
+  @override
+  String get leadPlayer => '선공';
+
+  @override
+  String get leadPlayerHint => '👆 선공입니다!';
+
+  @override
+  String get selectCardBelow => '아래에서 카드를 선택하세요';
+
+  @override
+  String get leadPlayerSelectCard => '👆 선공입니다! 카드를 선택하세요';
+
+  @override
+  String jokerCallAnnouncement(String suit) {
+    return '조커 콜! $suit';
+  }
+
+  @override
+  String get wonCards => '획득:';
+
+  @override
+  String get jokerCallTitle => '조커 콜';
+
+  @override
+  String jokerCallQuestion(String suit) {
+    return '$suit 조커 콜을 선언하시겠습니까?';
+  }
+
+  @override
+  String get no => '아니오';
+
+  @override
+  String jokerCallButton(String suit) {
+    return '$suit 조커 콜!';
+  }
+
+  @override
+  String get allPassedTitle => '모두 패스';
+
+  @override
+  String get allPassedMessage => '모든 플레이어가 패스했습니다.\n새 게임을 시작합니다.';
+
+  @override
+  String get girudaChangeWarning => '기루다 변경 시 목표 +2 증가';
+
+  @override
+  String get keep => '유지';
+
+  @override
+  String get aiRecommendation => 'AI 추천';
+
+  @override
+  String get discardCards => '버릴 카드:';
+
+  @override
+  String get goalPlus2 => '(목표 +2)';
+
+  @override
+  String get applyRecommendation => '추천 적용';
+
+  @override
+  String nthTrickShort(int n) {
+    return '$n트릭';
+  }
 }

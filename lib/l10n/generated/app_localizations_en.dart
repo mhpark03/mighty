@@ -67,6 +67,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get club => 'Club';
 
   @override
+  String get spadeName => 'Spade';
+
+  @override
+  String get diamondName => 'Diamond';
+
+  @override
+  String get heartName => 'Heart';
+
+  @override
+  String get clubName => 'Club';
+
+  @override
   String get selectKitty => 'Select Kitty';
 
   @override
@@ -192,4 +204,126 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get player => 'Player';
+
+  @override
+  String get you => 'You';
+
+  @override
+  String get bidding => 'Bidding...';
+
+  @override
+  String get waiting => 'Waiting';
+
+  @override
+  String get otherPlayerTurn => 'Other player\'s turn';
+
+  @override
+  String get yourCards => 'Your Cards';
+
+  @override
+  String get biddingTurn => 'Your Bid';
+
+  @override
+  String bidWithAmount(int amount) {
+    return 'Bid $amount';
+  }
+
+  @override
+  String trickComplete(int number) {
+    return 'Trick $number Complete';
+  }
+
+  @override
+  String winnerAnnouncement(String name, String team) {
+    return '$name Wins! ($team)';
+  }
+
+  @override
+  String get attackTeam => 'Attack';
+
+  @override
+  String get defenseTeam => 'Defense';
+
+  @override
+  String get nextTrick => 'Next Trick';
+
+  @override
+  String get friendNone => 'None';
+
+  @override
+  String get firstTrick => '1st Trick';
+
+  @override
+  String get selectCardHint => 'Select a card ↓';
+
+  @override
+  String get previousTrick => 'Previous Trick';
+
+  @override
+  String get winShort => 'Win';
+
+  @override
+  String get leadPlayer => 'Lead';
+
+  @override
+  String get leadPlayerHint => '👆 You lead!';
+
+  @override
+  String get selectCardBelow => 'Select a card below';
+
+  @override
+  String get leadPlayerSelectCard => '👆 You lead! Select a card';
+
+  @override
+  String jokerCallAnnouncement(String suit) {
+    return 'Joker Call! $suit';
+  }
+
+  @override
+  String get wonCards => 'Won:';
+
+  @override
+  String get jokerCallTitle => 'Joker Call';
+
+  @override
+  String jokerCallQuestion(String suit) {
+    return 'Declare $suit Joker Call?';
+  }
+
+  @override
+  String get no => 'No';
+
+  @override
+  String jokerCallButton(String suit) {
+    return '$suit Joker Call!';
+  }
+
+  @override
+  String get allPassedTitle => 'All Passed';
+
+  @override
+  String get allPassedMessage => 'All players passed.\nStarting new game.';
+
+  @override
+  String get girudaChangeWarning => 'Changing trump: goal +2';
+
+  @override
+  String get keep => 'Keep';
+
+  @override
+  String get aiRecommendation => 'AI Recommendation';
+
+  @override
+  String get discardCards => 'Discard:';
+
+  @override
+  String get goalPlus2 => '(Goal +2)';
+
+  @override
+  String get applyRecommendation => 'Apply';
+
+  @override
+  String nthTrickShort(int n) {
+    return 'Trick $n';
+  }
 }

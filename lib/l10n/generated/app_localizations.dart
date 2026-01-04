@@ -210,6 +210,30 @@ abstract class AppLocalizations {
   /// **'클럽'**
   String get club;
 
+  /// No description provided for @spadeName.
+  ///
+  /// In ko, this message translates to:
+  /// **'스페이드'**
+  String get spadeName;
+
+  /// No description provided for @diamondName.
+  ///
+  /// In ko, this message translates to:
+  /// **'다이아'**
+  String get diamondName;
+
+  /// No description provided for @heartName.
+  ///
+  /// In ko, this message translates to:
+  /// **'하트'**
+  String get heartName;
+
+  /// No description provided for @clubName.
+  ///
+  /// In ko, this message translates to:
+  /// **'클로버'**
+  String get clubName;
+
   /// No description provided for @selectKitty.
   ///
   /// In ko, this message translates to:
@@ -431,6 +455,222 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'플레이어'**
   String get player;
+
+  /// No description provided for @you.
+  ///
+  /// In ko, this message translates to:
+  /// **'당신'**
+  String get you;
+
+  /// No description provided for @bidding.
+  ///
+  /// In ko, this message translates to:
+  /// **'비딩 중...'**
+  String get bidding;
+
+  /// No description provided for @waiting.
+  ///
+  /// In ko, this message translates to:
+  /// **'대기'**
+  String get waiting;
+
+  /// No description provided for @otherPlayerTurn.
+  ///
+  /// In ko, this message translates to:
+  /// **'다른 플레이어 차례입니다'**
+  String get otherPlayerTurn;
+
+  /// No description provided for @yourCards.
+  ///
+  /// In ko, this message translates to:
+  /// **'당신의 카드'**
+  String get yourCards;
+
+  /// No description provided for @biddingTurn.
+  ///
+  /// In ko, this message translates to:
+  /// **'비딩 차례'**
+  String get biddingTurn;
+
+  /// No description provided for @bidWithAmount.
+  ///
+  /// In ko, this message translates to:
+  /// **'비딩 {amount}'**
+  String bidWithAmount(int amount);
+
+  /// No description provided for @trickComplete.
+  ///
+  /// In ko, this message translates to:
+  /// **'트릭 {number} 완료'**
+  String trickComplete(int number);
+
+  /// No description provided for @winnerAnnouncement.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} 승리! ({team})'**
+  String winnerAnnouncement(String name, String team);
+
+  /// No description provided for @attackTeam.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격팀'**
+  String get attackTeam;
+
+  /// No description provided for @defenseTeam.
+  ///
+  /// In ko, this message translates to:
+  /// **'방어팀'**
+  String get defenseTeam;
+
+  /// No description provided for @nextTrick.
+  ///
+  /// In ko, this message translates to:
+  /// **'다음 트릭'**
+  String get nextTrick;
+
+  /// No description provided for @friendNone.
+  ///
+  /// In ko, this message translates to:
+  /// **'없음'**
+  String get friendNone;
+
+  /// No description provided for @firstTrick.
+  ///
+  /// In ko, this message translates to:
+  /// **'첫트릭'**
+  String get firstTrick;
+
+  /// No description provided for @selectCardHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'카드를 선택하세요 ↓'**
+  String get selectCardHint;
+
+  /// No description provided for @previousTrick.
+  ///
+  /// In ko, this message translates to:
+  /// **'이전 트릭'**
+  String get previousTrick;
+
+  /// No description provided for @winShort.
+  ///
+  /// In ko, this message translates to:
+  /// **'승'**
+  String get winShort;
+
+  /// No description provided for @leadPlayer.
+  ///
+  /// In ko, this message translates to:
+  /// **'선공'**
+  String get leadPlayer;
+
+  /// No description provided for @leadPlayerHint.
+  ///
+  /// In ko, this message translates to:
+  /// **'👆 선공입니다!'**
+  String get leadPlayerHint;
+
+  /// No description provided for @selectCardBelow.
+  ///
+  /// In ko, this message translates to:
+  /// **'아래에서 카드를 선택하세요'**
+  String get selectCardBelow;
+
+  /// No description provided for @leadPlayerSelectCard.
+  ///
+  /// In ko, this message translates to:
+  /// **'👆 선공입니다! 카드를 선택하세요'**
+  String get leadPlayerSelectCard;
+
+  /// No description provided for @jokerCallAnnouncement.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 콜! {suit}'**
+  String jokerCallAnnouncement(String suit);
+
+  /// No description provided for @wonCards.
+  ///
+  /// In ko, this message translates to:
+  /// **'획득:'**
+  String get wonCards;
+
+  /// No description provided for @jokerCallTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 콜'**
+  String get jokerCallTitle;
+
+  /// No description provided for @jokerCallQuestion.
+  ///
+  /// In ko, this message translates to:
+  /// **'{suit} 조커 콜을 선언하시겠습니까?'**
+  String jokerCallQuestion(String suit);
+
+  /// No description provided for @no.
+  ///
+  /// In ko, this message translates to:
+  /// **'아니오'**
+  String get no;
+
+  /// No description provided for @jokerCallButton.
+  ///
+  /// In ko, this message translates to:
+  /// **'{suit} 조커 콜!'**
+  String jokerCallButton(String suit);
+
+  /// No description provided for @allPassedTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'모두 패스'**
+  String get allPassedTitle;
+
+  /// No description provided for @allPassedMessage.
+  ///
+  /// In ko, this message translates to:
+  /// **'모든 플레이어가 패스했습니다.\n새 게임을 시작합니다.'**
+  String get allPassedMessage;
+
+  /// No description provided for @girudaChangeWarning.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 변경 시 목표 +2 증가'**
+  String get girudaChangeWarning;
+
+  /// No description provided for @keep.
+  ///
+  /// In ko, this message translates to:
+  /// **'유지'**
+  String get keep;
+
+  /// No description provided for @aiRecommendation.
+  ///
+  /// In ko, this message translates to:
+  /// **'AI 추천'**
+  String get aiRecommendation;
+
+  /// No description provided for @discardCards.
+  ///
+  /// In ko, this message translates to:
+  /// **'버릴 카드:'**
+  String get discardCards;
+
+  /// No description provided for @goalPlus2.
+  ///
+  /// In ko, this message translates to:
+  /// **'(목표 +2)'**
+  String get goalPlus2;
+
+  /// No description provided for @applyRecommendation.
+  ///
+  /// In ko, this message translates to:
+  /// **'추천 적용'**
+  String get applyRecommendation;
+
+  /// No description provided for @nthTrickShort.
+  ///
+  /// In ko, this message translates to:
+  /// **'{n}트릭'**
+  String nthTrickShort(int n);
 }
 
 class _AppLocalizationsDelegate
