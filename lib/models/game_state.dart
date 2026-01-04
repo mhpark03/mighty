@@ -429,6 +429,7 @@ class GameState {
 
   bool canPlayCard(PlayingCard card, Player player) {
     if (currentTrick == null || currentTrick!.cards.isEmpty) {
+      // 첫 트릭에서 조커/마이티 제한
       if (currentTrickNumber == 1 && !mightyJokerUsed) {
         if (card.isJoker || card.isMighty) {
           if (player.hand.length > 1) {
@@ -441,6 +442,15 @@ class GameState {
           }
         }
       }
+
+      // 마지막 트릭(10번째)에서 조커 제한 - 다른 카드가 있으면 조커 사용 불가
+      if (currentTrickNumber == 10 && card.isJoker) {
+        final otherCards = player.hand.where((c) => !c.isJoker).toList();
+        if (otherCards.isNotEmpty) {
+          return false;
+        }
+      }
+
       return true;
     }
 
@@ -462,6 +472,20 @@ class GameState {
 
     if (leadSuit == null) {
       return true;
+    }
+
+    // 마지막 트릭(10번째)에서 조커 제한 - 다른 낼 수 있는 카드가 있으면 조커 사용 불가
+    if (currentTrickNumber == 10 && card.isJoker) {
+      // 리드 무늬가 있는지 확인
+      bool hasLeadSuit = player.hand.any((c) => !c.isJoker && c.suit == leadSuit);
+      if (hasLeadSuit) {
+        return false;
+      }
+      // 리드 무늬가 없으면 다른 카드가 있는지 확인
+      final otherCards = player.hand.where((c) => !c.isJoker).toList();
+      if (otherCards.isNotEmpty) {
+        return false;
+      }
     }
 
     if (card.isJoker || card.isMighty) {

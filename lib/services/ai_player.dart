@@ -510,6 +510,14 @@ class AIPlayer {
       return playableCards.first;
     }
 
+    // 트릭 9에서 조커가 있으면 조커 사용 (마지막 트릭에는 사용 불가)
+    if (state.currentTrickNumber == 9) {
+      final joker = playableCards.where((c) => c.isJoker).toList();
+      if (joker.isNotEmpty) {
+        return joker.first;
+      }
+    }
+
     if (state.currentTrick == null || state.currentTrick!.cards.isEmpty) {
       return _selectLeadCard(playableCards, player, state);
     } else {
