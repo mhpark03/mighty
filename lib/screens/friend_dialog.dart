@@ -118,9 +118,9 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
     final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // 카드 크기 계산
-    final handCardWidth = (screenWidth - 48) / 5.5;
-    final handCardHeight = handCardWidth * 1.4;
+    // 카드 크기 계산 (내 카드용 - 작게)
+    final handCardWidth = (screenWidth - 32) / 6;
+    final handCardHeight = handCardWidth * 1.3;
 
     return Scaffold(
       backgroundColor: Colors.green[800],
@@ -135,7 +135,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
             // 내 카드 표시
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               color: Colors.black26,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,7 +336,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: firstRow.map((card) {
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 1),
               child: CardWidget(
                 card: card,
                 width: cardWidth,
@@ -346,12 +346,12 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
             );
           }).toList(),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: secondRow.map((card) {
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 1),
               child: CardWidget(
                 card: card,
                 width: cardWidth,
