@@ -406,11 +406,56 @@ class AppLocalizationsZh extends AppLocalizations {
   String get resetStats => '重置';
 
   @override
-  String get resetStatsConfirm => '重置所有统计数据？';
+  String get resetStatsConfirm => '观看广告后，所有统计数据将被重置。\n继续吗？';
 
   @override
   String get exitApp => '退出应用';
 
   @override
   String get exitAppConfirm => '退出应用？';
+
+  @override
+  String get gameGuide => '游戏方法';
+
+  @override
+  String get guideOverview => '游戏概述';
+
+  @override
+  String get guideOverviewText => 'Mighty是一款5人吃墩纸牌游戏。庄家(1人)和朋友(1人)组队对抗防守队(3人)。';
+
+  @override
+  String get guideBidding => '叫牌';
+
+  @override
+  String get guideBiddingText => '• 每位玩家宣布将赢得的得分牌数\n• 叫牌最高者成为庄家\n• 庄家选择王牌花色';
+
+  @override
+  String get guideSpecialCards => '特殊牌';
+
+  @override
+  String get guideSpecialCardsText =>
+      '• Mighty: 黑桃A (最强的牌)\n• 小丑: 第二强的牌\n• 王牌: 庄家选择的花色';
+
+  @override
+  String get guideFriend => '朋友';
+
+  @override
+  String get guideFriendText =>
+      '• 庄家指定持有特定牌的人为朋友\n• 朋友可以隐藏身份\n• 小丑召唤: 指定持有特定3的人为朋友';
+
+  @override
+  String get guideScoring => '计分';
+
+  @override
+  String get guideScoringText =>
+      '• 得分牌: A, K, Q, J, 10 (各1分，共20分)\n• 庄家队达到目标分数即获胜\n• 胜者得+分，败者得-分';
+
+  @override
+  String get guideTips => '游戏技巧';
+
+  @override
+  String get guideTipsText => '• Mighty和小丑始终很强\n• 善用王牌\n• 识别朋友身份很重要';
+
+  @override
+  String get close => '关闭';
 }

@@ -831,7 +831,7 @@ abstract class AppLocalizations {
   /// No description provided for @resetStatsConfirm.
   ///
   /// In ko, this message translates to:
-  /// **'모든 통계를 초기화하시겠습니까?'**
+  /// **'광고를 시청하면 모든 통계가 초기화됩니다.\n계속하시겠습니까?'**
   String get resetStatsConfirm;
 
   /// No description provided for @exitApp.
@@ -845,6 +845,90 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'앱을 종료하시겠습니까?'**
   String get exitAppConfirm;
+
+  /// No description provided for @gameGuide.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 방법'**
+  String get gameGuide;
+
+  /// No description provided for @guideOverview.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 개요'**
+  String get guideOverview;
+
+  /// No description provided for @guideOverviewText.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티는 5명이 즐기는 트릭테이킹 카드 게임입니다. 주공(1명)과 프렌드(1명)가 팀을 이루어 수비팀(3명)과 대결합니다.'**
+  String get guideOverviewText;
+
+  /// No description provided for @guideBidding.
+  ///
+  /// In ko, this message translates to:
+  /// **'비딩'**
+  String get guideBidding;
+
+  /// No description provided for @guideBiddingText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 각 플레이어는 자신이 획득할 점수 카드 수를 선언합니다\n• 가장 높은 비딩을 한 플레이어가 주공이 됩니다\n• 주공은 기루다(으뜸패)를 정합니다'**
+  String get guideBiddingText;
+
+  /// No description provided for @guideSpecialCards.
+  ///
+  /// In ko, this message translates to:
+  /// **'특수 카드'**
+  String get guideSpecialCards;
+
+  /// No description provided for @guideSpecialCardsText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 마이티: 스페이드 A (가장 강한 카드)\n• 조커: 두 번째로 강한 카드\n• 기루다: 주공이 정한 으뜸패 무늬'**
+  String get guideSpecialCardsText;
+
+  /// No description provided for @guideFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드'**
+  String get guideFriend;
+
+  /// No description provided for @guideFriendText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 주공은 특정 카드를 가진 사람을 프렌드로 지정합니다\n• 프렌드는 자신이 프렌드인지 숨길 수 있습니다\n• 조커콜: 특정 무늬의 3을 가진 사람을 프렌드로 지정'**
+  String get guideFriendText;
+
+  /// No description provided for @guideScoring.
+  ///
+  /// In ko, this message translates to:
+  /// **'점수 계산'**
+  String get guideScoring;
+
+  /// No description provided for @guideScoringText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 점수 카드: A, K, Q, J, 10 (각 1점, 총 20점)\n• 주공팀이 목표 점수 이상 획득하면 승리\n• 승리팀은 +점수, 패배팀은 -점수'**
+  String get guideScoringText;
+
+  /// No description provided for @guideTips.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 팁'**
+  String get guideTips;
+
+  /// No description provided for @guideTipsText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 마이티와 조커는 항상 강력합니다\n• 기루다 카드를 잘 활용하세요\n• 프렌드의 정체를 파악하는 것이 중요합니다'**
+  String get guideTipsText;
+
+  /// No description provided for @close.
+  ///
+  /// In ko, this message translates to:
+  /// **'닫기'**
+  String get close;
 }
 
 class _AppLocalizationsDelegate

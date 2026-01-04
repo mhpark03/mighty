@@ -406,11 +406,59 @@ class AppLocalizationsJa extends AppLocalizations {
   String get resetStats => 'リセット';
 
   @override
-  String get resetStatsConfirm => 'すべての統計をリセットしますか？';
+  String get resetStatsConfirm => '広告を視聴すると、すべての統計がリセットされます。\n続行しますか？';
 
   @override
   String get exitApp => 'アプリ終了';
 
   @override
   String get exitAppConfirm => 'アプリを終了しますか？';
+
+  @override
+  String get gameGuide => '遊び方';
+
+  @override
+  String get guideOverview => 'ゲーム概要';
+
+  @override
+  String get guideOverviewText =>
+      'マイティは5人で遊ぶトリックテイキングカードゲームです。宣言者(1人)とフレンド(1人)がチームを組み、守備チーム(3人)と対戦します。';
+
+  @override
+  String get guideBidding => 'ビッディング';
+
+  @override
+  String get guideBiddingText =>
+      '• 各プレイヤーは獲得する得点カードの数を宣言します\n• 最高ビッドのプレイヤーが宣言者になります\n• 宣言者は切り札を決めます';
+
+  @override
+  String get guideSpecialCards => '特殊カード';
+
+  @override
+  String get guideSpecialCardsText =>
+      '• マイティ: スペードのA (最強のカード)\n• ジョーカー: 2番目に強いカード\n• 切り札: 宣言者が選んだスート';
+
+  @override
+  String get guideFriend => 'フレンド';
+
+  @override
+  String get guideFriendText =>
+      '• 宣言者は特定のカードを持つ人をフレンドに指定します\n• フレンドは正体を隠すことができます\n• ジョーカーコール: 特定の3を持つ人をフレンドに指定';
+
+  @override
+  String get guideScoring => 'スコア計算';
+
+  @override
+  String get guideScoringText =>
+      '• 得点カード: A, K, Q, J, 10 (各1点、合計20点)\n• 宣言者チームが目標点数以上で勝利\n• 勝者は+点、敗者は-点';
+
+  @override
+  String get guideTips => 'ゲームのコツ';
+
+  @override
+  String get guideTipsText =>
+      '• マイティとジョーカーは常に強力です\n• 切り札を上手く使いましょう\n• フレンドの正体を見抜くことが重要です';
+
+  @override
+  String get close => '閉じる';
 }

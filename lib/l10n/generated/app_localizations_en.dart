@@ -406,11 +406,60 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resetStats => 'Reset';
 
   @override
-  String get resetStatsConfirm => 'Reset all statistics?';
+  String get resetStatsConfirm =>
+      'Watch an ad to reset all statistics.\nContinue?';
 
   @override
   String get exitApp => 'Exit App';
 
   @override
   String get exitAppConfirm => 'Exit the app?';
+
+  @override
+  String get gameGuide => 'How to Play';
+
+  @override
+  String get guideOverview => 'Overview';
+
+  @override
+  String get guideOverviewText =>
+      'Mighty is a trick-taking card game for 5 players. The Declarer (1) and Friend (1) team up against the Defenders (3).';
+
+  @override
+  String get guideBidding => 'Bidding';
+
+  @override
+  String get guideBiddingText =>
+      '• Each player declares how many point cards they will win\n• The highest bidder becomes the Declarer\n• The Declarer chooses the trump suit (Giruda)';
+
+  @override
+  String get guideSpecialCards => 'Special Cards';
+
+  @override
+  String get guideSpecialCardsText =>
+      '• Mighty: Ace of Spades (strongest card)\n• Joker: Second strongest card\n• Trump: The suit chosen by the Declarer';
+
+  @override
+  String get guideFriend => 'Friend';
+
+  @override
+  String get guideFriendText =>
+      '• The Declarer designates someone with a specific card as Friend\n• The Friend can hide their identity\n• Joker Call: Designate the holder of a specific 3 as Friend';
+
+  @override
+  String get guideScoring => 'Scoring';
+
+  @override
+  String get guideScoringText =>
+      '• Point cards: A, K, Q, J, 10 (1 point each, 20 total)\n• Declarer team wins if they reach the target score\n• Winners get + points, losers get - points';
+
+  @override
+  String get guideTips => 'Tips';
+
+  @override
+  String get guideTipsText =>
+      '• Mighty and Joker are always powerful\n• Use trump cards wisely\n• Identifying the Friend is crucial';
+
+  @override
+  String get close => 'Close';
 }
