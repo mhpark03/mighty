@@ -78,6 +78,23 @@ class AIPlayer {
     // === 3. 조커 (거의 확실한 1트릭, 첫 트릭 제외) ===
     if (hasJoker) strength += 2;
 
+    // === 3-1. 마이티 + 조커/A 조합 보너스 (프렌드 지정 가능성) ===
+    if (hasMighty) {
+      // 마이티 + 조커: 매우 강력한 조합
+      if (hasJoker) {
+        strength += 2;
+      }
+      // 마이티 + 다른 에이스: 프렌드로 지정되어 협력 가능
+      int aceCount = hand.where((c) =>
+          c.rank == Rank.ace &&
+          !(c.suit == mightySuit && c.rank == Rank.ace) &&  // 마이티 제외
+          !c.isJoker
+      ).length;
+      if (aceCount >= 1) {
+        strength += aceCount;  // 에이스 개당 +1
+      }
+    }
+
     // === 4. 기루다 이외의 A, K, Q (선공 시 트릭 가능) ===
     for (final suit in Suit.values) {
       if (suit == giruda) continue; // 기루다는 이미 계산함
