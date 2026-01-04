@@ -1272,13 +1272,11 @@ class _GameScreenState extends State<GameScreen> {
     final isLeadPlayer = state.currentTrick != null &&
         state.currentTrick!.leadPlayerId == index;
 
-    // 플레이어가 획득한 점수 카드
+    // 플레이어가 획득한 점수 카드 (조커 제외)
     final pointCards = player.wonCards
-        .where((c) => c.isPointCard || c.isJoker)
+        .where((c) => c.isPointCard && !c.isJoker)
         .toList();
     pointCards.sort((a, b) {
-      if (a.isJoker) return -1;
-      if (b.isJoker) return 1;
       if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
       return b.rankValue.compareTo(a.rankValue);
     });
@@ -1699,13 +1697,11 @@ class _GameScreenState extends State<GameScreen> {
     // 추천 카드 가져오기
     final recommendedCard = _showRecommendation ? controller.getRecommendedCard() : null;
 
-    // 플레이어가 획득한 점수 카드
+    // 플레이어가 획득한 점수 카드 (조커 제외)
     final pointCards = controller.humanPlayer.wonCards
-        .where((c) => c.isPointCard || c.isJoker)
+        .where((c) => c.isPointCard && !c.isJoker)
         .toList();
     pointCards.sort((a, b) {
-      if (a.isJoker) return -1;
-      if (b.isJoker) return 1;
       if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
       return b.rankValue.compareTo(a.rankValue);
     });
