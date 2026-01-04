@@ -820,8 +820,9 @@ class _GameScreenState extends State<GameScreen> {
     if (!controller.canPlayCard(card)) return;
 
     if (selectedCard == card) {
-      // 선공이고 첫 트릭이 아니면 조커 콜 옵션 표시
-      if (controller.canDeclareJokerCall) {
+      // 조커 콜 카드(♣3 또는 ♠3)를 선공으로 낼 때만 조커 콜 가능
+      final jokerCallCard = controller.state.jokerCall;
+      if (controller.canDeclareJokerCall && card == jokerCallCard) {
         _showJokerCallDialog(card, controller);
       } else {
         controller.humanPlayCard(card);
@@ -837,11 +838,12 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _showJokerCallDialog(PlayingCard card, GameController controller) {
+    final suitSymbol = _getSuitSymbol(card.suit!);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('조커 콜'),
-        content: const Text('조커 콜을 선언하시겠습니까?'),
+        content: Text('$suitSymbol 조커 콜을 선언하시겠습니까?'),
         actions: [
           TextButton(
             onPressed: () {
@@ -856,51 +858,16 @@ class _GameScreenState extends State<GameScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              _showJokerCallSuitDialog(card, controller);
+              // 조커 콜 카드의 무늬로 자동 콜
+              controller.humanPlayCard(card, jokerCallSuit: card.suit);
+              setState(() {
+                selectedCard = null;
+              });
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('조커 콜!', style: TextStyle(color: Colors.white)),
+            child: Text('$suitSymbol 조커 콜!', style: const TextStyle(color: Colors.white)),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showJokerCallSuitDialog(PlayingCard card, GameController controller) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('조커 콜 무늬 선택'),
-        content: Wrap(
-          spacing: 8,
-          children: [
-            _buildSuitButton(Suit.spade, '♠', Colors.black, card, controller),
-            _buildSuitButton(Suit.diamond, '♦', Colors.red, card, controller),
-            _buildSuitButton(Suit.heart, '♥', Colors.red, card, controller),
-            _buildSuitButton(Suit.club, '♣', Colors.black, card, controller),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSuitButton(Suit suit, String symbol, Color color,
-      PlayingCard card, GameController controller) {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.pop(context);
-        controller.humanPlayCard(card, jokerCallSuit: suit);
-        setState(() {
-          selectedCard = null;
-        });
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      ),
-      child: Text(
-        symbol,
-        style: TextStyle(fontSize: 24, color: color),
       ),
     );
   }

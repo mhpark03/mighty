@@ -143,6 +143,7 @@ class GameController extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 600));
 
     final currentPlayer = _state.players[_state.currentPlayer];
+    PlayingCard card;
 
     // AI 조커 콜 결정 (선공 시에만)
     if (_state.currentTrick != null && _state.currentTrick!.cards.isEmpty) {
@@ -151,10 +152,15 @@ class GameController extends ChangeNotifier {
         _state.declareJokerCall(jokerCallSuit);
         notifyListeners();
         await Future.delayed(const Duration(milliseconds: 500));
+        // 조커 콜 시 조커 콜 카드를 냄
+        card = _state.jokerCall;
+      } else {
+        card = _aiPlayer.selectCard(currentPlayer, _state);
       }
+    } else {
+      card = _aiPlayer.selectCard(currentPlayer, _state);
     }
 
-    final card = _aiPlayer.selectCard(currentPlayer, _state);
     _state.playCard(card, currentPlayer.id);
 
     _isProcessing = false;

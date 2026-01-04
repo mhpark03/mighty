@@ -222,6 +222,7 @@ class AIPlayer {
   }
 
   // 조커 콜 결정 (선공 시에만 호출)
+  // 조커 콜 카드(♣3 또는 ♠3)를 가지고 있을 때만 조커 콜 가능
   Suit? decideJokerCall(Player player, GameState state) {
     // 첫 트릭에서는 조커 콜 불가
     if (state.currentTrickNumber <= 1) return null;
@@ -231,34 +232,39 @@ class AIPlayer {
       return null;
     }
 
+    // 조커 콜 카드 확인
+    final jokerCallCard = state.jokerCall;
+    bool hasJokerCallCard = player.hand.any((c) =>
+        c.suit == jokerCallCard.suit && c.rank == jokerCallCard.rank);
+    if (!hasJokerCallCard) return null;
+
     // 조커를 가지고 있으면 조커 콜 안 함
     bool hasJoker = player.hand.any((c) => c.isJoker);
     if (hasJoker) return null;
 
-    // 30% 확률로 조커 콜 시도
-    if (Random().nextDouble() > 0.3) return null;
+    // 50% 확률로 조커 콜 시도
+    if (Random().nextDouble() > 0.5) return null;
 
-    // 가장 많은 카드를 가진 무늬로 조커 콜
-    Map<Suit, int> suitCounts = {};
-    for (final suit in Suit.values) {
-      suitCounts[suit] = player.hand.where((c) => !c.isJoker && c.suit == suit).length;
+    // 조커 콜 카드의 무늬로 콜
+    return jokerCallCard.suit;
+  }
+
+  // AI가 조커 콜 카드를 낼지 결정
+  bool shouldPlayJokerCallCard(Player player, GameState state) {
+    final jokerCallCard = state.jokerCall;
+    bool hasJokerCallCard = player.hand.any((c) =>
+        c.suit == jokerCallCard.suit && c.rank == jokerCallCard.rank);
+
+    if (!hasJokerCallCard) return false;
+    if (state.currentTrickNumber <= 1) return false;
+
+    // 조커가 없으면 조커 콜 카드를 내서 조커 콜 시도
+    bool hasJoker = player.hand.any((c) => c.isJoker);
+    if (!hasJoker && Random().nextDouble() < 0.5) {
+      return true;
     }
 
-    Suit? bestSuit;
-    int maxCount = 0;
-    for (final entry in suitCounts.entries) {
-      if (entry.value > maxCount) {
-        maxCount = entry.value;
-        bestSuit = entry.key;
-      }
-    }
-
-    // 최소 2장 이상 있어야 조커 콜
-    if (maxCount >= 2) {
-      return bestSuit;
-    }
-
-    return null;
+    return false;
   }
 
   PlayingCard selectCard(Player player, GameState state) {
