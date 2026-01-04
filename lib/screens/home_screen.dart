@@ -7,6 +7,7 @@ import '../l10n/generated/app_localizations.dart';
 import '../models/game_state.dart';
 import '../services/game_controller.dart';
 import '../services/stats_service.dart';
+import '../widgets/banner_ad_widget.dart';
 import 'game_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -52,10 +53,13 @@ class HomeScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: Colors.green[800],
           body: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(8, topPadding, 8, bottomPadding),
-              child: Column(
-                children: [
+            child: Column(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(8, topPadding, 8, bottomPadding),
+                    child: Column(
+                      children: [
                   // 타이틀
                   Text(
                     l10n.appTitle,
@@ -237,22 +241,26 @@ class HomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: isSmallScreen ? 4 : 8),
 
-                  // 앱 종료 버튼
-                  TextButton.icon(
-                    onPressed: () => _showExitAppDialog(context, l10n),
-                    icon: Icon(Icons.power_settings_new, color: Colors.white54, size: isSmallScreen ? 16 : 18),
-                    label: Text(
-                      l10n.exitApp,
-                      style: TextStyle(color: Colors.white54, fontSize: isSmallScreen ? 12 : 13),
-                    ),
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: isSmallScreen ? 4 : 6),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        // 앱 종료 버튼
+                        TextButton.icon(
+                          onPressed: () => _showExitAppDialog(context, l10n),
+                          icon: Icon(Icons.power_settings_new, color: Colors.white54, size: isSmallScreen ? 16 : 18),
+                          label: Text(
+                            l10n.exitApp,
+                            style: TextStyle(color: Colors.white54, fontSize: isSmallScreen ? 12 : 13),
+                          ),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: isSmallScreen ? 4 : 6),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+                const BannerAdWidget(),
+              ],
             ),
           ),
         );

@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'services/game_controller.dart';
 import 'services/stats_service.dart';
 import 'screens/home_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 전체 화면 모드 설정 (상태바 숨기기)
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.immersiveSticky,
+    overlays: [],
+  );
+
+  // AdMob 초기화
+  MobileAds.instance.initialize();
+
   runApp(const MightyApp());
 }
 
