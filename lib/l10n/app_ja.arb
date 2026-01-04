@@ -63,5 +63,8 @@
   "win": "勝",
   "loss": "敗",
   "resetStats": "リセット",
-  "resetStatsConfirm": "すべての統計をリセットしますか？"
+  "resetStatsConfirm": "すべての統計をリセットしますか？",
+  "startGame": "ゲーム開始",
+  "exitApp": "アプリ終了",
+  "exitAppConfirm": "アプリを終了しますか？"
 }

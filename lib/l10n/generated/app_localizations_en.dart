@@ -404,4 +404,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resetStatsConfirm => 'Reset all statistics?';
+
+  @override
+  String get exitApp => 'Exit App';
+
+  @override
+  String get exitAppConfirm => 'Exit the app?';
 }

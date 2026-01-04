@@ -404,4 +404,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get resetStatsConfirm => 'すべての統計をリセットしますか？';
+
+  @override
+  String get exitApp => 'アプリ終了';
+
+  @override
+  String get exitAppConfirm => 'アプリを終了しますか？';
 }

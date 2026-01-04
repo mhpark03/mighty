@@ -63,5 +63,8 @@
   "win": "胜",
   "loss": "负",
   "resetStats": "重置",
-  "resetStatsConfirm": "重置所有统计数据？"
+  "resetStatsConfirm": "重置所有统计数据？",
+  "startGame": "开始游戏",
+  "exitApp": "退出应用",
+  "exitAppConfirm": "退出应用？"
 }

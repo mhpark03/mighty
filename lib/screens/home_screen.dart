@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../models/game_state.dart';
@@ -21,18 +24,18 @@ class HomeScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: Colors.green[800],
           body: SafeArea(
-            child: SingleChildScrollView(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Column(
+              children: [
+                // 상단 영역: 타이틀 + 버튼
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // 타이틀
                       Text(
                         l10n.appTitle,
                         style: const TextStyle(
-                          fontSize: 48,
+                          fontSize: 42,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           shadows: [
@@ -44,90 +47,107 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Text(
                         l10n.gameSubtitle,
-                        style: TextStyle(
-                          fontSize: 16,
+                        style: const TextStyle(
+                          fontSize: 14,
                           color: Colors.white70,
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 24),
 
-                      // 이어하기 버튼 (진행 중인 게임이 있을 때만)
-                      if (hasActiveGame) ...[
-                        _buildMenuButton(
-                          context,
-                          icon: Icons.play_arrow,
-                          label: l10n.continueGame,
-                          color: Colors.amber,
-                          textColor: Colors.black,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const GameScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        // 현재 게임 상태 표시
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black26,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            _getGameStatusText(controller, l10n),
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                      ],
-
-                      // 새 게임 버튼
-                      _buildMenuButton(
-                        context,
-                        icon: Icons.add,
-                        label: l10n.newGame,
-                        color: hasActiveGame ? Colors.white24 : Colors.amber,
-                        textColor: hasActiveGame ? Colors.white : Colors.black,
-                        onPressed: () {
-                          if (hasActiveGame) {
-                            _showNewGameConfirmDialog(context, controller, l10n);
-                          } else {
-                            controller.startNewGame();
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const GameScreen(),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      // 플레이어 통계
-                      if (statsService.isLoaded)
-                        _buildStatsSection(context, statsService, l10n),
+                      // 게임 시작하기 버튼 (이어하기 또는 새 게임)
+                      _buildStartGameButton(context, controller, hasActiveGame, l10n),
                     ],
                   ),
                 ),
-              ),
+
+                // 하단 영역: 통계 테이블 (화면 꽉 채움)
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    child: statsService.isLoaded
+                        ? _buildStatsSection(context, statsService, l10n)
+                        : const SizedBox.shrink(),
+                  ),
+                ),
+
+                // 하단 버튼: 앱 종료
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () => _showExitAppDialog(context, l10n),
+                        icon: const Icon(Icons.power_settings_new, color: Colors.white70),
+                        label: Text(
+                          l10n.exitApp,
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildStartGameButton(
+    BuildContext context,
+    GameController controller,
+    bool hasActiveGame,
+    AppLocalizations l10n,
+  ) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          if (hasActiveGame) {
+            // 이어하기
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const GameScreen(),
+              ),
+            );
+          } else {
+            // 새 게임 시작
+            controller.startNewGame();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const GameScreen(),
+              ),
+            );
+          }
+        },
+        icon: Icon(
+          hasActiveGame ? Icons.play_arrow : Icons.play_arrow,
+          color: Colors.black,
+          size: 28,
+        ),
+        label: Text(
+          hasActiveGame ? l10n.continueGame : l10n.startGame,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.amber,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
     );
   }
 
@@ -136,39 +156,44 @@ class HomeScreen extends StatelessWidget {
     if (stats.isEmpty) return const SizedBox.shrink();
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.black26,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
+          // 헤더
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 l10n.playerStats,
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
               TextButton.icon(
                 onPressed: () => _showResetStatsDialog(context, statsService, l10n),
-                icon: const Icon(Icons.refresh, size: 16, color: Colors.white70),
+                icon: const Icon(Icons.refresh, size: 14, color: Colors.white70),
                 label: Text(
                   l10n.resetStats,
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  style: const TextStyle(color: Colors.white70, fontSize: 11),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          // 헤더
+          const SizedBox(height: 8),
+          // 테이블 헤더
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             decoration: BoxDecoration(
               color: Colors.black26,
               borderRadius: BorderRadius.circular(4),
@@ -215,8 +240,14 @@ class HomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           // 플레이어별 통계
-          for (int i = 0; i < stats.length; i++)
-            _buildPlayerStatRow(stats[i], i == 0, l10n),
+          Expanded(
+            child: ListView.builder(
+              itemCount: stats.length,
+              itemBuilder: (context, index) {
+                return _buildPlayerStatRow(stats[index], index == 0, l10n);
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -226,8 +257,8 @@ class HomeScreen extends StatelessWidget {
     final scoreColor = playerStats.totalScore >= 0 ? Colors.lightGreenAccent : Colors.redAccent;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: const BoxDecoration(
         border: Border(
           bottom: BorderSide(color: Colors.white12, width: 1),
         ),
@@ -239,14 +270,14 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               children: [
                 if (isHuman)
-                  const Icon(Icons.person, color: Colors.amber, size: 16),
-                if (isHuman) const SizedBox(width: 4),
+                  const Icon(Icons.person, color: Colors.amber, size: 18),
+                if (isHuman) const SizedBox(width: 6),
                 Flexible(
                   child: Text(
                     playerStats.name,
                     style: TextStyle(
                       color: isHuman ? Colors.amber : Colors.white,
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: isHuman ? FontWeight.bold : FontWeight.normal,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -262,7 +293,7 @@ class HomeScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 13,
+                fontSize: 14,
               ),
             ),
           ),
@@ -273,7 +304,7 @@ class HomeScreen extends StatelessWidget {
               textAlign: TextAlign.right,
               style: TextStyle(
                 color: scoreColor,
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -307,65 +338,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuButton(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required Color color,
-    required Color textColor,
-    required VoidCallback onPressed,
-  }) {
-    return SizedBox(
-      width: 200,
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, color: textColor),
-        label: Text(
-          label,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _getGameStatusText(GameController controller, AppLocalizations l10n) {
-    final state = controller.state;
-    switch (state.phase) {
-      case GamePhase.bidding:
-        return l10n.biddingPhase;
-      case GamePhase.selectingKitty:
-        return l10n.selectKitty;
-      case GamePhase.declaringFriend:
-        return l10n.declareFriend;
-      case GamePhase.playing:
-        return '${l10n.trick} ${state.currentTrickNumber}/10';
-      default:
-        return '';
-    }
-  }
-
-  void _showNewGameConfirmDialog(
-    BuildContext context,
-    GameController controller,
-    AppLocalizations l10n,
-  ) {
-    final parentContext = context;
+  void _showExitAppDialog(BuildContext context, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.newGame),
-        content: Text(l10n.exitGameConfirm),
+        title: Text(l10n.exitApp),
+        content: Text(l10n.exitAppConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -374,17 +352,17 @@ class HomeScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              controller.reset();
-              controller.startNewGame();
-              Navigator.push(
-                parentContext,
-                MaterialPageRoute(
-                  builder: (context) => const GameScreen(),
-                ),
-              );
+              // 앱 종료
+              if (Platform.isAndroid) {
+                SystemNavigator.pop();
+              } else if (Platform.isIOS) {
+                exit(0);
+              } else {
+                exit(0);
+              }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-            child: Text(l10n.newGame, style: const TextStyle(color: Colors.black)),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text(l10n.exit, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),

@@ -404,4 +404,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get resetStatsConfirm => '重置所有统计数据？';
+
+  @override
+  String get exitApp => '退出应用';
+
+  @override
+  String get exitAppConfirm => '退出应用？';
 }

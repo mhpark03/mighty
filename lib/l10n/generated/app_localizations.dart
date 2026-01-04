@@ -117,7 +117,7 @@ abstract class AppLocalizations {
   /// No description provided for @startGame.
   ///
   /// In ko, this message translates to:
-  /// **'게임 시작'**
+  /// **'게임 시작하기'**
   String get startGame;
 
   /// No description provided for @newGame.
@@ -827,6 +827,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'모든 통계를 초기화하시겠습니까?'**
   String get resetStatsConfirm;
+
+  /// No description provided for @exitApp.
+  ///
+  /// In ko, this message translates to:
+  /// **'앱 종료'**
+  String get exitApp;
+
+  /// No description provided for @exitAppConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'앱을 종료하시겠습니까?'**
+  String get exitAppConfirm;
 }
 
 class _AppLocalizationsDelegate

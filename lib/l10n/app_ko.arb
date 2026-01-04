@@ -206,5 +206,8 @@
   "win": "승",
   "loss": "패",
   "resetStats": "초기화",
-  "resetStatsConfirm": "모든 통계를 초기화하시겠습니까?"
+  "resetStatsConfirm": "모든 통계를 초기화하시겠습니까?",
+  "startGame": "게임 시작하기",
+  "exitApp": "앱 종료",
+  "exitAppConfirm": "앱을 종료하시겠습니까?"
 }

@@ -120,5 +120,8 @@
   "win": "W",
   "loss": "L",
   "resetStats": "Reset",
-  "resetStatsConfirm": "Reset all statistics?"
+  "resetStatsConfirm": "Reset all statistics?",
+  "startGame": "Start Game",
+  "exitApp": "Exit App",
+  "exitAppConfirm": "Exit the app?"
 }

@@ -15,7 +15,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get gameSubtitle => '한국의 전통 트릭테이킹 카드 게임';
 
   @override
-  String get startGame => '게임 시작';
+  String get startGame => '게임 시작하기';
 
   @override
   String get newGame => '새 게임';
@@ -404,4 +404,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get resetStatsConfirm => '모든 통계를 초기화하시겠습니까?';
+
+  @override
+  String get exitApp => '앱 종료';
+
+  @override
+  String get exitAppConfirm => '앱을 종료하시겠습니까?';
 }
