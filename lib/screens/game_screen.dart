@@ -58,6 +58,32 @@ class _GameScreenState extends State<GameScreen> {
     _trickCountdown = 10;
   }
 
+  void _showExitDialog(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.exitGame),
+        content: Text(l10n.exitGameConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); // Go back to home screen
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: Text(l10n.exit, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -69,6 +95,10 @@ class _GameScreenState extends State<GameScreen> {
           appBar: AppBar(
             title: Text(l10n.appTitle),
             backgroundColor: Colors.green[900],
+            leading: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => _showExitDialog(controller),
+            ),
             actions: [
               IconButton(
                 icon: const Icon(Icons.refresh),

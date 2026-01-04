@@ -190,5 +190,12 @@
   "reasonNeedJoker": "조커 필요",
   "reasonNeedGirudaAce": "기루다 A 필요",
   "reasonNeedGirudaKing": "기루다 K 필요",
-  "reasonStrongHand": "강한 핸드"
+  "reasonStrongHand": "강한 핸드",
+  "continueGame": "이어하기",
+  "exitGame": "게임 종료",
+  "exitGameConfirm": "게임을 종료하시겠습니까?\n현재 게임은 자동 저장됩니다.",
+  "cancel": "취소",
+  "exit": "종료",
+  "savedGame": "저장된 게임",
+  "noSavedGame": "저장된 게임이 없습니다"
 }

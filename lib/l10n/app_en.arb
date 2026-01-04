@@ -104,5 +104,12 @@
   "reasonNeedJoker": "Need Joker",
   "reasonNeedGirudaAce": "Need Trump Ace",
   "reasonNeedGirudaKing": "Need Trump King",
-  "reasonStrongHand": "Strong hand"
+  "reasonStrongHand": "Strong hand",
+  "continueGame": "Continue",
+  "exitGame": "Exit Game",
+  "exitGameConfirm": "Exit the game?\nCurrent game will be saved.",
+  "cancel": "Cancel",
+  "exit": "Exit",
+  "savedGame": "Saved Game",
+  "noSavedGame": "No saved game"
 }

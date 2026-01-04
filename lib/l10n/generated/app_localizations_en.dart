@@ -356,4 +356,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reasonStrongHand => 'Strong hand';
+
+  @override
+  String get continueGame => 'Continue';
+
+  @override
+  String get exitGame => 'Exit Game';
+
+  @override
+  String get exitGameConfirm => 'Exit the game?\nCurrent game will be saved.';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get exit => 'Exit';
+
+  @override
+  String get savedGame => 'Saved Game';
+
+  @override
+  String get noSavedGame => 'No saved game';
 }

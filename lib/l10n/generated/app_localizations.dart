@@ -731,6 +731,48 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'강한 핸드'**
   String get reasonStrongHand;
+
+  /// No description provided for @continueGame.
+  ///
+  /// In ko, this message translates to:
+  /// **'이어하기'**
+  String get continueGame;
+
+  /// No description provided for @exitGame.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 종료'**
+  String get exitGame;
+
+  /// No description provided for @exitGameConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임을 종료하시겠습니까?\n현재 게임은 자동 저장됩니다.'**
+  String get exitGameConfirm;
+
+  /// No description provided for @cancel.
+  ///
+  /// In ko, this message translates to:
+  /// **'취소'**
+  String get cancel;
+
+  /// No description provided for @exit.
+  ///
+  /// In ko, this message translates to:
+  /// **'종료'**
+  String get exit;
+
+  /// No description provided for @savedGame.
+  ///
+  /// In ko, this message translates to:
+  /// **'저장된 게임'**
+  String get savedGame;
+
+  /// No description provided for @noSavedGame.
+  ///
+  /// In ko, this message translates to:
+  /// **'저장된 게임이 없습니다'**
+  String get noSavedGame;
 }
 
 class _AppLocalizationsDelegate

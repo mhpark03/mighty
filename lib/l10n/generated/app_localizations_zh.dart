@@ -356,4 +356,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reasonStrongHand => '강한 핸드';
+
+  @override
+  String get continueGame => '이어하기';
+
+  @override
+  String get exitGame => '게임 종료';
+
+  @override
+  String get exitGameConfirm => '게임을 종료하시겠습니까?\n현재 게임은 자동 저장됩니다.';
+
+  @override
+  String get cancel => '취소';
+
+  @override
+  String get exit => '종료';
+
+  @override
+  String get savedGame => '저장된 게임';
+
+  @override
+  String get noSavedGame => '저장된 게임이 없습니다';
 }
