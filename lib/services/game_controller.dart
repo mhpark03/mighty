@@ -154,9 +154,14 @@ class GameController extends ChangeNotifier {
     }
   }
 
-  void humanPlayCard(PlayingCard card) {
+  void humanPlayCard(PlayingCard card, {Suit? jokerCallSuit}) {
     if (_state.currentPlayer != 0) return;
     if (!_state.canPlayCard(card, humanPlayer)) return;
+
+    // 조커 콜 선언 (선공 시에만)
+    if (jokerCallSuit != null && isLeadingTrick) {
+      _state.declareJokerCall(jokerCallSuit);
+    }
 
     _state.playCard(card, 0);
     notifyListeners();
@@ -165,6 +170,16 @@ class GameController extends ChangeNotifier {
       _processAIPlayIfNeeded();
     }
   }
+
+  // 현재 트릭의 선공인지 확인
+  bool get isLeadingTrick =>
+      _state.currentTrick != null && _state.currentTrick!.cards.isEmpty;
+
+  // 조커 콜이 가능한지 확인 (첫 트릭이 아니고, 선공이면 가능)
+  bool get canDeclareJokerCall =>
+      _state.currentTrickNumber > 1 &&
+      isLeadingTrick &&
+      _state.currentPlayer == 0;
 
   List<PlayingCard> getPlayableCards() {
     return humanPlayer.hand

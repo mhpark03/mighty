@@ -735,24 +735,46 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     return Center(
-      child: Wrap(
-        spacing: 8,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          for (int i = 0; i < trick.cards.length; i++)
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  state.players[trick.playerOrder[i]].name,
-                  style: const TextStyle(color: Colors.white70, fontSize: 10),
+          // 조커 콜 표시
+          if (trick.jokerCall == JokerCallType.jokerCall && trick.jokerCallSuit != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '조커 콜! ${_getSuitSymbol(trick.jokerCallSuit!)}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
-                CardWidget(
-                  card: trick.cards[i],
-                  width: 50,
-                  height: 75,
-                ),
-              ],
+              ),
             ),
+          Wrap(
+            spacing: 8,
+            children: [
+              for (int i = 0; i < trick.cards.length; i++)
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      state.players[trick.playerOrder[i]].name,
+                      style: const TextStyle(color: Colors.white70, fontSize: 10),
+                    ),
+                    CardWidget(
+                      card: trick.cards[i],
+                      width: 50,
+                      height: 75,
+                    ),
+                  ],
+                ),
+            ],
+          ),
         ],
       ),
     );
@@ -798,15 +820,89 @@ class _GameScreenState extends State<GameScreen> {
     if (!controller.canPlayCard(card)) return;
 
     if (selectedCard == card) {
-      controller.humanPlayCard(card);
-      setState(() {
-        selectedCard = null;
-      });
+      // 선공이고 첫 트릭이 아니면 조커 콜 옵션 표시
+      if (controller.canDeclareJokerCall) {
+        _showJokerCallDialog(card, controller);
+      } else {
+        controller.humanPlayCard(card);
+        setState(() {
+          selectedCard = null;
+        });
+      }
     } else {
       setState(() {
         selectedCard = card;
       });
     }
+  }
+
+  void _showJokerCallDialog(PlayingCard card, GameController controller) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('조커 콜'),
+        content: const Text('조커 콜을 선언하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              controller.humanPlayCard(card);
+              setState(() {
+                selectedCard = null;
+              });
+            },
+            child: const Text('아니오'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showJokerCallSuitDialog(card, controller);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('조커 콜!', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showJokerCallSuitDialog(PlayingCard card, GameController controller) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('조커 콜 무늬 선택'),
+        content: Wrap(
+          spacing: 8,
+          children: [
+            _buildSuitButton(Suit.spade, '♠', Colors.black, card, controller),
+            _buildSuitButton(Suit.diamond, '♦', Colors.red, card, controller),
+            _buildSuitButton(Suit.heart, '♥', Colors.red, card, controller),
+            _buildSuitButton(Suit.club, '♣', Colors.black, card, controller),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSuitButton(Suit suit, String symbol, Color color,
+      PlayingCard card, GameController controller) {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.pop(context);
+        controller.humanPlayCard(card, jokerCallSuit: suit);
+        setState(() {
+          selectedCard = null;
+        });
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      ),
+      child: Text(
+        symbol,
+        style: TextStyle(fontSize: 24, color: color),
+      ),
+    );
   }
 
   Widget _buildGameEndScreen(GameController controller) {

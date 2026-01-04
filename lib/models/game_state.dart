@@ -110,6 +110,7 @@ class Trick {
   Suit? leadSuit;
   int? winnerId;
   JokerCallType jokerCall;
+  Suit? jokerCallSuit;  // 조커 콜로 지정된 무늬
 
   Trick({
     required this.trickNumber,
@@ -119,6 +120,7 @@ class Trick {
     this.leadSuit,
     this.winnerId,
     this.jokerCall = JokerCallType.none,
+    this.jokerCallSuit,
   })  : cards = cards ?? [],
         playerOrder = playerOrder ?? [];
 
@@ -333,11 +335,21 @@ class GameState {
 
     final leadSuit = currentTrick!.leadSuit;
 
-    if (leadSuit == null) {
-      return true;
+    // 조커 콜이 선언된 경우
+    if (currentTrick!.jokerCall == JokerCallType.jokerCall) {
+      final callSuit = currentTrick!.jokerCallSuit ?? leadSuit;
+
+      // 조커를 가지고 있고, 조커 콜 무늬를 가지고 있으면 조커를 내야 함
+      bool hasJoker = player.hand.any((c) => c.isJoker);
+      bool hasCallSuit = player.hand.any((c) => !c.isJoker && c.suit == callSuit);
+
+      if (hasJoker && hasCallSuit) {
+        // 조커만 낼 수 있음
+        return card.isJoker;
+      }
     }
 
-    if (currentTrick!.jokerCall == JokerCallType.jokerCall && card.isJoker) {
+    if (leadSuit == null) {
       return true;
     }
 
@@ -356,14 +368,18 @@ class GameState {
     return false;
   }
 
+  // 조커 콜 선언 (선공 시에만 가능)
+  void declareJokerCall(Suit suit) {
+    if (currentTrick != null && currentTrick!.cards.isEmpty) {
+      currentTrick!.jokerCall = JokerCallType.jokerCall;
+      currentTrick!.jokerCallSuit = suit;
+    }
+  }
+
   void playCard(PlayingCard card, int playerId) {
     final player = players[playerId];
     player.removeCard(card);
     currentTrick!.addCard(card, playerId);
-
-    if (currentTrick!.cards.length == 1 && card == jokerCall) {
-      currentTrick!.jokerCall = JokerCallType.jokerCall;
-    }
 
     if (!friendRevealed && friendDeclaration != null) {
       if (friendDeclaration!.card != null && card == friendDeclaration!.card) {
