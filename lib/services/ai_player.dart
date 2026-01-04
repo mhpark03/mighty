@@ -212,10 +212,10 @@ class AIPlayer {
       return FriendDeclaration.byCard(PlayingCard.joker());
     }
 
-    // 3. 기루다 A-K-Q-J-10 순서로 체크
+    // 3. 기루다 A-K 체크
     if (state.giruda != null) {
-      final girudaHighRanks = [Rank.ace, Rank.king, Rank.queen, Rank.jack, Rank.ten];
-      for (final rank in girudaHighRanks) {
+      final girudaTopRanks = [Rank.ace, Rank.king];
+      for (final rank in girudaTopRanks) {
         final girudaCard = PlayingCard(suit: state.giruda!, rank: rank);
         // 마이티가 아닌 경우에만 체크
         if (girudaCard != state.mighty) {
@@ -239,7 +239,19 @@ class AIPlayer {
       }
     }
 
-    // 5. 마이티, 조커, 기루다 고위카드, 모든 에이스를 가지고 있으면 프렌드 없음
+    // 5. 기루다 Q-J-10 체크
+    if (state.giruda != null) {
+      final girudaMidRanks = [Rank.queen, Rank.jack, Rank.ten];
+      for (final rank in girudaMidRanks) {
+        final girudaCard = PlayingCard(suit: state.giruda!, rank: rank);
+        bool hasCard = hand.any((c) => c.suit == girudaCard.suit && c.rank == girudaCard.rank);
+        if (!hasCard) {
+          return FriendDeclaration.byCard(girudaCard);
+        }
+      }
+    }
+
+    // 6. 마이티, 조커, 기루다 고위카드, 모든 에이스를 가지고 있으면 프렌드 없음
     return FriendDeclaration.noFriend();
   }
 
