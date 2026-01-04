@@ -534,7 +534,6 @@ class _GameScreenState extends State<GameScreen> {
         Column(
           children: [
             _buildGameInfo(state),
-            _buildPlayedPointCards(state),
             const SizedBox(height: 4),
             Expanded(
               child: _buildPlayArea(controller),
@@ -774,158 +773,6 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _buildPlayedPointCards(GameState state) {
-    final declarerCards = state.declarerTeamPointCards;
-    final defenderCards = state.defenderTeamPointCards;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      color: Colors.black45,
-      child: Row(
-        children: [
-          // 공격팀 점수 카드
-          Expanded(
-            child: _buildTeamPointCards(
-              '공격팀',
-              declarerCards,
-              state,
-              Colors.blue[700]!,
-            ),
-          ),
-          // 구분선
-          Container(
-            width: 2,
-            height: 60,
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            color: Colors.white24,
-          ),
-          // 방어팀 점수 카드
-          Expanded(
-            child: _buildTeamPointCards(
-              '방어팀',
-              defenderCards,
-              state,
-              Colors.red[700]!,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTeamPointCards(
-    String teamName,
-    List<PlayingCard> cards,
-    GameState state,
-    Color teamColor,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: teamColor,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                teamName,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '${cards.length}장',
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        if (cards.isEmpty)
-          const Text(
-            '-',
-            style: TextStyle(color: Colors.grey, fontSize: 12),
-          )
-        else
-          Wrap(
-            spacing: 3,
-            runSpacing: 2,
-            children: cards.map((card) => _buildMiniCard(card, state)).toList(),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildMiniCard(PlayingCard card, GameState state) {
-    final isMighty = card == state.mighty;
-
-    if (card.isJoker) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-        decoration: BoxDecoration(
-          color: Colors.purple[600],
-          borderRadius: BorderRadius.circular(3),
-          border: Border.all(color: Colors.purple[300]!, width: 1),
-        ),
-        child: const Text(
-          '🃏',
-          style: TextStyle(fontSize: 11),
-        ),
-      );
-    }
-
-    final isRed = card.suit == Suit.diamond || card.suit == Suit.heart;
-    final suitSymbol = _getSuitSymbol(card.suit!);
-    String rank;
-    switch (card.rank) {
-      case Rank.ace:
-        rank = 'A';
-        break;
-      case Rank.king:
-        rank = 'K';
-        break;
-      case Rank.queen:
-        rank = 'Q';
-        break;
-      case Rank.jack:
-        rank = 'J';
-        break;
-      case Rank.ten:
-        rank = '10';
-        break;
-      default:
-        rank = '${card.rankValue}';
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-      decoration: BoxDecoration(
-        color: isMighty ? Colors.amber[700] : Colors.white,
-        borderRadius: BorderRadius.circular(3),
-        border: isMighty
-            ? Border.all(color: Colors.amber[300]!, width: 1)
-            : null,
-      ),
-      child: Text(
-        '$suitSymbol$rank',
-        style: TextStyle(
-          color: isRed ? Colors.red[700] : Colors.black,
-          fontSize: 11,
-          fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
-        ),
-      ),
-    );
-  }
-
   Widget _buildGameInfo(GameState state) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -1124,70 +971,156 @@ class _GameScreenState extends State<GameScreen> {
     final isLeadPlayer = state.currentTrick != null &&
         state.currentTrick!.leadPlayerId == index;
 
-    return Stack(
-      clipBehavior: Clip.none,
+    // 플레이어가 획득한 점수 카드
+    final pointCards = player.wonCards
+        .where((c) => c.isPointCard || c.isJoker)
+        .toList();
+    pointCards.sort((a, b) {
+      if (a.isJoker) return -1;
+      if (b.isJoker) return 1;
+      if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
+      return b.rankValue.compareTo(a.rankValue);
+    });
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isCurrentPlayer ? Colors.amber.withValues(alpha: 0.3) : Colors.black26,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isDeclarer
-                  ? Colors.red
-                  : (isFriend ? Colors.blue : Colors.transparent),
-              width: 2,
-            ),
-          ),
-          child: Column(
-            children: [
-              Text(
-                player.name,
-                style: TextStyle(
-                  color: isCurrentPlayer ? Colors.amber : Colors.white,
-                  fontWeight: isCurrentPlayer ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-              Text(
-                l10n.cards(player.hand.length),
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-              if (isDeclarer)
-                Text(
-                  l10n.declarer,
-                  style: const TextStyle(color: Colors.red, fontSize: 10),
-                ),
-              if (isFriend)
-                Text(
-                  l10n.friend,
-                  style: const TextStyle(color: Colors.blue, fontSize: 10),
-                ),
-            ],
-          ),
-        ),
-        // 선공 표시
-        if (isLeadPlayer)
-          Positioned(
-            top: -8,
-            right: -8,
-            child: Container(
-              padding: const EdgeInsets.all(4),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.orange,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1),
-              ),
-              child: const Text(
-                '1',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
+                color: isCurrentPlayer ? Colors.amber.withValues(alpha: 0.3) : Colors.black26,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isDeclarer
+                      ? Colors.red
+                      : (isFriend ? Colors.blue : Colors.transparent),
+                  width: 2,
                 ),
               ),
+              child: Column(
+                children: [
+                  Text(
+                    player.name,
+                    style: TextStyle(
+                      color: isCurrentPlayer ? Colors.amber : Colors.white,
+                      fontWeight: isCurrentPlayer ? FontWeight.bold : FontWeight.normal,
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    l10n.cards(player.hand.length),
+                    style: const TextStyle(color: Colors.white70, fontSize: 10),
+                  ),
+                  if (isDeclarer)
+                    Text(
+                      l10n.declarer,
+                      style: const TextStyle(color: Colors.red, fontSize: 9),
+                    ),
+                  if (isFriend)
+                    Text(
+                      l10n.friend,
+                      style: const TextStyle(color: Colors.blue, fontSize: 9),
+                    ),
+                ],
+              ),
+            ),
+            // 선공 표시
+            if (isLeadPlayer)
+              Positioned(
+                top: -8,
+                right: -8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                  child: const Text(
+                    '1',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        // 획득한 점수 카드 표시
+        if (pointCards.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: pointCards.map((card) => _buildTinyCard(card, state)).toList(),
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildTinyCard(PlayingCard card, GameState state) {
+    final isMighty = card == state.mighty;
+
+    if (card.isJoker) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        decoration: BoxDecoration(
+          color: Colors.purple[600],
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: const Text('🃏', style: TextStyle(fontSize: 14)),
+      );
+    }
+
+    final isRed = card.suit == Suit.diamond || card.suit == Suit.heart;
+    final suitSymbol = _getSuitSymbol(card.suit!);
+    String rank;
+    switch (card.rank) {
+      case Rank.ace:
+        rank = 'A';
+        break;
+      case Rank.king:
+        rank = 'K';
+        break;
+      case Rank.queen:
+        rank = 'Q';
+        break;
+      case Rank.jack:
+        rank = 'J';
+        break;
+      case Rank.ten:
+        rank = '10';
+        break;
+      default:
+        rank = '${card.rankValue}';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      decoration: BoxDecoration(
+        color: isMighty ? Colors.amber[700] : Colors.white,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        '$suitSymbol$rank',
+        style: TextStyle(
+          color: isRed ? Colors.red[700] : Colors.black,
+          fontSize: 14,
+          fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
     );
   }
 
@@ -1256,37 +1189,77 @@ class _GameScreenState extends State<GameScreen> {
     final isLeadPlayer = controller.state.currentTrick != null &&
         controller.state.currentTrick!.leadPlayerId == 0;
 
+    // 플레이어가 획득한 점수 카드
+    final pointCards = controller.humanPlayer.wonCards
+        .where((c) => c.isPointCard || c.isJoker)
+        .toList();
+    pointCards.sort((a, b) {
+      if (a.isJoker) return -1;
+      if (b.isJoker) return 1;
+      if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
+      return b.rankValue.compareTo(a.rankValue);
+    });
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       color: Colors.black26,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 선공 표시
-          if (isLeadPlayer && controller.state.phase == GamePhase.playing)
-            Container(
-              margin: const EdgeInsets.only(bottom: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.orange,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.star, color: Colors.white, size: 14),
-                  SizedBox(width: 4),
-                  Text(
-                    '선공',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
+          // 상단: 선공 표시 & 획득한 점수 카드
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 선공 표시
+              if (isLeadPlayer && controller.state.phase == GamePhase.playing)
+                Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                ],
-              ),
-            ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.star, color: Colors.white, size: 14),
+                      SizedBox(width: 4),
+                      Text(
+                        '선공',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              // 획득한 점수 카드
+              if (pointCards.isNotEmpty && controller.state.phase == GamePhase.playing)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        '획득: ',
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+                      Wrap(
+                        spacing: 4,
+                        children: pointCards.map((card) => _buildTinyCard(card, controller.state)).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
           // 카드 목록
           SizedBox(
             height: 90,

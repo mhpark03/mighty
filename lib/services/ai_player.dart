@@ -106,7 +106,6 @@ class AIPlayer {
       bool hasAce = suitCards.any((c) =>
           c.rank == Rank.ace && !(c.suit == mightySuit && c.rank == Rank.ace));
       bool hasKing = suitCards.any((c) => c.rank == Rank.king);
-      bool hasQueen = suitCards.any((c) => c.rank == Rank.queen);
 
       // 비기루다 고위 카드 (선공 시에만 유용, 가치 낮음)
       // A-K 연속이면 2트릭 가능성
