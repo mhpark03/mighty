@@ -54,8 +54,9 @@ class _KittyDialogState extends State<KittyDialog> {
     _selectedGiruda = widget.currentGiruda;
     _noGiruda = widget.currentGiruda == null;
 
-    // AI 추천 계산
+    // AI 추천 계산 및 자동 적용
     _calculateRecommendation();
+    _applyRecommendation();
   }
 
   void _calculateRecommendation() {
@@ -94,34 +95,40 @@ class _KittyDialogState extends State<KittyDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = (screenWidth * 0.9 - 48) / 7; // 7장씩 한 줄에
+    final cardHeight = cardWidth * 1.4;
 
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
-        height: MediaQuery.of(context).size.height * 0.8,
-        padding: const EdgeInsets.all(16),
+        width: screenWidth * 0.95,
+        padding: const EdgeInsets.all(12),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               l10n.selectKitty,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               l10n.selectKittyDesc(_selectedDiscards.length),
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
-            const SizedBox(height: 16),
-            Text(l10n.receivedKitty, style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            // 받은 키티
+            Text(l10n.receivedKitty, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: widget.kitty
                   .map((card) => Padding(
-                        padding: const EdgeInsets.all(4),
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
                         child: CardWidget(
                           card: card,
-                          width: 50,
-                          height: 75,
+                          width: cardWidth,
+                          height: cardHeight,
                           isSelected: _selectedDiscards.contains(card),
                           onTap: () => _toggleCard(card),
                         ),
@@ -129,40 +136,26 @@ class _KittyDialogState extends State<KittyDialog> {
                   .toList(),
             ),
             const SizedBox(height: 12),
-            // AI 추천 영역
-            _buildRecommendationSection(),
+            // 내 카드 (13장)
+            Text(l10n.myCards, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const SizedBox(height: 4),
+            // 2줄로 표시 (7장 + 6장)
+            _buildCardRows(cardWidth, cardHeight),
             const SizedBox(height: 12),
-            Text(l10n.myCards, style: const TextStyle(fontWeight: FontWeight.bold)),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Wrap(
-                  spacing: 4,
-                  runSpacing: 4,
-                  children: _allCards
-                      .map((card) => CardWidget(
-                            card: card,
-                            width: 50,
-                            height: 75,
-                            isSelected: _selectedDiscards.contains(card),
-                            onTap: () => _toggleCard(card),
-                          ))
-                      .toList(),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
+            // 기루다 변경
             Text(l10n.changeGiruda,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            const SizedBox(height: 4),
             Wrap(
-              spacing: 8,
+              spacing: 6,
+              runSpacing: 4,
               children: [
                 _buildGirudaChip(Suit.spade, '♠', false),
                 _buildGirudaChip(Suit.diamond, '♦', true),
                 _buildGirudaChip(Suit.heart, '♥', true),
                 _buildGirudaChip(Suit.club, '♣', false),
                 ChoiceChip(
-                  label: Text(l10n.noGiruda),
+                  label: Text(l10n.noGiruda, style: const TextStyle(fontSize: 12)),
                   selected: _noGiruda,
                   onSelected: (_) => setState(() {
                     _noGiruda = true;
@@ -173,31 +166,32 @@ class _KittyDialogState extends State<KittyDialog> {
             ),
             // 기루다 변경 경고
             if (_isGirudaChanged) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                   border: Border.all(color: Colors.orange, width: 1),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.warning_amber, color: Colors.orange, size: 20),
-                    const SizedBox(width: 8),
+                    const Icon(Icons.warning_amber, color: Colors.orange, size: 16),
+                    const SizedBox(width: 6),
                     Text(
                       l10n.girudaChangeWarning,
                       style: TextStyle(
                         color: Colors.orange[800],
                         fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
                   ],
                 ),
               ),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             ElevatedButton(
               onPressed: _selectedDiscards.length == 3
                   ? () {
@@ -210,11 +204,11 @@ class _KittyDialogState extends State<KittyDialog> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.amber,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               ),
               child: Text(
                 l10n.confirm,
-                style: const TextStyle(fontSize: 18, color: Colors.black),
+                style: const TextStyle(fontSize: 16, color: Colors.black),
               ),
             ),
           ],
@@ -223,171 +217,46 @@ class _KittyDialogState extends State<KittyDialog> {
     );
   }
 
-  Widget _buildRecommendationSection() {
-    final l10n = AppLocalizations.of(context)!;
-    final isGirudaChangeRecommended = _recommendedGiruda != widget.currentGiruda;
-    String girudaText;
-    if (_recommendedNoGiruda) {
-      girudaText = l10n.noGiruda;
-    } else if (_recommendedGiruda != null) {
-      girudaText = _getSuitSymbol(_recommendedGiruda!);
-    } else {
-      girudaText = l10n.keep;
-    }
+  Widget _buildCardRows(double cardWidth, double cardHeight) {
+    // 13장 카드를 2줄로 나누기 (7장 + 6장)
+    final firstRow = _allCards.take(7).toList();
+    final secondRow = _allCards.skip(7).toList();
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.blue.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue, width: 1),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.lightbulb, color: Colors.blue, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                l10n.aiRecommendation,
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // 추천 버릴 카드
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(l10n.discardCards, style: const TextStyle(fontSize: 12)),
-              ..._recommendedDiscards.map((card) => Padding(
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: firstRow
+              .map((card) => Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: _buildMiniCard(card),
-                  )),
-            ],
-          ),
-          const SizedBox(height: 4),
-          // 추천 기루다
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('${l10n.giruda}: ', style: const TextStyle(fontSize: 12)),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: isGirudaChangeRecommended
-                      ? Colors.orange.withValues(alpha: 0.2)
-                      : Colors.grey.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  girudaText,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isGirudaChangeRecommended ? Colors.orange[800] : null,
-                  ),
-                ),
-              ),
-              if (isGirudaChangeRecommended) ...[
-                const SizedBox(width: 4),
-                Text(
-                  l10n.goalPlus2,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.orange[700],
-                  ),
-                ),
-              ],
-            ],
-          ),
-          const SizedBox(height: 8),
-          // 추천 적용 버튼
-          ElevatedButton.icon(
-            onPressed: _applyRecommendation,
-            icon: const Icon(Icons.auto_fix_high, size: 16),
-            label: Text(l10n.applyRecommendation),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMiniCard(PlayingCard card) {
-    if (card.isJoker) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-        decoration: BoxDecoration(
-          color: Colors.purple[100],
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: Colors.purple),
+                    child: CardWidget(
+                      card: card,
+                      width: cardWidth,
+                      height: cardHeight,
+                      isSelected: _selectedDiscards.contains(card),
+                      onTap: () => _toggleCard(card),
+                    ),
+                  ))
+              .toList(),
         ),
-        child: const Text('🃏', style: TextStyle(fontSize: 14)),
-      );
-    }
-
-    final isRed = card.suit == Suit.diamond || card.suit == Suit.heart;
-    final suitSymbol = _getSuitSymbol(card.suit!);
-    String rank;
-    switch (card.rank) {
-      case Rank.ace:
-        rank = 'A';
-        break;
-      case Rank.king:
-        rank = 'K';
-        break;
-      case Rank.queen:
-        rank = 'Q';
-        break;
-      case Rank.jack:
-        rank = 'J';
-        break;
-      case Rank.ten:
-        rank = '10';
-        break;
-      default:
-        rank = '${card.rankValue}';
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Colors.grey),
-      ),
-      child: Text(
-        '$suitSymbol$rank',
-        style: TextStyle(
-          color: isRed ? Colors.red : Colors.black,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: secondRow
+              .map((card) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: CardWidget(
+                      card: card,
+                      width: cardWidth,
+                      height: cardHeight,
+                      isSelected: _selectedDiscards.contains(card),
+                      onTap: () => _toggleCard(card),
+                    ),
+                  ))
+              .toList(),
         ),
-      ),
+      ],
     );
-  }
-
-  String _getSuitSymbol(Suit suit) {
-    switch (suit) {
-      case Suit.spade:
-        return '♠';
-      case Suit.diamond:
-        return '♦';
-      case Suit.heart:
-        return '♥';
-      case Suit.club:
-        return '♣';
-    }
   }
 
   void _toggleCard(PlayingCard card) {
