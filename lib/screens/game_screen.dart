@@ -25,7 +25,7 @@ class _GameScreenState extends State<GameScreen> {
   Timer? _trickTimer;
   int _trickCountdown = 10;
   bool _timerRunning = false;
-  bool _showRecommendation = false;
+  bool _showRecommendation = true;
   bool _statsRecorded = false;
 
   @override
@@ -1747,66 +1747,23 @@ class _GameScreenState extends State<GameScreen> {
                     ],
                   ),
                 ),
-              // 획득한 점수 카드
+              // 획득한 점수 카드 (스크롤 가능)
               if (pointCards.isNotEmpty && controller.state.phase == GamePhase.playing)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        l10n.wonCards,
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
-                      ),
-                      Wrap(
-                        spacing: 4,
-                        children: pointCards.map((card) => _buildTinyCard(card, controller.state)).toList(),
-                      ),
-                    ],
-                  ),
-                ),
-              // 추천 보기 버튼 (사용자 차례일 때만)
-              if (isHumanTurn && controller.state.phase == GamePhase.playing)
-                Container(
-                  margin: const EdgeInsets.only(left: 8),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showRecommendation = !_showRecommendation;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _showRecommendation ? Colors.lightBlueAccent : Colors.grey[700],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: _showRecommendation ? Colors.white : Colors.transparent,
-                          width: 1,
-                        ),
-                      ),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.lightbulb,
-                            color: Colors.white,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            l10n.showRecommendation,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                        children: pointCards.map((card) => Padding(
+                          padding: const EdgeInsets.only(right: 3),
+                          child: _buildTinyCard(card, controller.state),
+                        )).toList(),
                       ),
                     ),
                   ),
