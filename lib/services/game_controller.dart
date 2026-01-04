@@ -290,6 +290,17 @@ class GameController extends ChangeNotifier {
     return _aiPlayer.selectCard(humanPlayer, _state);
   }
 
+  /// 사용자에게 추천할 비딩을 반환
+  /// AI 로직을 사용하여 최적의 비딩을 선택
+  Bid? getRecommendedBid() {
+    if (_state.phase != GamePhase.bidding) return null;
+    if (_state.currentBidder != 0) return null;
+    if (_state.passedPlayers[0]) return null;
+
+    // AI 로직을 사용하여 추천 비딩 선택
+    return _aiPlayer.decideBid(humanPlayer, _state);
+  }
+
   void reset() {
     _initializePlayers();
     notifyListeners();

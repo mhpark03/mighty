@@ -349,6 +349,9 @@ class _GameScreenState extends State<GameScreen> {
     final state = controller.state;
     final isHumanTurn = state.currentBidder == 0 && !controller.isProcessing;
 
+    // AI 추천 비딩 가져오기
+    final recommendedBid = isHumanTurn ? controller.getRecommendedBid() : null;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -369,6 +372,35 @@ class _GameScreenState extends State<GameScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          // AI 추천 표시
+          if (isHumanTurn && recommendedBid != null) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.lightBlueAccent.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.lightBlueAccent, width: 1),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    recommendedBid.passed
+                        ? '${l10n.aiRecommendation}: ${l10n.pass}'
+                        : '${l10n.aiRecommendation}: ${recommendedBid.tricks} ${_getSuitName(recommendedBid.suit, l10n)}',
+                    style: const TextStyle(
+                      color: Colors.lightBlueAccent,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           if (isHumanTurn) ...[
             // 트릭 수 선택
@@ -558,6 +590,14 @@ class _GameScreenState extends State<GameScreen> {
     final isPassed = state.passedPlayers[0];
     final isCurrentBidder = state.currentBidder == 0;
 
+    // 세로 모드 확인
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // 세로 모드에서 카드 크기와 배치 계산
+    final cardWidth = isPortrait ? (screenWidth - 32) / 6 - 4 : 55.0;
+    final cardHeight = cardWidth * 1.4;
+
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -572,6 +612,7 @@ class _GameScreenState extends State<GameScreen> {
         ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -612,32 +653,85 @@ class _GameScreenState extends State<GameScreen> {
               ],
             ],
           ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 90,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (final card in hand)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: CardWidget(
-                        card: card,
-                        width: 55,
-                        height: 80,
-                        isSelected: false,
-                        isPlayable: true,
-                        onTap: null,
+          const SizedBox(height: 6),
+          // 세로 모드: 2줄 배치, 가로 모드: 1줄 스크롤
+          if (isPortrait)
+            _buildTwoRowCards(hand, cardWidth, cardHeight)
+          else
+            SizedBox(
+              height: 90,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (final card in hand)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: CardWidget(
+                          card: card,
+                          width: 55,
+                          height: 80,
+                          isSelected: false,
+                          isPlayable: true,
+                          onTap: null,
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTwoRowCards(List<PlayingCard> hand, double cardWidth, double cardHeight) {
+    // 카드를 2줄로 나누기 (위: 앞 절반, 아래: 뒤 절반)
+    final halfIndex = (hand.length + 1) ~/ 2;
+    final firstRow = hand.sublist(0, halfIndex);
+    final secondRow = hand.sublist(halfIndex);
+
+    return Column(
+      children: [
+        // 첫 번째 줄
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (final card in firstRow)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: CardWidget(
+                  card: card,
+                  width: cardWidth,
+                  height: cardHeight,
+                  isSelected: false,
+                  isPlayable: true,
+                  onTap: null,
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        // 두 번째 줄
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (final card in secondRow)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: CardWidget(
+                  card: card,
+                  width: cardWidth,
+                  height: cardHeight,
+                  isSelected: false,
+                  isPlayable: true,
+                  onTap: null,
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -1053,6 +1147,20 @@ class _GameScreenState extends State<GameScreen> {
         return '♥';
       case Suit.club:
         return '♣';
+    }
+  }
+
+  String _getSuitName(Suit? suit, AppLocalizations l10n) {
+    if (suit == null) return l10n.noGiruda;
+    switch (suit) {
+      case Suit.spade:
+        return l10n.spadeName;
+      case Suit.diamond:
+        return l10n.diamondName;
+      case Suit.heart:
+        return l10n.heartName;
+      case Suit.club:
+        return l10n.clubName;
     }
   }
 
