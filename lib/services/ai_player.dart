@@ -13,22 +13,23 @@ class AIPlayer {
     // 2. 선택된 기루다를 기준으로 핸드 강도 계산
     int strength = evaluateHandStrength(hand, bestSuit);
 
-    // 3. 비딩 결정
-    if (state.currentBid != null) {
-      if (strength < state.currentBid!.tricks + 1) {
-        return Bid.pass(player.id);
-      }
+    // 3. 비딩 결정 - 순서대로 1씩 증가하며 비딩
+    int bidAmount;
+    if (state.currentBid == null) {
+      // 첫 비딩은 13부터 시작
+      bidAmount = 13;
+    } else {
+      // 현재 최고 비딩 + 1로 비딩
+      bidAmount = state.currentBid!.tricks + 1;
     }
 
-    if (strength < 13) {
+    // 비딩할 금액이 자신의 강도보다 높으면 패스
+    if (bidAmount > strength || strength < 13) {
       return Bid.pass(player.id);
     }
 
-    int bidAmount = min(strength, 20);
-
-    if (state.currentBid != null) {
-      bidAmount = max(bidAmount, state.currentBid!.tricks + 1);
-    }
+    // 최대 20까지만 비딩 가능
+    bidAmount = min(bidAmount, 20);
 
     return Bid(
       playerId: player.id,
