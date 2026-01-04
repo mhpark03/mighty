@@ -200,14 +200,58 @@ class AIPlayer {
   FriendDeclaration declareFriend(Player player, GameState state) {
     final hand = player.hand;
 
-    // 1. 마이티가 없으면 마이티 소유자를 프렌드로
     bool hasMighty = hand.any((c) => c.isMighty);
+    bool hasJoker = hand.any((c) => c.isJoker);
+
+    // 기루다 A 보유 확인
+    bool hasGirudaAce = false;
+    if (state.giruda != null) {
+      final girudaAce = PlayingCard(suit: state.giruda!, rank: Rank.ace);
+      if (girudaAce != state.mighty) {
+        hasGirudaAce = hand.any((c) => c.suit == girudaAce.suit && c.rank == girudaAce.rank);
+      }
+    }
+
+    // 기루다 외 A 보유 확인
+    int nonGirudaAceCount = 0;
+    for (final suit in Suit.values) {
+      if (suit == state.giruda) continue;
+      final ace = PlayingCard(suit: suit, rank: Rank.ace);
+      if (ace != state.mighty) {
+        if (hand.any((c) => c.suit == ace.suit && c.rank == ace.rank)) {
+          nonGirudaAceCount++;
+        }
+      }
+    }
+
+    // 조커 콜 카드 보유 확인
+    final jokerCallCard = state.jokerCall;
+    bool hasJokerCallCard = hand.any((c) =>
+        c.suit == jokerCallCard.suit && c.rank == jokerCallCard.rank);
+
+    // === 노 프렌드 조건 체크 ===
+
+    // 조건 1: 마이티 + 조커 + 기루다 A + 기루다 외 A 1개 이상 → 노 프렌드
+    if (hasMighty && hasJoker && hasGirudaAce && nonGirudaAceCount >= 1) {
+      return FriendDeclaration.noFriend();
+    }
+
+    // 조건 2: 마이티 + 모든 A + 조커 콜 카드 → 노 프렌드
+    int totalAces = (hasGirudaAce ? 1 : 0) + nonGirudaAceCount;
+    // 마이티가 A인 경우 제외하고 3장의 A가 있으면 모든 A 보유
+    int maxNonMightyAces = (state.mighty.rank == Rank.ace) ? 3 : 4;
+    if (hasMighty && totalAces == maxNonMightyAces && hasJokerCallCard) {
+      return FriendDeclaration.noFriend();
+    }
+
+    // === 일반 프렌드 선택 ===
+
+    // 1. 마이티가 없으면 마이티 소유자를 프렌드로
     if (!hasMighty) {
       return FriendDeclaration.byCard(state.mighty);
     }
 
     // 2. 조커가 없으면 조커 소유자를 프렌드로
-    bool hasJoker = hand.any((c) => c.isJoker);
     if (!hasJoker) {
       return FriendDeclaration.byCard(PlayingCard.joker());
     }
