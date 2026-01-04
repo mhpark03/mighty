@@ -590,6 +590,25 @@ class AIPlayer {
       }
     }
 
+    // === 수비팀 점수 카드 전략 ===
+    // 프렌드가 공개되고, 내가 수비팀이고, 수비팀이 이길 확률이 높으면 점수 카드를 낸다
+    bool isDefenseTeam = _isPlayerOnDefenseTeam(player, state);
+    bool defenseWinning = _isDefenseTeamWinning(state, currentWinnerId);
+
+    if (isDefenseTeam && defenseWinning) {
+      // 수비팀이 이기고 있으면 점수 카드(10/J/Q)를 낸다
+      final pointCards = playableCards.where((c) =>
+          !c.isJoker && !c.isMighty && c.isPointCard &&
+          (c.rank == Rank.ten || c.rank == Rank.jack || c.rank == Rank.queen)
+      ).toList();
+
+      if (pointCards.isNotEmpty) {
+        // 점수 카드 중 가장 낮은 것부터 (10 < J < Q)
+        pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        return pointCards.first;
+      }
+    }
+
     // === 기존 로직 ===
     final suitCards =
         playableCards.where((c) => !c.isJoker && c.suit == leadSuit).toList();
@@ -601,6 +620,15 @@ class AIPlayer {
         if (currentWinningCard != null &&
             state.isCardStronger(card, currentWinningCard, leadSuit, false)) {
           return card;
+        }
+      }
+
+      // 수비팀이고 수비팀이 이기고 있으면 점수 카드 우선
+      if (isDefenseTeam && defenseWinning) {
+        final suitPointCards = suitCards.where((c) => c.isPointCard).toList();
+        if (suitPointCards.isNotEmpty) {
+          suitPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return suitPointCards.first;
         }
       }
 
@@ -618,6 +646,15 @@ class AIPlayer {
         if (worthTrumping) {
           return girudaCards.first;
         }
+      }
+    }
+
+    // 수비팀이 이기고 있으면 점수 카드 우선
+    if (isDefenseTeam && defenseWinning) {
+      final pointCards = playableCards.where((c) => c.isPointCard && !c.isMighty).toList();
+      if (pointCards.isNotEmpty) {
+        pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        return pointCards.first;
       }
     }
 
@@ -708,5 +745,46 @@ class AIPlayer {
     }
 
     return winning;
+  }
+
+  // 플레이어가 수비팀인지 확인
+  bool _isPlayerOnDefenseTeam(Player player, GameState state) {
+    // 주공이면 수비팀 아님
+    if (player.isDeclarer) return false;
+
+    // 프렌드가 공개되었고 프렌드이면 수비팀 아님
+    if (state.friendRevealed && player.isFriend) return false;
+
+    // 프렌드가 아직 공개되지 않은 경우, 자신이 프렌드 카드를 가지고 있는지 확인
+    if (!state.friendRevealed && state.friendDeclaration?.card != null) {
+      final friendCard = state.friendDeclaration!.card!;
+      bool hasFriendCard = player.hand.any((c) =>
+          c.suit == friendCard.suit && c.rank == friendCard.rank);
+      if (hasFriendCard) return false; // 프렌드 카드를 가지고 있으면 주공팀
+    }
+
+    // 그 외에는 수비팀
+    return true;
+  }
+
+  // 수비팀이 현재 트릭에서 이기고 있는지 확인
+  bool _isDefenseTeamWinning(GameState state, int? currentWinnerId) {
+    if (currentWinnerId == null) return false;
+
+    final winner = state.players[currentWinnerId];
+
+    // 주공이 이기고 있으면 수비팀이 이기는 것 아님
+    if (winner.isDeclarer) return false;
+
+    // 프렌드가 공개되고 프렌드가 이기고 있으면 수비팀이 이기는 것 아님
+    if (state.friendRevealed && winner.isFriend) return false;
+
+    // 프렌드가 아직 공개되지 않은 경우
+    // 이기고 있는 사람이 프렌드 카드를 가지고 있을 수 있으므로 보수적으로 판단
+    // -> 프렌드가 공개된 경우에만 수비팀 승리로 판단
+    if (!state.friendRevealed) return false;
+
+    // 수비팀이 이기고 있음
+    return true;
   }
 }
