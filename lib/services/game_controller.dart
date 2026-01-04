@@ -143,6 +143,17 @@ class GameController extends ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 600));
 
     final currentPlayer = _state.players[_state.currentPlayer];
+
+    // AI 조커 콜 결정 (선공 시에만)
+    if (_state.currentTrick != null && _state.currentTrick!.cards.isEmpty) {
+      final jokerCallSuit = _aiPlayer.decideJokerCall(currentPlayer, _state);
+      if (jokerCallSuit != null) {
+        _state.declareJokerCall(jokerCallSuit);
+        notifyListeners();
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+    }
+
     final card = _aiPlayer.selectCard(currentPlayer, _state);
     _state.playCard(card, currentPlayer.id);
 

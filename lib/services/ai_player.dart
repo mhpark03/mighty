@@ -221,6 +221,46 @@ class AIPlayer {
     return FriendDeclaration.noFriend();
   }
 
+  // 조커 콜 결정 (선공 시에만 호출)
+  Suit? decideJokerCall(Player player, GameState state) {
+    // 첫 트릭에서는 조커 콜 불가
+    if (state.currentTrickNumber <= 1) return null;
+
+    // 선공이 아니면 조커 콜 불가
+    if (state.currentTrick == null || state.currentTrick!.cards.isNotEmpty) {
+      return null;
+    }
+
+    // 조커를 가지고 있으면 조커 콜 안 함
+    bool hasJoker = player.hand.any((c) => c.isJoker);
+    if (hasJoker) return null;
+
+    // 30% 확률로 조커 콜 시도
+    if (Random().nextDouble() > 0.3) return null;
+
+    // 가장 많은 카드를 가진 무늬로 조커 콜
+    Map<Suit, int> suitCounts = {};
+    for (final suit in Suit.values) {
+      suitCounts[suit] = player.hand.where((c) => !c.isJoker && c.suit == suit).length;
+    }
+
+    Suit? bestSuit;
+    int maxCount = 0;
+    for (final entry in suitCounts.entries) {
+      if (entry.value > maxCount) {
+        maxCount = entry.value;
+        bestSuit = entry.key;
+      }
+    }
+
+    // 최소 2장 이상 있어야 조커 콜
+    if (maxCount >= 2) {
+      return bestSuit;
+    }
+
+    return null;
+  }
+
   PlayingCard selectCard(Player player, GameState state) {
     final playableCards = player.hand
         .where((card) => state.canPlayCard(card, player))
