@@ -308,21 +308,42 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
       return b.rankValue.compareTo(a.rankValue);
     });
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: sortedHand.map((card) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: CardWidget(
-              card: card,
-              width: cardWidth,
-              height: cardHeight,
-              isPlayable: false,
-            ),
-          );
-        }).toList(),
-      ),
+    // 2줄로 나누기 (5장씩)
+    final firstRow = sortedHand.take(5).toList();
+    final secondRow = sortedHand.skip(5).toList();
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: firstRow.map((card) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: CardWidget(
+                card: card,
+                width: cardWidth,
+                height: cardHeight,
+                isPlayable: false,
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: secondRow.map((card) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: CardWidget(
+                card: card,
+                width: cardWidth,
+                height: cardHeight,
+                isPlayable: false,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
@@ -393,12 +414,11 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
   }
 
   Widget _buildSelectableCards(double cardWidth, double cardHeight) {
-    // 무늬별로 그룹화
-    final spades = _allSelectableCards.where((c) => c.suit == Suit.spade).toList();
-    final diamonds = _allSelectableCards.where((c) => c.suit == Suit.diamond).toList();
-    final hearts = _allSelectableCards.where((c) => c.suit == Suit.heart).toList();
-    final clubs = _allSelectableCards.where((c) => c.suit == Suit.club).toList();
-    final joker = _allSelectableCards.where((c) => c.isJoker).toList();
+    // 무늬별로 그룹화 (조커 제외 - 위에 버튼으로 있음)
+    final spades = _allSelectableCards.where((c) => c.suit == Suit.spade && !c.isJoker).toList();
+    final diamonds = _allSelectableCards.where((c) => c.suit == Suit.diamond && !c.isJoker).toList();
+    final hearts = _allSelectableCards.where((c) => c.suit == Suit.heart && !c.isJoker).toList();
+    final clubs = _allSelectableCards.where((c) => c.suit == Suit.club && !c.isJoker).toList();
 
     return SingleChildScrollView(
       child: Column(
@@ -410,8 +430,6 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
           _buildCardRow(hearts, cardWidth, cardHeight, '♥'),
           const SizedBox(height: 4),
           _buildCardRow(clubs, cardWidth, cardHeight, '♣'),
-          const SizedBox(height: 4),
-          _buildCardRow(joker, cardWidth, cardHeight, '🃏'),
         ],
       ),
     );
@@ -438,12 +456,14 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
             child: Row(
               children: cards.map((card) {
                 final isInHand = _isCardInHand(card);
+                final isMighty = card == widget.mighty;
+                final isDisabled = isInHand || isMighty;
                 final isSelected = _selectedType == 'card' && _selectedCard == card;
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 1),
                   child: GestureDetector(
-                    onTap: isInHand
+                    onTap: isDisabled
                         ? null
                         : () {
                             setState(() {
@@ -452,7 +472,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                             });
                           },
                     child: Opacity(
-                      opacity: isInHand ? 0.3 : 1.0,
+                      opacity: isDisabled ? 0.3 : 1.0,
                       child: Container(
                         width: cardWidth,
                         height: cardHeight,
@@ -460,7 +480,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                           color: card.isJoker ? Colors.purple : Colors.white,
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
-                            color: isSelected ? Colors.amber : (isInHand ? Colors.grey : Colors.grey[400]!),
+                            color: isSelected ? Colors.amber : (isDisabled ? Colors.grey : Colors.grey[400]!),
                             width: isSelected ? 3 : 1,
                           ),
                           boxShadow: isSelected
