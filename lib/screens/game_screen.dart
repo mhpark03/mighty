@@ -97,22 +97,11 @@ class _GameScreenState extends State<GameScreen> {
             title: Text(l10n.appTitle, style: const TextStyle(color: Colors.white)),
             backgroundColor: Colors.green[900],
             iconTheme: const IconThemeData(color: Colors.white),
-            leading: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white),
-              onPressed: () => _showExitDialog(controller),
-            ),
+            automaticallyImplyLeading: false,
             actions: [
               IconButton(
-                icon: const Icon(Icons.refresh, color: Colors.white),
-                onPressed: () {
-                  controller.reset();
-                  controller.startNewGame();
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.power_settings_new, color: Colors.white),
+                icon: const Icon(Icons.close, color: Colors.white),
                 onPressed: () => _showExitDialog(controller),
-                tooltip: l10n.exitGame,
               ),
             ],
           ),
@@ -240,19 +229,6 @@ class _GameScreenState extends State<GameScreen> {
                   l10n.noBidYet,
                   style: const TextStyle(color: Colors.white70),
                 ),
-              ElevatedButton.icon(
-                onPressed: () {
-                  controller.reset();
-                  controller.startNewGame();
-                },
-                icon: const Icon(Icons.refresh, size: 16),
-                label: Text(l10n.newGame),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                ),
-              ),
             ],
           ),
         ),
