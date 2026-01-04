@@ -1256,6 +1256,7 @@ class _GameScreenState extends State<GameScreen> {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (int i = 1; i < 5; i++)
           SizedBox(
