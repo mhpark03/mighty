@@ -20,6 +20,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   PlayingCard? selectedCard;
+  bool _allPassedDialogShown = false;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +54,13 @@ class _GameScreenState extends State<GameScreen> {
 
     switch (state.phase) {
       case GamePhase.waiting:
+        // 모두 패스한 경우 팝업 표시
+        if (state.allPassed && !_allPassedDialogShown) {
+          _allPassedDialogShown = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _showAllPassedDialog(controller);
+          });
+        }
         return _buildWaitingScreen(controller);
       case GamePhase.dealing:
         return const Center(
@@ -866,6 +874,31 @@ class _GameScreenState extends State<GameScreen> {
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Text('$suitSymbol 조커 콜!', style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAllPassedDialog(GameController controller) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('모두 패스'),
+        content: const Text('모든 플레이어가 패스했습니다.\n새 게임을 시작합니다.'),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                _allPassedDialogShown = false;
+              });
+              controller.reset();
+              controller.startNewGame();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: const Text('새 게임', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),

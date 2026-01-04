@@ -193,6 +193,9 @@ class GameState {
 
   int get currentTrickNumber => tricksPlayed + 1;
 
+  // 모두 패스했는지 확인
+  bool get allPassed => passedPlayers.every((p) => p);
+
   bool get isNoGiruda => giruda == null;
 
   PlayingCard get mighty {
@@ -271,8 +274,8 @@ class GameState {
     }
 
     if (passCount == 5) {
-      reset();
-      startNewGame();
+      // 모두 패스 - 컨트롤러에서 처리하도록 phase만 변경
+      phase = GamePhase.waiting;
       return;
     }
 
