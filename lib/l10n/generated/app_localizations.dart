@@ -618,6 +618,18 @@ abstract class AppLocalizations {
   /// **'{suit} 조커 콜!'**
   String jokerCallButton(String suit);
 
+  /// No description provided for @jokerLeadSuitTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 선공'**
+  String get jokerLeadSuitTitle;
+
+  /// No description provided for @jokerLeadSuitQuestion.
+  ///
+  /// In ko, this message translates to:
+  /// **'다른 플레이어가 따라야 할 무늬를 선택하세요'**
+  String get jokerLeadSuitQuestion;
+
   /// No description provided for @allPassedTitle.
   ///
   /// In ko, this message translates to:

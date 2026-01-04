@@ -69,6 +69,8 @@
   "exitAppConfirm": "退出应用？",
   "joker": "小丑",
   "mighty": "王牌",
+  "jokerLeadSuitTitle": "小丑领先",
+  "jokerLeadSuitQuestion": "选择其他玩家必须跟随的花色",
   "gameGuide": "游戏方法",
   "guideOverview": "游戏概述",
   "guideOverviewText": "Mighty是一款5人吃墩纸牌游戏。庄家(1人)和朋友(1人)组队对抗防守队(3人)。",

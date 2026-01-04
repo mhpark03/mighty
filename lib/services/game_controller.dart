@@ -156,6 +156,7 @@ class GameController extends ChangeNotifier {
 
     final currentPlayer = _state.players[_state.currentPlayer];
     PlayingCard card;
+    Suit? jokerLeadSuit;
 
     // AI 조커 콜 결정 (선공 시에만)
     if (_state.currentTrick != null && _state.currentTrick!.cards.isEmpty) {
@@ -168,6 +169,10 @@ class GameController extends ChangeNotifier {
         card = _state.jokerCall;
       } else {
         card = _aiPlayer.selectCard(currentPlayer, _state);
+        // 조커 선공 시 무늬 결정
+        if (card.isJoker) {
+          jokerLeadSuit = _aiPlayer.selectJokerLeadSuit(currentPlayer, _state);
+        }
       }
     } else {
       card = _aiPlayer.selectCard(currentPlayer, _state);
@@ -176,7 +181,7 @@ class GameController extends ChangeNotifier {
     // 트릭 완료 여부 확인을 위해 현재 트릭 수 저장
     final trickCountBefore = _state.tricks.length;
 
-    _state.playCard(card, currentPlayer.id);
+    _state.playCard(card, currentPlayer.id, jokerLeadSuit: jokerLeadSuit);
 
     _isProcessing = false;
 
@@ -200,7 +205,7 @@ class GameController extends ChangeNotifier {
     }
   }
 
-  void humanPlayCard(PlayingCard card, {Suit? jokerCallSuit}) {
+  void humanPlayCard(PlayingCard card, {Suit? jokerCallSuit, Suit? jokerLeadSuit}) {
     if (_state.currentPlayer != 0) return;
     if (!_state.canPlayCard(card, humanPlayer)) return;
     // 사용자가 선공일 때는 확인 대기 중이 아니므로 카드 낼 수 있음
@@ -217,7 +222,7 @@ class GameController extends ChangeNotifier {
     // 트릭 완료 여부 확인을 위해 현재 트릭 수 저장
     final trickCountBefore = _state.tricks.length;
 
-    _state.playCard(card, 0);
+    _state.playCard(card, 0, jokerLeadSuit: jokerLeadSuit);
 
     // 트릭이 완료되었는지 확인
     if (_state.tricks.length > trickCountBefore && _state.phase == GamePhase.playing) {

@@ -299,6 +299,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get jokerLeadSuitTitle => 'Joker Lead';
+
+  @override
+  String get jokerLeadSuitQuestion => 'Select the suit others must follow';
+
+  @override
   String get allPassedTitle => 'All Passed';
 
   @override

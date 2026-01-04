@@ -69,6 +69,8 @@
   "exitAppConfirm": "アプリを終了しますか？",
   "joker": "ジョーカー",
   "mighty": "マイティ",
+  "jokerLeadSuitTitle": "ジョーカーリード",
+  "jokerLeadSuitQuestion": "他のプレイヤーが従うスートを選んでください",
   "gameGuide": "遊び方",
   "guideOverview": "ゲーム概要",
   "guideOverviewText": "マイティは5人で遊ぶトリックテイキングカードゲームです。宣言者(1人)とフレンド(1人)がチームを組み、守備チーム(3人)と対戦します。",

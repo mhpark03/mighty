@@ -167,6 +167,8 @@
       "suit": {"type": "String"}
     }
   },
+  "jokerLeadSuitTitle": "조커 선공",
+  "jokerLeadSuitQuestion": "다른 플레이어가 따라야 할 무늬를 선택하세요",
   "allPassedTitle": "모두 패스",
   "allPassedMessage": "모든 플레이어가 패스했습니다.\n새 게임을 시작합니다.",
   "girudaChangeWarning": "기루다 변경 시 목표 +2 증가",

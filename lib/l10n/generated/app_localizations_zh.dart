@@ -299,6 +299,12 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get jokerLeadSuitTitle => '小丑领先';
+
+  @override
+  String get jokerLeadSuitQuestion => '选择其他玩家必须跟随的花色';
+
+  @override
   String get allPassedTitle => '모두 패스';
 
   @override

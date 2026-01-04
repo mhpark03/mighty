@@ -86,6 +86,8 @@
   "jokerCallQuestion": "Declare {suit} Joker Call?",
   "no": "No",
   "jokerCallButton": "{suit} Joker Call!",
+  "jokerLeadSuitTitle": "Joker Lead",
+  "jokerLeadSuitQuestion": "Select the suit others must follow",
   "allPassedTitle": "All Passed",
   "allPassedMessage": "All players passed.\nStarting new game.",
   "girudaChangeWarning": "Changing trump: goal +2",

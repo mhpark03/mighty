@@ -1894,6 +1894,9 @@ class _GameScreenState extends State<GameScreen> {
       final jokerCallCard = controller.state.jokerCall;
       if (controller.canDeclareJokerCall && card == jokerCallCard) {
         _showJokerCallDialog(card, controller);
+      } else if (card.isJoker && controller.isLeadingTrick) {
+        // 조커 선공 시 무늬 선택 다이얼로그
+        _showJokerLeadSuitDialog(card, controller);
       } else {
         controller.humanPlayCard(card);
         setState(() {
@@ -1939,6 +1942,51 @@ class _GameScreenState extends State<GameScreen> {
             child: Text(l10n.jokerCallButton(suitSymbol), style: const TextStyle(color: Colors.white)),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showJokerLeadSuitDialog(PlayingCard card, GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.jokerLeadSuitTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.jokerLeadSuitQuestion),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final suit in Suit.values)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      controller.humanPlayCard(card, jokerLeadSuit: suit);
+                      setState(() {
+                        selectedCard = null;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: (suit == Suit.heart || suit == Suit.diamond)
+                          ? Colors.red[100]
+                          : Colors.grey[200],
+                      foregroundColor: (suit == Suit.heart || suit == Suit.diamond)
+                          ? Colors.red
+                          : Colors.black,
+                    ),
+                    child: Text(
+                      _getSuitSymbol(suit),
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

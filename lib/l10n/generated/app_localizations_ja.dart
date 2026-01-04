@@ -299,6 +299,12 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get jokerLeadSuitTitle => 'ジョーカーリード';
+
+  @override
+  String get jokerLeadSuitQuestion => '他のプレイヤーが従うスートを選んでください';
+
+  @override
   String get allPassedTitle => '모두 패스';
 
   @override

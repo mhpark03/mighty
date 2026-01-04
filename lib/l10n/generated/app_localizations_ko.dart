@@ -299,6 +299,12 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get jokerLeadSuitTitle => '조커 선공';
+
+  @override
+  String get jokerLeadSuitQuestion => '다른 플레이어가 따라야 할 무늬를 선택하세요';
+
+  @override
   String get allPassedTitle => '모두 패스';
 
   @override

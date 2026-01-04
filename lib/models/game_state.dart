@@ -113,6 +113,7 @@ class Trick {
   int? winnerId;
   JokerCallType jokerCall;
   Suit? jokerCallSuit;  // 조커 콜로 지정된 무늬
+  Suit? jokerLeadSuit;  // 조커 선공 시 지정된 무늬
 
   Trick({
     required this.trickNumber,
@@ -123,12 +124,19 @@ class Trick {
     this.winnerId,
     this.jokerCall = JokerCallType.none,
     this.jokerCallSuit,
+    this.jokerLeadSuit,
   })  : cards = cards ?? [],
         playerOrder = playerOrder ?? [];
 
-  void addCard(PlayingCard card, int playerId) {
-    if (cards.isEmpty && !card.isJoker) {
-      leadSuit = card.suit;
+  void addCard(PlayingCard card, int playerId, {Suit? jokerSuit}) {
+    if (cards.isEmpty) {
+      if (card.isJoker) {
+        // 조커 선공 시 지정된 무늬를 leadSuit으로 사용
+        jokerLeadSuit = jokerSuit;
+        leadSuit = jokerSuit;
+      } else {
+        leadSuit = card.suit;
+      }
     }
     cards.add(card);
     playerOrder.add(playerId);
@@ -511,10 +519,10 @@ class GameState {
     }
   }
 
-  void playCard(PlayingCard card, int playerId) {
+  void playCard(PlayingCard card, int playerId, {Suit? jokerLeadSuit}) {
     final player = players[playerId];
     player.removeCard(card);
-    currentTrick!.addCard(card, playerId);
+    currentTrick!.addCard(card, playerId, jokerSuit: jokerLeadSuit);
 
     if (!friendRevealed && friendDeclaration != null) {
       if (friendDeclaration!.card != null && card == friendDeclaration!.card) {
