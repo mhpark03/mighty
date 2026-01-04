@@ -88,6 +88,11 @@ class _GameScreenState extends State<GameScreen> {
   Widget _buildGameBody(GameController controller) {
     final state = controller.state;
 
+    // 키티 선택 단계가 아니면 플래그 리셋
+    if (state.phase != GamePhase.selectingKitty) {
+      _kittyDialogShown = false;
+    }
+
     switch (state.phase) {
       case GamePhase.waiting:
         // 모두 패스한 경우 팝업 표시
@@ -635,21 +640,30 @@ class _GameScreenState extends State<GameScreen> {
       );
     }
 
+    // 사용자가 주공이면 바로 키티 선택 다이얼로그 표시
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.state.phase == GamePhase.selectingKitty &&
+          controller.state.declarerId == 0 &&
+          !_kittyDialogShown) {
+        _kittyDialogShown = true;
+        _showKittyDialog(controller);
+      }
+    });
+
     return Column(
       children: [
         Expanded(
           child: Center(
-            child: ElevatedButton(
-              onPressed: () => _showKittyDialog(controller),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              ),
-              child: Text(
-                l10n.selectKitty,
-                style: const TextStyle(fontSize: 18, color: Colors.black),
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(color: Colors.amber),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.selectKitty,
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ],
             ),
           ),
         ),
@@ -657,6 +671,8 @@ class _GameScreenState extends State<GameScreen> {
       ],
     );
   }
+
+  bool _kittyDialogShown = false;
 
   void _showKittyDialog(GameController controller) {
     showDialog(
@@ -668,6 +684,7 @@ class _GameScreenState extends State<GameScreen> {
         currentGiruda: controller.state.giruda,
         onConfirm: (discards, newGiruda) {
           Navigator.pop(context);
+          _kittyDialogShown = false;
           controller.humanSelectKitty(discards, newGiruda);
         },
       ),
@@ -749,9 +766,6 @@ class _GameScreenState extends State<GameScreen> {
             Expanded(
               child: _buildPlayArea(controller),
             ),
-            // 사용자 선공 시 이전 트릭 정보 표시
-            if (controller.isHumanLeaderAfterTrick)
-              _buildPreviousTrickInfo(controller),
             _buildPlayerHand(controller),
           ],
         ),
@@ -759,91 +773,6 @@ class _GameScreenState extends State<GameScreen> {
         if (controller.waitingForTrickConfirm)
           _buildTrickConfirmOverlay(controller),
       ],
-    );
-  }
-
-  Widget _buildPreviousTrickInfo(GameController controller) {
-    final trick = controller.lastCompletedTrick;
-    if (trick == null) return const SizedBox.shrink();
-
-    final winner = controller.state.players[trick.winnerId ?? 0];
-    final isDeclarerTeam = winner.isDeclarer || winner.isFriend;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isDeclarerTeam ? Colors.blue[900] : Colors.red[900],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDeclarerTeam ? Colors.blue[400]! : Colors.red[400]!,
-          width: 2,
-        ),
-      ),
-      child: Row(
-        children: [
-          // 이전 트릭 카드들
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Text(
-                    '이전: ',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                  for (int i = 0; i < trick.cards.length; i++) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      decoration: trick.playerOrder[i] == trick.winnerId
-                          ? BoxDecoration(
-                              border: Border.all(color: Colors.amber, width: 1),
-                              borderRadius: BorderRadius.circular(4),
-                            )
-                          : null,
-                      child: CardWidget(
-                        card: trick.cards[i],
-                        width: 30,
-                        height: 45,
-                      ),
-                    ),
-                    const SizedBox(width: 2),
-                  ],
-                ],
-              ),
-            ),
-          ),
-          // 승자 정보
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.amber,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '${winner.name} 승',
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          // 카드 선택 안내
-          const Text(
-            '카드를 선택하세요',
-            style: TextStyle(
-              color: Colors.amber,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -1134,7 +1063,7 @@ class _GameScreenState extends State<GameScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.green[600]!, width: 2),
             ),
-            child: _buildTrickCards(trick, state),
+            child: _buildTrickCards(trick, state, controller),
           ),
         ),
         Positioned(
@@ -1348,11 +1277,109 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _buildTrickCards(Trick? trick, GameState state) {
+  Widget _buildTrickCards(Trick? trick, GameState state, GameController controller) {
     final l10n = AppLocalizations.of(context)!;
     final isHumanLeading = state.currentPlayer == 0 && (trick == null || trick.cards.isEmpty);
+    final lastTrick = controller.lastCompletedTrick;
+    final showPreviousTrick = isHumanLeading && lastTrick != null;
 
     if (trick == null || trick.cards.isEmpty) {
+      // 이전 트릭이 있고 사용자가 선공이면 이전 트릭 표시
+      if (showPreviousTrick) {
+        final winner = state.players[lastTrick.winnerId ?? 0];
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 이전 트릭 헤더
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black38,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      '이전 트릭 ',
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.amber,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '${winner.name} 승',
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // 이전 트릭 카드들
+              Wrap(
+                spacing: 8,
+                children: [
+                  for (int i = 0; i < lastTrick.cards.length; i++)
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          state.players[lastTrick.playerOrder[i]].name,
+                          style: TextStyle(
+                            color: lastTrick.playerOrder[i] == lastTrick.winnerId
+                                ? Colors.amber
+                                : Colors.white70,
+                            fontSize: 10,
+                            fontWeight: lastTrick.playerOrder[i] == lastTrick.winnerId
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                        ),
+                        Container(
+                          decoration: lastTrick.playerOrder[i] == lastTrick.winnerId
+                              ? BoxDecoration(
+                                  border: Border.all(color: Colors.amber, width: 2),
+                                  borderRadius: BorderRadius.circular(4),
+                                )
+                              : null,
+                          child: Opacity(
+                            opacity: 0.7,
+                            child: CardWidget(
+                              card: lastTrick.cards[i],
+                              width: 40,
+                              height: 56,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              // 선공 안내
+              const Text(
+                '👆 선공입니다! 카드를 선택하세요',
+                style: TextStyle(
+                  color: Colors.amber,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      // 이전 트릭이 없는 경우 기본 메시지
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

@@ -391,6 +391,16 @@ class GameState {
     }
 
     kitty = discardCards;
+
+    // 기루다가 변경되면 목표 +2 증가
+    if (newGiruda != giruda && currentBid != null) {
+      currentBid = Bid(
+        playerId: currentBid!.playerId,
+        suit: newGiruda,
+        tricks: currentBid!.tricks + 2,
+      );
+    }
+
     giruda = newGiruda;
     declarer.sortHand();
     phase = GamePhase.declaringFriend;
