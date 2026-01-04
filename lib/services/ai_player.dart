@@ -55,6 +55,36 @@ class AIPlayer {
     return remaining <= 7;
   }
 
+  // 컷된 무늬 목록 가져오기 (기루다로 다른 무늬가 이겨진 경우)
+  Set<Suit> _getCutSuits(GameState state) {
+    Set<Suit> cutSuits = {};
+    if (state.giruda == null) return cutSuits;
+
+    for (final trick in state.tricks) {
+      if (trick.leadSuit == null || trick.winnerId == null) continue;
+
+      // 리드 무늬가 기루다가 아닌 경우
+      if (trick.leadSuit != state.giruda) {
+        // 이긴 카드 찾기
+        int winnerIndex = trick.playerOrder.indexOf(trick.winnerId!);
+        if (winnerIndex >= 0 && winnerIndex < trick.cards.length) {
+          PlayingCard winningCard = trick.cards[winnerIndex];
+          // 이긴 카드가 기루다이고 마이티/조커가 아닌 경우 = 컷
+          if (!winningCard.isJoker && !winningCard.isMighty &&
+              winningCard.suit == state.giruda) {
+            cutSuits.add(trick.leadSuit!);
+          }
+        }
+      }
+    }
+    return cutSuits;
+  }
+
+  // 특정 무늬가 컷된 적이 있는지 확인
+  bool _wasSuitCut(GameState state, Suit suit) {
+    return _getCutSuits(state).contains(suit);
+  }
+
   // 카드의 실효 가치 계산 (오픈된 카드 고려)
   // A가 오픈되면 K가 가장 높은 카드가 됨 -> K의 가치 = A의 가치
   int _getEffectiveCardValue(PlayingCard card, GameState state) {
@@ -1117,10 +1147,19 @@ class AIPlayer {
       // 마이티 무늬 확인 (기루다가 스페이드면 다이아, 아니면 스페이드)
       Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
 
+      // 컷된 무늬와 남은 기루다 확인
+      final cutSuits = _getCutSuits(state);
+      final remainingGiruda = _getRemainingGirudaCount(state, player);
+
       // 마이티 대신 사용할 수 있는 최상위 카드 찾기
       // (실효가치 14+ 또는 마이티와 같은 무늬의 K)
+      // 단, 컷된 무늬는 제외 (상대 기루다 0이면 모든 무늬 허용)
       final topCardsInstead = playableCards.where((c) {
         if (c.isMighty || c.isJoker) return false;
+        // 컷된 무늬는 우선순위 낮춤 (상대 기루다 없으면 허용)
+        if (remainingGiruda > 0 && c.suit != null && cutSuits.contains(c.suit)) {
+          return false;
+        }
         // 마이티와 같은 무늬의 K (마이티가 A이므로 K가 최상위)
         if (c.suit == mightySuit && c.rank == Rank.king) return true;
         // 실효가치 14 이상
@@ -1207,8 +1246,15 @@ class AIPlayer {
           if (!teamWinningSecurely) {
             // 마이티 대신 최상위 카드로 이길 수 있으면 최상위 카드 우선
             Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
+            final cutSuits = _getCutSuits(state);
+            final remainingGiruda = _getRemainingGirudaCount(state, player);
+
             final topCardsInstead = playableCards.where((c) {
               if (c.isMighty || c.isJoker) return false;
+              // 컷된 무늬는 우선순위 낮춤 (상대 기루다 없으면 허용)
+              if (remainingGiruda > 0 && c.suit != null && cutSuits.contains(c.suit)) {
+                return false;
+              }
               if (c.suit == mightySuit && c.rank == Rank.king) return true;
               return _getEffectiveCardValue(c, state) >= 14;
             }).toList();
@@ -1239,8 +1285,15 @@ class AIPlayer {
         if (defenseWinning || pointCardsInTrick >= 1) {
           // 마이티 대신 최상위 카드로 이길 수 있으면 최상위 카드 우선
           Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
+          final cutSuits = _getCutSuits(state);
+          final remainingGiruda = _getRemainingGirudaCount(state, player);
+
           final topCardsInstead = playableCards.where((c) {
             if (c.isMighty || c.isJoker) return false;
+            // 컷된 무늬는 우선순위 낮춤 (상대 기루다 없으면 허용)
+            if (remainingGiruda > 0 && c.suit != null && cutSuits.contains(c.suit)) {
+              return false;
+            }
             if (c.suit == mightySuit && c.rank == Rank.king) return true;
             return _getEffectiveCardValue(c, state) >= 14;
           }).toList();
