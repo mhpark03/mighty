@@ -212,7 +212,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
 
             // 카드로 지정 섹션
             Expanded(
@@ -227,7 +227,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 8, bottom: 8),
+                      padding: const EdgeInsets.only(left: 8, bottom: 4),
                       child: Text(
                         l10n.byCard,
                         style: const TextStyle(
@@ -239,7 +239,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                     ),
                     // 무늬 선택 버튼들
                     _buildSuitSelector(),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     // 선택된 무늬의 카드들 (3열)
                     Expanded(
                       child: _buildCardGrid(),
@@ -457,8 +457,8 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         });
       },
       child: Container(
-        width: 60,
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        width: 55,
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(8),
@@ -471,7 +471,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
           child: Text(
             symbol,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               color: isSelected
                   ? (isRed ? Colors.red : Colors.black)
                   : (isRed ? Colors.red[300] : Colors.white70),
@@ -501,16 +501,16 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         c.rank == Rank.four || c.rank == Rank.three || c.rank == Rank.two).toList();
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = (screenWidth - 80) / 5;
-    final cardHeight = cardWidth * 1.4;
+    final cardWidth = (screenWidth - 64) / 5.5;
+    final cardHeight = cardWidth * 1.3;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildCardGridRow(row1, cardWidth, cardHeight),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildCardGridRow(row2, cardWidth, cardHeight),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildCardGridRow(row3, cardWidth, cardHeight),
       ],
     );
