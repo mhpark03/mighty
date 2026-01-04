@@ -85,6 +85,68 @@ class AIPlayer {
     return _getCutSuits(state).contains(suit);
   }
 
+  // 주공이 강한 무늬 찾기 (이전 트릭에서 높은 카드를 낸 무늬)
+  Suit? _getDeclarerStrongSuit(GameState state) {
+    if (state.declarerId == null) return null;
+
+    // 무늬별 주공이 낸 카드 중 가장 높은 랭크 기록
+    Map<Suit, int> suitHighestRank = {};
+
+    for (final trick in state.tricks) {
+      int declarerIndex = trick.playerOrder.indexOf(state.declarerId!);
+      if (declarerIndex >= 0 && declarerIndex < trick.cards.length) {
+        PlayingCard card = trick.cards[declarerIndex];
+        if (!card.isJoker && !card.isMighty && card.suit != null) {
+          Suit suit = card.suit!;
+          int rankValue = card.rankValue;
+          if (!suitHighestRank.containsKey(suit) || rankValue > suitHighestRank[suit]!) {
+            suitHighestRank[suit] = rankValue;
+          }
+        }
+      }
+    }
+
+    // 가장 높은 랭크를 낸 무늬 찾기 (기루다 제외, 기루다는 주공이 당연히 강함)
+    Suit? strongestSuit;
+    int highestRank = 0;
+    for (final entry in suitHighestRank.entries) {
+      if (entry.key != state.giruda && entry.value > highestRank) {
+        highestRank = entry.value;
+        strongestSuit = entry.key;
+      }
+    }
+
+    // A나 K 이상을 낸 무늬만 강한 무늬로 인정
+    if (highestRank >= 13) {
+      return strongestSuit;
+    }
+    return null;
+  }
+
+  // 주공이 특정 무늬가 없는지 확인 (컷한 이력으로 판단)
+  Set<Suit> _getDeclarerVoidSuits(GameState state) {
+    Set<Suit> voidSuits = {};
+    if (state.declarerId == null || state.giruda == null) return voidSuits;
+
+    for (final trick in state.tricks) {
+      if (trick.leadSuit == null) continue;
+      Suit leadSuit = trick.leadSuit!;
+
+      // 주공이 리드 무늬가 아닌 카드를 낸 경우 = 해당 무늬가 없음
+      int declarerIndex = trick.playerOrder.indexOf(state.declarerId!);
+      if (declarerIndex >= 0 && declarerIndex < trick.cards.length) {
+        PlayingCard card = trick.cards[declarerIndex];
+        if (!card.isJoker) {
+          // 리드 무늬와 다른 무늬를 냈으면 리드 무늬가 없는 것
+          if (card.suit != leadSuit) {
+            voidSuits.add(leadSuit);
+          }
+        }
+      }
+    }
+    return voidSuits;
+  }
+
   // 카드의 실효 가치 계산 (오픈된 카드 고려)
   // A가 오픈되면 K가 가장 높은 카드가 됨 -> K의 가치 = A의 가치
   int _getEffectiveCardValue(PlayingCard card, GameState state) {
@@ -939,6 +1001,67 @@ class AIPlayer {
       if (girudaCards.isNotEmpty) {
         girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
         return girudaCards.first;
+      }
+    }
+
+    // === 프렌드 선공 전략: 주공에게 선공 넘기기 ===
+    // 프렌드가 공개되고, 내가 프렌드이고, 주공이 아닌 경우
+    bool iAmFriend = state.friendRevealed && player.isFriend &&
+        state.declarerId != null && player.id != state.declarerId;
+
+    if (iAmFriend && state.giruda != null) {
+      // 전략 1: 주공의 강한 무늬로 선공 (주공이 A/K를 냈던 무늬)
+      Suit? declarerStrongSuit = _getDeclarerStrongSuit(state);
+      if (declarerStrongSuit != null) {
+        final strongSuitCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit == declarerStrongSuit).toList();
+        if (strongSuitCards.isNotEmpty) {
+          // 낮은 카드로 선공하여 주공이 이기게 함
+          strongSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return strongSuitCards.first;
+        }
+      }
+
+      // 전략 2: 주공이 없는 무늬로 선공 (주공이 기루다로 컷 가능)
+      Set<Suit> declarerVoidSuits = _getDeclarerVoidSuits(state);
+      if (declarerVoidSuits.isNotEmpty) {
+        for (Suit voidSuit in declarerVoidSuits) {
+          final voidSuitCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMighty && c.suit == voidSuit).toList();
+          if (voidSuitCards.isNotEmpty) {
+            // 낮은 카드로 선공하여 주공이 기루다로 컷하게 함
+            voidSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return voidSuitCards.first;
+          }
+        }
+      }
+
+      // 전략 3: 낮은 기루다로 선공 (주공이 높은 기루다로 이김)
+      final myGirudaCards = playableCards.where((c) =>
+          !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+      if (myGirudaCards.isNotEmpty) {
+        // 내 기루다 중 가장 낮은 것
+        myGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        // 10 이하의 낮은 기루다만 사용 (높은 기루다는 아낌)
+        final lowGiruda = myGirudaCards.where((c) => c.rankValue <= 10).toList();
+        if (lowGiruda.isNotEmpty) {
+          return lowGiruda.first;
+        }
+      }
+
+      // 전략 4: 비기루다 중 낮은 카드로 선공 (수비팀이 이길 가능성, 주공이 다음 기회에)
+      final nonGirudaCards = playableCards.where((c) =>
+          !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+      if (nonGirudaCards.isNotEmpty) {
+        nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        // 컷되지 않은 무늬 우선
+        final cutSuits = _getCutSuits(state);
+        final nonCutCards = nonGirudaCards.where((c) =>
+            c.suit != null && !cutSuits.contains(c.suit)).toList();
+        if (nonCutCards.isNotEmpty) {
+          return nonCutCards.first;
+        }
+        return nonGirudaCards.first;
       }
     }
 
