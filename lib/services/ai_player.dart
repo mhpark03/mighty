@@ -1015,13 +1015,35 @@ class AIPlayer {
       }
     }
 
-    // === 공격팀 선공권 탈환 전략 ===
-    // 공격팀(주공/프렌드)이 선공권을 잃었을 때 마이티/조커로 선공권을 되찾는다
-    // 선공권이 있어야 자신이 가진 높은 무늬로 공격하여 이길 가능성이 높아진다
+    // === 상대팀 조커에 대한 마이티 대응 ===
+    // 상대팀이 조커로 이기려 할 때 점수 카드 2장 이상이면 마이티로 선공 탈환
     bool isDefenseTeam = _isPlayerOnDefenseTeam(player, state);
     bool defenseWinning = _isDefenseTeamWinning(state, currentWinnerId);
     bool isAttackTeam = !isDefenseTeam;
 
+    if (currentWinningCard != null && currentWinningCard.isJoker) {
+      // 상대팀이 조커로 이기고 있는지 확인
+      bool opponentWinningWithJoker = (isAttackTeam && defenseWinning) ||
+          (isDefenseTeam && !defenseWinning);
+
+      if (opponentWinningWithJoker) {
+        // 현재 트릭의 점수 카드 수 계산
+        int pointCardsInTrick = state.currentTrick!.cards
+            .where((c) => c.isPointCard || c.isJoker).length;
+
+        // 점수 카드 2장 이상이고 마이티가 있으면 마이티 사용
+        if (pointCardsInTrick >= 2) {
+          final mighty = playableCards.where((c) => c.isMighty).toList();
+          if (mighty.isNotEmpty) {
+            return mighty.first;
+          }
+        }
+      }
+    }
+
+    // === 공격팀 선공권 탈환 전략 ===
+    // 공격팀(주공/프렌드)이 선공권을 잃었을 때 마이티/조커로 선공권을 되찾는다
+    // 선공권이 있어야 자신이 가진 높은 무늬로 공격하여 이길 가능성이 높아진다
     if (isAttackTeam && defenseWinning) {
       // 공격팀인데 수비팀이 이기고 있으면 마이티/조커로 선공권 탈환 시도
 
