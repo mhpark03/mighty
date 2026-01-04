@@ -500,11 +500,86 @@ class _GameScreenState extends State<GameScreen> {
               : l10n.noGiruda),
           _buildInfoItem(l10n.contract, '${state.currentBid?.tricks ?? 0}'),
           _buildInfoItem(l10n.trick, '${state.tricksPlayed}/10'),
-          if (state.friendRevealed && state.friend != null)
-            _buildInfoItem(l10n.friend, state.friend!.name),
+          // 프렌드 선언 정보 표시
+          _buildFriendInfo(state, l10n),
         ],
       ),
     );
+  }
+
+  Widget _buildFriendInfo(GameState state, AppLocalizations l10n) {
+    String friendLabel = l10n.friend;
+    String friendValue;
+    Color valueColor = Colors.white;
+
+    if (state.friendRevealed && state.friend != null) {
+      // 프렌드가 공개됨
+      friendValue = state.friend!.name;
+      valueColor = Colors.lightBlueAccent;
+    } else if (state.friendDeclaration != null) {
+      // 프렌드 선언 조건 표시
+      final decl = state.friendDeclaration!;
+      if (decl.isNoFriend) {
+        friendValue = '없음';
+        valueColor = Colors.grey;
+      } else if (decl.isFirstTrickWinner) {
+        friendValue = '첫트릭';
+        valueColor = Colors.amber;
+      } else if (decl.trickNumber != null) {
+        friendValue = '${decl.trickNumber}트릭';
+        valueColor = Colors.amber;
+      } else if (decl.card != null) {
+        friendValue = _getCardString(decl.card!);
+        valueColor = Colors.amber;
+      } else {
+        friendValue = '?';
+      }
+    } else {
+      friendValue = '?';
+    }
+
+    return Column(
+      children: [
+        Text(
+          friendLabel,
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
+        ),
+        Text(
+          friendValue,
+          style: TextStyle(
+            color: valueColor,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getCardString(PlayingCard card) {
+    if (card.isJoker) return 'Joker';
+    String suit = _getSuitSymbol(card.suit!);
+    String rank;
+    switch (card.rank) {
+      case Rank.ace:
+        rank = 'A';
+        break;
+      case Rank.king:
+        rank = 'K';
+        break;
+      case Rank.queen:
+        rank = 'Q';
+        break;
+      case Rank.jack:
+        rank = 'J';
+        break;
+      case Rank.ten:
+        rank = '10';
+        break;
+      default:
+        rank = '${card.rankValue}';
+    }
+    return '$suit$rank';
   }
 
   String _getSuitSymbol(Suit suit) {
