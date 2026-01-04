@@ -1111,13 +1111,19 @@ class AIPlayer {
     // 선공권이 있어야 자신이 가진 높은 무늬로 공격하여 이길 가능성이 높아진다
     if (isAttackTeam && defenseWinning) {
       // 공격팀인데 수비팀이 이기고 있으면 마이티/조커로 선공권 탈환 시도
+      bool hasJoker = player.hand.any((c) => c.isJoker);
+      bool hasMighty = playableCards.any((c) => c.isMighty);
 
       // 마이티로 선공권 탈환 (첫 트릭 제외)
-      if (state.currentTrickNumber > 1) {
+      // 단, 조커가 있으면 조커를 먼저 사용하고 마이티는 상대 조커 대응용으로 아낌
+      if (state.currentTrickNumber > 1 && hasMighty) {
         final mighty = playableCards.where((c) => c.isMighty).toList();
-        if (mighty.isNotEmpty) {
-          // 현재 이기고 있는 카드가 조커가 아니면 마이티 사용
-          if (currentWinningCard != null && !currentWinningCard.isJoker) {
+        // 현재 이기고 있는 카드가 조커가 아니면 마이티 사용
+        if (currentWinningCard != null && !currentWinningCard.isJoker) {
+          // 조커가 없거나, 점수 카드가 3장 이상일 때만 마이티 사용
+          int pointCardsInTrick = state.currentTrick!.cards
+              .where((c) => c.isPointCard || c.isJoker).length;
+          if (!hasJoker || pointCardsInTrick >= 3) {
             return mighty.first;
           }
         }
@@ -1142,6 +1148,51 @@ class AIPlayer {
               }
             }
           }
+        }
+      }
+    }
+
+    // === 공격팀 마이티로 점수 카드 수집 전략 ===
+    // 조커가 없고 점수 카드가 많을 때 마이티로 수집
+    if (isAttackTeam && state.currentTrickNumber > 1) {
+      final mighty = playableCards.where((c) => c.isMighty).toList();
+      if (mighty.isNotEmpty) {
+        bool hasJoker = player.hand.any((c) => c.isJoker);
+        int pointCardsInTrick = state.currentTrick!.cards
+            .where((c) => c.isPointCard || c.isJoker).length;
+
+        // 조커가 없고 점수 카드 3장 이상이면 마이티 사용
+        // 또는 점수 카드 4장 이상이면 조커 유무와 관계없이 마이티 사용
+        if ((!hasJoker && pointCardsInTrick >= 3) || pointCardsInTrick >= 4) {
+          // 같은 팀이 확실히 이기고 있지 않을 때만
+          bool teamWinningSecurely = false;
+          if (!defenseWinning && currentWinningCard != null) {
+            if (currentWinningCard.isMighty || currentWinningCard.isJoker) {
+              teamWinningSecurely = true;
+            } else {
+              int effectiveValue = _getEffectiveCardValue(currentWinningCard, state);
+              if (effectiveValue >= 14) {
+                teamWinningSecurely = true;
+              }
+            }
+          }
+          if (!teamWinningSecurely) {
+            return mighty.first;
+          }
+        }
+      }
+    }
+
+    // === 공격팀 후반전 마이티 전략 ===
+    // 후반전(트릭 8 이후)에 마이티를 사용하여 확실한 승리 확보
+    if (isAttackTeam && state.currentTrickNumber >= 8) {
+      final mighty = playableCards.where((c) => c.isMighty).toList();
+      if (mighty.isNotEmpty) {
+        // 수비팀이 이기고 있거나 점수 카드가 있으면 마이티 사용
+        int pointCardsInTrick = state.currentTrick!.cards
+            .where((c) => c.isPointCard || c.isJoker).length;
+        if (defenseWinning || pointCardsInTrick >= 1) {
+          return mighty.first;
         }
       }
     }
