@@ -636,11 +636,45 @@ class AIPlayer {
       }
     }
 
-    // === 수비팀 점수 카드 전략 ===
-    // 프렌드가 공개되고, 내가 수비팀이고, 수비팀이 이길 확률이 높으면 점수 카드를 낸다
+    // === 공격팀 선공권 탈환 전략 ===
+    // 공격팀(주공/프렌드)이 선공권을 잃었을 때 마이티/조커로 선공권을 되찾는다
+    // 선공권이 있어야 자신이 가진 높은 무늬로 공격하여 이길 가능성이 높아진다
     bool isDefenseTeam = _isPlayerOnDefenseTeam(player, state);
     bool defenseWinning = _isDefenseTeamWinning(state, currentWinnerId);
+    bool isAttackTeam = !isDefenseTeam;
 
+    if (isAttackTeam && defenseWinning) {
+      // 공격팀인데 수비팀이 이기고 있으면 마이티/조커로 선공권 탈환 시도
+
+      // 마이티로 선공권 탈환 (첫 트릭 제외)
+      if (state.currentTrickNumber > 1) {
+        final mighty = playableCards.where((c) => c.isMighty).toList();
+        if (mighty.isNotEmpty) {
+          // 현재 이기고 있는 카드가 조커가 아니면 마이티 사용
+          if (currentWinningCard != null && !currentWinningCard.isJoker) {
+            return mighty.first;
+          }
+        }
+      }
+
+      // 조커로 선공권 탈환 (첫 트릭 및 마지막 트릭 제외)
+      if (state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
+        final joker = playableCards.where((c) => c.isJoker).toList();
+        if (joker.isNotEmpty) {
+          // 현재 이기고 있는 카드가 마이티가 아니면 조커 사용
+          if (currentWinningCard != null && !currentWinningCard.isMighty) {
+            // 조커콜 상태가 아닐 때만 사용
+            bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
+            if (!jokerCalled) {
+              return joker.first;
+            }
+          }
+        }
+      }
+    }
+
+    // === 수비팀 점수 카드 전략 ===
+    // 프렌드가 공개되고, 내가 수비팀이고, 수비팀이 이길 확률이 높으면 점수 카드를 낸다
     if (isDefenseTeam && defenseWinning) {
       // 수비팀이 이기고 있으면 점수 카드(10/J/Q)를 낸다
       final pointCards = playableCards.where((c) =>
