@@ -383,4 +383,25 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get showRecommendation => '추천 보기';
+
+  @override
+  String get playerStats => '플레이어 통계';
+
+  @override
+  String get winLoss => '승/패';
+
+  @override
+  String get totalScore => '총점';
+
+  @override
+  String get win => '승';
+
+  @override
+  String get loss => '패';
+
+  @override
+  String get resetStats => '초기화';
+
+  @override
+  String get resetStatsConfirm => '모든 통계를 초기화하시겠습니까?';
 }

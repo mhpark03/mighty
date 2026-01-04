@@ -56,5 +56,12 @@
   "points": "{points}点",
   "player": "プレイヤー",
   "recommendedCard": "おすすめ",
-  "showRecommendation": "ヒント表示"
+  "showRecommendation": "ヒント表示",
+  "playerStats": "プレイヤー統計",
+  "winLoss": "勝/敗",
+  "totalScore": "合計",
+  "win": "勝",
+  "loss": "敗",
+  "resetStats": "リセット",
+  "resetStatsConfirm": "すべての統計をリセットしますか？"
 }

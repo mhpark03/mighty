@@ -56,5 +56,12 @@
   "points": "{points}分",
   "player": "玩家",
   "recommendedCard": "推荐",
-  "showRecommendation": "显示提示"
+  "showRecommendation": "显示提示",
+  "playerStats": "玩家统计",
+  "winLoss": "胜/负",
+  "totalScore": "总分",
+  "win": "胜",
+  "loss": "负",
+  "resetStats": "重置",
+  "resetStatsConfirm": "重置所有统计数据？"
 }

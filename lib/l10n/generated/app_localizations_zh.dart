@@ -383,4 +383,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get showRecommendation => '显示提示';
+
+  @override
+  String get playerStats => '玩家统计';
+
+  @override
+  String get winLoss => '胜/负';
+
+  @override
+  String get totalScore => '总分';
+
+  @override
+  String get win => '胜';
+
+  @override
+  String get loss => '负';
+
+  @override
+  String get resetStats => '重置';
+
+  @override
+  String get resetStatsConfirm => '重置所有统计数据？';
 }

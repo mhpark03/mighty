@@ -199,5 +199,12 @@
   "savedGame": "저장된 게임",
   "noSavedGame": "저장된 게임이 없습니다",
   "recommendedCard": "추천 카드",
-  "showRecommendation": "추천 보기"
+  "showRecommendation": "추천 보기",
+  "playerStats": "플레이어 통계",
+  "winLoss": "승/패",
+  "totalScore": "총점",
+  "win": "승",
+  "loss": "패",
+  "resetStats": "초기화",
+  "resetStatsConfirm": "모든 통계를 초기화하시겠습니까?"
 }

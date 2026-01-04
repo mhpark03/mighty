@@ -383,4 +383,25 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get showRecommendation => 'ヒント表示';
+
+  @override
+  String get playerStats => 'プレイヤー統計';
+
+  @override
+  String get winLoss => '勝/敗';
+
+  @override
+  String get totalScore => '合計';
+
+  @override
+  String get win => '勝';
+
+  @override
+  String get loss => '敗';
+
+  @override
+  String get resetStats => 'リセット';
+
+  @override
+  String get resetStatsConfirm => 'すべての統計をリセットしますか？';
 }

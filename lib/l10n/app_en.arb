@@ -113,5 +113,12 @@
   "savedGame": "Saved Game",
   "noSavedGame": "No saved game",
   "recommendedCard": "Recommended",
-  "showRecommendation": "Show Hint"
+  "showRecommendation": "Show Hint",
+  "playerStats": "Player Statistics",
+  "winLoss": "W/L",
+  "totalScore": "Score",
+  "win": "W",
+  "loss": "L",
+  "resetStats": "Reset",
+  "resetStatsConfirm": "Reset all statistics?"
 }

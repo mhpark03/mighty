@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'services/game_controller.dart';
+import 'services/stats_service.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -14,8 +15,11 @@ class MightyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => GameController(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => StatsService()..loadStats()),
+        ChangeNotifierProvider(create: (context) => GameController()),
+      ],
       child: MaterialApp(
         title: 'Mighty',
         debugShowCheckedModeBanner: false,

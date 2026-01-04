@@ -7,6 +7,7 @@ import '../models/card.dart';
 import '../models/player.dart';
 import '../models/game_state.dart';
 import '../services/game_controller.dart';
+import '../services/stats_service.dart';
 import '../widgets/card_widget.dart';
 import 'kitty_dialog.dart';
 import 'friend_dialog.dart';
@@ -25,6 +26,7 @@ class _GameScreenState extends State<GameScreen> {
   int _trickCountdown = 10;
   bool _timerRunning = false;
   bool _showRecommendation = false;
+  bool _statsRecorded = false;
 
   @override
   void dispose() {
@@ -1755,6 +1757,34 @@ class _GameScreenState extends State<GameScreen> {
     final l10n = AppLocalizations.of(context)!;
     final state = controller.state;
 
+    // 통계 기록 (한 번만)
+    if (!_statsRecorded && state.declarerId != null) {
+      _statsRecorded = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final statsService = context.read<StatsService>();
+        final playerScores = <int, int>{};
+        for (int i = 0; i < state.players.length; i++) {
+          playerScores[i] = state.getPlayerScore(i);
+        }
+
+        // 프렌드 ID 찾기
+        int? friendId;
+        for (int i = 0; i < state.players.length; i++) {
+          if (state.players[i].isFriend) {
+            friendId = i;
+            break;
+          }
+        }
+
+        statsService.recordGameResult(
+          playerScores: playerScores,
+          declarerWon: state.declarerWon,
+          declarerId: state.declarerId!,
+          friendId: friendId,
+        );
+      });
+    }
+
     return Center(
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -1817,6 +1847,9 @@ class _GameScreenState extends State<GameScreen> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
+                setState(() {
+                  _statsRecorded = false;
+                });
                 controller.reset();
                 controller.startNewGame();
               },

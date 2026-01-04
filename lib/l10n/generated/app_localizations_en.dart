@@ -383,4 +383,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showRecommendation => 'Show Hint';
+
+  @override
+  String get playerStats => 'Player Statistics';
+
+  @override
+  String get winLoss => 'W/L';
+
+  @override
+  String get totalScore => 'Score';
+
+  @override
+  String get win => 'W';
+
+  @override
+  String get loss => 'L';
+
+  @override
+  String get resetStats => 'Reset';
+
+  @override
+  String get resetStatsConfirm => 'Reset all statistics?';
 }

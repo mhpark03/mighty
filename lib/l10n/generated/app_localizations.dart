@@ -785,6 +785,48 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'추천 보기'**
   String get showRecommendation;
+
+  /// No description provided for @playerStats.
+  ///
+  /// In ko, this message translates to:
+  /// **'플레이어 통계'**
+  String get playerStats;
+
+  /// No description provided for @winLoss.
+  ///
+  /// In ko, this message translates to:
+  /// **'승/패'**
+  String get winLoss;
+
+  /// No description provided for @totalScore.
+  ///
+  /// In ko, this message translates to:
+  /// **'총점'**
+  String get totalScore;
+
+  /// No description provided for @win.
+  ///
+  /// In ko, this message translates to:
+  /// **'승'**
+  String get win;
+
+  /// No description provided for @loss.
+  ///
+  /// In ko, this message translates to:
+  /// **'패'**
+  String get loss;
+
+  /// No description provided for @resetStats.
+  ///
+  /// In ko, this message translates to:
+  /// **'초기화'**
+  String get resetStats;
+
+  /// No description provided for @resetStatsConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'모든 통계를 초기화하시겠습니까?'**
+  String get resetStatsConfirm;
 }
 
 class _AppLocalizationsDelegate
