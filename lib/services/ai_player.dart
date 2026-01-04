@@ -1043,6 +1043,7 @@ class AIPlayer {
 
     // === 공격팀 조커로 점수 카드 수집 전략 ===
     // 점수 카드가 3장 이상 쌓였을 때 조커로 가져오기
+    // 단, 같은 팀이 확실히 이기고 있으면 조커 낭비하지 않음
     if (isAttackTeam && state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
       final joker = playableCards.where((c) => c.isJoker).toList();
       if (joker.isNotEmpty) {
@@ -1056,7 +1057,26 @@ class AIPlayer {
             // 조커콜 상태가 아닐 때만 사용
             bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
             if (!jokerCalled) {
-              return joker.first;
+              // 같은 팀이 확실히 이기고 있는지 확인
+              bool teamWinningSecurely = false;
+              if (!defenseWinning && currentWinningCard != null) {
+                // 공격팀이 이기고 있을 때, 이기는 카드가 최상위인지 확인
+                if (currentWinningCard.isMighty) {
+                  teamWinningSecurely = true;
+                } else if (currentWinningCard.isJoker) {
+                  teamWinningSecurely = true;
+                } else {
+                  // 실효 가치 14 이상(A급)이면 확실히 이김
+                  int effectiveValue = _getEffectiveCardValue(currentWinningCard, state);
+                  if (effectiveValue >= 14) {
+                    teamWinningSecurely = true;
+                  }
+                }
+              }
+              // 같은 팀이 확실히 이기고 있지 않을 때만 조커 사용
+              if (!teamWinningSecurely) {
+                return joker.first;
+              }
             }
           }
         }
