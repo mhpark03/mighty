@@ -10,7 +10,7 @@ import '../services/game_controller.dart';
 import '../services/stats_service.dart';
 import '../widgets/card_widget.dart';
 import 'kitty_dialog.dart';
-import 'friend_dialog.dart';
+import 'friend_dialog.dart' show FriendSelectionScreen;
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -857,18 +857,19 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _showFriendDialog(GameController controller) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => FriendDialog(
-        mighty: controller.state.mighty,
-        hand: controller.humanPlayer.hand,
-        gameState: controller.state,
-        onDeclare: (declaration) {
-          Navigator.pop(context);
-          _friendDialogShown = false;
-          controller.humanDeclareFriend(declaration);
-        },
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FriendSelectionScreen(
+          mighty: controller.state.mighty,
+          hand: controller.humanPlayer.hand,
+          gameState: controller.state,
+          onDeclare: (declaration) {
+            Navigator.pop(context);
+            _friendDialogShown = false;
+            controller.humanDeclareFriend(declaration);
+          },
+        ),
       ),
     );
   }

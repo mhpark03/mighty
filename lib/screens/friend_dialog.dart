@@ -4,14 +4,15 @@ import '../models/card.dart';
 import '../models/player.dart';
 import '../models/game_state.dart';
 import '../services/ai_player.dart';
+import '../widgets/card_widget.dart';
 
-class FriendDialog extends StatefulWidget {
+class FriendSelectionScreen extends StatefulWidget {
   final PlayingCard mighty;
   final List<PlayingCard> hand;
   final GameState gameState;
   final Function(FriendDeclaration) onDeclare;
 
-  const FriendDialog({
+  const FriendSelectionScreen({
     super.key,
     required this.mighty,
     required this.hand,
@@ -20,27 +21,51 @@ class FriendDialog extends StatefulWidget {
   });
 
   @override
-  State<FriendDialog> createState() => _FriendDialogState();
+  State<FriendSelectionScreen> createState() => _FriendSelectionScreenState();
 }
 
-class _FriendDialogState extends State<FriendDialog> {
+class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
   String _selectedType = 'card';
-  Suit _selectedSuit = Suit.spade;
-  Rank _selectedRank = Rank.ace;
+  PlayingCard? _selectedCard;
 
   // AI 추천
   final AIPlayer _aiPlayer = AIPlayer();
   late FriendDeclaration _recommendedDeclaration;
 
+  // 선택 가능한 모든 카드 목록 (53장 - 내 손패 10장 = 43장)
+  late List<PlayingCard> _allSelectableCards;
+
   @override
   void initState() {
     super.initState();
+    _initSelectableCards();
     _calculateRecommendation();
-    _applyRecommendation(); // 초기 선택으로 자동 적용
+    _applyRecommendation();
+  }
+
+  void _initSelectableCards() {
+    _allSelectableCards = [];
+
+    // 모든 카드 생성 (조커 포함)
+    for (final suit in Suit.values) {
+      for (final rank in Rank.values) {
+        _allSelectableCards.add(PlayingCard(suit: suit, rank: rank));
+      }
+    }
+    _allSelectableCards.add(PlayingCard.joker());
+
+    // 무늬 순서로 정렬 (스페이드, 다이아, 하트, 클럽, 조커)
+    _allSelectableCards.sort((a, b) {
+      if (a.isJoker) return 1;
+      if (b.isJoker) return -1;
+      if (a.suit != b.suit) {
+        return a.suit!.index.compareTo(b.suit!.index);
+      }
+      return b.rankValue.compareTo(a.rankValue);
+    });
   }
 
   void _calculateRecommendation() {
-    // 임시 Player 객체 생성
     final tempPlayer = Player(id: 0, name: 'temp', type: PlayerType.human);
     tempPlayer.hand.clear();
     tempPlayer.hand.addAll(widget.hand);
@@ -51,18 +76,27 @@ class _FriendDialogState extends State<FriendDialog> {
   void _applyRecommendation() {
     if (_recommendedDeclaration.isNoFriend) {
       _selectedType = 'none';
+      _selectedCard = null;
+    } else if (_recommendedDeclaration.isFirstTrickWinner) {
+      _selectedType = 'firstTrick';
+      _selectedCard = null;
     } else if (_recommendedDeclaration.card != null) {
       final card = _recommendedDeclaration.card!;
       if (card.isJoker) {
         _selectedType = 'joker';
+        _selectedCard = card;
       } else if (card.isMighty) {
         _selectedType = 'mighty';
+        _selectedCard = card;
       } else {
         _selectedType = 'card';
-        _selectedSuit = card.suit!;
-        _selectedRank = card.rank!;
+        _selectedCard = card;
       }
     }
+  }
+
+  bool _isCardInHand(PlayingCard card) {
+    return widget.hand.any((c) => c == card);
   }
 
   @override
@@ -70,96 +104,189 @@ class _FriendDialogState extends State<FriendDialog> {
     final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      child: Container(
-        width: screenWidth * 0.95,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 타이틀
-            Center(
-              child: Text(
-                l10n.declareFriend,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 16),
-            // 프렌드 선언 방식
-            Text(l10n.friendDeclarationType, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            const SizedBox(height: 8),
-            _buildRadioOption('card', l10n.byCard, null),
-            _buildRadioOption('mighty', l10n.mighty, null),
-            _buildRadioOption('joker', l10n.joker, null),
-            _buildRadioOption('none', l10n.noFriend, l10n.noFriendDesc),
-            const SizedBox(height: 12),
-            // 카드 선택기 (카드로 지정 선택 시)
-            if (_selectedType == 'card') _buildCardSelector(),
-            const SizedBox(height: 16),
-            // 선언 버튼
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  FriendDeclaration declaration;
-                  switch (_selectedType) {
-                    case 'card':
-                      declaration = FriendDeclaration.byCard(
-                        PlayingCard(suit: _selectedSuit, rank: _selectedRank),
-                      );
-                      break;
-                    case 'mighty':
-                      declaration = FriendDeclaration.byCard(widget.mighty);
-                      break;
-                    case 'joker':
-                      declaration = FriendDeclaration.byCard(PlayingCard.joker());
-                      break;
-                    case 'none':
-                    default:
-                      declaration = FriendDeclaration.noFriend();
-                      break;
-                  }
-                  widget.onDeclare(declaration);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                ),
-                child: Text(
-                  l10n.declare,
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+    // 카드 크기 계산 (한 줄에 7장)
+    final cardWidth = (screenWidth - 48) / 7;
+    final cardHeight = cardWidth * 1.4;
 
-  Widget _buildRadioOption(String value, String title, String? subtitle) {
-    return InkWell(
-      onTap: () => setState(() => _selectedType = value),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
+    return Scaffold(
+      backgroundColor: Colors.green[800],
+      appBar: AppBar(
+        backgroundColor: Colors.green[900],
+        title: Text(l10n.declareFriend),
+        automaticallyImplyLeading: false,
+      ),
+      body: SafeArea(
+        child: Column(
           children: [
-            Radio<String>(
-              value: value,
-              groupValue: _selectedType,
-              onChanged: (v) => setState(() => _selectedType = v!),
-            ),
-            Expanded(
+            // 내 카드 표시
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              color: Colors.black26,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title),
-                  if (subtitle != null)
-                    Text(
-                      subtitle,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8, bottom: 4),
+                    child: Text(
+                      l10n.myCards,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                  ),
+                  _buildMyHandCards(cardWidth * 0.85, cardHeight * 0.85),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // 빠른 선택 버튼들
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.friendDeclarationType,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildQuickButton(
+                          'mighty',
+                          '${l10n.mighty}\n${_getMightySymbol()}',
+                          Colors.amber,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildQuickButton(
+                          'joker',
+                          '${l10n.joker}\n🃏',
+                          Colors.purple,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildQuickButton(
+                          'firstTrick',
+                          '${l10n.firstTrickFriend}\n🏆',
+                          Colors.blue,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildQuickButton(
+                          'none',
+                          '${l10n.noFriend}\n🚫',
+                          Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // 선택 가능한 카드 목록
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black26,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8, bottom: 8),
+                      child: Text(
+                        l10n.byCard,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: _buildSelectableCards(cardWidth * 0.9, cardHeight * 0.9),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // 현재 선택 표시 및 확인 버튼
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.black38,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Column(
+                children: [
+                  // 현재 선택 표시
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.check_circle, color: Colors.amber, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          _getSelectionDescription(l10n),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // 확인 버튼
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _canConfirm() ? _onConfirm : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        l10n.declare,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -169,117 +296,275 @@ class _FriendDialogState extends State<FriendDialog> {
     );
   }
 
-  Widget _buildCardSelector() {
-    final l10n = AppLocalizations.of(context)!;
+  Widget _buildMyHandCards(double cardWidth, double cardHeight) {
+    // 손패를 정렬
+    final sortedHand = List<PlayingCard>.from(widget.hand);
+    sortedHand.sort((a, b) {
+      if (a.isJoker) return -1;
+      if (b.isJoker) return 1;
+      if (a.suit != b.suit) {
+        return a.suit!.index.compareTo(b.suit!.index);
+      }
+      return b.rankValue.compareTo(a.rankValue);
+    });
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(l10n.suit, style: const TextStyle(fontWeight: FontWeight.bold)),
-        Wrap(
-          spacing: 8,
-          children: [
-            ChoiceChip(
-              label: const Text('♠'),
-              selected: _selectedSuit == Suit.spade,
-              onSelected: (_) => setState(() => _selectedSuit = Suit.spade),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: sortedHand.map((card) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: CardWidget(
+              card: card,
+              width: cardWidth,
+              height: cardHeight,
+              isPlayable: false,
             ),
-            ChoiceChip(
-              label: const Text('♦', style: TextStyle(color: Colors.red)),
-              selected: _selectedSuit == Suit.diamond,
-              onSelected: (_) => setState(() => _selectedSuit = Suit.diamond),
-            ),
-            ChoiceChip(
-              label: const Text('♥', style: TextStyle(color: Colors.red)),
-              selected: _selectedSuit == Suit.heart,
-              onSelected: (_) => setState(() => _selectedSuit = Suit.heart),
-            ),
-            ChoiceChip(
-              label: const Text('♣'),
-              selected: _selectedSuit == Suit.club,
-              onSelected: (_) => setState(() => _selectedSuit = Suit.club),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(l10n.rank, style: const TextStyle(fontWeight: FontWeight.bold)),
-        Wrap(
-          spacing: 4,
-          runSpacing: 4,
-          children: [
-            for (final rank in Rank.values.reversed)
-              ChoiceChip(
-                label: Text(_rankToString(rank)),
-                selected: _selectedRank == rank,
-                onSelected: (_) => setState(() => _selectedRank = rank),
-              ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.blue.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildQuickButton(String type, String label, Color color) {
+    final isSelected = _selectedType == type;
+    final isDisabled = _isQuickButtonDisabled(type);
+
+    return GestureDetector(
+      onTap: isDisabled
+          ? null
+          : () {
+              setState(() {
+                _selectedType = type;
+                if (type == 'mighty') {
+                  _selectedCard = widget.mighty;
+                } else if (type == 'joker') {
+                  _selectedCard = PlayingCard.joker();
+                } else {
+                  _selectedCard = null;
+                }
+              });
+            },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: isDisabled
+              ? Colors.grey[700]
+              : (isSelected ? color : color.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? Colors.white : Colors.transparent,
+            width: 2,
           ),
-          child: Row(
-            children: [
-              const Icon(Icons.info_outline, size: 16),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  l10n.selectedCard('${_getSuitSymbol(_selectedSuit)}${_rankToString(_selectedRank)}'),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isDisabled ? Colors.grey[500] : Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 11,
+                height: 1.3,
+              ),
+            ),
+            if (isDisabled)
+              const Text(
+                '(보유중)',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 9,
                 ),
               ),
-            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  bool _isQuickButtonDisabled(String type) {
+    if (type == 'mighty') {
+      return _isCardInHand(widget.mighty);
+    } else if (type == 'joker') {
+      return _isCardInHand(PlayingCard.joker());
+    }
+    return false;
+  }
+
+  Widget _buildSelectableCards(double cardWidth, double cardHeight) {
+    // 무늬별로 그룹화
+    final spades = _allSelectableCards.where((c) => c.suit == Suit.spade).toList();
+    final diamonds = _allSelectableCards.where((c) => c.suit == Suit.diamond).toList();
+    final hearts = _allSelectableCards.where((c) => c.suit == Suit.heart).toList();
+    final clubs = _allSelectableCards.where((c) => c.suit == Suit.club).toList();
+    final joker = _allSelectableCards.where((c) => c.isJoker).toList();
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildCardRow(spades, cardWidth, cardHeight, '♠'),
+          const SizedBox(height: 4),
+          _buildCardRow(diamonds, cardWidth, cardHeight, '♦'),
+          const SizedBox(height: 4),
+          _buildCardRow(hearts, cardWidth, cardHeight, '♥'),
+          const SizedBox(height: 4),
+          _buildCardRow(clubs, cardWidth, cardHeight, '♣'),
+          const SizedBox(height: 4),
+          _buildCardRow(joker, cardWidth, cardHeight, '🃏'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCardRow(List<PlayingCard> cards, double cardWidth, double cardHeight, String label) {
+    return Row(
+      children: [
+        // 무늬 라벨
+        SizedBox(
+          width: 20,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: label == '♦' || label == '♥' ? Colors.red[300] : Colors.white70,
+            ),
+          ),
+        ),
+        // 카드들
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: cards.map((card) {
+                final isInHand = _isCardInHand(card);
+                final isSelected = _selectedType == 'card' && _selectedCard == card;
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 1),
+                  child: GestureDetector(
+                    onTap: isInHand
+                        ? null
+                        : () {
+                            setState(() {
+                              _selectedType = 'card';
+                              _selectedCard = card;
+                            });
+                          },
+                    child: Opacity(
+                      opacity: isInHand ? 0.3 : 1.0,
+                      child: Container(
+                        width: cardWidth,
+                        height: cardHeight,
+                        decoration: BoxDecoration(
+                          color: card.isJoker ? Colors.purple : Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: isSelected ? Colors.amber : (isInHand ? Colors.grey : Colors.grey[400]!),
+                            width: isSelected ? 3 : 1,
+                          ),
+                          boxShadow: isSelected
+                              ? [BoxShadow(color: Colors.amber.withValues(alpha: 0.5), blurRadius: 8)]
+                              : null,
+                        ),
+                        child: _buildMiniCard(card),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         ),
       ],
     );
   }
 
-  String _rankToString(Rank rank) {
-    switch (rank) {
-      case Rank.ace:
-        return 'A';
-      case Rank.king:
-        return 'K';
-      case Rank.queen:
-        return 'Q';
-      case Rank.jack:
-        return 'J';
-      case Rank.ten:
-        return '10';
-      case Rank.nine:
-        return '9';
-      case Rank.eight:
-        return '8';
-      case Rank.seven:
-        return '7';
-      case Rank.six:
-        return '6';
-      case Rank.five:
-        return '5';
-      case Rank.four:
-        return '4';
-      case Rank.three:
-        return '3';
-      case Rank.two:
-        return '2';
+  Widget _buildMiniCard(PlayingCard card) {
+    if (card.isJoker) {
+      return const Center(
+        child: Text('🃏', style: TextStyle(fontSize: 16)),
+      );
+    }
+
+    final color = card.isRed ? Colors.red : Colors.black;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            card.suitSymbol,
+            style: TextStyle(fontSize: 10, color: color),
+          ),
+          Text(
+            card.rankSymbol,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getMightySymbol() {
+    final mighty = widget.mighty;
+    if (mighty.isJoker) return '🃏';
+    return '${mighty.suitSymbol}${mighty.rankSymbol}';
+  }
+
+  String _getSelectionDescription(AppLocalizations l10n) {
+    switch (_selectedType) {
+      case 'mighty':
+        return '${l10n.mighty} (${_getMightySymbol()})';
+      case 'joker':
+        return l10n.joker;
+      case 'firstTrick':
+        return l10n.firstTrickFriend;
+      case 'none':
+        return l10n.noFriend;
+      case 'card':
+        if (_selectedCard != null) {
+          if (_selectedCard!.isJoker) {
+            return l10n.joker;
+          }
+          return '${_selectedCard!.suitSymbol}${_selectedCard!.rankSymbol}';
+        }
+        return l10n.byCard;
+      default:
+        return '';
     }
   }
 
-  String _getSuitSymbol(Suit suit) {
-    switch (suit) {
-      case Suit.spade:
-        return '♠';
-      case Suit.diamond:
-        return '♦';
-      case Suit.heart:
-        return '♥';
-      case Suit.club:
-        return '♣';
+  bool _canConfirm() {
+    if (_selectedType == 'card') {
+      return _selectedCard != null;
     }
+    return true;
+  }
+
+  void _onConfirm() {
+    FriendDeclaration declaration;
+    switch (_selectedType) {
+      case 'mighty':
+        declaration = FriendDeclaration.byCard(widget.mighty);
+        break;
+      case 'joker':
+        declaration = FriendDeclaration.byCard(PlayingCard.joker());
+        break;
+      case 'firstTrick':
+        declaration = FriendDeclaration.firstTrickWinner();
+        break;
+      case 'none':
+        declaration = FriendDeclaration.noFriend();
+        break;
+      case 'card':
+      default:
+        declaration = FriendDeclaration.byCard(_selectedCard!);
+        break;
+    }
+    widget.onDeclare(declaration);
   }
 }
