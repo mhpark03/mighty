@@ -243,11 +243,14 @@ class AIPlayer {
       return FriendDeclaration.noFriend();
     }
 
-    // 조건 2: 마이티 + 모든 A + 조커 콜 카드 → 노 프렌드
+    // K 카드 개수 확인
+    int kingCount = hand.where((c) => !c.isJoker && c.rank == Rank.king).length;
+
+    // 조건 2: 마이티 + 모든 A + 조커 콜 카드 + K 2장 이상 → 노 프렌드
     int totalAces = (hasGirudaAce ? 1 : 0) + nonGirudaAceCount;
     // 마이티가 A인 경우 제외하고 3장의 A가 있으면 모든 A 보유
     int maxNonMightyAces = (state.mighty.rank == Rank.ace) ? 3 : 4;
-    if (hasMighty && totalAces == maxNonMightyAces && hasJokerCallCard) {
+    if (hasMighty && totalAces == maxNonMightyAces && hasJokerCallCard && kingCount >= 2) {
       return FriendDeclaration.noFriend();
     }
 
