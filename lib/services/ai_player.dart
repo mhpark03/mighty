@@ -614,20 +614,10 @@ class AIPlayer {
           }
         }
 
-        // 조건 2: 트릭에 점수 카드가 많거나 주공이 지고 있을 때 프렌드 카드 사용
-        int pointCardsInTrick = state.currentTrick!.cards
-            .where((c) => c.isPointCard).length;
-
-        if (declarerInDanger && pointCardsInTrick >= 2) {
+        // 조건 2: 주공팀이 위기 상황일 때 프렌드 카드로 구출
+        // (언제든지 수비팀이 이기고 있으면 프렌드 카드 사용)
+        if (declarerInDanger) {
           // 프렌드 카드로 이길 수 있는지 확인
-          if (currentWinningCard != null &&
-              state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
-            return friendCard;
-          }
-        }
-
-        // 조건 3: 마지막 트릭(10번째)이거나 주공팀 점수가 부족할 때 프렌드 공개
-        if (state.currentTrickNumber >= 8 && declarerInDanger) {
           if (currentWinningCard != null &&
               state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
             return friendCard;
@@ -669,6 +659,53 @@ class AIPlayer {
               return joker.first;
             }
           }
+        }
+      }
+    }
+
+    // === 공격팀 카드 아끼기 전략 ===
+    // 주공팀이 높은 기루다로 이길 확률이 높으면 낮은 카드를 우선 버린다
+    bool attackTeamWinning = isAttackTeam && !defenseWinning;
+
+    if (isAttackTeam && attackTeamWinning) {
+      // 공격팀이 이기고 있으면 낮은 카드를 버려서 강한 카드 아끼기
+
+      // 높은 기루다 보유 확인 (A, K, Q)
+      bool hasHighGiruda = false;
+      if (state.giruda != null) {
+        hasHighGiruda = player.hand.any((c) =>
+            !c.isJoker && c.suit == state.giruda &&
+            (c.rank == Rank.ace || c.rank == Rank.king || c.rank == Rank.queen));
+      }
+
+      // 마이티/조커 보유 확인
+      bool hasMightyOrJoker = player.hand.any((c) => c.isMighty || c.isJoker);
+
+      // 강한 카드가 있으면 낮은 카드 우선 버리기
+      if (hasHighGiruda || hasMightyOrJoker) {
+        // 리드 무늬가 있으면 리드 무늬 중 낮은 카드
+        final suitCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit == leadSuit).toList();
+        if (suitCards.isNotEmpty) {
+          suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          // 점수 카드가 아닌 낮은 카드 우선
+          final nonPointSuitCards = suitCards.where((c) => !c.isPointCard).toList();
+          if (nonPointSuitCards.isNotEmpty) {
+            return nonPointSuitCards.first;
+          }
+          return suitCards.first;
+        }
+
+        // 리드 무늬가 없으면 비기루다 중 낮은 카드 버리기
+        final nonGirudaCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+        if (nonGirudaCards.isNotEmpty) {
+          nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
+          if (nonPointCards.isNotEmpty) {
+            return nonPointCards.first;
+          }
+          return nonGirudaCards.first;
         }
       }
     }
