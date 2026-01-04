@@ -1132,7 +1132,14 @@ class AIPlayer {
             // 조커콜 상태가 아닐 때만 사용
             bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
             if (!jokerCalled) {
-              return joker.first;
+              // 선공권 탈환 후 유지할 최상위 카드가 있는지 확인
+              // 최상위 카드 없으면 점수 많을 때 사용하는 게 나음
+              bool hasTopCards = player.hand.any((c) =>
+                  c.isMighty ||
+                  (!c.isJoker && _getEffectiveCardValue(c, state) >= 14));
+              if (hasTopCards) {
+                return joker.first;
+              }
             }
           }
         }
@@ -1171,7 +1178,14 @@ class AIPlayer {
           if (currentWinningCard != null && !currentWinningCard.isMighty) {
             bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
             if (!jokerCalled) {
-              return joker.first;
+              // 선공권 탈환 후 유지할 최상위 카드가 있는지 확인
+              // 최상위 카드 없으면 점수 많을 때 사용하는 게 나음
+              bool hasTopCards = player.hand.any((c) =>
+                  c.isMighty ||
+                  (!c.isJoker && _getEffectiveCardValue(c, state) >= 14));
+              if (hasTopCards) {
+                return joker.first;
+              }
             }
           }
         }
