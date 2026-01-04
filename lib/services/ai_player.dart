@@ -873,15 +873,63 @@ class AIPlayer {
       return suitCards.last;
     }
 
+    // === 컷(기루다로 자르기) 전략 ===
     if (state.giruda != null) {
       final girudaCards =
           playableCards.where((c) => !c.isJoker && c.suit == state.giruda).toList();
 
       if (girudaCards.isNotEmpty) {
-        girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        // 내 팀이 이기고 있는지 확인
+        bool myTeamWinning = (isAttackTeam && !defenseWinning) || (isDefenseTeam && defenseWinning);
 
-        bool worthTrumping = state.currentTrick!.cards.any((c) => c.isPointCard);
-        if (worthTrumping) {
+        if (myTeamWinning) {
+          // 내 팀이 이기고 있으면 컷하지 않고 낮은 카드 버리기
+          // 비기루다 중 낮은 카드 버리기
+          final nonGirudaCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+          if (nonGirudaCards.isNotEmpty) {
+            // 점수 카드가 아닌 낮은 카드 우선
+            final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
+            if (nonPointCards.isNotEmpty) {
+              nonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return nonPointCards.first;
+            }
+            // 수비팀이면서 수비팀이 이기면 점수 카드 버리기 가능
+            if (isDefenseTeam && defenseWinning) {
+              nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return nonGirudaCards.first;
+            }
+            nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return nonGirudaCards.first;
+          }
+          // 비기루다가 없으면 가장 낮은 기루다
+          girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return girudaCards.first;
+        } else {
+          // 내 팀이 지고 있으면 이길 수 있는 최소의 기루다로 컷
+          girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue)); // 낮은 순
+
+          // 현재 이기고 있는 카드를 이길 수 있는 가장 낮은 기루다 찾기
+          for (final girudaCard in girudaCards) {
+            if (currentWinningCard != null &&
+                state.isCardStronger(girudaCard, currentWinningCard, leadSuit, false)) {
+              return girudaCard;
+            }
+          }
+
+          // 이길 수 없으면 낮은 카드 버리기
+          final nonGirudaCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+          if (nonGirudaCards.isNotEmpty) {
+            final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
+            if (nonPointCards.isNotEmpty) {
+              nonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return nonPointCards.first;
+            }
+            nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return nonGirudaCards.first;
+          }
+          // 기루다만 있으면 가장 낮은 기루다
           return girudaCards.first;
         }
       }
