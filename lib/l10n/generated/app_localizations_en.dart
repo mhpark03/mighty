@@ -326,4 +326,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String nthTrickShort(int n) {
     return 'Trick $n';
   }
+
+  @override
+  String get recommendedFriend => 'Recommended:';
+
+  @override
+  String get joker => 'Joker';
+
+  @override
+  String get recommendNoFriend => 'No Friend recommended';
+
+  @override
+  String get reasonHasMighty => 'Has Mighty';
+
+  @override
+  String get reasonHasJoker => 'Has Joker';
+
+  @override
+  String get reasonNeedMighty => 'Need Mighty';
+
+  @override
+  String get reasonNeedJoker => 'Need Joker';
+
+  @override
+  String get reasonNeedGirudaAce => 'Need Trump Ace';
+
+  @override
+  String get reasonNeedGirudaKing => 'Need Trump King';
+
+  @override
+  String get reasonStrongHand => 'Strong hand';
 }

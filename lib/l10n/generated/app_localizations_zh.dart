@@ -326,4 +326,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String nthTrickShort(int n) {
     return '$n트릭';
   }
+
+  @override
+  String get recommendedFriend => '추천 프렌드:';
+
+  @override
+  String get joker => '조커';
+
+  @override
+  String get recommendNoFriend => '노프렌드 추천';
+
+  @override
+  String get reasonHasMighty => '마이티 보유';
+
+  @override
+  String get reasonHasJoker => '조커 보유';
+
+  @override
+  String get reasonNeedMighty => '마이티 필요';
+
+  @override
+  String get reasonNeedJoker => '조커 필요';
+
+  @override
+  String get reasonNeedGirudaAce => '기루다 A 필요';
+
+  @override
+  String get reasonNeedGirudaKing => '기루다 K 필요';
+
+  @override
+  String get reasonStrongHand => '강한 핸드';
 }

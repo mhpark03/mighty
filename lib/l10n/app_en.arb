@@ -94,5 +94,15 @@
   "discardCards": "Discard:",
   "goalPlus2": "(Goal +2)",
   "applyRecommendation": "Apply",
-  "nthTrickShort": "Trick {n}"
+  "nthTrickShort": "Trick {n}",
+  "recommendedFriend": "Recommended:",
+  "joker": "Joker",
+  "recommendNoFriend": "No Friend recommended",
+  "reasonHasMighty": "Has Mighty",
+  "reasonHasJoker": "Has Joker",
+  "reasonNeedMighty": "Need Mighty",
+  "reasonNeedJoker": "Need Joker",
+  "reasonNeedGirudaAce": "Need Trump Ace",
+  "reasonNeedGirudaKing": "Need Trump King",
+  "reasonStrongHand": "Strong hand"
 }

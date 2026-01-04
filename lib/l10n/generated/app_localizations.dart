@@ -671,6 +671,66 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'{n}트릭'**
   String nthTrickShort(int n);
+
+  /// No description provided for @recommendedFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'추천 프렌드:'**
+  String get recommendedFriend;
+
+  /// No description provided for @joker.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커'**
+  String get joker;
+
+  /// No description provided for @recommendNoFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'노프렌드 추천'**
+  String get recommendNoFriend;
+
+  /// No description provided for @reasonHasMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 보유'**
+  String get reasonHasMighty;
+
+  /// No description provided for @reasonHasJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 보유'**
+  String get reasonHasJoker;
+
+  /// No description provided for @reasonNeedMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 필요'**
+  String get reasonNeedMighty;
+
+  /// No description provided for @reasonNeedJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 필요'**
+  String get reasonNeedJoker;
+
+  /// No description provided for @reasonNeedGirudaAce.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 A 필요'**
+  String get reasonNeedGirudaAce;
+
+  /// No description provided for @reasonNeedGirudaKing.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 K 필요'**
+  String get reasonNeedGirudaKing;
+
+  /// No description provided for @reasonStrongHand.
+  ///
+  /// In ko, this message translates to:
+  /// **'강한 핸드'**
+  String get reasonStrongHand;
 }
 
 class _AppLocalizationsDelegate

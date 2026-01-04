@@ -180,5 +180,15 @@
     "placeholders": {
       "n": {"type": "int"}
     }
-  }
+  },
+  "recommendedFriend": "추천 프렌드:",
+  "joker": "조커",
+  "recommendNoFriend": "노프렌드 추천",
+  "reasonHasMighty": "마이티 보유",
+  "reasonHasJoker": "조커 보유",
+  "reasonNeedMighty": "마이티 필요",
+  "reasonNeedJoker": "조커 필요",
+  "reasonNeedGirudaAce": "기루다 A 필요",
+  "reasonNeedGirudaKing": "기루다 K 필요",
+  "reasonStrongHand": "강한 핸드"
 }

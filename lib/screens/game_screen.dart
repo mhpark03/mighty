@@ -752,6 +752,8 @@ class _GameScreenState extends State<GameScreen> {
       barrierDismissible: false,
       builder: (context) => FriendDialog(
         mighty: controller.state.mighty,
+        hand: controller.humanPlayer.hand,
+        gameState: controller.state,
         onDeclare: (declaration) {
           Navigator.pop(context);
           _friendDialogShown = false;
