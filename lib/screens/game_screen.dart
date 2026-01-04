@@ -695,6 +695,8 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  bool _friendDialogShown = false;
+
   Widget _buildFriendScreen(GameController controller) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -712,21 +714,30 @@ class _GameScreenState extends State<GameScreen> {
       );
     }
 
+    // 사용자가 주공이면 바로 프렌드 선언 다이얼로그 표시
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.state.phase == GamePhase.declaringFriend &&
+          controller.state.declarerId == 0 &&
+          !_friendDialogShown) {
+        _friendDialogShown = true;
+        _showFriendDialog(controller);
+      }
+    });
+
     return Column(
       children: [
         Expanded(
           child: Center(
-            child: ElevatedButton(
-              onPressed: () => _showFriendDialog(controller),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              ),
-              child: Text(
-                l10n.declareFriend,
-                style: const TextStyle(fontSize: 18, color: Colors.black),
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(color: Colors.amber),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.declareFriend,
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ],
             ),
           ),
         ),
@@ -743,6 +754,7 @@ class _GameScreenState extends State<GameScreen> {
         mighty: controller.state.mighty,
         onDeclare: (declaration) {
           Navigator.pop(context);
+          _friendDialogShown = false;
           controller.humanDeclareFriend(declaration);
         },
       ),
