@@ -1381,6 +1381,70 @@ class AIPlayer {
       }
     }
 
+    // === 수비팀 마이티로 점수 카드 탈취 전략 ===
+    // 공격팀이 점수 카드를 많이 가져갈 때 마이티로 뺏기
+    if (isDefenseTeam && state.currentTrickNumber > 1) {
+      final mighty = playableCards.where((c) => c.isMighty).toList();
+      if (mighty.isNotEmpty) {
+        int pointCardsInTrick = state.currentTrick!.cards
+            .where((c) => c.isPointCard || c.isJoker).length;
+
+        // 점수 카드 3장 이상이고 공격팀이 이기고 있을 때 마이티 사용
+        // 조커가 없거나 점수 4장 이상이면 마이티 사용
+        bool hasJoker = player.hand.any((c) => c.isJoker);
+        if ((!hasJoker && pointCardsInTrick >= 3) || pointCardsInTrick >= 4) {
+          if (!defenseWinning) {
+            // 현재 이기는 카드가 조커가 아니면 마이티 사용
+            if (currentWinningCard == null || !currentWinningCard.isJoker) {
+              return mighty.first;
+            }
+          }
+        }
+      }
+    }
+
+    // === 수비팀 선공권 탈환 전략 (마이티) ===
+    // 공격팀이 이기고 있을 때 마이티로 선공권 뺏기
+    if (isDefenseTeam && !defenseWinning && state.currentTrickNumber > 1) {
+      final mighty = playableCards.where((c) => c.isMighty).toList();
+      if (mighty.isNotEmpty) {
+        // 현재 이기고 있는 카드가 조커가 아니면 마이티 사용
+        if (currentWinningCard != null && !currentWinningCard.isJoker) {
+          // 조커가 있으면 조커 먼저, 마이티는 상대 조커 대응용으로 아낌
+          bool hasJoker = player.hand.any((c) => c.isJoker);
+          int pointCardsInTrick = state.currentTrick!.cards
+              .where((c) => c.isPointCard || c.isJoker).length;
+          // 조커가 없거나 점수 카드 3장 이상이면 마이티 사용
+          if (!hasJoker || pointCardsInTrick >= 3) {
+            // 선공권 탈환 후 유지할 최상위 카드가 있는지 확인
+            bool hasTopCards = player.hand.any((c) =>
+                !c.isMighty && !c.isJoker &&
+                _getEffectiveCardValue(c, state) >= 14);
+            if (hasTopCards) {
+              return mighty.first;
+            }
+          }
+        }
+      }
+    }
+
+    // === 수비팀 후반전 마이티 전략 ===
+    // 후반전(트릭 8 이후)에 마이티를 사용하여 점수 확보
+    if (isDefenseTeam && state.currentTrickNumber >= 8) {
+      final mighty = playableCards.where((c) => c.isMighty).toList();
+      if (mighty.isNotEmpty) {
+        // 공격팀이 이기고 있거나 점수 카드가 있으면 마이티 사용
+        int pointCardsInTrick = state.currentTrick!.cards
+            .where((c) => c.isPointCard || c.isJoker).length;
+        if (!defenseWinning || pointCardsInTrick >= 1) {
+          // 현재 이기는 카드가 조커가 아니면 마이티 사용
+          if (currentWinningCard == null || !currentWinningCard.isJoker) {
+            return mighty.first;
+          }
+        }
+      }
+    }
+
     // === 같은 팀이 최상위 카드로 이기고 있을 때 낮은 카드 버리기 ===
     // 팀원이 이미 최상위 카드(마이티/조커/실효가치14+)로 이기고 있으면
     // 높은 카드를 낭비하지 않고 낮은 카드를 버린다
