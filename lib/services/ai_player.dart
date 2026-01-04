@@ -527,6 +527,44 @@ class AIPlayer {
 
   PlayingCard _selectLeadCard(
       List<PlayingCard> playableCards, Player player, GameState state) {
+
+    // 방어팀인지 확인
+    bool isDefenseTeam = _isPlayerOnDefenseTeam(player, state);
+
+    if (isDefenseTeam && state.giruda != null) {
+      // === 방어팀 선공 전략 ===
+      // 기루다를 아끼고, 다른 무늬의 높은 카드를 낸다
+      // (주공이 높은 기루다를 많이 가지고 있을 가능성이 높으므로)
+
+      // 기루다가 아닌 카드들
+      final nonGirudaCards = playableCards.where((c) =>
+          !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+
+      if (nonGirudaCards.isNotEmpty) {
+        // 높은 카드 순으로 정렬 (A, K, Q, J, 10...)
+        nonGirudaCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+
+        // 에이스나 킹이 있으면 그것을 낸다 (트릭을 딸 가능성 높음)
+        final highCards = nonGirudaCards.where((c) =>
+            c.rank == Rank.ace || c.rank == Rank.king).toList();
+        if (highCards.isNotEmpty) {
+          return highCards.first;
+        }
+
+        // 없으면 가장 높은 비기루다 카드
+        return nonGirudaCards.first;
+      }
+
+      // 기루다만 남은 경우, 가장 낮은 기루다를 낸다
+      final girudaCards = playableCards.where((c) =>
+          !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+      if (girudaCards.isNotEmpty) {
+        girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        return girudaCards.first;
+      }
+    }
+
+    // === 주공팀 또는 노기루다 선공 전략 (기존 로직) ===
     playableCards.sort((a, b) {
       if (a.isMighty) return -1;
       if (b.isMighty) return 1;
