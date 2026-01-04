@@ -179,17 +179,47 @@ class AIPlayer {
 
   List<PlayingCard> selectKittyCards(Player player, GameState state) {
     final hand = List<PlayingCard>.from(player.hand);
+
+    // 조커 보유 확인
+    bool hasJoker = hand.any((c) => c.isJoker);
+    final jokerCallCard = state.jokerCall;
+
+    // 각 무늬별 카드 수 계산 (기루다 제외)
+    Map<Suit, int> suitCount = {};
+    for (final suit in Suit.values) {
+      if (suit == state.giruda) continue;
+      suitCount[suit] = hand.where((c) => !c.isJoker && c.suit == suit).length;
+    }
+
     hand.sort((a, b) {
+      // 1. 조커/마이티는 절대 버리지 않음
       if (a.isJoker || a.isMighty) return 1;
       if (b.isJoker || b.isMighty) return -1;
 
+      // 2. 조커가 있으면 조커콜 카드 우선 버림
+      if (hasJoker) {
+        bool aIsJokerCall = a.suit == jokerCallCard.suit && a.rank == jokerCallCard.rank;
+        bool bIsJokerCall = b.suit == jokerCallCard.suit && b.rank == jokerCallCard.rank;
+        if (aIsJokerCall && !bIsJokerCall) return -1;
+        if (!aIsJokerCall && bIsJokerCall) return 1;
+      }
+
+      // 3. 기루다는 버리지 않음
       if (state.giruda != null) {
         if (a.suit == state.giruda && b.suit != state.giruda) return 1;
         if (a.suit != state.giruda && b.suit == state.giruda) return -1;
       }
 
+      // 4. 점수 카드는 버리지 않음
       if (a.isPointCard && !b.isPointCard) return 1;
       if (!a.isPointCard && b.isPointCard) return -1;
+
+      // 5. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
+      int aCount = suitCount[a.suit] ?? 0;
+      int bCount = suitCount[b.suit] ?? 0;
+      if (aCount != bCount) {
+        return aCount.compareTo(bCount); // 적은 쪽이 앞으로
+      }
 
       return a.rankValue.compareTo(b.rankValue);
     });
@@ -404,7 +434,42 @@ class AIPlayer {
       List<PlayingCard> playableCards, Player player, GameState state) {
     final leadSuit = state.currentTrick!.leadSuit;
     final currentWinningCard = _findCurrentWinningCard(state);
+    final currentWinnerId = _findCurrentWinnerId(state);
 
+    // === 프렌드 카드 사용 로직 ===
+    // 프렌드 카드를 가지고 있고, 아직 공개되지 않은 경우
+    if (!state.friendRevealed && state.friendDeclaration?.card != null) {
+      final friendCard = state.friendDeclaration!.card!;
+      bool hasFriendCard = playableCards.any((c) =>
+          c.suit == friendCard.suit && c.rank == friendCard.rank);
+
+      if (hasFriendCard) {
+        // 주공이 위험한 상황인지 확인
+        bool declarerInDanger = _isDeclarerInDanger(state, currentWinnerId);
+
+        // 트릭에 점수 카드가 많거나 주공이 지고 있을 때 프렌드 카드 사용
+        int pointCardsInTrick = state.currentTrick!.cards
+            .where((c) => c.isPointCard).length;
+
+        if (declarerInDanger && pointCardsInTrick >= 2) {
+          // 프렌드 카드로 이길 수 있는지 확인
+          if (currentWinningCard != null &&
+              state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
+            return friendCard;
+          }
+        }
+
+        // 마지막 트릭(10번째)이거나 주공팀 점수가 부족할 때 프렌드 공개
+        if (state.currentTrickNumber >= 8 && declarerInDanger) {
+          if (currentWinningCard != null &&
+              state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
+            return friendCard;
+          }
+        }
+      }
+    }
+
+    // === 기존 로직 ===
     final suitCards =
         playableCards.where((c) => !c.isJoker && c.suit == leadSuit).toList();
 
@@ -443,6 +508,45 @@ class AIPlayer {
 
     playableCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
     return playableCards.first;
+  }
+
+  // 현재 트릭에서 이기고 있는 플레이어 ID 찾기
+  int? _findCurrentWinnerId(GameState state) {
+    if (state.currentTrick == null || state.currentTrick!.cards.isEmpty) {
+      return null;
+    }
+
+    int winnerIndex = 0;
+    PlayingCard? winning;
+    final leadSuit = state.currentTrick!.leadSuit;
+
+    for (int i = 0; i < state.currentTrick!.cards.length; i++) {
+      final card = state.currentTrick!.cards[i];
+      if (winning == null) {
+        winning = card;
+        winnerIndex = i;
+      } else if (state.isCardStronger(card, winning, leadSuit, false)) {
+        winning = card;
+        winnerIndex = i;
+      }
+    }
+
+    return state.currentTrick!.playerOrder[winnerIndex];
+  }
+
+  // 주공이 위험한 상황인지 확인
+  bool _isDeclarerInDanger(GameState state, int? currentWinnerId) {
+    if (currentWinnerId == null) return false;
+
+    // 현재 이기고 있는 사람이 수비팀인지 확인
+    final winner = state.players[currentWinnerId];
+
+    // 주공이나 이미 공개된 프렌드가 이기고 있으면 위험하지 않음
+    if (winner.isDeclarer) return false;
+    if (state.friendRevealed && winner.isFriend) return false;
+
+    // 수비팀이 이기고 있으면 주공 위험
+    return true;
   }
 
   PlayingCard? _findCurrentWinningCard(GameState state) {

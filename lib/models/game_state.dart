@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'card.dart';
 import 'player.dart';
 
@@ -239,6 +241,8 @@ class GameState {
   void startNewGame() {
     reset();
     dealCards();
+    // 비딩 시작 플레이어를 랜덤하게 지정
+    currentBidder = Random().nextInt(5);
     phase = GamePhase.bidding;
   }
 
