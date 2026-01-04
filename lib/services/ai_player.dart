@@ -1114,6 +1114,34 @@ class AIPlayer {
       bool hasJoker = player.hand.any((c) => c.isJoker);
       bool hasMighty = playableCards.any((c) => c.isMighty);
 
+      // 마이티 무늬 확인 (기루다가 스페이드면 다이아, 아니면 스페이드)
+      Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
+
+      // 마이티 대신 사용할 수 있는 최상위 카드 찾기
+      // (실효가치 14+ 또는 마이티와 같은 무늬의 K)
+      final topCardsInstead = playableCards.where((c) {
+        if (c.isMighty || c.isJoker) return false;
+        // 마이티와 같은 무늬의 K (마이티가 A이므로 K가 최상위)
+        if (c.suit == mightySuit && c.rank == Rank.king) return true;
+        // 실효가치 14 이상
+        return _getEffectiveCardValue(c, state) >= 14;
+      }).toList();
+
+      // 최상위 카드가 있고 현재 이기는 카드를 이길 수 있으면 최상위 카드 우선
+      if (topCardsInstead.isNotEmpty && currentWinningCard != null) {
+        // 현재 이기는 카드가 조커/마이티가 아니면 최상위 카드로 이길 수 있음
+        if (!currentWinningCard.isJoker && !currentWinningCard.isMighty) {
+          // 가장 높은 실효가치 카드 선택
+          topCardsInstead.sort((a, b) =>
+              _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+          final topCard = topCardsInstead.first;
+          // 현재 이기는 카드보다 강하면 사용
+          if (state.isCardStronger(topCard, currentWinningCard, leadSuit, false)) {
+            return topCard;
+          }
+        }
+      }
+
       // 마이티로 선공권 탈환 (첫 트릭 제외)
       // 단, 조커가 있으면 조커를 먼저 사용하고 마이티는 상대 조커 대응용으로 아낌
       if (state.currentTrickNumber > 1 && hasMighty) {
@@ -1177,6 +1205,23 @@ class AIPlayer {
             }
           }
           if (!teamWinningSecurely) {
+            // 마이티 대신 최상위 카드로 이길 수 있으면 최상위 카드 우선
+            Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
+            final topCardsInstead = playableCards.where((c) {
+              if (c.isMighty || c.isJoker) return false;
+              if (c.suit == mightySuit && c.rank == Rank.king) return true;
+              return _getEffectiveCardValue(c, state) >= 14;
+            }).toList();
+
+            if (topCardsInstead.isNotEmpty && currentWinningCard != null &&
+                !currentWinningCard.isJoker && !currentWinningCard.isMighty) {
+              topCardsInstead.sort((a, b) =>
+                  _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+              final topCard = topCardsInstead.first;
+              if (state.isCardStronger(topCard, currentWinningCard, leadSuit, false)) {
+                return topCard;
+              }
+            }
             return mighty.first;
           }
         }
@@ -1192,6 +1237,23 @@ class AIPlayer {
         int pointCardsInTrick = state.currentTrick!.cards
             .where((c) => c.isPointCard || c.isJoker).length;
         if (defenseWinning || pointCardsInTrick >= 1) {
+          // 마이티 대신 최상위 카드로 이길 수 있으면 최상위 카드 우선
+          Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
+          final topCardsInstead = playableCards.where((c) {
+            if (c.isMighty || c.isJoker) return false;
+            if (c.suit == mightySuit && c.rank == Rank.king) return true;
+            return _getEffectiveCardValue(c, state) >= 14;
+          }).toList();
+
+          if (topCardsInstead.isNotEmpty && currentWinningCard != null &&
+              !currentWinningCard.isJoker && !currentWinningCard.isMighty) {
+            topCardsInstead.sort((a, b) =>
+                _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+            final topCard = topCardsInstead.first;
+            if (state.isCardStronger(topCard, currentWinningCard, leadSuit, false)) {
+              return topCard;
+            }
+          }
           return mighty.first;
         }
       }
