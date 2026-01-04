@@ -94,11 +94,11 @@ class GameController extends ChangeNotifier {
 
     final declarer = _state.players[_state.declarerId!];
 
-    // 1. 먼저 버릴 카드 선택 (현재 기루다 기준)
-    final discardCards = _aiPlayer.selectKittyCards(declarer, _state);
+    // 1. 13장으로 기루다 변경 여부 결정
+    final newGiruda = _aiPlayer.decideGirudaChange(declarer, _state, _state.kitty);
 
-    // 2. 최종 10장 카드로 기루다 변경 여부 결정
-    final newGiruda = _aiPlayer.decideGirudaChange(declarer, _state, _state.kitty, discardCards);
+    // 2. 최종 기루다를 기준으로 버릴 카드 선택
+    final discardCards = _aiPlayer.selectKittyCardsWithGiruda(declarer, _state, _state.kitty, newGiruda);
 
     // 3. 키티 선택 완료 (기루다 변경 시 목표 +2 자동 적용)
     _state.selectKitty(discardCards, newGiruda);

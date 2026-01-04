@@ -228,24 +228,22 @@ class AIPlayer {
   }
 
   /// AI가 키티를 받은 후 기루다 변경 여부 결정
-  /// 최종 10장 카드로 계산하고, 목표 달성 가능 여부를 고려
-  Suit? decideGirudaChange(Player player, GameState state, List<PlayingCard> kitty, List<PlayingCard> discardCards) {
-    // 최종 10장 카드 (hand + kitty - discards)
-    final finalCards = [...player.hand, ...kitty]
-        .where((c) => !discardCards.contains(c))
-        .toList();
+  /// 13장 카드로 계산하고, 목표 달성 가능 여부를 고려
+  Suit? decideGirudaChange(Player player, GameState state, List<PlayingCard> kitty) {
+    // 13장 카드 (hand + kitty)
+    final allCards = [...player.hand, ...kitty];
 
     final targetTricks = state.currentBid?.tricks ?? 13;
 
     // 현재 기루다로의 강도
-    final currentStrength = evaluateHandStrength(finalCards, state.giruda);
+    final currentStrength = evaluateHandStrength(allCards, state.giruda);
 
     // 최적의 기루다 찾기
-    final bestSuit = findBestSuit(finalCards);
-    final bestStrength = evaluateHandStrength(finalCards, bestSuit);
+    final bestSuit = findBestSuit(allCards);
+    final bestStrength = evaluateHandStrength(allCards, bestSuit);
 
     // 노기루다 강도
-    final noGirudaStrength = evaluateHandStrength(finalCards, null);
+    final noGirudaStrength = evaluateHandStrength(allCards, null);
 
     // 기루다 변경 시 목표 +2 증가
     final newTargetTricks = targetTricks + 2;
@@ -288,6 +286,57 @@ class AIPlayer {
 
     // 변경하지 않음 (기존 기루다 유지)
     return state.giruda;
+  }
+
+  /// 최종 기루다를 기준으로 버릴 카드 선택
+  List<PlayingCard> selectKittyCardsWithGiruda(Player player, GameState state, List<PlayingCard> kitty, Suit? finalGiruda) {
+    final hand = [...player.hand, ...kitty];
+
+    // 조커 보유 확인
+    bool hasJoker = hand.any((c) => c.isJoker);
+    final jokerCallCard = state.jokerCall;
+
+    // 각 무늬별 카드 수 계산 (최종 기루다 제외)
+    Map<Suit, int> suitCount = {};
+    for (final suit in Suit.values) {
+      if (suit == finalGiruda) continue;
+      suitCount[suit] = hand.where((c) => !c.isJoker && c.suit == suit).length;
+    }
+
+    hand.sort((a, b) {
+      // 1. 조커/마이티는 절대 버리지 않음
+      if (a.isJoker || a.isMighty) return 1;
+      if (b.isJoker || b.isMighty) return -1;
+
+      // 2. 조커가 있으면 조커콜 카드 우선 버림
+      if (hasJoker) {
+        bool aIsJokerCall = a.suit == jokerCallCard.suit && a.rank == jokerCallCard.rank;
+        bool bIsJokerCall = b.suit == jokerCallCard.suit && b.rank == jokerCallCard.rank;
+        if (aIsJokerCall && !bIsJokerCall) return -1;
+        if (!aIsJokerCall && bIsJokerCall) return 1;
+      }
+
+      // 3. 최종 기루다는 버리지 않음
+      if (finalGiruda != null) {
+        if (a.suit == finalGiruda && b.suit != finalGiruda) return 1;
+        if (a.suit != finalGiruda && b.suit == finalGiruda) return -1;
+      }
+
+      // 4. 점수 카드는 버리지 않음
+      if (a.isPointCard && !b.isPointCard) return 1;
+      if (!a.isPointCard && b.isPointCard) return -1;
+
+      // 5. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
+      int aCount = suitCount[a.suit] ?? 0;
+      int bCount = suitCount[b.suit] ?? 0;
+      if (aCount != bCount) {
+        return aCount.compareTo(bCount); // 적은 쪽이 앞으로
+      }
+
+      return a.rankValue.compareTo(b.rankValue);
+    });
+
+    return hand.take(3).toList();
   }
 
   FriendDeclaration declareFriend(Player player, GameState state) {
