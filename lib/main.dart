@@ -6,6 +6,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'services/game_controller.dart';
 import 'services/stats_service.dart';
+import 'services/ad_service.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -19,6 +20,9 @@ void main() {
 
   // AdMob 초기화
   MobileAds.instance.initialize();
+
+  // 보상형 광고 미리 로드
+  AdService().loadRewardedAd();
 
   runApp(const MightyApp());
 }

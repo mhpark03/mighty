@@ -21,6 +21,8 @@ class StatsService extends ChangeNotifier {
     if (statsJson != null) {
       try {
         _playerStats = PlayerStats.decodeList(statsJson);
+        // 기존 AI 이름을 새 이름으로 업데이트
+        _updatePlayerNames();
       } catch (e) {
         _initDefaultStats();
       }
@@ -30,6 +32,14 @@ class StatsService extends ChangeNotifier {
 
     _isLoaded = true;
     notifyListeners();
+  }
+
+  /// 플레이어 이름 업데이트 (기존 데이터 마이그레이션)
+  void _updatePlayerNames() {
+    final defaultNames = ['플레이어', '민준', '서연', '지호', '수빈'];
+    for (int i = 0; i < _playerStats.length && i < defaultNames.length; i++) {
+      _playerStats[i].name = defaultNames[i];
+    }
   }
 
   /// 기본 플레이어 통계 초기화

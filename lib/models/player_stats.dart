@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class PlayerStats {
-  final String name;
+  String name;
   int wins;
   int losses;
   int totalScore;

@@ -7,6 +7,7 @@ import '../l10n/generated/app_localizations.dart';
 import '../models/game_state.dart';
 import '../services/game_controller.dart';
 import '../services/stats_service.dart';
+import '../services/ad_service.dart';
 import '../widgets/banner_ad_widget.dart';
 import 'game_screen.dart';
 
@@ -350,8 +351,13 @@ class HomeScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              statsService.resetStats();
               Navigator.pop(dialogContext);
+              // 보상형 광고 표시 후 초기화
+              AdService().showRewardedAd(
+                onRewarded: () {
+                  statsService.resetStats();
+                },
+              );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.resetStats, style: const TextStyle(color: Colors.white)),
