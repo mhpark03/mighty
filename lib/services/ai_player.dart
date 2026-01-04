@@ -43,14 +43,16 @@ class AIPlayer {
     return 13 - playedCount - myCount;
   }
 
-  // 기루다가 초반인지 확인 (오픈된 기루다가 4장 이하)
-  bool _isEarlyGirudaPhase(GameState state) {
-    return _getPlayedGirudaCount(state) <= 4;
+  // 기루다가 초반인지 확인 (상대가 가진 기루다가 7장 초과)
+  bool _isEarlyGirudaPhase(GameState state, Player player) {
+    final remaining = _getRemainingGirudaCount(state, player);
+    return remaining > 7;
   }
 
-  // 기루다가 후반인지 확인 (오픈된 기루다가 7장 이상)
-  bool _isLateGirudaPhase(GameState state) {
-    return _getPlayedGirudaCount(state) >= 7;
+  // 기루다가 후반인지 확인 (상대가 가진 기루다가 7장 이하)
+  bool _isLateGirudaPhase(GameState state, Player player) {
+    final remaining = _getRemainingGirudaCount(state, player);
+    return remaining <= 7;
   }
 
   // 카드의 실효 가치 계산 (오픈된 카드 고려)
@@ -657,15 +659,15 @@ class AIPlayer {
       bool jokerIsFriendCard = state.friendDeclaration?.card?.isJoker ?? false;
 
       if (state.giruda != null) {
-        // 조건 1: 조커가 프렌드 카드이고 초반(기루다 4장 이하 오픈)이면 기루다 호출
+        // 조건 1: 조커가 프렌드 카드이고 초반(상대 기루다 7장 초과)이면 기루다 호출
         // → 주공의 낮은 기루다를 제거하여 기루다 정리
-        if (jokerIsFriendCard && _isEarlyGirudaPhase(state)) {
+        if (jokerIsFriendCard && _isEarlyGirudaPhase(state, player)) {
           return state.giruda!;
         }
 
-        // 조건 2: 후반(기루다 7장 이상 오픈)이면 주공이 컷으로 기루다 사용할 확률 높음
+        // 조건 2: 후반(상대 기루다 7장 이하)이면 주공이 컷으로 기루다 사용할 확률 높음
         // → 기루다 호출하지 않고, 차상위 카드를 가진 무늬 호출
-        if (_isLateGirudaPhase(state)) {
+        if (_isLateGirudaPhase(state, player)) {
           return _selectSuitWithSecondHighestCard(player, state, playedCards);
         }
       }
