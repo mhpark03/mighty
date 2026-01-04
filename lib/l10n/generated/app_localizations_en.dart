@@ -334,6 +334,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get joker => 'Joker';
 
   @override
+  String get mighty => 'Mighty';
+
+  @override
   String get recommendNoFriend => 'No Friend recommended';
 
   @override

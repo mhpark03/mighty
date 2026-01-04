@@ -334,6 +334,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get joker => '조커';
 
   @override
+  String get mighty => '마이티';
+
+  @override
   String get recommendNoFriend => '노프렌드 추천';
 
   @override

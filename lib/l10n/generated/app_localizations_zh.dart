@@ -331,7 +331,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get recommendedFriend => '추천 프렌드:';
 
   @override
-  String get joker => '조커';
+  String get joker => '小丑';
+
+  @override
+  String get mighty => '王牌';
 
   @override
   String get recommendNoFriend => '노프렌드 추천';

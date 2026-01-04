@@ -331,7 +331,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get recommendedFriend => '추천 프렌드:';
 
   @override
-  String get joker => '조커';
+  String get joker => 'ジョーカー';
+
+  @override
+  String get mighty => 'マイティ';
 
   @override
   String get recommendNoFriend => '노프렌드 추천';

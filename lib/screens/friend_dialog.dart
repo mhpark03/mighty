@@ -31,12 +31,12 @@ class _FriendDialogState extends State<FriendDialog> {
   // AI 추천
   final AIPlayer _aiPlayer = AIPlayer();
   late FriendDeclaration _recommendedDeclaration;
-  late String _recommendationReason;
 
   @override
   void initState() {
     super.initState();
     _calculateRecommendation();
+    _applyRecommendation(); // 초기 선택으로 자동 적용
   }
 
   void _calculateRecommendation() {
@@ -46,227 +46,94 @@ class _FriendDialogState extends State<FriendDialog> {
     tempPlayer.hand.addAll(widget.hand);
 
     _recommendedDeclaration = _aiPlayer.declareFriend(tempPlayer, widget.gameState);
-    _recommendationReason = _getRecommendationReason();
-  }
-
-  String _getRecommendationReason() {
-    final hand = widget.hand;
-    final hasMighty = hand.any((c) => c.isMighty);
-    final hasJoker = hand.any((c) => c.isJoker);
-
-    if (_recommendedDeclaration.isNoFriend) {
-      return 'reasonStrongHand';
-    }
-
-    if (_recommendedDeclaration.card != null) {
-      final card = _recommendedDeclaration.card!;
-      if (card.isMighty) {
-        return 'reasonNeedMighty';
-      }
-      if (card.isJoker) {
-        return 'reasonNeedJoker';
-      }
-      if (card.suit == widget.gameState.giruda && card.rank == Rank.ace) {
-        return 'reasonNeedGirudaAce';
-      }
-      if (card.suit == widget.gameState.giruda && card.rank == Rank.king) {
-        return 'reasonNeedGirudaKing';
-      }
-    }
-
-    if (hasMighty) return 'reasonHasMighty';
-    if (hasJoker) return 'reasonHasJoker';
-    return 'reasonNeedMighty';
   }
 
   void _applyRecommendation() {
-    setState(() {
-      if (_recommendedDeclaration.isNoFriend) {
-        _selectedType = 'none';
-      } else if (_recommendedDeclaration.card != null) {
-        final card = _recommendedDeclaration.card!;
-        if (card.isJoker) {
-          _selectedType = 'joker';
-        } else {
-          _selectedType = 'card';
-          _selectedSuit = card.suit!;
-          _selectedRank = card.rank!;
-        }
+    if (_recommendedDeclaration.isNoFriend) {
+      _selectedType = 'none';
+    } else if (_recommendedDeclaration.card != null) {
+      final card = _recommendedDeclaration.card!;
+      if (card.isJoker) {
+        _selectedType = 'joker';
+      } else if (card.isMighty) {
+        _selectedType = 'mighty';
+      } else {
+        _selectedType = 'card';
+        _selectedSuit = card.suit!;
+        _selectedRank = card.rank!;
       }
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.of(context).size.width;
 
-    return AlertDialog(
-      title: Text(l10n.declareFriend),
-      content: SingleChildScrollView(
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      child: Container(
+        width: screenWidth * 0.95,
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // AI 추천 영역
-            _buildRecommendationSection(),
+            // 타이틀
+            Center(
+              child: Text(
+                l10n.declareFriend,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
             const SizedBox(height: 16),
-            Text(l10n.friendDeclarationType, style: const TextStyle(fontWeight: FontWeight.bold)),
+            // 프렌드 선언 방식
+            Text(l10n.friendDeclarationType, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             const SizedBox(height: 8),
             _buildRadioOption('card', l10n.byCard, null),
+            _buildRadioOption('mighty', l10n.mighty, null),
             _buildRadioOption('joker', l10n.joker, null),
             _buildRadioOption('none', l10n.noFriend, l10n.noFriendDesc),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+            // 카드 선택기 (카드로 지정 선택 시)
             if (_selectedType == 'card') _buildCardSelector(),
-          ],
-        ),
-      ),
-      actions: [
-        ElevatedButton(
-          onPressed: () {
-            FriendDeclaration declaration;
-            switch (_selectedType) {
-              case 'card':
-                declaration = FriendDeclaration.byCard(
-                  PlayingCard(suit: _selectedSuit, rank: _selectedRank),
-                );
-                break;
-              case 'joker':
-                declaration = FriendDeclaration.byCard(PlayingCard.joker());
-                break;
-              case 'none':
-              default:
-                declaration = FriendDeclaration.noFriend();
-                break;
-            }
-            widget.onDeclare(declaration);
-          },
-          child: Text(l10n.declare),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRecommendationSection() {
-    final l10n = AppLocalizations.of(context)!;
-
-    String recommendedText;
-    if (_recommendedDeclaration.isNoFriend) {
-      recommendedText = l10n.noFriend;
-    } else if (_recommendedDeclaration.card != null) {
-      final card = _recommendedDeclaration.card!;
-      if (card.isJoker) {
-        recommendedText = l10n.joker;
-      } else {
-        recommendedText = '${_getSuitSymbol(card.suit!)}${_rankToString(card.rank!)}';
-      }
-    } else {
-      recommendedText = l10n.noFriend;
-    }
-
-    String reasonText;
-    switch (_recommendationReason) {
-      case 'reasonStrongHand':
-        reasonText = l10n.reasonStrongHand;
-        break;
-      case 'reasonHasMighty':
-        reasonText = l10n.reasonHasMighty;
-        break;
-      case 'reasonHasJoker':
-        reasonText = l10n.reasonHasJoker;
-        break;
-      case 'reasonNeedMighty':
-        reasonText = l10n.reasonNeedMighty;
-        break;
-      case 'reasonNeedJoker':
-        reasonText = l10n.reasonNeedJoker;
-        break;
-      case 'reasonNeedGirudaAce':
-        reasonText = l10n.reasonNeedGirudaAce;
-        break;
-      case 'reasonNeedGirudaKing':
-        reasonText = l10n.reasonNeedGirudaKing;
-        break;
-      default:
-        reasonText = '';
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.blue.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue, width: 1),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.lightbulb, color: Colors.blue, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                l10n.aiRecommendation,
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // 추천 프렌드
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(l10n.recommendedFriend, style: const TextStyle(fontSize: 12)),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _recommendedDeclaration.isNoFriend
-                      ? Colors.grey.withValues(alpha: 0.2)
-                      : Colors.amber.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: _recommendedDeclaration.isNoFriend ? Colors.grey : Colors.amber,
-                  ),
+            const SizedBox(height: 16),
+            // 선언 버튼
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  FriendDeclaration declaration;
+                  switch (_selectedType) {
+                    case 'card':
+                      declaration = FriendDeclaration.byCard(
+                        PlayingCard(suit: _selectedSuit, rank: _selectedRank),
+                      );
+                      break;
+                    case 'mighty':
+                      declaration = FriendDeclaration.byCard(widget.mighty);
+                      break;
+                    case 'joker':
+                      declaration = FriendDeclaration.byCard(PlayingCard.joker());
+                      break;
+                    case 'none':
+                    default:
+                      declaration = FriendDeclaration.noFriend();
+                      break;
+                  }
+                  widget.onDeclare(declaration);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 ),
                 child: Text(
-                  recommendedText,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: _recommendedDeclaration.isNoFriend ? Colors.grey[700] : Colors.amber[800],
-                  ),
+                  l10n.declare,
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
                 ),
-              ),
-            ],
-          ),
-          if (reasonText.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              '($reasonText)',
-              style: TextStyle(
-                fontSize: 11,
-                color: Colors.grey[600],
               ),
             ),
           ],
-          const SizedBox(height: 8),
-          // 추천 적용 버튼
-          ElevatedButton.icon(
-            onPressed: _applyRecommendation,
-            icon: const Icon(Icons.auto_fix_high, size: 16),
-            label: Text(l10n.applyRecommendation),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -66,5 +66,7 @@
   "resetStatsConfirm": "重置所有统计数据？",
   "startGame": "开始游戏",
   "exitApp": "退出应用",
-  "exitAppConfirm": "退出应用？"
+  "exitAppConfirm": "退出应用？",
+  "joker": "小丑",
+  "mighty": "王牌"
 }

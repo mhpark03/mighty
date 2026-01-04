@@ -684,6 +684,12 @@ abstract class AppLocalizations {
   /// **'조커'**
   String get joker;
 
+  /// No description provided for @mighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티'**
+  String get mighty;
+
   /// No description provided for @recommendNoFriend.
   ///
   /// In ko, this message translates to:

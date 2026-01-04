@@ -66,5 +66,7 @@
   "resetStatsConfirm": "すべての統計をリセットしますか？",
   "startGame": "ゲーム開始",
   "exitApp": "アプリ終了",
-  "exitAppConfirm": "アプリを終了しますか？"
+  "exitAppConfirm": "アプリを終了しますか？",
+  "joker": "ジョーカー",
+  "mighty": "マイティ"
 }
