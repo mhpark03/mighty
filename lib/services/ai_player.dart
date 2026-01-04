@@ -1074,6 +1074,75 @@ class AIPlayer {
       }
     }
 
+    // === 같은 팀이 최상위 카드로 이기고 있을 때 낮은 카드 버리기 ===
+    // 팀원이 이미 최상위 카드(마이티/조커/실효가치14+)로 이기고 있으면
+    // 높은 카드를 낭비하지 않고 낮은 카드를 버린다
+    bool myTeamWinning = (isAttackTeam && !defenseWinning) || (isDefenseTeam && defenseWinning);
+
+    if (myTeamWinning && currentWinningCard != null) {
+      // 이기고 있는 카드가 최상위 카드인지 확인
+      bool winningCardIsTop = false;
+
+      if (currentWinningCard.isMighty) {
+        winningCardIsTop = true;
+      } else if (currentWinningCard.isJoker) {
+        // 조커는 마이티만 이길 수 있음
+        bool mightyPlayed = _getPlayedCards(state).any((c) => c.isMighty);
+        bool mightyInMyHand = player.hand.any((c) => c.isMighty);
+        winningCardIsTop = mightyPlayed || mightyInMyHand ||
+            !playableCards.any((c) => c.isMighty);
+      } else if (!currentWinningCard.isJoker) {
+        // 일반 카드: 실효 가치가 14 이상이면 최상위
+        int effectiveValue = _getEffectiveCardValue(currentWinningCard, state);
+        // 기루다인 경우 또는 리드 무늬인 경우에만 최상위로 인정
+        if (currentWinningCard.suit == state.giruda ||
+            currentWinningCard.suit == leadSuit) {
+          winningCardIsTop = effectiveValue >= 14;
+        }
+      }
+
+      // 팀원이 최상위 카드로 이기고 있으면 낮은 카드 버리기
+      if (winningCardIsTop) {
+        // 리드 무늬가 있으면 리드 무늬 중 낮은 카드
+        final suitCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit == leadSuit).toList();
+        if (suitCards.isNotEmpty) {
+          suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          // 점수 카드가 아닌 낮은 카드 우선
+          final nonPointSuitCards = suitCards.where((c) => !c.isPointCard).toList();
+          if (nonPointSuitCards.isNotEmpty) {
+            return nonPointSuitCards.first;
+          }
+          // 수비팀이 이기고 있으면 점수 카드도 버릴 수 있음
+          if (isDefenseTeam && defenseWinning) {
+            return suitCards.first;
+          }
+          // 공격팀은 점수 카드 중 낮은 것
+          return suitCards.first;
+        }
+
+        // 리드 무늬가 없으면 비기루다 중 낮은 카드 버리기
+        final nonGirudaCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+        if (nonGirudaCards.isNotEmpty) {
+          nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
+          if (nonPointCards.isNotEmpty) {
+            return nonPointCards.first;
+          }
+          return nonGirudaCards.first;
+        }
+
+        // 기루다만 있으면 낮은 기루다
+        final girudaCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+        if (girudaCards.isNotEmpty) {
+          girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return girudaCards.first;
+        }
+      }
+    }
+
     // === 공격팀 카드 아끼기 전략 ===
     // 주공팀이 높은 기루다로 이길 확률이 높으면 낮은 카드를 우선 버린다
     bool attackTeamWinning = isAttackTeam && !defenseWinning;
