@@ -1041,6 +1041,51 @@ class AIPlayer {
       }
     }
 
+    // === 공격팀 조커로 점수 카드 수집 전략 ===
+    // 점수 카드가 3장 이상 쌓였을 때 조커로 가져오기
+    if (isAttackTeam && state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
+      final joker = playableCards.where((c) => c.isJoker).toList();
+      if (joker.isNotEmpty) {
+        // 현재 트릭의 점수 카드 수 계산
+        int pointCardsInTrick = state.currentTrick!.cards
+            .where((c) => c.isPointCard || c.isJoker).length;
+
+        // 점수 카드 3장 이상이고, 현재 이기고 있는 카드가 마이티가 아니면 조커 사용
+        if (pointCardsInTrick >= 3) {
+          if (currentWinningCard == null || !currentWinningCard.isMighty) {
+            // 조커콜 상태가 아닐 때만 사용
+            bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
+            if (!jokerCalled) {
+              return joker.first;
+            }
+          }
+        }
+      }
+    }
+
+    // === 공격팀 후반전 조커 전략 사용 ===
+    // 후반전(트릭 7 이후)에 상대 기루다가 소진되었으면 조커로 선공 확보
+    if (isAttackTeam && state.currentTrickNumber >= 7 && state.currentTrickNumber < 10) {
+      final joker = playableCards.where((c) => c.isJoker).toList();
+      if (joker.isNotEmpty) {
+        final remainingGiruda = _getRemainingGirudaCount(state, player);
+        // 상대 기루다가 3장 이하로 남았고, 조커로 이길 수 있으면 사용
+        if (remainingGiruda <= 3) {
+          if (currentWinningCard == null || !currentWinningCard.isMighty) {
+            bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
+            if (!jokerCalled) {
+              // 우리 팀이 지고 있거나, 점수 카드가 1장 이상 있을 때
+              int pointCardsInTrick = state.currentTrick!.cards
+                  .where((c) => c.isPointCard || c.isJoker).length;
+              if (defenseWinning || pointCardsInTrick >= 1) {
+                return joker.first;
+              }
+            }
+          }
+        }
+      }
+    }
+
     // === 공격팀 선공권 탈환 전략 ===
     // 공격팀(주공/프렌드)이 선공권을 잃었을 때 마이티/조커로 선공권을 되찾는다
     // 선공권이 있어야 자신이 가진 높은 무늬로 공격하여 이길 가능성이 높아진다
