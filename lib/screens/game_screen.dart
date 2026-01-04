@@ -124,13 +124,32 @@ class _GameScreenState extends State<GameScreen> {
           color: Colors.black38,
           child: Column(
             children: [
-              Text(
-                l10n.biddingPhase,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    l10n.biddingPhase,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      controller.reset();
+                      controller.startNewGame();
+                    },
+                    icon: const Icon(Icons.refresh, size: 16),
+                    label: Text(l10n.newGame),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
               _buildBiddingInfo(state),
