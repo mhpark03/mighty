@@ -6,6 +6,7 @@ class CardWidget extends StatelessWidget {
   final bool isSelected;
   final bool isPlayable;
   final bool faceDown;
+  final bool isRecommended;
   final VoidCallback? onTap;
   final double width;
   final double height;
@@ -16,6 +17,7 @@ class CardWidget extends StatelessWidget {
     this.isSelected = false,
     this.isPlayable = true,
     this.faceDown = false,
+    this.isRecommended = false,
     this.onTap,
     this.width = 60,
     this.height = 90,
@@ -30,19 +32,52 @@ class CardWidget extends StatelessWidget {
         width: width,
         height: height,
         transform: Matrix4.translationValues(0, isSelected ? -10 : 0, 0),
-        child: Card(
-          elevation: isSelected ? 8 : 2,
-          color: faceDown ? Colors.blue[800] : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: BorderSide(
-              color: isSelected
-                  ? Colors.yellow
-                  : (isPlayable ? Colors.grey[300]! : Colors.grey[500]!),
-              width: isSelected ? 3 : 1,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Card(
+              elevation: isSelected ? 8 : (isRecommended ? 6 : 2),
+              color: faceDown ? Colors.blue[800] : Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: isSelected
+                      ? Colors.yellow
+                      : (isRecommended
+                          ? Colors.lightBlueAccent
+                          : (isPlayable ? Colors.grey[300]! : Colors.grey[500]!)),
+                  width: isSelected ? 3 : (isRecommended ? 3 : 1),
+                ),
+              ),
+              child: faceDown ? _buildCardBack() : _buildCardFront(),
             ),
-          ),
-          child: faceDown ? _buildCardBack() : _buildCardFront(),
+            // 추천 표시 배지
+            if (isRecommended)
+              Positioned(
+                top: -8,
+                right: -8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.lightBlueAccent,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.thumb_up,
+                    color: Colors.white,
+                    size: 12,
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

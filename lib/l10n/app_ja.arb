@@ -54,5 +54,7 @@
   "targetPoints": "目標: {points}点",
   "score": "スコア",
   "points": "{points}点",
-  "player": "プレイヤー"
+  "player": "プレイヤー",
+  "recommendedCard": "おすすめ",
+  "showRecommendation": "ヒント表示"
 }

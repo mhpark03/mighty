@@ -54,5 +54,7 @@
   "targetPoints": "目标: {points}分",
   "score": "分数",
   "points": "{points}分",
-  "player": "玩家"
+  "player": "玩家",
+  "recommendedCard": "推荐",
+  "showRecommendation": "显示提示"
 }

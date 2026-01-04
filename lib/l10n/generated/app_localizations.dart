@@ -773,6 +773,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'저장된 게임이 없습니다'**
   String get noSavedGame;
+
+  /// No description provided for @recommendedCard.
+  ///
+  /// In ko, this message translates to:
+  /// **'추천 카드'**
+  String get recommendedCard;
+
+  /// No description provided for @showRecommendation.
+  ///
+  /// In ko, this message translates to:
+  /// **'추천 보기'**
+  String get showRecommendation;
 }
 
 class _AppLocalizationsDelegate

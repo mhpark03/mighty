@@ -111,5 +111,7 @@
   "cancel": "Cancel",
   "exit": "Exit",
   "savedGame": "Saved Game",
-  "noSavedGame": "No saved game"
+  "noSavedGame": "No saved game",
+  "recommendedCard": "Recommended",
+  "showRecommendation": "Show Hint"
 }

@@ -377,4 +377,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get noSavedGame => '저장된 게임이 없습니다';
+
+  @override
+  String get recommendedCard => 'おすすめ';
+
+  @override
+  String get showRecommendation => 'ヒント表示';
 }

@@ -197,5 +197,7 @@
   "cancel": "취소",
   "exit": "종료",
   "savedGame": "저장된 게임",
-  "noSavedGame": "저장된 게임이 없습니다"
+  "noSavedGame": "저장된 게임이 없습니다",
+  "recommendedCard": "추천 카드",
+  "showRecommendation": "추천 보기"
 }

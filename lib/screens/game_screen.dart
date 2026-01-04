@@ -24,6 +24,7 @@ class _GameScreenState extends State<GameScreen> {
   Timer? _trickTimer;
   int _trickCountdown = 10;
   bool _timerRunning = false;
+  bool _showRecommendation = false;
 
   @override
   void dispose() {
@@ -107,6 +108,11 @@ class _GameScreenState extends State<GameScreen> {
                   controller.reset();
                   controller.startNewGame();
                 },
+              ),
+              IconButton(
+                icon: const Icon(Icons.power_settings_new, color: Colors.white),
+                onPressed: () => _showExitDialog(controller),
+                tooltip: l10n.exitGame,
               ),
             ],
           ),
@@ -1528,6 +1534,9 @@ class _GameScreenState extends State<GameScreen> {
     final isLeadPlayer = controller.state.currentTrick != null &&
         controller.state.currentTrick!.leadPlayerId == 0;
 
+    // 추천 카드 가져오기
+    final recommendedCard = _showRecommendation ? controller.getRecommendedCard() : null;
+
     // 플레이어가 획득한 점수 카드
     final pointCards = controller.humanPlayer.wonCards
         .where((c) => c.isPointCard || c.isJoker)
@@ -1539,13 +1548,16 @@ class _GameScreenState extends State<GameScreen> {
       return b.rankValue.compareTo(a.rankValue);
     });
 
+    // 사용자 차례인지 확인
+    final isHumanTurn = controller.isHumanTurn;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       color: Colors.black26,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 상단: 선공 표시 & 획득한 점수 카드
+          // 상단: 선공 표시 & 획득한 점수 카드 & 추천 버튼
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -1596,6 +1608,48 @@ class _GameScreenState extends State<GameScreen> {
                     ],
                   ),
                 ),
+              // 추천 보기 버튼 (사용자 차례일 때만)
+              if (isHumanTurn && controller.state.phase == GamePhase.playing)
+                Container(
+                  margin: const EdgeInsets.only(left: 8),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _showRecommendation = !_showRecommendation;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _showRecommendation ? Colors.lightBlueAccent : Colors.grey[700],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _showRecommendation ? Colors.white : Colors.transparent,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.lightbulb,
+                            color: Colors.white,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            l10n.showRecommendation,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 4),
@@ -1616,6 +1670,7 @@ class _GameScreenState extends State<GameScreen> {
                         height: 80,
                         isSelected: selectedCard == card,
                         isPlayable: playableCards.contains(card),
+                        isRecommended: recommendedCard != null && _isSameCard(card, recommendedCard),
                         onTap: () => _onCardTap(card, controller),
                       ),
                     ),
@@ -1626,6 +1681,13 @@ class _GameScreenState extends State<GameScreen> {
         ],
       ),
     );
+  }
+
+  // 두 카드가 같은지 비교
+  bool _isSameCard(PlayingCard a, PlayingCard b) {
+    if (a.isJoker && b.isJoker) return true;
+    if (a.isJoker || b.isJoker) return false;
+    return a.suit == b.suit && a.rank == b.rank;
   }
 
   void _onCardTap(PlayingCard card, GameController controller) {

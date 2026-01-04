@@ -172,23 +172,24 @@ class HomeScreen extends StatelessWidget {
     GameController controller,
     AppLocalizations l10n,
   ) {
+    final parentContext = context;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(l10n.newGame),
         content: Text(l10n.exitGameConfirm),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               controller.reset();
               controller.startNewGame();
               Navigator.push(
-                context,
+                parentContext,
                 MaterialPageRoute(
                   builder: (context) => const GameScreen(),
                 ),

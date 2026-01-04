@@ -377,4 +377,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noSavedGame => '저장된 게임이 없습니다';
+
+  @override
+  String get recommendedCard => '推荐';
+
+  @override
+  String get showRecommendation => '显示提示';
 }

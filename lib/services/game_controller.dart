@@ -276,6 +276,20 @@ class GameController extends ChangeNotifier {
     return _state.canPlayCard(card, humanPlayer);
   }
 
+  /// 사용자에게 추천할 카드를 반환
+  /// AI 로직을 사용하여 최적의 카드를 선택
+  PlayingCard? getRecommendedCard() {
+    if (_state.phase != GamePhase.playing) return null;
+    if (_state.currentPlayer != 0) return null;
+
+    final playableCards = getPlayableCards();
+    if (playableCards.isEmpty) return null;
+    if (playableCards.length == 1) return playableCards.first;
+
+    // AI 로직을 사용하여 추천 카드 선택
+    return _aiPlayer.selectCard(humanPlayer, _state);
+  }
+
   void reset() {
     _initializePlayers();
     notifyListeners();
