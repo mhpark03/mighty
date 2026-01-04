@@ -9,6 +9,8 @@ class GameController extends ChangeNotifier {
   late GameState _state;
   final AIPlayer _aiPlayer = AIPlayer();
   bool _isProcessing = false;
+  bool _waitingForTrickConfirm = false;
+  Trick? _lastCompletedTrick;
 
   GameController() {
     _initializePlayers();
@@ -16,11 +18,13 @@ class GameController extends ChangeNotifier {
 
   GameState get state => _state;
   bool get isProcessing => _isProcessing;
+  bool get waitingForTrickConfirm => _waitingForTrickConfirm;
+  Trick? get lastCompletedTrick => _lastCompletedTrick;
 
   Player get humanPlayer => _state.players[0];
   Player get currentPlayer => _state.players[_state.currentPlayer];
   bool get isHumanTurn =>
-      _state.currentPlayer == 0 && !_isProcessing;
+      _state.currentPlayer == 0 && !_isProcessing && !_waitingForTrickConfirm;
 
   void _initializePlayers() {
     final players = [
@@ -136,6 +140,7 @@ class GameController extends ChangeNotifier {
   void _processAIPlayIfNeeded() async {
     if (_state.phase != GamePhase.playing) return;
     if (_state.currentPlayer == 0) return;
+    if (_waitingForTrickConfirm) return;
 
     _isProcessing = true;
     notifyListeners();
@@ -161,9 +166,21 @@ class GameController extends ChangeNotifier {
       card = _aiPlayer.selectCard(currentPlayer, _state);
     }
 
+    // 트릭 완료 여부 확인을 위해 현재 트릭 수 저장
+    final trickCountBefore = _state.tricks.length;
+
     _state.playCard(card, currentPlayer.id);
 
     _isProcessing = false;
+
+    // 트릭이 완료되었는지 확인
+    if (_state.tricks.length > trickCountBefore && _state.phase == GamePhase.playing) {
+      _lastCompletedTrick = _state.tricks.last;
+      _waitingForTrickConfirm = true;
+      notifyListeners();
+      return; // 사용자 확인 대기
+    }
+
     notifyListeners();
 
     if (_state.phase == GamePhase.playing) {
@@ -174,13 +191,39 @@ class GameController extends ChangeNotifier {
   void humanPlayCard(PlayingCard card, {Suit? jokerCallSuit}) {
     if (_state.currentPlayer != 0) return;
     if (!_state.canPlayCard(card, humanPlayer)) return;
+    if (_waitingForTrickConfirm) return;
 
     // 조커 콜 선언 (선공 시에만)
     if (jokerCallSuit != null && isLeadingTrick) {
       _state.declareJokerCall(jokerCallSuit);
     }
 
+    // 트릭 완료 여부 확인을 위해 현재 트릭 수 저장
+    final trickCountBefore = _state.tricks.length;
+
     _state.playCard(card, 0);
+
+    // 트릭이 완료되었는지 확인
+    if (_state.tricks.length > trickCountBefore && _state.phase == GamePhase.playing) {
+      _lastCompletedTrick = _state.tricks.last;
+      _waitingForTrickConfirm = true;
+      notifyListeners();
+      return; // 사용자 확인 대기
+    }
+
+    notifyListeners();
+
+    if (_state.phase == GamePhase.playing) {
+      _processAIPlayIfNeeded();
+    }
+  }
+
+  // 트릭 확인 후 다음 단계 진행
+  void confirmTrick() {
+    if (!_waitingForTrickConfirm) return;
+
+    _waitingForTrickConfirm = false;
+    _lastCompletedTrick = null;
     notifyListeners();
 
     if (_state.phase == GamePhase.playing) {

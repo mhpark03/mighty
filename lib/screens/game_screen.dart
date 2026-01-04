@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -21,6 +23,42 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   PlayingCard? selectedCard;
   bool _allPassedDialogShown = false;
+  Timer? _trickTimer;
+  int _trickCountdown = 10;
+  bool _timerRunning = false;
+
+  @override
+  void dispose() {
+    _trickTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startTrickTimer(GameController controller) {
+    if (_timerRunning) return;
+    _timerRunning = true;
+    _trickCountdown = 10;
+
+    _trickTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      setState(() {
+        _trickCountdown--;
+      });
+      if (_trickCountdown <= 0) {
+        timer.cancel();
+        _timerRunning = false;
+        controller.confirmTrick();
+      }
+    });
+  }
+
+  void _stopTrickTimer() {
+    _trickTimer?.cancel();
+    _timerRunning = false;
+    _trickCountdown = 10;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -482,126 +520,321 @@ class _GameScreenState extends State<GameScreen> {
   Widget _buildPlayingScreen(GameController controller) {
     final state = controller.state;
 
-    return Column(
+    // 트릭 완료 대기 중이면 타이머 시작
+    if (controller.waitingForTrickConfirm && !_timerRunning) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _startTrickTimer(controller);
+      });
+    } else if (!controller.waitingForTrickConfirm && _timerRunning) {
+      _stopTrickTimer();
+    }
+
+    return Stack(
       children: [
-        _buildGameInfo(state),
-        _buildPlayedPointCards(state),
-        const SizedBox(height: 4),
-        Expanded(
-          child: _buildPlayArea(controller),
+        Column(
+          children: [
+            _buildGameInfo(state),
+            _buildPlayedPointCards(state),
+            const SizedBox(height: 4),
+            Expanded(
+              child: _buildPlayArea(controller),
+            ),
+            _buildPlayerHand(controller),
+          ],
         ),
-        _buildPlayerHand(controller),
+        // 트릭 완료 시 오버레이
+        if (controller.waitingForTrickConfirm)
+          _buildTrickConfirmOverlay(controller),
       ],
     );
   }
 
-  Widget _buildPlayedPointCards(GameState state) {
-    final pointCardsBySuit = state.playedPointCardsBySuit;
-    final isJokerPlayed = state.isJokerPlayed;
+  Widget _buildTrickConfirmOverlay(GameController controller) {
+    final trick = controller.lastCompletedTrick;
+    if (trick == null) return const SizedBox.shrink();
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      color: Colors.black45,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '공개된 점수 카드',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
+    final winner = controller.state.players[trick.winnerId ?? 0];
+    final isDeclarerTeam = winner.isDeclarer || winner.isFriend;
+
+    return Positioned.fill(
+      child: Container(
+        color: Colors.black54,
+        child: Center(
+          child: Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.green[800],
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDeclarerTeam ? Colors.blue : Colors.red,
+                width: 3,
+              ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Row(
-            children: [
-              // 조커 표시
-              if (isJokerPlayed)
-                Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.purple[700],
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    '🃏',
-                    style: TextStyle(fontSize: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '트릭 ${trick.trickNumber} 완료',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              // 각 무늬별 점수 카드
-              for (final suit in Suit.values) ...[
-                _buildSuitPointCards(suit, pointCardsBySuit[suit]!, state),
-                const SizedBox(width: 8),
+                const SizedBox(height: 16),
+                // 낸 카드들 표시
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (int i = 0; i < trick.cards.length; i++)
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            controller.state.players[trick.playerOrder[i]].name,
+                            style: TextStyle(
+                              color: trick.playerOrder[i] == trick.winnerId
+                                  ? Colors.amber
+                                  : Colors.white70,
+                              fontSize: 11,
+                              fontWeight: trick.playerOrder[i] == trick.winnerId
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                          Container(
+                            decoration: trick.playerOrder[i] == trick.winnerId
+                                ? BoxDecoration(
+                                    border: Border.all(color: Colors.amber, width: 2),
+                                    borderRadius: BorderRadius.circular(6),
+                                  )
+                                : null,
+                            child: CardWidget(
+                              card: trick.cards[i],
+                              width: 50,
+                              height: 75,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // 승자 표시
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isDeclarerTeam ? Colors.blue[700] : Colors.red[700],
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${winner.name} 승리! (${isDeclarerTeam ? "공격팀" : "방어팀"})',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // 타이머 & 진행 버튼
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 타이머 표시
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _trickCountdown <= 3 ? Colors.red : Colors.grey[700],
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$_trickCountdown',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    // 진행 버튼
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        _stopTrickTimer();
+                        controller.confirmTrick();
+                      },
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('다음 트릭'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
               ],
-            ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlayedPointCards(GameState state) {
+    final declarerCards = state.declarerTeamPointCards;
+    final defenderCards = state.defenderTeamPointCards;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      color: Colors.black45,
+      child: Row(
+        children: [
+          // 공격팀 점수 카드
+          Expanded(
+            child: _buildTeamPointCards(
+              '공격팀',
+              declarerCards,
+              state,
+              Colors.blue[700]!,
+            ),
+          ),
+          // 구분선
+          Container(
+            width: 2,
+            height: 60,
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            color: Colors.white24,
+          ),
+          // 방어팀 점수 카드
+          Expanded(
+            child: _buildTeamPointCards(
+              '방어팀',
+              defenderCards,
+              state,
+              Colors.red[700]!,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSuitPointCards(Suit suit, List<PlayingCard> cards, GameState state) {
-    final suitSymbol = _getSuitSymbol(suit);
-    final isRed = suit == Suit.diamond || suit == Suit.heart;
-    final suitColor = isRed ? Colors.red[300]! : Colors.white;
+  Widget _buildTeamPointCards(
+    String teamName,
+    List<PlayingCard> cards,
+    GameState state,
+    Color teamColor,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: teamColor,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                teamName,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '${cards.length}장',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        if (cards.isEmpty)
+          const Text(
+            '-',
+            style: TextStyle(color: Colors.grey, fontSize: 12),
+          )
+        else
+          Wrap(
+            spacing: 3,
+            runSpacing: 2,
+            children: cards.map((card) => _buildMiniCard(card, state)).toList(),
+          ),
+      ],
+    );
+  }
 
-    // 해당 무늬의 마이티인지 확인
-    final mighty = state.mighty;
+  Widget _buildMiniCard(PlayingCard card, GameState state) {
+    final isMighty = card == state.mighty;
 
-    String cardString = cards.map((c) {
-      String rank;
-      switch (c.rank) {
-        case Rank.ace:
-          rank = 'A';
-          break;
-        case Rank.king:
-          rank = 'K';
-          break;
-        case Rank.queen:
-          rank = 'Q';
-          break;
-        case Rank.jack:
-          rank = 'J';
-          break;
-        case Rank.ten:
-          rank = '10';
-          break;
-        default:
-          rank = '${c.rankValue}';
-      }
-      // 마이티면 강조
-      if (c == mighty) {
-        return '[$rank]';
-      }
-      return rank;
-    }).join(' ');
-
-    if (cardString.isEmpty) {
-      cardString = '-';
+    if (card.isJoker) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        decoration: BoxDecoration(
+          color: Colors.purple[600],
+          borderRadius: BorderRadius.circular(3),
+          border: Border.all(color: Colors.purple[300]!, width: 1),
+        ),
+        child: const Text(
+          '🃏',
+          style: TextStyle(fontSize: 11),
+        ),
+      );
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          suitSymbol,
-          style: TextStyle(
-            color: suitColor,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
+    final isRed = card.suit == Suit.diamond || card.suit == Suit.heart;
+    final suitSymbol = _getSuitSymbol(card.suit!);
+    String rank;
+    switch (card.rank) {
+      case Rank.ace:
+        rank = 'A';
+        break;
+      case Rank.king:
+        rank = 'K';
+        break;
+      case Rank.queen:
+        rank = 'Q';
+        break;
+      case Rank.jack:
+        rank = 'J';
+        break;
+      case Rank.ten:
+        rank = '10';
+        break;
+      default:
+        rank = '${card.rankValue}';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+      decoration: BoxDecoration(
+        color: isMighty ? Colors.amber[700] : Colors.white,
+        borderRadius: BorderRadius.circular(3),
+        border: isMighty
+            ? Border.all(color: Colors.amber[300]!, width: 1)
+            : null,
+      ),
+      child: Text(
+        '$suitSymbol$rank',
+        style: TextStyle(
+          color: isRed ? Colors.red[700] : Colors.black,
+          fontSize: 11,
+          fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
         ),
-        const SizedBox(width: 2),
-        Text(
-          cardString,
-          style: TextStyle(
-            color: cards.isEmpty ? Colors.grey : Colors.white,
-            fontSize: 11,
-          ),
-        ),
-      ],
+      ),
     );
   }
 

@@ -252,6 +252,46 @@ class GameState {
   // 마이티가 공개되었는지
   bool get isMightyPlayed => playedPointCards.any((c) => c == mighty);
 
+  // 공격팀(주공+프렌드)이 획득한 점수 카드
+  List<PlayingCard> get declarerTeamPointCards {
+    List<PlayingCard> cards = [];
+    for (final player in players) {
+      if (player.isDeclarer || player.isFriend) {
+        cards.addAll(player.wonCards.where((c) => c.isPointCard || c.isJoker));
+      }
+    }
+    // 랭크 순 정렬
+    cards.sort((a, b) {
+      if (a.isJoker) return -1;
+      if (b.isJoker) return 1;
+      if (a.suit != b.suit) {
+        return a.suit!.index.compareTo(b.suit!.index);
+      }
+      return b.rankValue.compareTo(a.rankValue);
+    });
+    return cards;
+  }
+
+  // 방어팀이 획득한 점수 카드
+  List<PlayingCard> get defenderTeamPointCards {
+    List<PlayingCard> cards = [];
+    for (final player in players) {
+      if (!player.isDeclarer && !player.isFriend) {
+        cards.addAll(player.wonCards.where((c) => c.isPointCard || c.isJoker));
+      }
+    }
+    // 랭크 순 정렬
+    cards.sort((a, b) {
+      if (a.isJoker) return -1;
+      if (b.isJoker) return 1;
+      if (a.suit != b.suit) {
+        return a.suit!.index.compareTo(b.suit!.index);
+      }
+      return b.rankValue.compareTo(a.rankValue);
+    });
+    return cards;
+  }
+
   bool get isNoGiruda => giruda == null;
 
   PlayingCard get mighty {
