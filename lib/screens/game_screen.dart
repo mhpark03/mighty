@@ -1352,21 +1352,28 @@ class _GameScreenState extends State<GameScreen> {
               ),
           ],
         ),
-        // 획득한 점수 카드 표시
+        // 획득한 점수 카드 표시 (최대 3열)
         if (pointCards.isNotEmpty)
           Container(
             width: maxWidth - 8,
             margin: const EdgeInsets.only(top: 4),
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
             decoration: BoxDecoration(
               color: Colors.black54,
               borderRadius: BorderRadius.circular(4),
             ),
-            child: Wrap(
-              spacing: 2,
-              runSpacing: 2,
-              alignment: WrapAlignment.center,
-              children: pointCards.map((card) => _buildTinyCard(card, state)).toList(),
+            child: Builder(
+              builder: (context) {
+                // 3열로 제한하기 위한 카드 너비 계산
+                final containerWidth = maxWidth - 8 - 4; // 패딩 제외
+                final cardWidth = (containerWidth - 4) / 3; // 3열, spacing 2*2
+                return Wrap(
+                  spacing: 2,
+                  runSpacing: 2,
+                  alignment: WrapAlignment.center,
+                  children: pointCards.map((card) => _buildTinyCardFixed(card, state, cardWidth)).toList(),
+                );
+              },
             ),
           ),
       ],
@@ -1422,6 +1429,67 @@ class _GameScreenState extends State<GameScreen> {
           color: isRed ? Colors.red[700] : Colors.black,
           fontSize: 11,
           fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+    );
+  }
+
+  // 고정 너비의 작은 카드 (3열 레이아웃용)
+  Widget _buildTinyCardFixed(PlayingCard card, GameState state, double width) {
+    final isMighty = card == state.mighty;
+
+    if (card.isJoker) {
+      return Container(
+        width: width,
+        padding: const EdgeInsets.symmetric(vertical: 1),
+        decoration: BoxDecoration(
+          color: Colors.purple[600],
+          borderRadius: BorderRadius.circular(3),
+        ),
+        child: const Center(
+          child: Text('🃏', style: TextStyle(fontSize: 10)),
+        ),
+      );
+    }
+
+    final isRed = card.suit == Suit.diamond || card.suit == Suit.heart;
+    final suitSymbol = _getSuitSymbol(card.suit!);
+    String rank;
+    switch (card.rank) {
+      case Rank.ace:
+        rank = 'A';
+        break;
+      case Rank.king:
+        rank = 'K';
+        break;
+      case Rank.queen:
+        rank = 'Q';
+        break;
+      case Rank.jack:
+        rank = 'J';
+        break;
+      case Rank.ten:
+        rank = '10';
+        break;
+      default:
+        rank = '${card.rankValue}';
+    }
+
+    return Container(
+      width: width,
+      padding: const EdgeInsets.symmetric(vertical: 1),
+      decoration: BoxDecoration(
+        color: isMighty ? Colors.amber[700] : Colors.white,
+        borderRadius: BorderRadius.circular(3),
+      ),
+      child: Center(
+        child: Text(
+          '$suitSymbol$rank',
+          style: TextStyle(
+            color: isRed ? Colors.red[700] : Colors.black,
+            fontSize: 10,
+            fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
+          ),
         ),
       ),
     );
