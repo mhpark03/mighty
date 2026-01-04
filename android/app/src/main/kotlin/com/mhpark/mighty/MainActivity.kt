@@ -1,4 +1,4 @@
-package com.example.mighty_app
+package com.mhpark.mighty
 
 import io.flutter.embedding.android.FlutterActivity
 
