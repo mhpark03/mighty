@@ -113,8 +113,8 @@ class CardWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(2),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // 상단 왼쪽: 숫자와 무늬
           Align(
             alignment: Alignment.topLeft,
             child: Text(
@@ -128,29 +128,14 @@ class CardWidget extends StatelessWidget {
               ),
             ),
           ),
+          // 중앙: 큰 무늬
           Expanded(
             child: Center(
               child: Text(
                 card.suitSymbol,
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 26,
                   color: color,
-                ),
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: RotatedBox(
-              quarterTurns: 2,
-              child: Text(
-                '${card.rankSymbol}\n${card.suitSymbol}',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                  height: 1.0,
                 ),
               ),
             ),

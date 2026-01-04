@@ -1739,34 +1739,104 @@ class _GameScreenState extends State<GameScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          // 카드 목록
-          SizedBox(
-            height: 90,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for (final card in hand)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: CardWidget(
-                        card: card,
-                        width: 55,
-                        height: 80,
-                        isSelected: selectedCard == card,
-                        isPlayable: playableCards.contains(card),
-                        isRecommended: recommendedCard != null && _isSameCard(card, recommendedCard),
-                        onTap: () => _onCardTap(card, controller),
-                      ),
-                    ),
-                ],
-              ),
-            ),
+          // 카드 목록 - 세로 모드: 2줄, 가로 모드: 1줄 스크롤
+          _buildGamePlayerCards(
+            hand,
+            playableCards,
+            recommendedCard,
+            controller,
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildGamePlayerCards(
+    List<PlayingCard> hand,
+    List<PlayingCard> playableCards,
+    PlayingCard? recommendedCard,
+    GameController controller,
+  ) {
+    final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    if (isPortrait) {
+      // 세로 모드: 2줄 배치
+      final cardWidth = (screenWidth - 32) / 6 - 4;
+      final cardHeight = cardWidth * 1.4;
+
+      final halfIndex = (hand.length + 1) ~/ 2;
+      final firstRow = hand.sublist(0, halfIndex);
+      final secondRow = hand.sublist(halfIndex);
+
+      return Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (final card in firstRow)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: CardWidget(
+                    card: card,
+                    width: cardWidth,
+                    height: cardHeight,
+                    isSelected: selectedCard == card,
+                    isPlayable: playableCards.contains(card),
+                    isRecommended: recommendedCard != null && _isSameCard(card, recommendedCard),
+                    onTap: () => _onCardTap(card, controller),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (final card in secondRow)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: CardWidget(
+                    card: card,
+                    width: cardWidth,
+                    height: cardHeight,
+                    isSelected: selectedCard == card,
+                    isPlayable: playableCards.contains(card),
+                    isRecommended: recommendedCard != null && _isSameCard(card, recommendedCard),
+                    onTap: () => _onCardTap(card, controller),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      );
+    } else {
+      // 가로 모드: 1줄 스크롤
+      return SizedBox(
+        height: 90,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (final card in hand)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: CardWidget(
+                    card: card,
+                    width: 55,
+                    height: 80,
+                    isSelected: selectedCard == card,
+                    isPlayable: playableCards.contains(card),
+                    isRecommended: recommendedCard != null && _isSameCard(card, recommendedCard),
+                    onTap: () => _onCardTap(card, controller),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   // 두 카드가 같은지 비교
