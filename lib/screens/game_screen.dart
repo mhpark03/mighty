@@ -1249,16 +1249,22 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildTopPlayers(GameState state) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final playerWidth = (screenWidth - 16) / 4; // 4명의 AI, 좌우 여백 8씩
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         for (int i = 1; i < 5; i++)
-          _buildPlayerIndicator(state.players[i], state, i),
+          SizedBox(
+            width: playerWidth,
+            child: _buildPlayerIndicator(state.players[i], state, i, playerWidth),
+          ),
       ],
     );
   }
 
-  Widget _buildPlayerIndicator(Player player, GameState state, int index) {
+  Widget _buildPlayerIndicator(Player player, GameState state, int index, double maxWidth) {
     final l10n = AppLocalizations.of(context)!;
     final isCurrentPlayer = state.currentPlayer == index;
     final isDeclarer = player.isDeclarer;
@@ -1284,7 +1290,7 @@ class _GameScreenState extends State<GameScreen> {
           clipBehavior: Clip.none,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: isCurrentPlayer ? Colors.amber.withValues(alpha: 0.3) : Colors.black26,
                 borderRadius: BorderRadius.circular(8),
@@ -1302,22 +1308,22 @@ class _GameScreenState extends State<GameScreen> {
                     style: TextStyle(
                       color: isCurrentPlayer ? Colors.amber : Colors.white,
                       fontWeight: isCurrentPlayer ? FontWeight.bold : FontWeight.normal,
-                      fontSize: 12,
+                      fontSize: 11,
                     ),
                   ),
                   Text(
                     l10n.cards(player.hand.length),
-                    style: const TextStyle(color: Colors.white70, fontSize: 10),
+                    style: const TextStyle(color: Colors.white70, fontSize: 9),
                   ),
                   if (isDeclarer)
                     Text(
                       l10n.declarer,
-                      style: const TextStyle(color: Colors.red, fontSize: 9),
+                      style: const TextStyle(color: Colors.red, fontSize: 8),
                     ),
                   if (isFriend)
                     Text(
                       l10n.friend,
-                      style: const TextStyle(color: Colors.blue, fontSize: 9),
+                      style: const TextStyle(color: Colors.blue, fontSize: 8),
                     ),
                 ],
               ),
@@ -1325,10 +1331,10 @@ class _GameScreenState extends State<GameScreen> {
             // 선공 표시
             if (isLeadPlayer)
               Positioned(
-                top: -8,
-                right: -8,
+                top: -6,
+                right: -6,
                 child: Container(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     color: Colors.orange,
                     shape: BoxShape.circle,
@@ -1338,7 +1344,7 @@ class _GameScreenState extends State<GameScreen> {
                     '1',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 10,
+                      fontSize: 9,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1349,6 +1355,7 @@ class _GameScreenState extends State<GameScreen> {
         // 획득한 점수 카드 표시
         if (pointCards.isNotEmpty)
           Container(
+            width: maxWidth - 8,
             margin: const EdgeInsets.only(top: 4),
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             decoration: BoxDecoration(
@@ -1356,8 +1363,9 @@ class _GameScreenState extends State<GameScreen> {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Wrap(
-              spacing: 4,
-              runSpacing: 4,
+              spacing: 2,
+              runSpacing: 2,
+              alignment: WrapAlignment.center,
               children: pointCards.map((card) => _buildTinyCard(card, state)).toList(),
             ),
           ),
