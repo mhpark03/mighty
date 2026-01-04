@@ -429,7 +429,7 @@ class GameState {
 
   bool canPlayCard(PlayingCard card, Player player) {
     if (currentTrick == null || currentTrick!.cards.isEmpty) {
-      // 첫 트릭에서 조커/마이티 제한
+      // 첫 트릭 선공에서 조커/마이티 제한
       if (currentTrickNumber == 1 && !mightyJokerUsed) {
         if (card.isJoker || card.isMighty) {
           if (player.hand.length > 1) {
