@@ -7,9 +7,7 @@ import '../models/card.dart';
 import '../models/player.dart';
 import '../models/game_state.dart';
 import '../services/game_controller.dart';
-import '../services/ai_player.dart';
 import '../widgets/card_widget.dart';
-import 'bidding_dialog.dart';
 import 'kitty_dialog.dart';
 import 'friend_dialog.dart';
 
@@ -164,245 +162,458 @@ class _GameScreenState extends State<GameScreen> {
 
     return Column(
       children: [
-        // 비딩 정보 헤더
+        // 상단 정보 바
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           color: Colors.black38,
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    l10n.biddingPhase,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      controller.reset();
-                      controller.startNewGame();
-                    },
-                    icon: const Icon(Icons.refresh, size: 16),
-                    label: Text(l10n.newGame),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              _buildBiddingInfo(state),
-              if (state.currentBidder == 0 && !controller.isProcessing)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: _buildBiddingControls(controller),
+              Text(
+                l10n.biddingPhase,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
+              ),
+              if (state.currentBid != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    l10n.highestBid(state.currentBid.toString()),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                )
+              else
+                Text(
+                  l10n.noBidYet,
+                  style: const TextStyle(color: Colors.white70),
+                ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  controller.reset();
+                  controller.startNewGame();
+                },
+                icon: const Icon(Icons.refresh, size: 16),
+                label: Text(l10n.newGame),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                ),
+              ),
             ],
           ),
         ),
-        // DEBUG: 모든 플레이어 카드 및 계산 결과
+        // 게임 영역
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              children: [
-                // 플레이어 (나)
-                _buildPlayerDebugInfo(state.players[0], true),
-                const SizedBox(height: 8),
-                // AI 1~4를 2x2 그리드로 표시
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: _buildPlayerDebugInfo(state.players[1], false)),
-                    const SizedBox(width: 8),
-                    Expanded(child: _buildPlayerDebugInfo(state.players[2], false)),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(child: _buildPlayerDebugInfo(state.players[3], false)),
-                    const SizedBox(width: 8),
-                    Expanded(child: _buildPlayerDebugInfo(state.players[4], false)),
-                  ],
-                ),
-              ],
-            ),
+          child: Stack(
+            children: [
+              // AI 플레이어들 비딩 상태
+              // AI 1 (왼쪽)
+              Positioned(
+                left: 8,
+                top: 50,
+                child: _buildBiddingPlayerStatus(state, 1, controller.isProcessing),
+              ),
+              // AI 2 (상단 왼쪽)
+              Positioned(
+                left: MediaQuery.of(context).size.width * 0.25,
+                top: 8,
+                child: _buildBiddingPlayerStatus(state, 2, controller.isProcessing),
+              ),
+              // AI 3 (상단 오른쪽)
+              Positioned(
+                right: MediaQuery.of(context).size.width * 0.25,
+                top: 8,
+                child: _buildBiddingPlayerStatus(state, 3, controller.isProcessing),
+              ),
+              // AI 4 (오른쪽)
+              Positioned(
+                right: 8,
+                top: 50,
+                child: _buildBiddingPlayerStatus(state, 4, controller.isProcessing),
+              ),
+              // 중앙 비딩 컨트롤
+              Center(
+                child: _buildCenterBiddingArea(controller),
+              ),
+            ],
           ),
         ),
+        // 하단 사용자 카드
+        _buildBiddingPlayerHand(controller),
       ],
     );
   }
 
-  Widget _buildPlayerDebugInfo(Player player, bool isHuman) {
-    final aiPlayer = AIPlayer();
-    final bestSuit = aiPlayer.findBestSuit(player.hand);
-    final strength = aiPlayer.evaluateHandStrength(player.hand, bestSuit);
+  Widget _buildBiddingPlayerStatus(GameState state, int playerId, bool isProcessing) {
+    final player = state.players[playerId];
+    final isPassed = state.passedPlayers[playerId];
+    final isCurrentBidder = state.currentBidder == playerId;
+    final hasBid = state.currentBid?.playerId == playerId;
 
-    // 카드를 무늬별로 정렬
-    final sortedHand = List<PlayingCard>.from(player.hand);
-    sortedHand.sort((a, b) {
-      if (a.isJoker) return -1;
-      if (b.isJoker) return 1;
-      if (a.suit != b.suit) {
-        return a.suit!.index.compareTo(b.suit!.index);
-      }
-      return b.rankValue.compareTo(a.rankValue);
-    });
+    Color borderColor;
+    String statusText;
+    Color statusColor;
+
+    if (isPassed) {
+      borderColor = Colors.grey;
+      statusText = '패스';
+      statusColor = Colors.grey;
+    } else if (isCurrentBidder && isProcessing) {
+      borderColor = Colors.orange;
+      statusText = '비딩 중...';
+      statusColor = Colors.orange;
+    } else if (hasBid) {
+      borderColor = Colors.amber;
+      statusText = '${state.currentBid!.tricks}';
+      statusColor = Colors.amber;
+    } else {
+      borderColor = Colors.white38;
+      statusText = '대기';
+      statusColor = Colors.white54;
+    }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: isHuman ? Colors.blue.withValues(alpha: 0.3) : Colors.black26,
+        color: Colors.black54,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isHuman ? Colors.blue : Colors.transparent,
-          width: 2,
-        ),
+        border: Border.all(color: borderColor, width: 2),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Text(
-                player.name,
-                style: TextStyle(
-                  color: isHuman ? Colors.lightBlueAccent : Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  '기루다: ${bestSuit != null ? _getSuitSymbol(bestSuit) : "없음"}',
-                  style: const TextStyle(color: Colors.amber, fontSize: 12),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: strength >= 13
-                      ? Colors.green.withValues(alpha: 0.3)
-                      : Colors.red.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  '강도: $strength ${strength >= 13 ? "(비딩가능)" : "(패스)"}',
-                  style: TextStyle(
-                    color: strength >= 13 ? Colors.lightGreen : Colors.redAccent,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ],
+          Text(
+            player.name,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 4,
-            runSpacing: 4,
-            children: [
-              for (final card in sortedHand)
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: (bestSuit != null && card.suit == bestSuit)
-                          ? Colors.amber
-                          : Colors.transparent,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: CardWidget(
-                    card: card,
-                    width: 36,
-                    height: 54,
-                  ),
-                ),
-            ],
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              statusText,
+              style: TextStyle(
+                color: statusColor,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBiddingInfo(GameState state) {
+  Widget _buildCenterBiddingArea(GameController controller) {
     final l10n = AppLocalizations.of(context)!;
+    final state = controller.state;
+    final isHumanTurn = state.currentBidder == 0 && !controller.isProcessing;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black38,
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.green[800],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.green[600]!, width: 2),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            l10n.currentBidder(state.players[state.currentBidder].name),
-            style: const TextStyle(color: Colors.white, fontSize: 18),
-          ),
-          const SizedBox(height: 8),
-          if (state.currentBid != null)
-            Text(
-              l10n.highestBid(state.currentBid.toString()),
-              style: const TextStyle(color: Colors.amber, fontSize: 16),
-            )
-          else
-            Text(
-              l10n.noBidYet,
-              style: const TextStyle(color: Colors.white70, fontSize: 16),
+            isHumanTurn
+                ? l10n.currentBidder('당신')
+                : l10n.currentBidder(state.players[state.currentBidder].name),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
+          ),
+          const SizedBox(height: 12),
+          if (isHumanTurn) ...[
+            // 트릭 수 선택
+            Text(
+              '트릭 수',
+              style: TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 4,
+              children: [
+                for (int i = 13; i <= 20; i++)
+                  _buildBidChip(i, state),
+              ],
+            ),
+            const SizedBox(height: 12),
+            // 기루다 선택
+            Text(
+              '기루다',
+              style: TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 4,
+              children: [
+                _buildSuitChip(Suit.spade, '♠', '스페이드'),
+                _buildSuitChip(Suit.diamond, '♦', '다이아'),
+                _buildSuitChip(Suit.heart, '♥', '하트'),
+                _buildSuitChip(Suit.club, '♣', '클로버'),
+                _buildSuitChip(null, '', '노기루다'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // 버튼들
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                  onPressed: () => controller.humanPass(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  ),
+                  child: const Text('패스', style: TextStyle(color: Colors.white)),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: _canBid(state) ? () => _submitBid(controller) : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  ),
+                  child: Text(
+                    '비딩 ($_selectedBidAmount)',
+                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            if (controller.isProcessing)
+              const CircularProgressIndicator(color: Colors.white)
+            else
+              const Text(
+                '다른 플레이어 차례입니다',
+                style: TextStyle(color: Colors.white70),
+              ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildBiddingControls(GameController controller) {
-    final l10n = AppLocalizations.of(context)!;
+  int _selectedBidAmount = 13;
+  Suit? _selectedBidSuit = Suit.spade;
 
-    return ElevatedButton(
-      onPressed: () => _showBiddingDialog(controller),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.amber,
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-      ),
-      child: Text(
-        l10n.bidButton,
-        style: const TextStyle(fontSize: 18, color: Colors.black),
+  Widget _buildBidChip(int amount, GameState state) {
+    final minBid = (state.currentBid?.tricks ?? 12) + 1;
+    final isEnabled = amount >= minBid;
+    final isSelected = _selectedBidAmount == amount;
+
+    return GestureDetector(
+      onTap: isEnabled
+          ? () => setState(() => _selectedBidAmount = amount)
+          : null,
+      child: Opacity(
+        opacity: isEnabled ? 1.0 : 0.4,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? Colors.amber
+                : (isEnabled ? Colors.white24 : Colors.black38),
+            borderRadius: BorderRadius.circular(8),
+            border: isSelected
+                ? Border.all(color: Colors.white, width: 2)
+                : (isEnabled ? null : Border.all(color: Colors.grey[700]!, width: 1)),
+          ),
+          child: Text(
+            '$amount',
+            style: TextStyle(
+              color: isSelected
+                  ? Colors.black
+                  : (isEnabled ? Colors.white : Colors.grey[600]),
+              fontSize: 16,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              decoration: isEnabled ? null : TextDecoration.lineThrough,
+              decorationColor: Colors.grey[500],
+            ),
+          ),
+        ),
       ),
     );
   }
 
-  void _showBiddingDialog(GameController controller) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => BiddingDialog(
-        currentBid: controller.state.currentBid,
-        onBid: (bid) {
-          Navigator.pop(context);
-          controller.humanBid(bid);
-        },
-        onPass: () {
-          Navigator.pop(context);
-          controller.humanPass();
-        },
+  Widget _buildSuitChip(Suit? suit, String symbol, String name) {
+    final isSelected = _selectedBidSuit == suit;
+    final isRed = suit == Suit.diamond || suit == Suit.heart;
+    final isClub = suit == Suit.club;
+
+    Color symbolColor;
+    if (isSelected) {
+      symbolColor = Colors.black;
+    } else if (isRed) {
+      symbolColor = Colors.red[400]!;
+    } else if (isClub) {
+      symbolColor = Colors.green[300]!; // 클로버는 녹색으로 구분
+    } else {
+      symbolColor = Colors.white;
+    }
+
+    return GestureDetector(
+      onTap: () => setState(() => _selectedBidSuit = suit),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.amber : Colors.white24,
+          borderRadius: BorderRadius.circular(8),
+          border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (symbol.isNotEmpty) ...[
+              Text(
+                symbol,
+                style: TextStyle(
+                  color: symbolColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              name,
+              style: TextStyle(
+                color: isSelected ? Colors.black : Colors.white,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  bool _canBid(GameState state) {
+    final minBid = (state.currentBid?.tricks ?? 12) + 1;
+    return _selectedBidAmount >= minBid;
+  }
+
+  void _submitBid(GameController controller) {
+    final bid = Bid(
+      playerId: 0,
+      suit: _selectedBidSuit,
+      tricks: _selectedBidAmount,
+    );
+    controller.humanBid(bid);
+  }
+
+  Widget _buildBiddingPlayerHand(GameController controller) {
+    final state = controller.state;
+    final hand = state.players[0].hand;
+    final isPassed = state.passedPlayers[0];
+    final isCurrentBidder = state.currentBidder == 0;
+
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: isPassed
+            ? Colors.grey[800]
+            : (isCurrentBidder ? Colors.green[900] : Colors.black54),
+        border: Border(
+          top: BorderSide(
+            color: isCurrentBidder ? Colors.amber : Colors.green[700]!,
+            width: 2,
+          ),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '당신의 카드',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (isPassed) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    '패스',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ),
+              ] else if (isCurrentBidder) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    '비딩 차례',
+                    style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 90,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (final card in hand)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: CardWidget(
+                        card: card,
+                        width: 55,
+                        height: 80,
+                        isSelected: false,
+                        isPlayable: true,
+                        onTap: null,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -937,14 +1148,27 @@ class _GameScreenState extends State<GameScreen> {
                 color: controller.isHumanTurn ? Colors.amber : Colors.black38,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Text(
-                controller.isHumanTurn
-                    ? l10n.yourTurn
-                    : l10n.playerTurn(state.players[state.currentPlayer].name),
-                style: TextStyle(
-                  color: controller.isHumanTurn ? Colors.black : Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    controller.isHumanTurn
+                        ? l10n.yourTurn
+                        : l10n.playerTurn(state.players[state.currentPlayer].name),
+                    style: TextStyle(
+                      color: controller.isHumanTurn ? Colors.black : Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (controller.isHumanTurn)
+                    Text(
+                      '카드를 선택하세요 ↓',
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 11,
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
@@ -1126,12 +1350,49 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildTrickCards(Trick? trick, GameState state) {
     final l10n = AppLocalizations.of(context)!;
+    final isHumanLeading = state.currentPlayer == 0 && (trick == null || trick.cards.isEmpty);
 
     if (trick == null || trick.cards.isEmpty) {
       return Center(
-        child: Text(
-          l10n.playCard,
-          style: const TextStyle(color: Colors.white70, fontSize: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l10n.playCard,
+              style: const TextStyle(color: Colors.white70, fontSize: 16),
+            ),
+            if (isHumanLeading) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.amber, width: 1),
+                ),
+                child: const Column(
+                  children: [
+                    Text(
+                      '👆 선공입니다!',
+                      style: TextStyle(
+                        color: Colors.amber,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '아래에서 카드를 선택하세요',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
         ),
       );
     }
