@@ -390,6 +390,24 @@ class GameState {
     } while (passedPlayers[currentBidder]);
   }
 
+  // 딜 미스 선언 - 선언한 플레이어가 딜러가 되어 다시 시작
+  void declareDealMiss(int playerId) {
+    // 모든 플레이어 초기화
+    for (final player in players) {
+      player.reset();
+    }
+
+    // 상태 초기화
+    reset();
+
+    // 카드 다시 분배
+    dealCards();
+
+    // 딜 미스 선언자가 첫 비딩
+    currentBidder = playerId;
+    phase = GamePhase.bidding;
+  }
+
   void selectKitty(List<PlayingCard> discardCards, Suit? newGiruda) {
     final declarer = players[declarerId!];
     declarer.addCards(kitty);
@@ -437,6 +455,20 @@ class GameState {
 
   bool canPlayCard(PlayingCard card, Player player) {
     if (currentTrick == null || currentTrick!.cards.isEmpty) {
+      // 초구(첫 트릭) 주공 선공 시 기루다 제한 (초간 방지)
+      // 주공이 첫 트릭 선공일 때 기루다를 낼 수 없음
+      if (currentTrickNumber == 1 && player.isDeclarer && giruda != null) {
+        if (!card.isJoker && !card.isMighty && card.suit == giruda) {
+          // 기루다가 아닌 다른 카드가 있는지 확인
+          final nonGirudaCards = player.hand
+              .where((c) => !c.isJoker && !c.isMighty && c.suit != giruda)
+              .toList();
+          if (nonGirudaCards.isNotEmpty) {
+            return false;
+          }
+        }
+      }
+
       // 첫 트릭 선공에서 조커/마이티 제한
       if (currentTrickNumber == 1 && !mightyJokerUsed) {
         if (card.isJoker || card.isMighty) {
@@ -526,10 +558,13 @@ class GameState {
 
     if (!friendRevealed && friendDeclaration != null) {
       if (friendDeclaration!.card != null && card == friendDeclaration!.card) {
-        friendId = playerId;
-        friendRevealed = true;
-        players[playerId].isFriend = true;
-        players[playerId].team = Team.declarer;
+        // 주공이 프렌드 카드를 내면 프렌드로 설정하지 않음 (주공은 프렌드가 될 수 없음)
+        if (playerId != declarerId) {
+          friendId = playerId;
+          friendRevealed = true;
+          players[playerId].isFriend = true;
+          players[playerId].team = Team.declarer;
+        }
       }
     }
 
@@ -623,7 +658,47 @@ class GameState {
 
   void endGame() {
     phase = GamePhase.gameEnd;
+    // 프렌드가 밝혀지지 않은 경우 프렌드 카드를 가진 플레이어 찾기
+    _revealFriendIfNeeded();
     calculateScores();
+  }
+
+  void _revealFriendIfNeeded() {
+    if (friendRevealed) return;
+    if (friendDeclaration == null) return;
+    if (friendDeclaration!.isNoFriend) return;
+
+    // 카드로 지정된 프렌드 찾기
+    if (friendDeclaration!.card != null) {
+      final friendCard = friendDeclaration!.card!;
+      for (int i = 0; i < players.length; i++) {
+        if (i == declarerId) continue;
+        // 손에 남아있거나 이미 냈던 카드 확인
+        bool hasFriendCard = players[i].hand.any((c) =>
+            c.suit == friendCard.suit && c.rank == friendCard.rank);
+        bool playedFriendCard = players[i].wonCards.any((c) =>
+            c.suit == friendCard.suit && c.rank == friendCard.rank);
+        // 트릭에서 낸 카드도 확인
+        bool inTricks = false;
+        for (final trick in tricks) {
+          final cardIndex = trick.cards.indexWhere((c) =>
+              c.suit == friendCard.suit && c.rank == friendCard.rank);
+          if (cardIndex >= 0 && cardIndex < trick.playerOrder.length) {
+            // 이 트릭에서 누가 냈는지 확인
+            final friendPlayerId = trick.playerOrder[cardIndex];
+            if (friendPlayerId == i) {
+              inTricks = true;
+              break;
+            }
+          }
+        }
+        if (hasFriendCard || playedFriendCard || inTricks) {
+          players[i].isFriend = true;
+          friendRevealed = true;
+          return;
+        }
+      }
+    }
   }
 
   void calculateScores() {
@@ -657,36 +732,56 @@ class GameState {
   int getPlayerScore(int playerId) {
     final player = players[playerId];
     final targetTricks = currentBid?.tricks ?? 13;
+    const int minContract = 13;  // 최소 공약
     final isNoFriend = friendDeclaration?.isNoFriend ?? false;
 
-    if (player.isDeclarer) {
-      if (declarerWon) {
-        int baseScore = declarerTeamPoints - targetTricks;
-        if (isNoFriend) baseScore *= 2;
-        if (isNoGiruda) baseScore += 2;
-        return baseScore + (declarerTeamPoints >= 20 ? 4 : 0);
-      } else {
-        int baseScore = targetTricks - declarerTeamPoints;
-        if (isNoFriend) baseScore *= 2;
-        if (isNoGiruda) baseScore += 2;
-        return -(baseScore + 2);
+    int baseScore;
+    int specialMultiplier = 1;
+
+    if (declarerWon) {
+      // === 주공 승리 시 (하이리스크 하이리턴 방식) ===
+      // (득점 - 공약) + (득점 - 최소공약) × 2
+      baseScore = (declarerTeamPoints - targetTricks) +
+                  (declarerTeamPoints - minContract) * 2;
+
+      // 런 (주공팀이 20점 전부 획득): x2
+      if (declarerTeamPoints >= 20) {
+        specialMultiplier *= 2;
       }
-    } else if (player.isFriend) {
-      if (declarerWon) {
-        return (declarerTeamPoints - targetTricks) ~/ 2;
-      } else {
-        return -((targetTricks - declarerTeamPoints) ~/ 2 + 1);
+
+      // 노기루다: x2
+      if (isNoGiruda) {
+        specialMultiplier *= 2;
+      }
+
+      // 노프렌드: x2
+      if (isNoFriend) {
+        specialMultiplier *= 2;
       }
     } else {
-      if (declarerWon) {
-        int baseScore = (declarerTeamPoints - targetTricks);
-        if (isNoFriend) baseScore *= 2;
-        return -(baseScore ~/ 3 + 1);
-      } else {
-        int baseScore = (targetTricks - declarerTeamPoints);
-        if (isNoFriend) baseScore *= 2;
-        return (baseScore ~/ 3 + 1);
+      // === 주공 패배 시 ===
+      // (공약 - 득점) 만 적용, 노기루다/노프렌드 제외
+      baseScore = -(targetTricks - declarerTeamPoints);
+
+      // 백런 (수비팀이 11점 이상 획득): x2
+      if (defenderTeamPoints >= 11) {
+        specialMultiplier *= 2;
       }
     }
+
+    baseScore *= specialMultiplier;
+
+    // 역할별 배수 적용
+    // 야당과 프렌드는 baseScore, 주공은 2배
+    int roleMultiplier;
+    if (player.isDeclarer) {
+      roleMultiplier = 2;  // 주공: x2
+    } else if (player.isFriend) {
+      roleMultiplier = 1;  // 프렌드: x1
+    } else {
+      roleMultiplier = -1;  // 야당(수비): x(-1)
+    }
+
+    return baseScore * roleMultiplier;
   }
 }

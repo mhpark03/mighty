@@ -28,6 +28,7 @@ class _GameScreenState extends State<GameScreen> {
   bool _timerRunning = false;
   bool _showRecommendation = true;
   bool _statsRecorded = false;
+  bool _bidInitialized = false;
 
   @override
   void dispose() {
@@ -358,6 +359,31 @@ class _GameScreenState extends State<GameScreen> {
     // AI 추천 비딩 가져오기
     final recommendedBid = isHumanTurn ? controller.getRecommendedBid() : null;
 
+    // AI 추천으로 초기값 설정 (한 번만)
+    if (isHumanTurn && recommendedBid != null && !_bidInitialized) {
+      _bidInitialized = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            if (recommendedBid.passed) {
+              // 패스 추천: 기루다 선택 안 함
+              _suitManuallySelected = false;
+            } else {
+              // 비딩 추천: 추천값으로 설정
+              _selectedBidAmount = recommendedBid.tricks;
+              _selectedBidSuit = recommendedBid.suit;
+              _suitManuallySelected = true;
+            }
+          });
+        }
+      });
+    }
+    // 비딩 페이즈가 아니면 초기화 플래그 리셋
+    if (state.phase != GamePhase.bidding) {
+      _bidInitialized = false;
+      _suitManuallySelected = false;
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -436,7 +462,7 @@ class _GameScreenState extends State<GameScreen> {
                 _buildSuitChip(Suit.diamond, '♦', l10n.diamondName),
                 _buildSuitChip(Suit.heart, '♥', l10n.heartName),
                 _buildSuitChip(Suit.club, '♣', l10n.clubName),
-                _buildSuitChip(null, '', l10n.noGiruda),
+                _buildSuitChip(null, '✕', l10n.noGiruda),
               ],
             ),
             const SizedBox(height: 16),
@@ -466,6 +492,21 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ],
             ),
+            // 딜 미스 버튼
+            if (controller.canHumanDeclareDealMiss) ...[
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => _showDealMissDialog(controller),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                ),
+                child: Text(
+                  l10n.dealMiss,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ] else ...[
             if (controller.isProcessing)
               const CircularProgressIndicator(color: Colors.white)
@@ -482,6 +523,7 @@ class _GameScreenState extends State<GameScreen> {
 
   int _selectedBidAmount = 13;
   Suit? _selectedBidSuit = Suit.spade;
+  bool _suitManuallySelected = false;  // 사용자가 직접 기루다를 선택했는지
 
   Widget _buildBidChip(int amount, GameState state) {
     final minBid = (state.currentBid?.tricks ?? 12) + 1;
@@ -523,7 +565,8 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildSuitChip(Suit? suit, String symbol, String name) {
-    final isSelected = _selectedBidSuit == suit;
+    // 사용자가 직접 선택했거나 AI가 비딩을 추천한 경우에만 선택 표시
+    final isSelected = _suitManuallySelected && _selectedBidSuit == suit;
     final isRed = suit == Suit.diamond || suit == Suit.heart;
     final isClub = suit == Suit.club;
 
@@ -539,7 +582,10 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     return GestureDetector(
-      onTap: () => setState(() => _selectedBidSuit = suit),
+      onTap: () => setState(() {
+        _selectedBidSuit = suit;
+        _suitManuallySelected = true;
+      }),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -577,7 +623,8 @@ class _GameScreenState extends State<GameScreen> {
 
   bool _canBid(GameState state) {
     final minBid = (state.currentBid?.tricks ?? 12) + 1;
-    return _selectedBidAmount >= minBid;
+    // 기루다가 선택되어야 비딩 가능
+    return _selectedBidAmount >= minBid && _suitManuallySelected;
   }
 
   void _submitBid(GameController controller) {
@@ -1052,6 +1099,29 @@ class _GameScreenState extends State<GameScreen> {
   Widget _buildGameInfo(GameState state) {
     final l10n = AppLocalizations.of(context)!;
 
+    // 오픈된 기루다 수 계산
+    int playedGirudaCount = 0;
+    if (state.giruda != null) {
+      for (final trick in state.tricks) {
+        playedGirudaCount += trick.cards
+            .where((c) => !c.isJoker && c.suit == state.giruda)
+            .length;
+      }
+      if (state.currentTrick != null) {
+        playedGirudaCount += state.currentTrick!.cards
+            .where((c) => !c.isJoker && c.suit == state.giruda)
+            .length;
+      }
+    }
+
+    // 공격팀 획득 점수 계산
+    int attackTeamPoints = 0;
+    for (final player in state.players) {
+      if (player.isDeclarer || player.isFriend) {
+        attackTeamPoints += player.pointsWon;
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: Colors.black26,
@@ -1059,9 +1129,9 @@ class _GameScreenState extends State<GameScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildInfoItem(l10n.giruda, state.giruda != null
-              ? _getSuitSymbol(state.giruda!)
+              ? '${_getSuitSymbol(state.giruda!)} ($playedGirudaCount/13)'
               : l10n.noGiruda),
-          _buildInfoItem(l10n.contract, '${state.currentBid?.tricks ?? 0}'),
+          _buildInfoItem(l10n.contract, '${state.currentBid?.tricks ?? 0} ($attackTeamPoints)'),
           _buildInfoItem(l10n.trick, '${state.tricksPlayed}/10'),
           // 프렌드 선언 정보 표시
           _buildFriendInfo(state, l10n),
@@ -1518,8 +1588,8 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               // 이전 트릭 헤더
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                margin: const EdgeInsets.only(bottom: 4),
                 decoration: BoxDecoration(
                   color: Colors.black38,
                   borderRadius: BorderRadius.circular(8),
@@ -1529,7 +1599,7 @@ class _GameScreenState extends State<GameScreen> {
                   children: [
                     Text(
                       '${l10n.previousTrick} ',
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      style: const TextStyle(color: Colors.white70, fontSize: 11),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -1580,8 +1650,8 @@ class _GameScreenState extends State<GameScreen> {
                             opacity: 0.7,
                             child: CardWidget(
                               card: lastTrick.cards[i],
-                              width: 36,
-                              height: 50,
+                              width: 34,
+                              height: 47,
                             ),
                           ),
                         ),
@@ -1589,13 +1659,13 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               // 선공 안내
               Text(
                 l10n.leadPlayerSelectCard,
                 style: const TextStyle(
                   color: Colors.amber,
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1664,6 +1734,23 @@ class _GameScreenState extends State<GameScreen> {
               ),
               child: Text(
                 l10n.jokerCallAnnouncement(_getSuitSymbol(trick.jokerCallSuit!)),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          // 조커 선공 무늬 표시
+          if (trick.jokerLeadSuit != null && trick.cards.isNotEmpty && trick.cards.first.isJoker)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: Colors.purple,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '조커 선공: ${_getSuitSymbol(trick.jokerLeadSuit!)}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -1892,11 +1979,37 @@ class _GameScreenState extends State<GameScreen> {
     if (selectedCard == card) {
       // 조커 콜 카드(♣3 또는 ♠3)를 선공으로 낼 때만 조커 콜 가능
       final jokerCallCard = controller.state.jokerCall;
+
+      // 디버그 로그
+      print('=== Card Tap Debug ===');
+      print('card.isJoker: ${card.isJoker}');
+      print('isLeadingTrick: ${controller.isLeadingTrick}');
+      print('currentTrick: ${controller.state.currentTrick}');
+      print('currentTrick.cards.length: ${controller.state.currentTrick?.cards.length}');
+      print('currentTrick.cards.isEmpty: ${controller.state.currentTrick?.cards.isEmpty}');
+      print('currentTrickNumber: ${controller.state.currentTrickNumber}');
+      print('lastCompletedTrick: ${controller.lastCompletedTrick}');
+      print('currentPlayer: ${controller.state.currentPlayer}');
+
       if (controller.canDeclareJokerCall && card == jokerCallCard) {
         _showJokerCallDialog(card, controller);
-      } else if (card.isJoker && controller.isLeadingTrick) {
-        // 조커 선공 시 무늬 선택 다이얼로그
-        _showJokerLeadSuitDialog(card, controller);
+      } else if (card.isJoker) {
+        // 조커 선공 시 무늬 선택 다이얼로그 (선공인 경우에만)
+        print('=== Joker Play Debug ===');
+        print('isLeadingTrick: ${controller.isLeadingTrick}');
+        print('currentTrick.cards.isEmpty: ${controller.state.currentTrick?.cards.isEmpty}');
+        if (controller.isLeadingTrick) {
+          print('Showing Joker Lead Suit Dialog');
+          _showJokerLeadSuitDialog(card, controller);
+        } else {
+          // 조커를 따라가는 경우 (선공 아님)
+          print('Playing Joker as follower');
+          controller.humanPlayCard(card);
+          setState(() {
+            selectedCard = null;
+          });
+        }
+        return;
       } else {
         controller.humanPlayCard(card);
         setState(() {
@@ -2017,6 +2130,163 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  void _showDealMissDialog(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+    final hand = controller.humanPlayer.hand;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.dealMissTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.dealMissConfirm),
+            const SizedBox(height: 16),
+            // 패 공개
+            Text(
+              l10n.yourCards,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: [
+                for (final card in hand)
+                  CardWidget(
+                    card: card,
+                    width: 40,
+                    height: 56,
+                  ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              controller.humanDeclareDealMiss();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            child: Text(l10n.dealMiss, style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBaseScoreExplanation(GameState state) {
+    final targetTricks = state.currentBid?.tricks ?? 13;
+    const int minContract = 13;
+    final isNoFriend = state.friendDeclaration?.isNoFriend ?? false;
+    final isNoGiruda = state.giruda == null;
+    final isRun = state.declarerTeamPoints >= 20;
+    final isBackRun = state.defenderTeamPoints >= 11;
+    final declarerWon = state.declarerWon;
+
+    int baseScore;
+    String formula;
+    String calculation;
+    List<String> multipliers = [];
+    int specialMultiplier = 1;
+
+    if (declarerWon) {
+      // 승리: (득점 - 공약) + (득점 - 최소공약) × 2
+      final part1 = state.declarerTeamPoints - targetTricks;
+      final part2 = (state.declarerTeamPoints - minContract) * 2;
+      baseScore = part1 + part2;
+      formula = '(득점-공약) + (득점-최소)×2';
+      calculation = '(${state.declarerTeamPoints}-$targetTricks) + (${state.declarerTeamPoints}-$minContract)×2 = $part1 + $part2 = $baseScore';
+
+      if (isRun) {
+        specialMultiplier *= 2;
+        multipliers.add('런 ×2');
+      }
+      if (isNoGiruda) {
+        specialMultiplier *= 2;
+        multipliers.add('노기루다 ×2');
+      }
+      if (isNoFriend) {
+        specialMultiplier *= 2;
+        multipliers.add('노프렌드 ×2');
+      }
+    } else {
+      // 패배: -(공약 - 득점)
+      baseScore = -(targetTricks - state.declarerTeamPoints);
+      formula = '-(공약 - 득점)';
+      calculation = '-($targetTricks - ${state.declarerTeamPoints}) = $baseScore';
+
+      if (isBackRun) {
+        specialMultiplier *= 2;
+        multipliers.add('백런 ×2');
+      }
+    }
+
+    final finalBaseScore = baseScore * specialMultiplier;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            declarerWon ? '점수 계산 (승리)' : '점수 계산 (패배)',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: declarerWon ? Colors.blue[700] : Colors.red[700],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            formula,
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          ),
+          Text(
+            calculation,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+          ),
+          if (multipliers.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              '배수: ${multipliers.join(', ')}',
+              style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+            ),
+            Text(
+              '$baseScore × $specialMultiplier = $finalBaseScore',
+              style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+            ),
+          ],
+          const SizedBox(height: 8),
+          Text(
+            'Base Score = $finalBaseScore',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '주공 ×2, 프렌드 ×1, 야당 ×(-1)',
+            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildGameEndScreen(GameController controller) {
     final l10n = AppLocalizations.of(context)!;
     final state = controller.state;
@@ -2081,7 +2351,10 @@ class _GameScreenState extends State<GameScreen> {
               l10n.targetPoints(state.currentBid?.tricks ?? 0),
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            // baseScore 계산 설명
+            _buildBaseScoreExplanation(state),
+            const SizedBox(height: 16),
             Text(
               l10n.score,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

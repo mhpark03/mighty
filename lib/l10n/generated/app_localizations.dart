@@ -171,7 +171,7 @@ abstract class AppLocalizations {
   /// No description provided for @tricks.
   ///
   /// In ko, this message translates to:
-  /// **'트릭 수'**
+  /// **'목표 점수'**
   String get tricks;
 
   /// No description provided for @giruda.
@@ -941,6 +941,36 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'닫기'**
   String get close;
+
+  /// No description provided for @dealMiss.
+  ///
+  /// In ko, this message translates to:
+  /// **'딜 미스'**
+  String get dealMiss;
+
+  /// No description provided for @dealMissTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'딜 미스 선언'**
+  String get dealMissTitle;
+
+  /// No description provided for @dealMissConfirm.
+  ///
+  /// In ko, this message translates to:
+  /// **'딜 미스를 선언하시겠습니까?\n패를 공개하고 새로 시작합니다.'**
+  String get dealMissConfirm;
+
+  /// No description provided for @dealMissAnnouncement.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} 딜 미스 선언!'**
+  String dealMissAnnouncement(String name);
+
+  /// No description provided for @dealMissNewGame.
+  ///
+  /// In ko, this message translates to:
+  /// **'딜 미스로 게임을 다시 시작합니다.'**
+  String get dealMissNewGame;
 }
 
 class _AppLocalizationsDelegate

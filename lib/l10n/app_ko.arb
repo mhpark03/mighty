@@ -21,7 +21,7 @@
   "bid": "비딩",
   "bidButton": "비딩하기",
   "pass": "패스",
-  "tricks": "트릭 수",
+  "tricks": "목표 점수",
   "giruda": "기루다",
   "noGiruda": "노기루다",
   "spade": "스페이드",
@@ -226,5 +226,15 @@
   "guideScoringText": "• 점수 카드: A, K, Q, J, 10 (각 1점, 총 20점)\n• 주공팀이 목표 점수 이상 획득하면 승리\n• 승리팀은 +점수, 패배팀은 -점수",
   "guideTips": "게임 팁",
   "guideTipsText": "• 마이티와 조커는 항상 강력합니다\n• 기루다 카드를 잘 활용하세요\n• 프렌드의 정체를 파악하는 것이 중요합니다",
-  "close": "닫기"
+  "close": "닫기",
+  "dealMiss": "딜 미스",
+  "dealMissTitle": "딜 미스 선언",
+  "dealMissConfirm": "딜 미스를 선언하시겠습니까?\n패를 공개하고 새로 시작합니다.",
+  "dealMissAnnouncement": "{name} 딜 미스 선언!",
+  "@dealMissAnnouncement": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "dealMissNewGame": "딜 미스로 게임을 다시 시작합니다."
 }

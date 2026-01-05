@@ -46,7 +46,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pass => 'Pass';
 
   @override
-  String get tricks => 'Tricks';
+  String get tricks => 'Target Score';
 
   @override
   String get giruda => 'Trump';
@@ -468,4 +468,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get close => 'Close';
+
+  @override
+  String get dealMiss => '딜 미스';
+
+  @override
+  String get dealMissTitle => '딜 미스 선언';
+
+  @override
+  String get dealMissConfirm => '딜 미스를 선언하시겠습니까?\n패를 공개하고 새로 시작합니다.';
+
+  @override
+  String dealMissAnnouncement(String name) {
+    return '$name 딜 미스 선언!';
+  }
+
+  @override
+  String get dealMissNewGame => '딜 미스로 게임을 다시 시작합니다.';
 }

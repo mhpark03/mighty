@@ -46,7 +46,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get pass => 'パス';
 
   @override
-  String get tricks => 'トリック数';
+  String get tricks => '目標点数';
 
   @override
   String get giruda => '切り札';
@@ -467,4 +467,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get close => '閉じる';
+
+  @override
+  String get dealMiss => '딜 미스';
+
+  @override
+  String get dealMissTitle => '딜 미스 선언';
+
+  @override
+  String get dealMissConfirm => '딜 미스를 선언하시겠습니까?\n패를 공개하고 새로 시작합니다.';
+
+  @override
+  String dealMissAnnouncement(String name) {
+    return '$name 딜 미스 선언!';
+  }
+
+  @override
+  String get dealMissNewGame => '딜 미스로 게임을 다시 시작합니다.';
 }

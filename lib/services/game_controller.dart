@@ -86,6 +86,56 @@ class GameController extends ChangeNotifier {
     humanBid(Bid.pass(0));
   }
 
+  // 딜 미스 선언 가능 여부
+  bool get canHumanDeclareDealMiss {
+    if (_state.phase != GamePhase.bidding) return false;
+    if (_state.currentBidder != 0) return false;
+    return humanPlayer.canDeclareDealMiss;
+  }
+
+  // 딜 미스 선언
+  void humanDeclareDealMiss() {
+    if (!canHumanDeclareDealMiss) return;
+
+    _state.declareDealMiss(0);
+    notifyListeners();
+
+    // AI가 딜 미스 체크 후 비딩 진행
+    _processAIDealMissCheck();
+  }
+
+  // AI 딜 미스 체크 후 비딩 진행
+  void _processAIDealMissCheck() async {
+    while (_state.phase == GamePhase.bidding && _state.currentBidder != 0) {
+      final currentPlayer = _state.players[_state.currentBidder];
+
+      // AI 딜 미스 체크
+      if (currentPlayer.canDeclareDealMiss) {
+        // AI는 점수 카드가 0개일 때만 딜 미스 선언 (조커+1개는 플레이 시도)
+        final pointCards = currentPlayer.hand.where((c) => c.isPointCard).length;
+        if (pointCards == 0) {
+          _isProcessing = true;
+          notifyListeners();
+
+          await Future.delayed(const Duration(milliseconds: 800));
+
+          _state.declareDealMiss(_state.currentBidder);
+
+          _isProcessing = false;
+          notifyListeners();
+
+          // 딜 미스 후 다시 체크
+          continue;
+        }
+      }
+
+      // 딜 미스 안하면 비딩 진행
+      break;
+    }
+
+    _processBiddingIfNeeded();
+  }
+
   void _processAIKittySelection() async {
     _isProcessing = true;
     notifyListeners();
@@ -265,11 +315,12 @@ class GameController extends ChangeNotifier {
   bool get isLeadingTrick =>
       _state.currentTrick != null && _state.currentTrick!.cards.isEmpty;
 
-  // 조커 콜이 가능한지 확인 (첫 트릭이 아니고, 선공이면 가능)
+  // 조커 콜이 가능한지 확인 (첫 트릭이 아니고, 선공이고, 조커가 아직 플레이되지 않은 경우)
   bool get canDeclareJokerCall =>
       _state.currentTrickNumber > 1 &&
       isLeadingTrick &&
-      _state.currentPlayer == 0;
+      _state.currentPlayer == 0 &&
+      !_state.isJokerPlayed;
 
   List<PlayingCard> getPlayableCards() {
     return humanPlayer.hand

@@ -72,6 +72,25 @@ class Player {
     return wonCards.where((card) => card.isPointCard).length;
   }
 
+  // 딜 미스 선언 가능 여부 확인
+  // 조건: 점수 카드가 없거나, 조커 1장 + 점수 카드 1장만 있을 때
+  bool get canDeclareDealMiss {
+    final pointCards = hand.where((c) => c.isPointCard).toList();
+    final hasJoker = hand.any((c) => c.isJoker);
+
+    // 점수 카드가 없으면 딜 미스 가능
+    if (pointCards.isEmpty) {
+      return true;
+    }
+
+    // 조커가 있고 점수 카드가 정확히 1장이면 딜 미스 가능
+    if (hasJoker && pointCards.length == 1) {
+      return true;
+    }
+
+    return false;
+  }
+
   void clearHand() {
     hand.clear();
   }

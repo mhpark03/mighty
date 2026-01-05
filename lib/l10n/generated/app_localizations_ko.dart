@@ -46,7 +46,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pass => '패스';
 
   @override
-  String get tricks => '트릭 수';
+  String get tricks => '목표 점수';
 
   @override
   String get giruda => '기루다';
@@ -467,4 +467,21 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get close => '닫기';
+
+  @override
+  String get dealMiss => '딜 미스';
+
+  @override
+  String get dealMissTitle => '딜 미스 선언';
+
+  @override
+  String get dealMissConfirm => '딜 미스를 선언하시겠습니까?\n패를 공개하고 새로 시작합니다.';
+
+  @override
+  String dealMissAnnouncement(String name) {
+    return '$name 딜 미스 선언!';
+  }
+
+  @override
+  String get dealMissNewGame => '딜 미스로 게임을 다시 시작합니다.';
 }
