@@ -7,6 +7,7 @@ class CardWidget extends StatelessWidget {
   final bool isPlayable;
   final bool faceDown;
   final bool isRecommended;
+  final bool compact; // 간소화 모드: 숫자와 무늬만 표시
   final VoidCallback? onTap;
   final double width;
   final double height;
@@ -18,6 +19,7 @@ class CardWidget extends StatelessWidget {
     this.isPlayable = true,
     this.faceDown = false,
     this.isRecommended = false,
+    this.compact = false,
     this.onTap,
     this.width = 60,
     this.height = 90,
@@ -110,6 +112,22 @@ class CardWidget extends StatelessWidget {
 
     final color = card.isRed ? Colors.red : Colors.black;
 
+    // 간소화 모드: 숫자와 무늬만 중앙에 표시
+    if (compact) {
+      return Center(
+        child: Text(
+          '${card.rankSymbol}\n${card.suitSymbol}',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: height * 0.22,
+            fontWeight: FontWeight.bold,
+            color: color,
+            height: 1.1,
+          ),
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.all(2),
       child: Column(
@@ -146,6 +164,11 @@ class CardWidget extends StatelessWidget {
   }
 
   Widget _buildJokerCard() {
+    // 카드 크기에 따라 폰트 크기 조절
+    final isSmall = height < 60;
+    final emojiSize = isSmall ? 16.0 : 24.0;
+    final textSize = isSmall ? 6.0 : 8.0;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
@@ -155,23 +178,24 @@ class CardWidget extends StatelessWidget {
           colors: [Colors.purple, Colors.deepPurple],
         ),
       ),
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               '🃏',
-              style: TextStyle(fontSize: 24),
+              style: TextStyle(fontSize: emojiSize),
             ),
-            Text(
-              'JOKER',
-              style: TextStyle(
-                fontSize: 8,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            if (!isSmall)
+              Text(
+                'JOKER',
+                style: TextStyle(
+                  fontSize: textSize,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
-            ),
           ],
         ),
       ),

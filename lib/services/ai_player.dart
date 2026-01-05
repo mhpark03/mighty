@@ -2460,13 +2460,40 @@ class AIPlayer {
       }
     }
 
-    final nonPointCards = playableCards.where((c) => !c.isPointCard).toList();
-    if (nonPointCards.isNotEmpty) {
-      nonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-      return nonPointCards.first;
+    // 마이티가 이기고 있으면 조커를 내지 않음 (조커는 마이티를 이길 수 없음)
+    bool mightyWinning = currentWinningCard != null && currentWinningCard.isMighty;
+
+    // 조커/마이티 제외하고 낮은 카드 버리기
+    final nonSpecialNonPointCards = playableCards.where((c) =>
+        !c.isPointCard && !c.isJoker && !c.isMighty).toList();
+    if (nonSpecialNonPointCards.isNotEmpty) {
+      nonSpecialNonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+      return nonSpecialNonPointCards.first;
     }
 
-    playableCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+    // 조커/마이티 제외하고 점수 카드 버리기
+    final nonSpecialCards = playableCards.where((c) =>
+        !c.isJoker && !c.isMighty).toList();
+    if (nonSpecialCards.isNotEmpty) {
+      nonSpecialCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+      return nonSpecialCards.first;
+    }
+
+    // 조커/마이티만 남은 경우
+    // 마이티가 이기고 있으면 조커를 내지 않고 마이티를 냄 (조커 보존)
+    if (mightyWinning) {
+      final mighty = playableCards.where((c) => c.isMighty).toList();
+      if (mighty.isNotEmpty) {
+        return mighty.first;
+      }
+    }
+
+    // 그 외에는 조커 우선 (마이티는 더 강하므로 아끼기)
+    final joker = playableCards.where((c) => c.isJoker).toList();
+    if (joker.isNotEmpty) {
+      return joker.first;
+    }
+
     return playableCards.first;
   }
 

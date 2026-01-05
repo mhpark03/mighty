@@ -370,6 +370,7 @@ class GameState {
 
     int passCount = passedPlayers.where((p) => p).length;
 
+    // 4명이 패스하고 현재 배팅이 있으면 마지막 배팅한 사람이 주공
     if (passCount == 4 && currentBid != null) {
       declarerId = currentBid!.playerId;
       giruda = currentBid!.suit;
@@ -379,9 +380,23 @@ class GameState {
       return;
     }
 
+    // 5명 모두 패스하면 판 흐름
     if (passCount == 5) {
       // 모두 패스 - 컨트롤러에서 처리하도록 phase만 변경
       phase = GamePhase.waiting;
+      return;
+    }
+
+    // 배팅에 참여 중인 플레이어 수 계산 (패스하지 않은 플레이어)
+    int activeBidders = 5 - passCount;
+
+    // 배팅에 참여 중인 플레이어가 1명만 남고, 그 플레이어가 배팅을 했으면 자동으로 주공
+    if (activeBidders == 1 && currentBid != null) {
+      declarerId = currentBid!.playerId;
+      giruda = currentBid!.suit;
+      players[declarerId!].isDeclarer = true;
+      players[declarerId!].team = Team.declarer;
+      phase = GamePhase.selectingKitty;
       return;
     }
 
