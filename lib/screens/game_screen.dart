@@ -993,6 +993,23 @@ class _GameScreenState extends State<GameScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                // 조커 콜 표시
+                if (trick.jokerCall == JokerCallType.jokerCall && trick.jokerCallSuit != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    margin: const EdgeInsets.only(top: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      l10n.jokerCallAnnouncement(_getSuitSymbol(trick.jokerCallSuit!)),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 16),
                 // 낸 카드들 표시
                 Wrap(

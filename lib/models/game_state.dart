@@ -513,13 +513,10 @@ class GameState {
 
     // 조커 콜이 선언된 경우
     if (currentTrick!.jokerCall == JokerCallType.jokerCall) {
-      final callSuit = currentTrick!.jokerCallSuit ?? leadSuit;
-
-      // 조커를 가지고 있고, 조커 콜 무늬를 가지고 있으면 조커를 내야 함
+      // 조커를 가지고 있으면 반드시 조커를 내야 함
       bool hasJoker = player.hand.any((c) => c.isJoker);
-      bool hasCallSuit = player.hand.any((c) => !c.isJoker && c.suit == callSuit);
 
-      if (hasJoker && hasCallSuit) {
+      if (hasJoker) {
         // 조커만 낼 수 있음
         return card.isJoker;
       }
