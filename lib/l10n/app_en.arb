@@ -140,5 +140,10 @@
   "guideScoringText": "• Point cards: A, K, Q, J, 10 (1 point each, 20 total)\n• Declarer team wins if they reach the target score\n• Winners get + points, losers get - points",
   "guideTips": "Tips",
   "guideTipsText": "• Mighty and Joker are always powerful\n• Use trump cards wisely\n• Identifying the Friend is crucial",
-  "close": "Close"
+  "close": "Close",
+  "dealMiss": "Deal Miss",
+  "dealMissTitle": "Declare Deal Miss",
+  "dealMissConfirm": "Declare deal miss?\nYour hand will be revealed and a new game will start.",
+  "dealMissAnnouncement": "{name} declared Deal Miss!",
+  "dealMissNewGame": "Restarting game due to deal miss."
 }

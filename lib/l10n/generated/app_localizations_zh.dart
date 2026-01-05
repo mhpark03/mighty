@@ -67,16 +67,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get club => '梅花';
 
   @override
-  String get spadeName => '스페이드';
+  String get spadeName => '黑桃';
 
   @override
-  String get diamondName => '다이아';
+  String get diamondName => '方块';
 
   @override
-  String get heartName => '하트';
+  String get heartName => '红心';
 
   @override
-  String get clubName => '클로버';
+  String get clubName => '梅花';
 
   @override
   String get selectKitty => '选择底牌';
@@ -206,96 +206,96 @@ class AppLocalizationsZh extends AppLocalizations {
   String get player => '玩家';
 
   @override
-  String get you => '당신';
+  String get you => '你';
 
   @override
-  String get bidding => '비딩 중...';
+  String get bidding => '叫牌中...';
 
   @override
-  String get waiting => '대기';
+  String get waiting => '等待';
 
   @override
-  String get otherPlayerTurn => '다른 플레이어 차례입니다';
+  String get otherPlayerTurn => '其他玩家的回合';
 
   @override
-  String get yourCards => '당신의 카드';
+  String get yourCards => '你的牌';
 
   @override
-  String get biddingTurn => '비딩 차례';
+  String get biddingTurn => '叫牌轮';
 
   @override
   String bidWithAmount(int amount) {
-    return '비딩 $amount';
+    return '叫牌 $amount';
   }
 
   @override
   String trickComplete(int number) {
-    return '트릭 $number 완료';
+    return '第 $number 墩完成';
   }
 
   @override
   String winnerAnnouncement(String name, String team) {
-    return '$name 승리! ($team)';
+    return '$name 获胜! ($team)';
   }
 
   @override
-  String get attackTeam => '공격팀';
+  String get attackTeam => '进攻';
 
   @override
-  String get defenseTeam => '방어팀';
+  String get defenseTeam => '防守';
 
   @override
-  String get nextTrick => '다음 트릭';
+  String get nextTrick => '下一墩';
 
   @override
-  String get friendNone => '없음';
+  String get friendNone => '无';
 
   @override
-  String get firstTrick => '첫트릭';
+  String get firstTrick => '首墩';
 
   @override
-  String get selectCardHint => '카드를 선택하세요 ↓';
+  String get selectCardHint => '选择一张牌 ↓';
 
   @override
-  String get previousTrick => '이전 트릭';
+  String get previousTrick => '上一墩';
 
   @override
-  String get winShort => '승';
+  String get winShort => '胜';
 
   @override
-  String get leadPlayer => '선공';
+  String get leadPlayer => '领先';
 
   @override
-  String get leadPlayerHint => '👆 선공입니다!';
+  String get leadPlayerHint => '👆 你领先!';
 
   @override
-  String get selectCardBelow => '아래에서 카드를 선택하세요';
+  String get selectCardBelow => '请从下方选择一张牌';
 
   @override
-  String get leadPlayerSelectCard => '👆 선공입니다! 카드를 선택하세요';
+  String get leadPlayerSelectCard => '👆 你领先! 选择一张牌';
 
   @override
   String jokerCallAnnouncement(String suit) {
-    return '조커 콜! $suit';
+    return '小丑召唤! $suit';
   }
 
   @override
-  String get wonCards => '획득:';
+  String get wonCards => '获得:';
 
   @override
-  String get jokerCallTitle => '조커 콜';
+  String get jokerCallTitle => '小丑召唤';
 
   @override
   String jokerCallQuestion(String suit) {
-    return '$suit 조커 콜을 선언하시겠습니까?';
+    return '宣布 $suit 小丑召唤?';
   }
 
   @override
-  String get no => '아니오';
+  String get no => '否';
 
   @override
   String jokerCallButton(String suit) {
-    return '$suit 조커 콜!';
+    return '$suit 小丑召唤!';
   }
 
   @override
@@ -305,36 +305,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String get jokerLeadSuitQuestion => '选择其他玩家必须跟随的花色';
 
   @override
-  String get allPassedTitle => '모두 패스';
+  String get allPassedTitle => '全部过牌';
 
   @override
-  String get allPassedMessage => '모든 플레이어가 패스했습니다.\n새 게임을 시작합니다.';
+  String get allPassedMessage => '所有玩家都过牌了。\n开始新游戏。';
 
   @override
-  String get girudaChangeWarning => '기루다 변경 시 목표 +2 증가';
+  String get girudaChangeWarning => '更改王牌: 目标+2';
 
   @override
-  String get keep => '유지';
+  String get keep => '保持';
 
   @override
-  String get aiRecommendation => 'AI 추천';
+  String get aiRecommendation => 'AI推荐';
 
   @override
-  String get discardCards => '버릴 카드:';
+  String get discardCards => '弃牌:';
 
   @override
-  String get goalPlus2 => '(목표 +2)';
+  String get goalPlus2 => '(目标+2)';
 
   @override
-  String get applyRecommendation => '추천 적용';
+  String get applyRecommendation => '应用';
 
   @override
   String nthTrickShort(int n) {
-    return '$n트릭';
+    return '第$n墩';
   }
 
   @override
-  String get recommendedFriend => '추천 프렌드:';
+  String get recommendedFriend => '推荐:';
 
   @override
   String get joker => '小丑';
@@ -343,49 +343,49 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mighty => '王牌';
 
   @override
-  String get recommendNoFriend => '노프렌드 추천';
+  String get recommendNoFriend => '推荐无朋友';
 
   @override
-  String get reasonHasMighty => '마이티 보유';
+  String get reasonHasMighty => '持有王牌';
 
   @override
-  String get reasonHasJoker => '조커 보유';
+  String get reasonHasJoker => '持有小丑';
 
   @override
-  String get reasonNeedMighty => '마이티 필요';
+  String get reasonNeedMighty => '需要王牌';
 
   @override
-  String get reasonNeedJoker => '조커 필요';
+  String get reasonNeedJoker => '需要小丑';
 
   @override
-  String get reasonNeedGirudaAce => '기루다 A 필요';
+  String get reasonNeedGirudaAce => '需要王牌A';
 
   @override
-  String get reasonNeedGirudaKing => '기루다 K 필요';
+  String get reasonNeedGirudaKing => '需要王牌K';
 
   @override
-  String get reasonStrongHand => '강한 핸드';
+  String get reasonStrongHand => '强手牌';
 
   @override
-  String get continueGame => '이어하기';
+  String get continueGame => '继续';
 
   @override
-  String get exitGame => '게임 종료';
+  String get exitGame => '退出游戏';
 
   @override
-  String get exitGameConfirm => '게임을 종료하시겠습니까?\n현재 게임은 자동 저장됩니다.';
+  String get exitGameConfirm => '退出游戏?\n当前游戏将被保存。';
 
   @override
-  String get cancel => '취소';
+  String get cancel => '取消';
 
   @override
-  String get exit => '종료';
+  String get exit => '退出';
 
   @override
-  String get savedGame => '저장된 게임';
+  String get savedGame => '已保存的游戏';
 
   @override
-  String get noSavedGame => '저장된 게임이 없습니다';
+  String get noSavedGame => '没有已保存的游戏';
 
   @override
   String get recommendedCard => '推荐';
@@ -412,13 +412,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get resetStats => '重置';
 
   @override
-  String get resetStatsConfirm => '观看广告后，所有统计数据将被重置。\n继续吗？';
+  String get resetStatsConfirm => '观看广告后，所有统计数据将被重置。\n继续吗?';
 
   @override
   String get exitApp => '退出应用';
 
   @override
-  String get exitAppConfirm => '退出应用？';
+  String get exitAppConfirm => '退出应用?';
 
   @override
   String get gameGuide => '游戏方法';
@@ -466,19 +466,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get close => '关闭';
 
   @override
-  String get dealMiss => '딜 미스';
+  String get dealMiss => '发牌失误';
 
   @override
-  String get dealMissTitle => '딜 미스 선언';
+  String get dealMissTitle => '宣布发牌失误';
 
   @override
-  String get dealMissConfirm => '딜 미스를 선언하시겠습니까?\n패를 공개하고 새로 시작합니다.';
+  String get dealMissConfirm => '宣布发牌失误?\n将公开手牌并重新开始。';
 
   @override
   String dealMissAnnouncement(String name) {
-    return '$name 딜 미스 선언!';
+    return '$name 宣布发牌失误!';
   }
 
   @override
-  String get dealMissNewGame => '딜 미스로 게임을 다시 시작합니다.';
+  String get dealMissNewGame => '因发牌失误重新开始游戏。';
 }

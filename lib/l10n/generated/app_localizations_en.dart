@@ -470,19 +470,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get close => 'Close';
 
   @override
-  String get dealMiss => '딜 미스';
+  String get dealMiss => 'Deal Miss';
 
   @override
-  String get dealMissTitle => '딜 미스 선언';
+  String get dealMissTitle => 'Declare Deal Miss';
 
   @override
-  String get dealMissConfirm => '딜 미스를 선언하시겠습니까?\n패를 공개하고 새로 시작합니다.';
+  String get dealMissConfirm =>
+      'Declare deal miss?\nYour hand will be revealed and a new game will start.';
 
   @override
   String dealMissAnnouncement(String name) {
-    return '$name 딜 미스 선언!';
+    return '$name declared Deal Miss!';
   }
 
   @override
-  String get dealMissNewGame => '딜 미스로 게임을 다시 시작합니다.';
+  String get dealMissNewGame => 'Restarting game due to deal miss.';
 }
