@@ -794,8 +794,8 @@ class GameState {
 
     int finalScore = baseScore * roleMultiplier;
 
-    // 풀수당: 주공이 풀(20점)을 불렀다면 점수 x2
-    if (targetTricks == 20) {
+    // 풀풀: 주공이 풀(20점)을 부르고 20점을 모두 획득했을 때 x2
+    if (targetTricks == 20 && declarerTeamPoints == 20) {
       finalScore *= 2;
     }
 
