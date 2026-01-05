@@ -456,7 +456,8 @@ class _GameScreenState extends State<GameScreen> {
             ),
             const SizedBox(height: 4),
             Wrap(
-              spacing: 4,
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 _buildSuitChip(Suit.spade, '♠', l10n.spadeName),
                 _buildSuitChip(Suit.diamond, '♦', l10n.diamondName),
