@@ -1023,6 +1023,35 @@ class AIPlayer {
       bool jokerIsFriendCard = state.friendDeclaration?.card?.isJoker ?? false;
 
       if (state.giruda != null) {
+        // 조건 0: 약한 기루다만 남았을 때 기루다 콜하여 상대 기루다 소진
+        final myGirudaCards = player.hand.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+
+        if (myGirudaCards.isNotEmpty) {
+          myGirudaCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+          final myHighestGiruda = myGirudaCards.first;
+          final opponentGiruda = _getRemainingGirudaCount(state, player);
+
+          // 내 최고 기루다가 J 이하이고 상대 기루다가 남아있으면 기루다 콜
+          if (myHighestGiruda.rankValue <= 11 && opponentGiruda >= 2) {
+            final playedGirudaCards = playedCards.where((c) =>
+                !c.isJoker && c.suit == state.giruda).toList();
+
+            int highGirudaRemaining = 0;
+            for (final rank in [Rank.ace, Rank.king, Rank.queen]) {
+              bool played = playedGirudaCards.any((c) => c.rank == rank);
+              bool inMyHand = myGirudaCards.any((c) => c.rank == rank);
+              if (!played && !inMyHand) {
+                highGirudaRemaining++;
+              }
+            }
+
+            if (highGirudaRemaining >= 2) {
+              return state.giruda!;
+            }
+          }
+        }
+
         // 조건 1: 조커가 프렌드 카드이고 초반(상대 기루다 7장 초과)이면 기루다 호출
         // → 주공의 낮은 기루다를 제거하여 기루다 정리
         if (jokerIsFriendCard && _isEarlyGirudaPhase(state, player)) {
@@ -1420,6 +1449,54 @@ class AIPlayer {
     }
 
     // === 주공팀 또는 노기루다 선공 전략 ===
+
+    // === 약한 기루다만 남았을 때 조커로 기루다 콜 ===
+    // 기루다로 선공을 유지하다가 약한 기루다만 남으면 조커로 기루다 콜하여 상대 기루다 소진
+    if (state.giruda != null && state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
+      bool isAttackTeam = !_isPlayerOnDefenseTeam(player, state);
+
+      if (isAttackTeam) {
+        final joker = playableCards.where((c) => c.isJoker).toList();
+
+        if (joker.isNotEmpty) {
+          // 내 기루다 카드들
+          final myGirudaCards = player.hand.where((c) =>
+              !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+
+          if (myGirudaCards.isNotEmpty) {
+            // 내 기루다 중 최고 랭크
+            myGirudaCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+            final myHighestGiruda = myGirudaCards.first;
+
+            // 상대에게 남은 기루다 추정
+            final opponentGiruda = _getRemainingGirudaCount(state, player);
+
+            // 내 최고 기루다가 약하고 (J=11 이하), 상대 기루다가 남아있으면
+            // 조커로 기루다 콜하여 상대 기루다 소진시키기
+            if (myHighestGiruda.rankValue <= 11 && opponentGiruda >= 2) {
+              // 상대의 높은 기루다가 남아있는지 확인
+              final playedGirudaCards = _getPlayedCards(state).where((c) =>
+                  !c.isJoker && c.suit == state.giruda).toList();
+
+              // A, K, Q 중 안 나온 기루다 수 계산
+              int highGirudaRemaining = 0;
+              for (final rank in [Rank.ace, Rank.king, Rank.queen]) {
+                bool played = playedGirudaCards.any((c) => c.rank == rank);
+                bool inMyHand = myGirudaCards.any((c) => c.rank == rank);
+                if (!played && !inMyHand) {
+                  highGirudaRemaining++;
+                }
+              }
+
+              // 상대에게 높은 기루다(A,K,Q)가 2장 이상 남아있으면 조커로 기루다 콜
+              if (highGirudaRemaining >= 2) {
+                return joker.first;
+              }
+            }
+          }
+        }
+      }
+    }
 
     // 상대에게 남은 기루다가 없으면 최상위 카드/조커 우선 (컷 당할 위험 없음)
     if (state.giruda != null) {
