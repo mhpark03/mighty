@@ -420,6 +420,24 @@ abstract class AppLocalizations {
   /// **'수비 팀 승리!'**
   String get defenderTeamWins;
 
+  /// No description provided for @declarerTeam.
+  ///
+  /// In ko, this message translates to:
+  /// **'주공 팀'**
+  String get declarerTeam;
+
+  /// No description provided for @defenderTeam.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 팀'**
+  String get defenderTeam;
+
+  /// No description provided for @fullPoints.
+  ///
+  /// In ko, this message translates to:
+  /// **'풀'**
+  String get fullPoints;
+
   /// No description provided for @declarerTeamPoints.
   ///
   /// In ko, this message translates to:

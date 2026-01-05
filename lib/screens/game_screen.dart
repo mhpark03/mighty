@@ -2360,11 +2360,15 @@ class _GameScreenState extends State<GameScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              l10n.declarerTeamPoints(state.declarerTeamPoints),
+              state.declarerTeamPoints == 20
+                  ? '${l10n.declarerTeam}: ${l10n.fullPoints}'
+                  : l10n.declarerTeamPoints(state.declarerTeamPoints),
               style: const TextStyle(fontSize: 18),
             ),
             Text(
-              l10n.defenderTeamPoints(state.defenderTeamPoints),
+              state.defenderTeamPoints == 20
+                  ? '${l10n.defenderTeam}: ${l10n.fullPoints}'
+                  : l10n.defenderTeamPoints(state.defenderTeamPoints),
               style: const TextStyle(fontSize: 18),
             ),
             Text(

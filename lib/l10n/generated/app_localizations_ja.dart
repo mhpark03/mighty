@@ -180,6 +180,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get defenderTeamWins => '守備チームの勝利！';
 
   @override
+  String get declarerTeam => '宣言者チーム';
+
+  @override
+  String get defenderTeam => '守備チーム';
+
+  @override
+  String get fullPoints => 'フル';
+
+  @override
   String declarerTeamPoints(int points) {
     return '宣言者チーム: $points点';
   }

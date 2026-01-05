@@ -180,6 +180,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get defenderTeamWins => '防守队获胜！';
 
   @override
+  String get declarerTeam => '庄家队';
+
+  @override
+  String get defenderTeam => '防守队';
+
+  @override
+  String get fullPoints => '满分';
+
+  @override
   String declarerTeamPoints(int points) {
     return '庄家队: $points分';
   }

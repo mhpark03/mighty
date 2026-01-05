@@ -180,6 +180,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get defenderTeamWins => '수비 팀 승리!';
 
   @override
+  String get declarerTeam => '주공 팀';
+
+  @override
+  String get defenderTeam => '수비 팀';
+
+  @override
+  String get fullPoints => '풀';
+
+  @override
   String declarerTeamPoints(int points) {
     return '주공 팀: $points점';
   }
