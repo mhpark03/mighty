@@ -744,17 +744,15 @@ class GameState {
   int getPlayerScore(int playerId) {
     final player = players[playerId];
     final targetTricks = currentBid?.tricks ?? 13;
-    const int minContract = 13;  // 최소 공약
     final isNoFriend = friendDeclaration?.isNoFriend ?? false;
 
     int baseScore;
     int specialMultiplier = 1;
 
     if (declarerWon) {
-      // === 주공 승리 시 (하이리스크 하이리턴 방식) ===
-      // (득점 - 공약) + (득점 - 최소공약) × 2
-      baseScore = (declarerTeamPoints - targetTricks) +
-                  (declarerTeamPoints - minContract) * 2;
+      // === 주공 승리 시 ===
+      // 득점 - 목표 + 1
+      baseScore = declarerTeamPoints - targetTricks + 1;
 
       // 런 (주공팀이 20점 전부 획득): x2
       if (declarerTeamPoints >= 20) {
@@ -771,9 +769,9 @@ class GameState {
         specialMultiplier *= 2;
       }
     } else {
-      // === 주공 패배 시 ===
-      // (공약 - 득점) 만 적용, 노기루다/노프렌드 제외
-      baseScore = -(targetTricks - declarerTeamPoints);
+      // === 수비팀 승리 시 ===
+      // 득점 - 목표
+      baseScore = declarerTeamPoints - targetTricks;
 
       // 백런 (수비팀이 11점 이상 획득): x2
       if (defenderTeamPoints >= 11) {
