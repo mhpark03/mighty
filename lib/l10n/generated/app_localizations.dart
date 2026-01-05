@@ -129,37 +129,37 @@ abstract class AppLocalizations {
   /// No description provided for @biddingPhase.
   ///
   /// In ko, this message translates to:
-  /// **'비딩 단계'**
+  /// **'배팅 단계'**
   String get biddingPhase;
 
   /// No description provided for @currentBidder.
   ///
   /// In ko, this message translates to:
-  /// **'현재 비딩: {name}'**
+  /// **'현재 배팅: {name}'**
   String currentBidder(String name);
 
   /// No description provided for @noBidYet.
   ///
   /// In ko, this message translates to:
-  /// **'아직 비딩 없음'**
+  /// **'아직 배팅 없음'**
   String get noBidYet;
 
   /// No description provided for @highestBid.
   ///
   /// In ko, this message translates to:
-  /// **'최고 비딩: {bid}'**
+  /// **'최고 배팅: {bid}'**
   String highestBid(String bid);
 
   /// No description provided for @bid.
   ///
   /// In ko, this message translates to:
-  /// **'비딩'**
+  /// **'배팅'**
   String get bid;
 
   /// No description provided for @bidButton.
   ///
   /// In ko, this message translates to:
-  /// **'비딩하기'**
+  /// **'배팅하기'**
   String get bidButton;
 
   /// No description provided for @pass.
@@ -465,7 +465,7 @@ abstract class AppLocalizations {
   /// No description provided for @bidding.
   ///
   /// In ko, this message translates to:
-  /// **'비딩 중...'**
+  /// **'배팅 중...'**
   String get bidding;
 
   /// No description provided for @waiting.
@@ -489,13 +489,13 @@ abstract class AppLocalizations {
   /// No description provided for @biddingTurn.
   ///
   /// In ko, this message translates to:
-  /// **'비딩 차례'**
+  /// **'배팅 차례'**
   String get biddingTurn;
 
   /// No description provided for @bidWithAmount.
   ///
   /// In ko, this message translates to:
-  /// **'비딩 {amount}'**
+  /// **'배팅 {amount}'**
   String bidWithAmount(int amount);
 
   /// No description provided for @trickComplete.
@@ -879,13 +879,13 @@ abstract class AppLocalizations {
   /// No description provided for @guideBidding.
   ///
   /// In ko, this message translates to:
-  /// **'비딩'**
+  /// **'배팅'**
   String get guideBidding;
 
   /// No description provided for @guideBiddingText.
   ///
   /// In ko, this message translates to:
-  /// **'• 각 플레이어는 자신이 획득할 점수 카드 수를 선언합니다\n• 가장 높은 비딩을 한 플레이어가 주공이 됩니다\n• 주공은 기루다(으뜸패)를 정합니다'**
+  /// **'• 각 플레이어는 자신이 획득할 점수 카드 수를 선언합니다\n• 가장 높은 배팅을 한 플레이어가 주공이 됩니다\n• 주공은 기루다(으뜸패)를 정합니다'**
   String get guideBiddingText;
 
   /// No description provided for @guideSpecialCards.

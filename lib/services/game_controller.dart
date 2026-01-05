@@ -100,11 +100,11 @@ class GameController extends ChangeNotifier {
     _state.declareDealMiss(0);
     notifyListeners();
 
-    // AI가 딜 미스 체크 후 비딩 진행
+    // AI가 딜 미스 체크 후 배팅 진행
     _processAIDealMissCheck();
   }
 
-  // AI 딜 미스 체크 후 비딩 진행
+  // AI 딜 미스 체크 후 배팅 진행
   void _processAIDealMissCheck() async {
     while (_state.phase == GamePhase.bidding && _state.currentBidder != 0) {
       final currentPlayer = _state.players[_state.currentBidder];
@@ -129,7 +129,7 @@ class GameController extends ChangeNotifier {
         }
       }
 
-      // 딜 미스 안하면 비딩 진행
+      // 딜 미스 안하면 배팅 진행
       break;
     }
 
@@ -346,14 +346,14 @@ class GameController extends ChangeNotifier {
     return _aiPlayer.selectCard(humanPlayer, _state);
   }
 
-  /// 사용자에게 추천할 비딩을 반환
-  /// AI 로직을 사용하여 최적의 비딩을 선택
+  /// 사용자에게 추천할 배팅을 반환
+  /// AI 로직을 사용하여 최적의 배팅을 선택
   Bid? getRecommendedBid() {
     if (_state.phase != GamePhase.bidding) return null;
     if (_state.currentBidder != 0) return null;
     if (_state.passedPlayers[0]) return null;
 
-    // AI 로직을 사용하여 추천 비딩 선택
+    // AI 로직을 사용하여 추천 배팅 선택
     return _aiPlayer.decideBid(humanPlayer, _state);
   }
 

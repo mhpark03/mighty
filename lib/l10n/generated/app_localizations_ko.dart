@@ -21,26 +21,26 @@ class AppLocalizationsKo extends AppLocalizations {
   String get newGame => '새 게임';
 
   @override
-  String get biddingPhase => '비딩 단계';
+  String get biddingPhase => '배팅 단계';
 
   @override
   String currentBidder(String name) {
-    return '현재 비딩: $name';
+    return '현재 배팅: $name';
   }
 
   @override
-  String get noBidYet => '아직 비딩 없음';
+  String get noBidYet => '아직 배팅 없음';
 
   @override
   String highestBid(String bid) {
-    return '최고 비딩: $bid';
+    return '최고 배팅: $bid';
   }
 
   @override
-  String get bid => '비딩';
+  String get bid => '배팅';
 
   @override
-  String get bidButton => '비딩하기';
+  String get bidButton => '배팅하기';
 
   @override
   String get pass => '패스';
@@ -209,7 +209,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get you => '당신';
 
   @override
-  String get bidding => '비딩 중...';
+  String get bidding => '배팅 중...';
 
   @override
   String get waiting => '대기';
@@ -221,11 +221,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get yourCards => '당신의 카드';
 
   @override
-  String get biddingTurn => '비딩 차례';
+  String get biddingTurn => '배팅 차례';
 
   @override
   String bidWithAmount(int amount) {
-    return '비딩 $amount';
+    return '배팅 $amount';
   }
 
   @override
@@ -431,11 +431,11 @@ class AppLocalizationsKo extends AppLocalizations {
       '마이티는 5명이 즐기는 트릭테이킹 카드 게임입니다. 주공(1명)과 프렌드(1명)가 팀을 이루어 수비팀(3명)과 대결합니다.';
 
   @override
-  String get guideBidding => '비딩';
+  String get guideBidding => '배팅';
 
   @override
   String get guideBiddingText =>
-      '• 각 플레이어는 자신이 획득할 점수 카드 수를 선언합니다\n• 가장 높은 비딩을 한 플레이어가 주공이 됩니다\n• 주공은 기루다(으뜸패)를 정합니다';
+      '• 각 플레이어는 자신이 획득할 점수 카드 수를 선언합니다\n• 가장 높은 배팅을 한 플레이어가 주공이 됩니다\n• 주공은 기루다(으뜸패)를 정합니다';
 
   @override
   String get guideSpecialCards => '특수 카드';

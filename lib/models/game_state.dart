@@ -343,7 +343,7 @@ class GameState {
   void startNewGame() {
     reset();
     dealCards();
-    // 비딩 시작 플레이어를 랜덤하게 지정
+    // 배팅 시작 플레이어를 랜덤하게 지정
     currentBidder = Random().nextInt(5);
     phase = GamePhase.bidding;
   }
@@ -403,7 +403,7 @@ class GameState {
     // 카드 다시 분배
     dealCards();
 
-    // 딜 미스 선언자가 첫 비딩
+    // 딜 미스 선언자가 첫 배팅
     currentBidder = playerId;
     phase = GamePhase.bidding;
   }
@@ -782,6 +782,13 @@ class GameState {
       roleMultiplier = -1;  // 야당(수비): x(-1)
     }
 
-    return baseScore * roleMultiplier;
+    int finalScore = baseScore * roleMultiplier;
+
+    // 풀수당: 주공이 풀(20점)을 불렀다면 점수 x2
+    if (targetTricks == 20) {
+      finalScore *= 2;
+    }
+
+    return finalScore;
   }
 }

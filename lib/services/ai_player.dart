@@ -198,22 +198,22 @@ class AIPlayer {
     // 2. 선택된 기루다를 기준으로 핸드 강도 계산
     int strength = evaluateHandStrength(hand, bestSuit);
 
-    // 3. 비딩 결정 - 순서대로 1씩 증가하며 비딩
+    // 3. 배팅 결정 - 순서대로 1씩 증가하며 배팅
     int bidAmount;
     if (state.currentBid == null) {
-      // 첫 비딩은 13부터 시작
+      // 첫 배팅은 13부터 시작
       bidAmount = 13;
     } else {
-      // 현재 최고 비딩 + 1로 비딩
+      // 현재 최고 배팅 + 1로 배팅
       bidAmount = state.currentBid!.tricks + 1;
     }
 
-    // 비딩할 금액이 자신의 강도보다 높으면 패스
+    // 배팅할 금액이 자신의 강도보다 높으면 패스
     if (bidAmount > strength || strength < 13) {
       return Bid.pass(player.id);
     }
 
-    // 최대 20까지만 비딩 가능
+    // 최대 20까지만 배팅 가능
     bidAmount = min(bidAmount, 20);
 
     return Bid(
@@ -1709,6 +1709,134 @@ class AIPlayer {
         }
         // 마이티만 남은 경우
         return playableCards.first;
+      } else {
+        // === 공격팀: 팀원이 이기고 있지만 확실하지 않을 때 보조하기 ===
+        // 팀원(프렌드/주공)의 카드가 뒤집힐 수 있으니 더 강한 카드로 확실히 가져가기
+        // 단, 기루다로 "간을 치는" 것은 방지 (팀원이 리드 무늬로 이기고 있을 때)
+        if (isAttackTeam) {
+          // 팀원이 리드 무늬로 이기고 있으면, 리드 무늬 내에서만 보조
+          // (기루다로 오버컷하면 "간을 치는" 것이므로 방지)
+          bool teammateWinningWithLeadSuit = currentWinningCard != null &&
+              !currentWinningCard.isJoker && !currentWinningCard.isMighty &&
+              currentWinningCard.suit == leadSuit;
+
+          if (teammateWinningWithLeadSuit) {
+            // 리드 무늬 중 남은 최강 카드 계산 (상대가 낼 수 있는 최강)
+            final playedCards = _getPlayedCards(state);
+            PlayingCard? highestRemainingLeadSuit;
+
+            for (int rankVal = 14; rankVal >= 2; rankVal--) {
+              final rank = Rank.values[rankVal - 2];
+              final leadCard = PlayingCard(suit: leadSuit, rank: rank);
+              bool inMyHand = player.hand.any((c) =>
+                  c.suit == leadSuit && c.rank == rank);
+              bool alreadyPlayed = playedCards.any((c) =>
+                  c.suit == leadSuit && c.rank == rank);
+              if (!inMyHand && !alreadyPlayed) {
+                highestRemainingLeadSuit = leadCard;
+                break;
+              }
+            }
+
+            // 리드 무늬 중 오픈된 카드 수 계산 (플레이된 카드 + 내 손)
+            int openedLeadSuitCount = playedCards.where((c) => c.suit == leadSuit).length +
+                player.hand.where((c) => c.suit == leadSuit).length;
+            // 현재 트릭에서 나온 리드 무늬 카드도 포함
+            int trickLeadSuitCount = state.currentTrick!.cards
+                .where((c) => c.suit == leadSuit).length;
+            openedLeadSuitCount += trickLeadSuitCount;
+            int remainingLeadSuitCount = 13 - openedLeadSuitCount;
+
+            // 뒤에 남은 플레이어 수 (현재 플레이어는 아직 안 냈으므로 +1 하지 않음)
+            int remainingPlayers = 5 - state.currentTrick!.cards.length - 1;
+
+            // 남은 리드 무늬가 남은 플레이어 수보다 적으면 기루다 컷 가능성 있음
+            // (누군가는 리드 무늬가 없어서 기루다로 컷할 수 있음)
+            bool girudaCutPossible = remainingPlayers > 0 &&
+                remainingLeadSuitCount < remainingPlayers;
+
+            // 팀원이 확실히 이기는지 확인
+            // 1. 기루다 컷 가능성이 없고
+            // 2. 상대가 낼 수 있는 리드 무늬 최강보다 팀원 카드가 높으면 확실히 이김
+            bool teammateWinningSecurely = !girudaCutPossible &&
+                (highestRemainingLeadSuit == null ||
+                 currentWinningCard.rankValue > highestRemainingLeadSuit.rankValue);
+
+            if (teammateWinningSecurely) {
+              // 팀원이 확실히 이기면 낮은 카드 버리기
+              final suitCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit == leadSuit).toList();
+              if (suitCards.isNotEmpty) {
+                suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                final nonPointCards = suitCards.where((c) => !c.isPointCard).toList();
+                if (nonPointCards.isNotEmpty) {
+                  return nonPointCards.first;
+                }
+                return suitCards.first;
+              }
+              // 리드 무늬가 없으면 비기루다 중 낮은 카드
+              final nonGirudaCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+              if (nonGirudaCards.isNotEmpty) {
+                nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
+                if (nonPointCards.isNotEmpty) {
+                  return nonPointCards.first;
+                }
+                return nonGirudaCards.first;
+              }
+              // 기루다만 있으면 낮은 기루다
+              final girudaCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+              if (girudaCards.isNotEmpty) {
+                girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return girudaCards.first;
+              }
+            } else {
+              // 팀원이 역전될 수 있으면 리드 무늬 내에서 보조
+              // 상대 최강보다 높은 리드 무늬 카드 찾기
+              final strongerLeadSuitCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit == leadSuit &&
+                  c.rankValue > highestRemainingLeadSuit!.rankValue).toList();
+
+              if (strongerLeadSuitCards.isNotEmpty) {
+                // 이길 수 있는 카드 중 가장 낮은 것 선택
+                strongerLeadSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return strongerLeadSuitCards.first;
+              }
+
+              // 리드 무늬로 이길 수 없으면 낮은 카드 버리기 (기루다로 컷하지 않음)
+              final suitCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit == leadSuit).toList();
+              if (suitCards.isNotEmpty) {
+                suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                final nonPointCards = suitCards.where((c) => !c.isPointCard).toList();
+                if (nonPointCards.isNotEmpty) {
+                  return nonPointCards.first;
+                }
+                return suitCards.first;
+              }
+              // 리드 무늬가 없어도 기루다로 컷하지 않고 낮은 카드 버리기
+              final nonGirudaCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+              if (nonGirudaCards.isNotEmpty) {
+                nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
+                if (nonPointCards.isNotEmpty) {
+                  return nonPointCards.first;
+                }
+                return nonGirudaCards.first;
+              }
+              // 기루다만 있으면 낮은 기루다 (어쩔 수 없음)
+              final girudaCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+              if (girudaCards.isNotEmpty) {
+                girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return girudaCards.first;
+              }
+            }
+          }
+        }
       }
     }
 

@@ -245,7 +245,7 @@ class _GameScreenState extends State<GameScreen> {
         Expanded(
           child: Stack(
             children: [
-              // AI 플레이어들 비딩 상태
+              // AI 플레이어들 배팅 상태
               // AI 1 (왼쪽)
               Positioned(
                 left: 8,
@@ -270,7 +270,7 @@ class _GameScreenState extends State<GameScreen> {
                 top: 50,
                 child: _buildBiddingPlayerStatus(state, 4, controller.isProcessing),
               ),
-              // 중앙 비딩 컨트롤
+              // 중앙 배팅 컨트롤
               Center(
                 child: _buildCenterBiddingArea(controller),
               ),
@@ -356,7 +356,7 @@ class _GameScreenState extends State<GameScreen> {
     final state = controller.state;
     final isHumanTurn = state.currentBidder == 0 && !controller.isProcessing;
 
-    // AI 추천 비딩 가져오기
+    // AI 추천 배팅 가져오기
     final recommendedBid = isHumanTurn ? controller.getRecommendedBid() : null;
 
     // AI 추천으로 초기값 설정 (한 번만)
@@ -369,7 +369,7 @@ class _GameScreenState extends State<GameScreen> {
               // 패스 추천: 기루다 선택 안 함
               _suitManuallySelected = false;
             } else {
-              // 비딩 추천: 추천값으로 설정
+              // 배팅 추천: 추천값으로 설정
               _selectedBidAmount = recommendedBid.tricks;
               _selectedBidSuit = recommendedBid.suit;
               _suitManuallySelected = true;
@@ -378,7 +378,7 @@ class _GameScreenState extends State<GameScreen> {
         }
       });
     }
-    // 비딩 페이즈가 아니면 초기화 플래그 리셋
+    // 배팅 페이즈가 아니면 초기화 플래그 리셋
     if (state.phase != GamePhase.bidding) {
       _bidInitialized = false;
       _suitManuallySelected = false;
@@ -549,7 +549,7 @@ class _GameScreenState extends State<GameScreen> {
                 : (isEnabled ? null : Border.all(color: Colors.grey[700]!, width: 1)),
           ),
           child: Text(
-            '$amount',
+            amount == 20 ? '풀' : '$amount',
             style: TextStyle(
               color: isSelected
                   ? Colors.black
@@ -566,7 +566,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildSuitChip(Suit? suit, String symbol, String name) {
-    // 사용자가 직접 선택했거나 AI가 비딩을 추천한 경우에만 선택 표시
+    // 사용자가 직접 선택했거나 AI가 배팅을 추천한 경우에만 선택 표시
     final isSelected = _suitManuallySelected && _selectedBidSuit == suit;
     final isRed = suit == Suit.diamond || suit == Suit.heart;
     final isClub = suit == Suit.club;
@@ -624,7 +624,7 @@ class _GameScreenState extends State<GameScreen> {
 
   bool _canBid(GameState state) {
     final minBid = (state.currentBid?.tricks ?? 12) + 1;
-    // 기루다가 선택되어야 비딩 가능
+    // 기루다가 선택되어야 배팅 가능
     return _selectedBidAmount >= minBid && _suitManuallySelected;
   }
 
