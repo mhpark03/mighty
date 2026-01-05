@@ -1805,7 +1805,25 @@ class AIPlayer {
                 return strongerLeadSuitCards.first;
               }
 
-              // 리드 무늬로 이길 수 없으면 낮은 카드 버리기 (기루다로 컷하지 않음)
+              // 팀원이 약한 카드를 냈고 리드 무늬로 이길 수 없을 때
+              // 조커나 마이티로 트릭을 가져오기
+              if (currentWinningCard.rankValue <= 7) {
+                // 마이티가 있으면 사용 (조커보다 강함)
+                final mighty = playableCards.where((c) => c.isMighty).toList();
+                if (mighty.isNotEmpty) {
+                  return mighty.first;
+                }
+                // 조커가 있으면 사용 (조커콜 상태가 아닐 때만)
+                bool jokerCalled = state.currentTrick?.jokerCall == JokerCallType.jokerCall;
+                if (!jokerCalled) {
+                  final joker = playableCards.where((c) => c.isJoker).toList();
+                  if (joker.isNotEmpty) {
+                    return joker.first;
+                  }
+                }
+              }
+
+              // 리드 무늬로 도울 수 없으면 낮은 카드 버리기 (기루다로 컷하지 않음)
               final suitCards = playableCards.where((c) =>
                   !c.isJoker && !c.isMighty && c.suit == leadSuit).toList();
               if (suitCards.isNotEmpty) {
