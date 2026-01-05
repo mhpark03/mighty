@@ -1263,7 +1263,26 @@ class AIPlayer {
           return effectiveHighCards.first;
         }
 
-        // 없으면 가장 높은 비기루다 카드
+        // 이길 확률이 낮으면 높은 카드로 리드하지 않음
+        // 대신 낮은 카드를 버리거나, 이길 확률이 낮은 점수카드를 버림
+
+        // 1. 비점수카드 중 낮은 카드로 리드 (안전한 선택)
+        final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
+        if (nonPointCards.isNotEmpty) {
+          nonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return nonPointCards.first;
+        }
+
+        // 2. 이길 확률이 낮은 점수카드 리드 (A/K가 오픈된 J/Q/10)
+        final lowProbPointCards = nonGirudaCards.where((c) =>
+            c.isPointCard && _isLowWinProbabilityPointCard(c, player, state)).toList();
+        if (lowProbPointCards.isNotEmpty) {
+          lowProbPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return lowProbPointCards.first;
+        }
+
+        // 3. 이길 가능성 있는 점수카드는 보존하고 싶지만 다른 카드가 없으면 낮은 것
+        nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
         return nonGirudaCards.first;
       }
 
