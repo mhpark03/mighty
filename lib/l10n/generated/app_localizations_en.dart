@@ -495,4 +495,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dealMissNewGame => 'Restarting game due to deal miss.';
+
+  @override
+  String get aiPlayer1 => 'Alex';
+
+  @override
+  String get aiPlayer2 => 'Emma';
+
+  @override
+  String get aiPlayer3 => 'James';
+
+  @override
+  String get aiPlayer4 => 'Sophia';
+
+  @override
+  String get scoreCalcWin => 'Score Calculation (Win)';
+
+  @override
+  String get scoreCalcLose => 'Score Calculation (Lose)';
+
+  @override
+  String get scoreFormula => '(Points-Contract) + (Points-Min)×2';
+
+  @override
+  String get scoreFormulaLose => '-(Contract - Points)';
+
+  @override
+  String get scoreMultipliers => 'Declarer ×2, Friend ×1, Defense ×(-1)';
+
+  @override
+  String get multiplierRun => 'Run ×2';
+
+  @override
+  String get multiplierNoGiruda => 'No Trump ×2';
+
+  @override
+  String get multiplierNoFriend => 'No Friend ×2';
+
+  @override
+  String get multiplierBackRun => 'Back Run ×2';
+
+  @override
+  String get multiplierLabel => 'Multiplier';
 }

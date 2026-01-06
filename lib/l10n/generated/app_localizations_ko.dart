@@ -493,4 +493,46 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get dealMissNewGame => '딜 미스로 게임을 다시 시작합니다.';
+
+  @override
+  String get aiPlayer1 => '민준';
+
+  @override
+  String get aiPlayer2 => '서연';
+
+  @override
+  String get aiPlayer3 => '지호';
+
+  @override
+  String get aiPlayer4 => '수빈';
+
+  @override
+  String get scoreCalcWin => '점수 계산 (승리)';
+
+  @override
+  String get scoreCalcLose => '점수 계산 (패배)';
+
+  @override
+  String get scoreFormula => '(득점-공약) + (득점-최소)×2';
+
+  @override
+  String get scoreFormulaLose => '-(공약 - 득점)';
+
+  @override
+  String get scoreMultipliers => '주공 ×2, 프렌드 ×1, 야당 ×(-1)';
+
+  @override
+  String get multiplierRun => '런 ×2';
+
+  @override
+  String get multiplierNoGiruda => '노기루다 ×2';
+
+  @override
+  String get multiplierNoFriend => '노프렌드 ×2';
+
+  @override
+  String get multiplierBackRun => '백런 ×2';
+
+  @override
+  String get multiplierLabel => '배수';
 }

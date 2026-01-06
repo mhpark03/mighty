@@ -239,5 +239,19 @@
       "name": {"type": "String"}
     }
   },
-  "dealMissNewGame": "딜 미스로 게임을 다시 시작합니다."
+  "dealMissNewGame": "딜 미스로 게임을 다시 시작합니다.",
+  "aiPlayer1": "민준",
+  "aiPlayer2": "서연",
+  "aiPlayer3": "지호",
+  "aiPlayer4": "수빈",
+  "scoreCalcWin": "점수 계산 (승리)",
+  "scoreCalcLose": "점수 계산 (패배)",
+  "scoreFormula": "(득점-공약) + (득점-최소)×2",
+  "scoreFormulaLose": "-(공약 - 득점)",
+  "scoreMultipliers": "주공 ×2, 프렌드 ×1, 야당 ×(-1)",
+  "multiplierRun": "런 ×2",
+  "multiplierNoGiruda": "노기루다 ×2",
+  "multiplierNoFriend": "노프렌드 ×2",
+  "multiplierBackRun": "백런 ×2",
+  "multiplierLabel": "배수"
 }

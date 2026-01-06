@@ -490,4 +490,46 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dealMissNewGame => '因发牌失误重新开始游戏。';
+
+  @override
+  String get aiPlayer1 => '小明';
+
+  @override
+  String get aiPlayer2 => '小红';
+
+  @override
+  String get aiPlayer3 => '小刚';
+
+  @override
+  String get aiPlayer4 => '小美';
+
+  @override
+  String get scoreCalcWin => '分数计算 (胜利)';
+
+  @override
+  String get scoreCalcLose => '分数计算 (失败)';
+
+  @override
+  String get scoreFormula => '(得分-契约) + (得分-最小)×2';
+
+  @override
+  String get scoreFormulaLose => '-(契约 - 得分)';
+
+  @override
+  String get scoreMultipliers => '庄家 ×2, 朋友 ×1, 防守 ×(-1)';
+
+  @override
+  String get multiplierRun => '满贯 ×2';
+
+  @override
+  String get multiplierNoGiruda => '无将 ×2';
+
+  @override
+  String get multiplierNoFriend => '无朋友 ×2';
+
+  @override
+  String get multiplierBackRun => '反满贯 ×2';
+
+  @override
+  String get multiplierLabel => '倍数';
 }

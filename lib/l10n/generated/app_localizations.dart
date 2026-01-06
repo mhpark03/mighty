@@ -989,6 +989,90 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'딜 미스로 게임을 다시 시작합니다.'**
   String get dealMissNewGame;
+
+  /// No description provided for @aiPlayer1.
+  ///
+  /// In ko, this message translates to:
+  /// **'민준'**
+  String get aiPlayer1;
+
+  /// No description provided for @aiPlayer2.
+  ///
+  /// In ko, this message translates to:
+  /// **'서연'**
+  String get aiPlayer2;
+
+  /// No description provided for @aiPlayer3.
+  ///
+  /// In ko, this message translates to:
+  /// **'지호'**
+  String get aiPlayer3;
+
+  /// No description provided for @aiPlayer4.
+  ///
+  /// In ko, this message translates to:
+  /// **'수빈'**
+  String get aiPlayer4;
+
+  /// No description provided for @scoreCalcWin.
+  ///
+  /// In ko, this message translates to:
+  /// **'점수 계산 (승리)'**
+  String get scoreCalcWin;
+
+  /// No description provided for @scoreCalcLose.
+  ///
+  /// In ko, this message translates to:
+  /// **'점수 계산 (패배)'**
+  String get scoreCalcLose;
+
+  /// No description provided for @scoreFormula.
+  ///
+  /// In ko, this message translates to:
+  /// **'(득점-공약) + (득점-최소)×2'**
+  String get scoreFormula;
+
+  /// No description provided for @scoreFormulaLose.
+  ///
+  /// In ko, this message translates to:
+  /// **'-(공약 - 득점)'**
+  String get scoreFormulaLose;
+
+  /// No description provided for @scoreMultipliers.
+  ///
+  /// In ko, this message translates to:
+  /// **'주공 ×2, 프렌드 ×1, 야당 ×(-1)'**
+  String get scoreMultipliers;
+
+  /// No description provided for @multiplierRun.
+  ///
+  /// In ko, this message translates to:
+  /// **'런 ×2'**
+  String get multiplierRun;
+
+  /// No description provided for @multiplierNoGiruda.
+  ///
+  /// In ko, this message translates to:
+  /// **'노기루다 ×2'**
+  String get multiplierNoGiruda;
+
+  /// No description provided for @multiplierNoFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'노프렌드 ×2'**
+  String get multiplierNoFriend;
+
+  /// No description provided for @multiplierBackRun.
+  ///
+  /// In ko, this message translates to:
+  /// **'백런 ×2'**
+  String get multiplierBackRun;
+
+  /// No description provided for @multiplierLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'배수'**
+  String get multiplierLabel;
 }
 
 class _AppLocalizationsDelegate

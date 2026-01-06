@@ -30,6 +30,24 @@ class _GameScreenState extends State<GameScreen> {
   bool _statsRecorded = false;
   bool _bidInitialized = false;
 
+  /// 플레이어 ID에 따라 로컬라이즈된 이름 반환
+  String _getLocalizedPlayerName(Player player, AppLocalizations l10n) {
+    switch (player.id) {
+      case 0:
+        return l10n.player;
+      case 1:
+        return l10n.aiPlayer1;
+      case 2:
+        return l10n.aiPlayer2;
+      case 3:
+        return l10n.aiPlayer3;
+      case 4:
+        return l10n.aiPlayer4;
+      default:
+        return player.name;
+    }
+  }
+
   @override
   void dispose() {
     _trickTimer?.cancel();
@@ -324,7 +342,7 @@ class _GameScreenState extends State<GameScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            player.name,
+            _getLocalizedPlayerName(player, l10n),
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -397,7 +415,7 @@ class _GameScreenState extends State<GameScreen> {
           Text(
             isHumanTurn
                 ? l10n.currentBidder(l10n.you)
-                : l10n.currentBidder(state.players[state.currentBidder].name),
+                : l10n.currentBidder(_getLocalizedPlayerName(state.players[state.currentBidder], l10n)),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
@@ -1020,7 +1038,7 @@ class _GameScreenState extends State<GameScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            controller.state.players[trick.playerOrder[i]].name,
+                            _getLocalizedPlayerName(controller.state.players[trick.playerOrder[i]], l10n),
                             style: TextStyle(
                               color: trick.playerOrder[i] == trick.winnerId
                                   ? Colors.amber
@@ -1057,7 +1075,7 @@ class _GameScreenState extends State<GameScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    l10n.winnerAnnouncement(winner.name, isDeclarerTeam ? l10n.attackTeam : l10n.defenseTeam),
+                    l10n.winnerAnnouncement(_getLocalizedPlayerName(winner, l10n), isDeclarerTeam ? l10n.attackTeam : l10n.defenseTeam),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -1165,7 +1183,7 @@ class _GameScreenState extends State<GameScreen> {
 
     if (state.friendRevealed && state.friend != null) {
       // 프렌드가 공개됨
-      friendValue = state.friend!.name;
+      friendValue = _getLocalizedPlayerName(state.friend!, l10n);
       valueColor = Colors.lightBlueAccent;
     } else if (state.friendDeclaration != null) {
       // 프렌드 선언 조건 표시
@@ -1321,7 +1339,7 @@ class _GameScreenState extends State<GameScreen> {
                   Text(
                     controller.isHumanTurn
                         ? l10n.yourTurn
-                        : l10n.playerTurn(state.players[state.currentPlayer].name),
+                        : l10n.playerTurn(_getLocalizedPlayerName(state.players[state.currentPlayer], l10n)),
                     style: TextStyle(
                       color: controller.isHumanTurn ? Colors.black : Colors.white,
                       fontWeight: FontWeight.bold,
@@ -1399,7 +1417,7 @@ class _GameScreenState extends State<GameScreen> {
               child: Column(
                 children: [
                   Text(
-                    player.name,
+                    _getLocalizedPlayerName(player, l10n),
                     style: TextStyle(
                       color: isCurrentPlayer ? Colors.amber : Colors.white,
                       fontWeight: isCurrentPlayer ? FontWeight.bold : FontWeight.normal,
@@ -1626,7 +1644,7 @@ class _GameScreenState extends State<GameScreen> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        '${winner.name} ${l10n.winShort}',
+                        '${_getLocalizedPlayerName(winner, l10n)} ${l10n.winShort}',
                         style: const TextStyle(
                           color: Colors.black,
                           fontSize: 10,
@@ -1646,7 +1664,7 @@ class _GameScreenState extends State<GameScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          state.players[lastTrick.playerOrder[i]].name,
+                          _getLocalizedPlayerName(state.players[lastTrick.playerOrder[i]], l10n),
                           style: TextStyle(
                             color: lastTrick.playerOrder[i] == lastTrick.winnerId
                                 ? Colors.amber
@@ -1784,7 +1802,7 @@ class _GameScreenState extends State<GameScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      state.players[trick.playerOrder[i]].name,
+                      _getLocalizedPlayerName(state.players[trick.playerOrder[i]], l10n),
                       style: const TextStyle(color: Colors.white70, fontSize: 10),
                     ),
                     CardWidget(
@@ -2202,6 +2220,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildBaseScoreExplanation(GameState state) {
+    final l10n = AppLocalizations.of(context)!;
     final targetTricks = state.currentBid?.tricks ?? 13;
     const int minContract = 13;
     final isNoFriend = state.friendDeclaration?.isNoFriend ?? false;
@@ -2221,30 +2240,30 @@ class _GameScreenState extends State<GameScreen> {
       final part1 = state.declarerTeamPoints - targetTricks;
       final part2 = (state.declarerTeamPoints - minContract) * 2;
       baseScore = part1 + part2;
-      formula = '(득점-공약) + (득점-최소)×2';
+      formula = l10n.scoreFormula;
       calculation = '(${state.declarerTeamPoints}-$targetTricks) + (${state.declarerTeamPoints}-$minContract)×2 = $part1 + $part2 = $baseScore';
 
       if (isRun) {
         specialMultiplier *= 2;
-        multipliers.add('런 ×2');
+        multipliers.add(l10n.multiplierRun);
       }
       if (isNoGiruda) {
         specialMultiplier *= 2;
-        multipliers.add('노기루다 ×2');
+        multipliers.add(l10n.multiplierNoGiruda);
       }
       if (isNoFriend) {
         specialMultiplier *= 2;
-        multipliers.add('노프렌드 ×2');
+        multipliers.add(l10n.multiplierNoFriend);
       }
     } else {
       // 패배: -(공약 - 득점)
       baseScore = -(targetTricks - state.declarerTeamPoints);
-      formula = '-(공약 - 득점)';
+      formula = l10n.scoreFormulaLose;
       calculation = '-($targetTricks - ${state.declarerTeamPoints}) = $baseScore';
 
       if (isBackRun) {
         specialMultiplier *= 2;
-        multipliers.add('백런 ×2');
+        multipliers.add(l10n.multiplierBackRun);
       }
     }
 
@@ -2261,7 +2280,7 @@ class _GameScreenState extends State<GameScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            declarerWon ? '점수 계산 (승리)' : '점수 계산 (패배)',
+            declarerWon ? l10n.scoreCalcWin : l10n.scoreCalcLose,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -2280,7 +2299,7 @@ class _GameScreenState extends State<GameScreen> {
           if (multipliers.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
-              '배수: ${multipliers.join(', ')}',
+              '${l10n.multiplierLabel}: ${multipliers.join(', ')}',
               style: TextStyle(fontSize: 12, color: Colors.blue[700]),
             ),
             Text(
@@ -2299,7 +2318,7 @@ class _GameScreenState extends State<GameScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '주공 ×2, 프렌드 ×1, 야당 ×(-1)',
+            l10n.scoreMultipliers,
             style: TextStyle(fontSize: 11, color: Colors.grey[600]),
           ),
         ],
@@ -2391,7 +2410,7 @@ class _GameScreenState extends State<GameScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${player.name} ${player.isDeclarer ? "(${l10n.declarer})" : player.isFriend ? "(${l10n.friend})" : ""}',
+                      '${_getLocalizedPlayerName(player, l10n)} ${player.isDeclarer ? "(${l10n.declarer})" : player.isFriend ? "(${l10n.friend})" : ""}',
                     ),
                     Text(
                       l10n.points(state.getPlayerScore(player.id)),

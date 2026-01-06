@@ -148,5 +148,19 @@
   "dealMissTitle": "Declare Deal Miss",
   "dealMissConfirm": "Declare deal miss?\nYour hand will be revealed and a new game will start.",
   "dealMissAnnouncement": "{name} declared Deal Miss!",
-  "dealMissNewGame": "Restarting game due to deal miss."
+  "dealMissNewGame": "Restarting game due to deal miss.",
+  "aiPlayer1": "Alex",
+  "aiPlayer2": "Emma",
+  "aiPlayer3": "James",
+  "aiPlayer4": "Sophia",
+  "scoreCalcWin": "Score Calculation (Win)",
+  "scoreCalcLose": "Score Calculation (Lose)",
+  "scoreFormula": "(Points-Contract) + (Points-Min)×2",
+  "scoreFormulaLose": "-(Contract - Points)",
+  "scoreMultipliers": "Declarer ×2, Friend ×1, Defense ×(-1)",
+  "multiplierRun": "Run ×2",
+  "multiplierNoGiruda": "No Trump ×2",
+  "multiplierNoFriend": "No Friend ×2",
+  "multiplierBackRun": "Back Run ×2",
+  "multiplierLabel": "Multiplier"
 }

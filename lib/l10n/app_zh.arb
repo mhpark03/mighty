@@ -147,5 +147,19 @@
   "dealMissTitle": "宣布发牌失误",
   "dealMissConfirm": "宣布发牌失误?\n将公开手牌并重新开始。",
   "dealMissAnnouncement": "{name} 宣布发牌失误!",
-  "dealMissNewGame": "因发牌失误重新开始游戏。"
+  "dealMissNewGame": "因发牌失误重新开始游戏。",
+  "aiPlayer1": "小明",
+  "aiPlayer2": "小红",
+  "aiPlayer3": "小刚",
+  "aiPlayer4": "小美",
+  "scoreCalcWin": "分数计算 (胜利)",
+  "scoreCalcLose": "分数计算 (失败)",
+  "scoreFormula": "(得分-契约) + (得分-最小)×2",
+  "scoreFormulaLose": "-(契约 - 得分)",
+  "scoreMultipliers": "庄家 ×2, 朋友 ×1, 防守 ×(-1)",
+  "multiplierRun": "满贯 ×2",
+  "multiplierNoGiruda": "无将 ×2",
+  "multiplierNoFriend": "无朋友 ×2",
+  "multiplierBackRun": "反满贯 ×2",
+  "multiplierLabel": "倍数"
 }

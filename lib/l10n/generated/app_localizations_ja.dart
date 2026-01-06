@@ -493,4 +493,46 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get dealMissNewGame => 'ディールミスでゲームを再開します。';
+
+  @override
+  String get aiPlayer1 => '太郎';
+
+  @override
+  String get aiPlayer2 => '花子';
+
+  @override
+  String get aiPlayer3 => '健太';
+
+  @override
+  String get aiPlayer4 => '美咲';
+
+  @override
+  String get scoreCalcWin => 'スコア計算 (勝利)';
+
+  @override
+  String get scoreCalcLose => 'スコア計算 (敗北)';
+
+  @override
+  String get scoreFormula => '(得点-契約) + (得点-最小)×2';
+
+  @override
+  String get scoreFormulaLose => '-(契約 - 得点)';
+
+  @override
+  String get scoreMultipliers => '宣言者 ×2, フレンド ×1, 守備 ×(-1)';
+
+  @override
+  String get multiplierRun => 'ラン ×2';
+
+  @override
+  String get multiplierNoGiruda => 'ノートランプ ×2';
+
+  @override
+  String get multiplierNoFriend => 'ノーフレンド ×2';
+
+  @override
+  String get multiplierBackRun => 'バックラン ×2';
+
+  @override
+  String get multiplierLabel => '倍率';
 }
