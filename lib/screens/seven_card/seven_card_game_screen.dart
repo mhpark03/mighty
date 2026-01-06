@@ -1266,16 +1266,40 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
             ],
           ),
           const SizedBox(height: 6),
-          // 카드 표시 (best 5 하이라이트)
-          Wrap(
-            spacing: 3,
-            runSpacing: 3,
-            children: player.hand.map((card) {
-              final isInBestFive = player.pokerHand?.bestFive.any(
-                (c) => c.suit == card.suit && c.rank == card.rank
-              ) ?? false;
-              return _buildResultCard(card, isInBestFive);
-            }).toList(),
+          // 카드 표시 (best 5 먼저, 나머지는 흐리게)
+          Builder(
+            builder: (context) {
+              final bestFive = player.pokerHand?.bestFive ?? [];
+              // Best 5 카드와 나머지 분리
+              final inBestFive = <PlayingCard>[];
+              final notInBestFive = <PlayingCard>[];
+              for (final card in player.hand) {
+                final isInBest = bestFive.any(
+                  (c) => c.suit == card.suit && c.rank == card.rank
+                );
+                if (isInBest) {
+                  inBestFive.add(card);
+                } else {
+                  notInBestFive.add(card);
+                }
+              }
+              // Best 5를 bestFive 순서대로 정렬
+              inBestFive.sort((a, b) {
+                final aIndex = bestFive.indexWhere((c) => c.suit == a.suit && c.rank == a.rank);
+                final bIndex = bestFive.indexWhere((c) => c.suit == b.suit && c.rank == b.rank);
+                return aIndex.compareTo(bIndex);
+              });
+              return Wrap(
+                spacing: 3,
+                runSpacing: 3,
+                children: [
+                  // Best 5 카드 (하이라이트)
+                  ...inBestFive.map((card) => _buildResultCard(card, true, false)),
+                  // 나머지 카드 (흐리게)
+                  ...notInBestFive.map((card) => _buildResultCard(card, false, true)),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -1318,23 +1342,26 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
     );
   }
 
-  Widget _buildResultCard(PlayingCard card, bool isHighlighted) {
+  Widget _buildResultCard(PlayingCard card, bool isHighlighted, [bool isDimmed = false]) {
     if (card.isJoker) {
-      return Container(
-        width: 36,
-        height: 50,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(
-            color: isHighlighted ? Colors.amber : Colors.purple,
-            width: isHighlighted ? 2 : 1,
+      return Opacity(
+        opacity: isDimmed ? 0.4 : 1.0,
+        child: Container(
+          width: 36,
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(
+              color: isHighlighted ? Colors.amber : Colors.purple,
+              width: isHighlighted ? 2 : 1,
+            ),
           ),
-        ),
-        child: const Center(
-          child: Text(
-            'JK',
-            style: TextStyle(color: Colors.purple, fontSize: 10, fontWeight: FontWeight.bold),
+          child: const Center(
+            child: Text(
+              'JK',
+              style: TextStyle(color: Colors.purple, fontSize: 10, fontWeight: FontWeight.bold),
+            ),
           ),
         ),
       );
@@ -1344,29 +1371,32 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
     final suitSymbol = _getSuitSymbol(card.suit);
     final rankStr = _getRankString(card.rank);
 
-    return Container(
-      width: 36,
-      height: 50,
-      decoration: BoxDecoration(
-        color: isHighlighted ? Colors.amber[50] : Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: isHighlighted ? Colors.amber : Colors.grey,
-          width: isHighlighted ? 2 : 1,
+    return Opacity(
+      opacity: isDimmed ? 0.4 : 1.0,
+      child: Container(
+        width: 36,
+        height: 50,
+        decoration: BoxDecoration(
+          color: isHighlighted ? Colors.amber[50] : Colors.white,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: isHighlighted ? Colors.amber : Colors.grey,
+            width: isHighlighted ? 2 : 1,
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            rankStr,
-            style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            suitSymbol,
-            style: TextStyle(color: color, fontSize: 12),
-          ),
-        ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              rankStr,
+              style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              suitSymbol,
+              style: TextStyle(color: color, fontSize: 12),
+            ),
+          ],
+        ),
       ),
     );
   }
