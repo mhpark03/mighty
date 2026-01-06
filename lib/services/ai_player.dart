@@ -1601,7 +1601,7 @@ class AIPlayer {
 
     // === 팀 구분 ===
     bool isDefenseTeam = _isPlayerOnDefenseTeam(player, state);
-    bool defenseWinning = _isDefenseTeamWinning(state, currentWinnerId);
+    bool defenseWinning = _isDefenseTeamWinning(state, currentWinnerId, player);
     bool isAttackTeam = !isDefenseTeam;
 
     // === 같은 팀이 이기고 있을 때 낮은 카드 버리기 ===
@@ -2698,7 +2698,8 @@ class AIPlayer {
   }
 
   // 수비팀이 현재 트릭에서 이기고 있는지 확인
-  bool _isDefenseTeamWinning(GameState state, int? currentWinnerId) {
+  // player: 현재 판단하는 플레이어 (자신이 프렌드인지 알 수 있음)
+  bool _isDefenseTeamWinning(GameState state, int? currentWinnerId, Player player) {
     if (currentWinnerId == null) return false;
 
     final winner = state.players[currentWinnerId];
@@ -2710,9 +2711,42 @@ class AIPlayer {
     if (state.friendRevealed && winner.isFriend) return false;
 
     // 프렌드가 아직 공개되지 않은 경우
-    // 이기고 있는 사람이 프렌드 카드를 가지고 있을 수 있으므로 보수적으로 판단
-    // -> 프렌드가 공개된 경우에만 수비팀 승리로 판단
-    if (!state.friendRevealed) return false;
+    if (!state.friendRevealed) {
+      // 현재 플레이어가 프렌드 카드를 가지고 있으면 자신이 프렌드임을 알고 있음
+      // 이 경우 이기고 있는 사람이 자신이 아니면 수비팀이 이기는 것
+      if (state.friendDeclaration?.card != null) {
+        final friendCard = state.friendDeclaration!.card!;
+        bool iAmFriend;
+        if (friendCard.isJoker) {
+          iAmFriend = player.hand.any((c) => c.isJoker);
+        } else {
+          iAmFriend = player.hand.any((c) =>
+              c.suit == friendCard.suit && c.rank == friendCard.rank);
+        }
+
+        if (iAmFriend) {
+          // 내가 프렌드인데, 이기고 있는 사람이 나도 아니고 주공도 아니면 수비팀이 이기는 것
+          if (winner.id != player.id) {
+            return true;
+          }
+          return false; // 내가 이기고 있으므로 공격팀이 이기는 것
+        }
+      }
+
+      // 내가 프렌드가 아니면 보수적으로 판단
+      // 주공인 경우: 이기고 있는 사람이 프렌드일 수 있으므로 false
+      if (player.isDeclarer) {
+        return false;
+      }
+
+      // 수비팀인 경우: 이기고 있는 사람이 주공이 아니고 자신도 아니면
+      // 프렌드일 가능성과 수비팀일 가능성이 있음 -> 보수적으로 true로 판단
+      // (수비팀끼리 협력해야 하므로)
+      if (winner.id != player.id) {
+        return true;
+      }
+      return false;
+    }
 
     // 수비팀이 이기고 있음
     return true;
