@@ -719,9 +719,16 @@ class HiLoState {
     }
   }
 
+  /// 쇼다운에서 게임 종료로 이동
+  void proceedToGameEnd() {
+    if (phase == HiLoPhase.showdown) {
+      phase = HiLoPhase.gameEnd;
+    }
+  }
+
   /// 승자 결정 (하이/로우 분리)
   void _determineWinners() {
-    phase = HiLoPhase.gameEnd;
+    // showdown 상태 유지 (proceedToGameEnd로 gameEnd로 전환)
 
     final activePlayers = players.where((p) => p.isActive).toList();
 

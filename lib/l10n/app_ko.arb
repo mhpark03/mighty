@@ -290,5 +290,8 @@
   "waitingForHiLo": "선택 대기 중...",
   "selectedHi": "하이 선택",
   "selectedLo": "로우 선택",
-  "selectedSwing": "스윙 선택"
+  "selectedSwing": "스윙 선택",
+  "showdownTitle": "선언 현황",
+  "showdownDesc": "각 플레이어의 선택을 확인하세요",
+  "viewResults": "결과 보기"
 }

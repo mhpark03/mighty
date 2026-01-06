@@ -1295,6 +1295,24 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'스윙 선택'**
   String get selectedSwing;
+
+  /// No description provided for @showdownTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'선언 현황'**
+  String get showdownTitle;
+
+  /// No description provided for @showdownDesc.
+  ///
+  /// In ko, this message translates to:
+  /// **'각 플레이어의 선택을 확인하세요'**
+  String get showdownDesc;
+
+  /// No description provided for @viewResults.
+  ///
+  /// In ko, this message translates to:
+  /// **'결과 보기'**
+  String get viewResults;
 }
 
 class _AppLocalizationsDelegate

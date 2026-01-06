@@ -647,4 +647,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get selectedSwing => 'スイング選択';
+
+  @override
+  String get showdownTitle => '宣言状況';
+
+  @override
+  String get showdownDesc => '各プレイヤーの選択を確認してください';
+
+  @override
+  String get viewResults => '結果を見る';
 }

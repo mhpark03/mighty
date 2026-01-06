@@ -254,6 +254,12 @@ class HiLoController extends ChangeNotifier {
     _processAIHiLoSelectionIfNeeded();
   }
 
+  /// 쇼다운에서 결과 화면으로 이동
+  void proceedToGameEnd() {
+    _state.proceedToGameEnd();
+    notifyListeners();
+  }
+
   void _handlePostAction(HiLoPhase prevPhase) {
     if (_state.phase != prevPhase) {
       _checkPhaseTransition();

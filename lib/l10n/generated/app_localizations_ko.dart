@@ -647,4 +647,13 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get selectedSwing => '스윙 선택';
+
+  @override
+  String get showdownTitle => '선언 현황';
+
+  @override
+  String get showdownDesc => '각 플레이어의 선택을 확인하세요';
+
+  @override
+  String get viewResults => '결과 보기';
 }

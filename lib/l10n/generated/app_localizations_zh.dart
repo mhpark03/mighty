@@ -644,4 +644,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get selectedSwing => '已选双向';
+
+  @override
+  String get showdownTitle => '声明状况';
+
+  @override
+  String get showdownDesc => '确认各玩家的选择';
+
+  @override
+  String get viewResults => '查看结果';
 }

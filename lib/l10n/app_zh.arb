@@ -198,5 +198,8 @@
   "waitingForHiLo": "等待选择...",
   "selectedHi": "已选高",
   "selectedLo": "已选低",
-  "selectedSwing": "已选双向"
+  "selectedSwing": "已选双向",
+  "showdownTitle": "声明状况",
+  "showdownDesc": "确认各玩家的选择",
+  "viewResults": "查看结果"
 }

@@ -649,4 +649,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectedSwing => 'Selected Swing';
+
+  @override
+  String get showdownTitle => 'Declaration Status';
+
+  @override
+  String get showdownDesc => 'Check each player\'s choice';
+
+  @override
+  String get viewResults => 'View Results';
 }

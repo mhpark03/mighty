@@ -199,5 +199,8 @@
   "waitingForHiLo": "Waiting for selection...",
   "selectedHi": "Selected Hi",
   "selectedLo": "Selected Lo",
-  "selectedSwing": "Selected Swing"
+  "selectedSwing": "Selected Swing",
+  "showdownTitle": "Declaration Status",
+  "showdownDesc": "Check each player's choice",
+  "viewResults": "View Results"
 }

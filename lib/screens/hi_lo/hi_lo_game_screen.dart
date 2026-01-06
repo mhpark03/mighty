@@ -95,6 +95,8 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
       return _buildSelectOpenScreen(controller, state, l10n);
     } else if (state.phase == HiLoPhase.selectHiLo) {
       return _buildSelectHiLoScreen(controller, state, l10n);
+    } else if (state.phase == HiLoPhase.showdown) {
+      return _buildShowdownScreen(controller, state, l10n);
     } else if (state.phase == HiLoPhase.gameEnd) {
       return _buildGameEndScreen(controller, state, l10n);
     } else {
@@ -298,6 +300,219 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
         _buildOtherPlayersHiLoStatus(state, l10n),
         const Spacer(),
       ],
+    );
+  }
+
+  /// 쇼다운 화면 - 모든 플레이어의 선택 표시
+  Widget _buildShowdownScreen(HiLoController controller, HiLoState state, AppLocalizations l10n) {
+    final activePlayers = state.players.where((p) => p.isActive).toList();
+
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          color: Colors.black26,
+          child: Column(
+            children: [
+              const Icon(Icons.visibility, color: Colors.amber, size: 40),
+              const SizedBox(height: 8),
+              Text(
+                l10n.showdownTitle,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                l10n.showdownDesc,
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        // 모든 플레이어 선택 현황
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: activePlayers.map((player) {
+                return _buildShowdownPlayerCard(player, controller, l10n);
+              }).toList(),
+            ),
+          ),
+        ),
+        // 결과 보기 버튼
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => controller.proceedToGameEnd(),
+              icon: const Icon(Icons.emoji_events, size: 20),
+              label: Text(l10n.viewResults),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 쇼다운 플레이어 카드
+  Widget _buildShowdownPlayerCard(HiLoPlayer player, HiLoController controller, AppLocalizations l10n) {
+    final isHuman = player.id == 0;
+    final choice = player.hiLoChoice;
+    final hiHand = player.pokerHand;
+    final loHand = player.lowHand;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isHuman ? Colors.amber.withValues(alpha: 0.2) : Colors.black26,
+        borderRadius: BorderRadius.circular(12),
+        border: isHuman ? Border.all(color: Colors.amber, width: 2) : null,
+      ),
+      child: Column(
+        children: [
+          // 이름과 선택
+          Row(
+            children: [
+              if (isHuman)
+                const Icon(Icons.person, color: Colors.amber, size: 18),
+              if (isHuman) const SizedBox(width: 4),
+              Text(
+                player.name,
+                style: TextStyle(
+                  color: isHuman ? Colors.amber : Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              // 선택 배지
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: _getHiLoChoiceColor(choice),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      choice == HiLoChoice.hi ? Icons.arrow_upward :
+                      choice == HiLoChoice.lo ? Icons.arrow_downward :
+                      Icons.swap_vert,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _getHiLoChoiceText(choice, l10n),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // 카드 표시
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: player.hand.map((card) => _buildShowdownCard(card)).toList(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // 족보 정보
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // 하이 족보 (하이 또는 스윙 선택한 경우)
+              if (choice == HiLoChoice.hi || choice == HiLoChoice.swing)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text('Hi', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 11)),
+                      Text(
+                        hiHand != null ? controller.getHandRankDisplayName(hiHand) : '-',
+                        style: const TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                    ],
+                  ),
+                ),
+              // 로우 족보 (로우 또는 스윙 선택한 경우)
+              if (choice == HiLoChoice.lo || choice == HiLoChoice.swing)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text('Lo', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 11)),
+                      Text(
+                        loHand != null && loHand.isQualified ? controller.getLowHandDisplayName(loHand) : l10n.noLowHand,
+                        style: const TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 쇼다운 카드 위젯
+  Widget _buildShowdownCard(PlayingCard card) {
+    final color = (card.suit == Suit.heart || card.suit == Suit.diamond) ? Colors.red : Colors.black;
+    final suitSymbol = _getSuitSymbol(card.suit);
+    final rankStr = _getRankString(card.rank);
+
+    return Container(
+      width: 34,
+      height: 48,
+      margin: const EdgeInsets.symmetric(horizontal: 1),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: Colors.grey),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(rankStr, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
+          Text(suitSymbol, style: TextStyle(color: color, fontSize: 8)),
+        ],
+      ),
     );
   }
 
