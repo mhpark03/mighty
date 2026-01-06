@@ -275,7 +275,7 @@ class SevenCardController extends ChangeNotifier {
     _isProcessing = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(seconds: 1));
 
     // 다시 한번 체크 (전환 중에 호출되었을 수 있음)
     if (_isRoundTransitioning || !_isBettingPhase()) {
