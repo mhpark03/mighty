@@ -987,51 +987,124 @@ class _GameScreenState extends State<GameScreen> {
         // 트릭 완료 시 오버레이 (사용자가 선공이 아닐 때만)
         if (controller.waitingForTrickConfirm)
           _buildTrickConfirmOverlay(controller),
-        // 게임 종료 후 결과 보기 버튼
+        // 게임 종료 후 팀별 점수 및 버튼 표시
         if (state.phase == GamePhase.gameEnd && !_showGameResult)
           Positioned(
-            bottom: 200,
+            bottom: 180,
             left: 0,
             right: 0,
             child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _showGameResult = true;
-                      });
-                    },
-                    icon: const Icon(Icons.emoji_events, color: Colors.black),
-                    label: Text(
-                      l10n.score,
-                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                  // 팀별 점수 표시
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 주공팀 점수
+                        Column(
+                          children: [
+                            Text(
+                              l10n.declarerTeam,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              state.declarerTeamPoints == 20
+                                  ? l10n.fullPoints
+                                  : '${state.declarerTeamPoints}${l10n.points(0).replaceAll('0', '').trim()}',
+                              style: TextStyle(
+                                color: state.declarerWon ? Colors.greenAccent : Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'vs',
+                          style: TextStyle(
+                            color: Colors.white54,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // 수비팀 점수
+                        Column(
+                          children: [
+                            Text(
+                              l10n.defenderTeam,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              state.defenderTeamPoints == 20
+                                  ? l10n.fullPoints
+                                  : '${state.defenderTeamPoints}${l10n.points(0).replaceAll('0', '').trim()}',
+                              style: TextStyle(
+                                color: !state.declarerWon ? Colors.redAccent : Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _statsRecorded = false;
-                        _showGameResult = true;
-                      });
-                      controller.reset();
-                      controller.startNewGame();
-                    },
-                    icon: const Icon(Icons.refresh, color: Colors.black),
-                    label: Text(
-                      l10n.newGame,
-                      style: const TextStyle(fontSize: 16, color: Colors.black),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[400],
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    ),
+                  const SizedBox(height: 12),
+                  // 버튼들
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _showGameResult = true;
+                          });
+                        },
+                        icon: const Icon(Icons.emoji_events, color: Colors.black),
+                        label: Text(
+                          l10n.score,
+                          style: const TextStyle(fontSize: 16, color: Colors.black),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.amber,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _statsRecorded = false;
+                            _showGameResult = true;
+                          });
+                          controller.reset();
+                          controller.startNewGame();
+                        },
+                        icon: const Icon(Icons.refresh, color: Colors.black),
+                        label: Text(
+                          l10n.newGame,
+                          style: const TextStyle(fontSize: 16, color: Colors.black),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[400],
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
