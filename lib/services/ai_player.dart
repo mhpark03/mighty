@@ -2496,6 +2496,20 @@ class AIPlayer {
         }
       }
 
+      // 상대팀이 이기고 있으면 점수 카드를 피하고 낮은 카드 버리기
+      bool opponentWinning = (isDefenseTeam && !defenseWinning) || (isAttackTeam && defenseWinning);
+      if (opponentWinning) {
+        // 점수 카드가 아닌 카드 중 가장 낮은 카드
+        final nonPointSuitCards = suitCards.where((c) => !c.isPointCard).toList();
+        if (nonPointSuitCards.isNotEmpty) {
+          nonPointSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return nonPointSuitCards.first;
+        }
+        // 점수 카드만 있으면 가장 낮은 점수 카드 (어쩔 수 없음)
+        suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        return suitCards.first;
+      }
+
       return suitCards.last;
     }
 
