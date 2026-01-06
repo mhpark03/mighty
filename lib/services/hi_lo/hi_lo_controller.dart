@@ -405,7 +405,7 @@ class HiLoController extends ChangeNotifier {
     return HiLoChoice.hi;
   }
 
-  /// AI 베팅 액션 결정 (하이로우 게임 - 로우 잠재력 고려)
+  /// AI 베팅 액션 결정 (하이로우 게임 - 상대 로우 잠재력 고려)
   _AIAction _decideAIAction(HiLoPlayer player) {
     final random = Random();
     final hand = player.pokerHand;
@@ -418,45 +418,74 @@ class HiLoController extends ChangeNotifier {
     final lowPotential = _evaluateLowPotential(player);
     final hasStrongLowDraw = lowPotential >= 0.5;
 
-    // 완성된 로우 핸드 강도 평가 (6탑=1.0, 7탑=0.95, 8탑=0.85, 9탑=0.75)
+    // 완성된 로우 핸드 강도 평가 (확률 기반)
     final lowHandStrength = _evaluateCompletedLowStrength(player);
     final hasCompletedLow = lowHandStrength > 0;
 
+    // 상대 로우 잠재력 평가 (오픈 카드 기반)
+    final opponentLowPotential = _evaluateOpponentLowPotential();
+    final relativeLowStrength = _evaluateRelativeLowStrength(player);
+
     // 하이로우: 하이 또는 로우 중 더 강한 것 기준으로 베팅
-    // 6탑 로우는 로얄 스트레이트와 동급으로 취급
     final effectiveStrength = hasCompletedLow
         ? (handStrength > lowHandStrength ? handStrength : lowHandStrength)
         : handStrength;
 
     // 보스인 경우
     if (_state.isCurrentPlayerBoss) {
-      // 6탑 로우: 포카드급 (0.93) - 공격적
-      if (lowHandStrength >= 0.92) {
-        if (random.nextDouble() < 0.4) {
-          return _AIAction('full', 0);
+      // 로우 핸드 베팅: 상대 로우 잠재력 고려
+      if (hasCompletedLow) {
+        // 상대가 강한 로우 잠재력을 보이면 베팅 축소
+        final lowBetModifier = opponentLowPotential >= 0.7 ? 0.5 :
+                               opponentLowPotential >= 0.5 ? 0.7 : 1.0;
+
+        // 6탑 로우: 포카드급 (0.93)
+        if (lowHandStrength >= 0.92) {
+          if (relativeLowStrength > 0.3) {
+            // 상대보다 명확히 우위
+            if (random.nextDouble() < 0.4 * lowBetModifier) {
+              return _AIAction('full', 0);
+            }
+            return _AIAction('half', 0);
+          } else {
+            // 상대와 비슷하거나 불확실
+            if (random.nextDouble() < 0.3) {
+              return _AIAction('quarter', 0);
+            }
+            return _AIAction('bing', 0);
+          }
         }
-        return _AIAction('half', 0);
-      }
-      // 7탑 로우: 포카드~풀하우스급 (0.88)
-      if (lowHandStrength >= 0.87) {
-        if (random.nextDouble() < 0.35) {
-          return _AIAction('half', 0);
+        // 7탑 로우: 포카드~풀하우스급 (0.88)
+        if (lowHandStrength >= 0.87) {
+          if (relativeLowStrength > 0.2) {
+            if (random.nextDouble() < 0.35 * lowBetModifier) {
+              return _AIAction('half', 0);
+            }
+            return _AIAction('quarter', 0);
+          } else {
+            return _AIAction('bing', 0);
+          }
         }
-        return _AIAction('quarter', 0);
-      }
-      // 8탑 로우: 풀하우스급 (0.85)
-      if (lowHandStrength >= 0.84) {
-        if (random.nextDouble() < 0.4) {
-          return _AIAction('quarter', 0);
+        // 8탑 로우: 풀하우스급 (0.85)
+        if (lowHandStrength >= 0.84) {
+          if (relativeLowStrength > 0.1) {
+            if (random.nextDouble() < 0.4 * lowBetModifier) {
+              return _AIAction('quarter', 0);
+            }
+            return _AIAction('bing', 0);
+          } else {
+            return _AIAction('call', 0);
+          }
         }
-        return _AIAction('bing', 0);
-      }
-      // 9탑 로우: 플러시~스트레이트급 (0.72)
-      if (lowHandStrength >= 0.70) {
-        if (random.nextDouble() < 0.5) {
-          return _AIAction('bing', 0);
+        // 9탑 로우: 플러시~스트레이트급 (0.72)
+        if (lowHandStrength >= 0.70) {
+          if (relativeLowStrength > 0) {
+            if (random.nextDouble() < 0.5 * lowBetModifier) {
+              return _AIAction('bing', 0);
+            }
+          }
+          return _AIAction('call', 0);
         }
-        return _AIAction('call', 0);
       }
 
       if (effectiveStrength > 0.85 && random.nextDouble() < 0.3) {
@@ -479,33 +508,42 @@ class HiLoController extends ChangeNotifier {
     final callAmount = _state.getCallAmount();
 
     // 비보스이면서 강한 로우 핸드가 있으면 공격적으로 레이즈
+    // 단, 상대 로우 잠재력 고려
     if (!_state.isCurrentPlayerBoss && hasCompletedLow) {
-      // 6탑 로우: 포카드급 (0.93) - 공격적
-      if (lowHandStrength >= 0.92) {
-        if (random.nextDouble() < 0.4) {
+      // 상대가 강한 로우 잠재력을 보이면 레이즈 확률 축소
+      final raiseModifier = opponentLowPotential >= 0.7 ? 0.4 :
+                            opponentLowPotential >= 0.5 ? 0.6 : 1.0;
+
+      // 6탑 로우: 포카드급 (0.93)
+      if (lowHandStrength >= 0.92 && relativeLowStrength > 0.2) {
+        if (random.nextDouble() < 0.4 * raiseModifier) {
           return _selectRaiseAction(lowHandStrength, availableActions, random);
         }
         return _AIAction('call', 0);
       }
       // 7탑 로우: 포카드~풀하우스급 (0.88)
-      if (lowHandStrength >= 0.87) {
-        if (random.nextDouble() < 0.35) {
+      if (lowHandStrength >= 0.87 && relativeLowStrength > 0.1) {
+        if (random.nextDouble() < 0.35 * raiseModifier) {
           return _selectRaiseAction(lowHandStrength, availableActions, random);
         }
         return _AIAction('call', 0);
       }
       // 8탑 로우: 풀하우스급 (0.85)
-      if (lowHandStrength >= 0.84) {
-        if (random.nextDouble() < 0.3) {
+      if (lowHandStrength >= 0.84 && relativeLowStrength > 0) {
+        if (random.nextDouble() < 0.3 * raiseModifier) {
           return _selectRaiseAction(lowHandStrength, availableActions, random);
         }
         return _AIAction('call', 0);
       }
-      // 9탑 로우: 플러시~스트레이트급 (0.72)
-      if (lowHandStrength >= 0.70) {
-        if (random.nextDouble() < 0.25) {
+      // 9탑 로우: 플러시~스트레이트급 (0.72) - 상대 로우가 약할 때만
+      if (lowHandStrength >= 0.70 && relativeLowStrength > 0.1) {
+        if (random.nextDouble() < 0.25 * raiseModifier) {
           return _selectRaiseAction(lowHandStrength, availableActions, random);
         }
+        return _AIAction('call', 0);
+      }
+      // 로우 핸드가 있지만 상대가 더 강해 보이면 콜만
+      if (hasCompletedLow && relativeLowStrength <= 0) {
         return _AIAction('call', 0);
       }
     }
@@ -514,13 +552,26 @@ class HiLoController extends ChangeNotifier {
     if (cardsRemaining == 0) {
       final opponentStrength = _evaluateOpponentOpenCards();
 
-      // 하이로우: 로우 핸드가 강하면 계속 진행
+      // 하이로우: 로우 핸드가 강하면 계속 진행 (상대 로우와 비교)
       final currentLowHand = player.lowHand;
       final hasGoodLow = currentLowHand != null && currentLowHand.isQualified;
 
       if (_isLosingToOpponentOpenCards(player, hand)) {
-        // 로우가 좋으면 폴드하지 않음
+        // 하이에서 지고 있지만 로우가 좋으면 상대 로우 잠재력 확인
         if (hasGoodLow) {
+          // 상대 로우가 약하면 콜, 강하면 신중하게
+          if (relativeLowStrength > 0) {
+            return _AIAction('call', 0);
+          } else if (relativeLowStrength > -0.3) {
+            // 로우에서도 약간 밀리지만 가능성 있음
+            if (random.nextDouble() < 0.6) {
+              return _AIAction('call', 0);
+            }
+          }
+          // 로우에서도 크게 밀리면 폴드 고려
+          if (callAmount > 0 && opponentLowPotential >= 0.7) {
+            return _AIAction('die', 0);
+          }
           return _AIAction('call', 0);
         }
         if (callAmount > 0) {
@@ -529,7 +580,7 @@ class HiLoController extends ChangeNotifier {
         return _AIAction('call', 0);
       }
 
-      final relativeStrength = handStrength - opponentStrength;
+      final relativeHiStrength = handStrength - opponentStrength;
 
       if (handStrength >= 0.45) {
         if (opponentStrength < 0.55) {
@@ -546,16 +597,22 @@ class HiLoController extends ChangeNotifier {
         }
       }
 
-      if (relativeStrength > 0 && handStrength >= 0.2) {
+      if (relativeHiStrength > 0 && handStrength >= 0.2) {
         if (random.nextDouble() < 0.8) {
           return _AIAction('call', 0);
         }
       }
 
       if (handStrength < 0.25) {
-        // 로우가 좋으면 계속 진행
-        if (hasGoodLow) {
+        // 로우가 좋고 상대 로우보다 우위면 계속 진행
+        if (hasGoodLow && relativeLowStrength > 0) {
           return _AIAction('call', 0);
+        }
+        // 로우가 있지만 상대 로우가 더 강해 보이면 신중하게
+        if (hasGoodLow && relativeLowStrength > -0.2) {
+          if (random.nextDouble() < 0.5) {
+            return _AIAction('call', 0);
+          }
         }
         if (opponentStrength >= 0.35 && callAmount > 0) {
           return _AIAction('die', 0);
@@ -942,6 +999,88 @@ class HiLoController extends ChangeNotifier {
     }
 
     return maxStrength;
+  }
+
+  /// 상대방 오픈 카드 기반 로우 잠재력 평가
+  /// 가장 위협적인 상대의 로우 강도 반환 (0.0 ~ 1.0)
+  double _evaluateOpponentLowPotential() {
+    double maxLowStrength = 0.0;
+
+    for (final player in _state.players) {
+      if (player.id == _state.currentPlayerIndex || player.isFolded) continue;
+
+      final openCards = player.openCards;
+      if (openCards.isEmpty) continue;
+
+      // 로우 카드 (A=1, 2~8) 분석
+      final lowRanks = <int>{};
+      bool hasPair = false;
+      final rankCounts = <int, int>{};
+
+      for (final card in openCards) {
+        final rankValue = card.rank == Rank.ace ? 1 : card.rankValue;
+        rankCounts[rankValue] = (rankCounts[rankValue] ?? 0) + 1;
+
+        if (rankValue <= 8) {
+          lowRanks.add(rankValue);
+        }
+      }
+
+      // 페어가 있으면 로우 잠재력 감소
+      hasPair = rankCounts.values.any((count) => count >= 2);
+
+      final uniqueLowCount = lowRanks.length;
+      double lowStrength = 0.0;
+
+      // 오픈 카드 수에 따른 로우 잠재력 계산
+      if (uniqueLowCount >= 4) {
+        // 4장 이상의 유니크 로우 카드 = 매우 위협적
+        final sortedLow = lowRanks.toList()..sort();
+        final highCard = sortedLow.length >= 5
+            ? sortedLow[4]
+            : sortedLow.last;
+
+        if (highCard <= 6) {
+          lowStrength = hasPair ? 0.7 : 0.9;  // 6탑 가능
+        } else if (highCard <= 7) {
+          lowStrength = hasPair ? 0.6 : 0.8;  // 7탑 가능
+        } else {
+          lowStrength = hasPair ? 0.5 : 0.7;  // 8탑 가능
+        }
+      } else if (uniqueLowCount >= 3) {
+        // 3장의 유니크 로우 카드 = 잠재력 있음
+        if (lowRanks.contains(1)) {  // A 보유
+          lowStrength = hasPair ? 0.4 : 0.6;
+        } else {
+          lowStrength = hasPair ? 0.3 : 0.5;
+        }
+      } else if (uniqueLowCount >= 2) {
+        // 2장의 유니크 로우 카드 = 약간의 잠재력
+        if (lowRanks.contains(1)) {
+          lowStrength = 0.3;
+        } else {
+          lowStrength = 0.2;
+        }
+      }
+
+      maxLowStrength = max(maxLowStrength, lowStrength);
+    }
+
+    return maxLowStrength;
+  }
+
+  /// 내 로우 핸드가 상대 오픈 카드 기준으로 우위인지 평가
+  /// 반환값: 상대적 우위 (-1.0 ~ 1.0, 양수면 내가 우위)
+  double _evaluateRelativeLowStrength(HiLoPlayer currentPlayer) {
+    final myLowStrength = _evaluateCompletedLowStrength(currentPlayer);
+    if (myLowStrength == 0) return -1.0;  // 로우 없음
+
+    final opponentLowPotential = _evaluateOpponentLowPotential();
+
+    // 상대적 강도 계산
+    // 내 로우가 확정이고 상대는 잠재력만 있으므로 약간의 보너스
+    final myAdjusted = myLowStrength + 0.1;
+    return (myAdjusted - opponentLowPotential).clamp(-1.0, 1.0);
   }
 
   bool _isLosingToOpponentOpenCards(HiLoPlayer currentPlayer, PokerHand? myHand) {
