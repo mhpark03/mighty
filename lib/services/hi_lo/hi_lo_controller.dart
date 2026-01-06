@@ -1001,9 +1001,71 @@ class HiLoController extends ChangeNotifier {
     return maxStrength;
   }
 
+  /// 모든 보이는 카드(내 카드 + 모든 오픈 카드) 수집
+  /// 상대방이 가질 수 없는 "데드 카드" 목록
+  Set<String> _collectDeadCards(HiLoPlayer currentPlayer) {
+    final deadCards = <String>{};
+
+    // 1. 내 모든 카드 (히든 + 오픈)
+    for (final card in currentPlayer.hand) {
+      if (card.suit != null && card.rank != null) {
+        deadCards.add('${card.suit!.name}_${card.rank!.name}');
+      }
+    }
+
+    // 2. 모든 플레이어의 오픈 카드 (다이한 플레이어 포함)
+    for (final player in _state.players) {
+      if (player.id == currentPlayer.id) continue;
+      for (final card in player.openCards) {
+        if (card.suit != null && card.rank != null) {
+          deadCards.add('${card.suit!.name}_${card.rank!.name}');
+        }
+      }
+    }
+
+    return deadCards;
+  }
+
+  /// 특정 랭크의 남은 카드 수 계산 (4장 중 데드 카드 제외)
+  int _countRemainingCards(int rankValue, Set<String> deadCards) {
+    final rankName = _getRankNameFromValue(rankValue);
+    int remaining = 4;  // 각 랭크당 4장 (스페이드, 하트, 다이아, 클럽)
+
+    for (final suitName in ['spade', 'heart', 'diamond', 'club']) {
+      if (deadCards.contains('${suitName}_$rankName')) {
+        remaining--;
+      }
+    }
+
+    return remaining;
+  }
+
+  String _getRankNameFromValue(int value) {
+    switch (value) {
+      case 1: return 'ace';
+      case 2: return 'two';
+      case 3: return 'three';
+      case 4: return 'four';
+      case 5: return 'five';
+      case 6: return 'six';
+      case 7: return 'seven';
+      case 8: return 'eight';
+      case 9: return 'nine';
+      case 10: return 'ten';
+      case 11: return 'jack';
+      case 12: return 'queen';
+      case 13: return 'king';
+      case 14: return 'ace';
+      default: return '';
+    }
+  }
+
   /// 상대방 오픈 카드 기반 로우 잠재력 평가
-  /// 가장 위협적인 상대의 로우 강도 반환 (0.0 ~ 1.0)
+  /// 내 카드 + 모든 오픈 카드(데드 카드)를 고려하여 계산
   double _evaluateOpponentLowPotential() {
+    final currentPlayer = _state.players[_state.currentPlayerIndex];
+    final deadCards = _collectDeadCards(currentPlayer);
+
     double maxLowStrength = 0.0;
 
     for (final player in _state.players) {
@@ -1029,8 +1091,51 @@ class HiLoController extends ChangeNotifier {
       // 페어가 있으면 로우 잠재력 감소
       hasPair = rankCounts.values.any((count) => count >= 2);
 
+      // 상대가 필요한 로우 카드 중 남은 카드 수 계산
+      // 상대가 아직 필요한 로우 랭크들
+      final neededLowRanks = <int>[];
+      for (int rank = 1; rank <= 8; rank++) {
+        if (!lowRanks.contains(rank)) {
+          neededLowRanks.add(rank);
+        }
+      }
+
+      // 필요한 카드들의 가용성 계산
+      int totalNeededAvailable = 0;
+      int criticalMissing = 0;  // 완전히 없는 중요 랭크
+      for (final rank in neededLowRanks) {
+        final remaining = _countRemainingCards(rank, deadCards);
+        totalNeededAvailable += remaining;
+        if (remaining == 0 && rank <= 6) {
+          criticalMissing++;  // 6 이하의 카드가 모두 데드
+        }
+      }
+
       final uniqueLowCount = lowRanks.length;
+      final cardsNeeded = 5 - uniqueLowCount;
       double lowStrength = 0.0;
+
+      // 가용성 기반 잠재력 조정
+      // cardsNeeded장이 필요한데, 가능한 로우 카드가 부족하면 잠재력 감소
+      double availabilityFactor = 1.0;
+      if (cardsNeeded > 0) {
+        // 필요한 카드당 평균 2장 이상 남아있어야 정상
+        final avgAvailable = totalNeededAvailable / max(neededLowRanks.length, 1);
+        if (avgAvailable < 1.5) {
+          availabilityFactor = 0.5;  // 가용 카드 부족
+        } else if (avgAvailable < 2.5) {
+          availabilityFactor = 0.7;  // 가용 카드 적음
+        } else if (avgAvailable < 3.0) {
+          availabilityFactor = 0.85;
+        }
+
+        // 중요 랭크가 완전히 데드면 추가 감소
+        if (criticalMissing >= 2) {
+          availabilityFactor *= 0.5;
+        } else if (criticalMissing >= 1) {
+          availabilityFactor *= 0.7;
+        }
+      }
 
       // 오픈 카드 수에 따른 로우 잠재력 계산
       if (uniqueLowCount >= 4) {
@@ -1041,25 +1146,25 @@ class HiLoController extends ChangeNotifier {
             : sortedLow.last;
 
         if (highCard <= 6) {
-          lowStrength = hasPair ? 0.7 : 0.9;  // 6탑 가능
+          lowStrength = (hasPair ? 0.7 : 0.9) * availabilityFactor;
         } else if (highCard <= 7) {
-          lowStrength = hasPair ? 0.6 : 0.8;  // 7탑 가능
+          lowStrength = (hasPair ? 0.6 : 0.8) * availabilityFactor;
         } else {
-          lowStrength = hasPair ? 0.5 : 0.7;  // 8탑 가능
+          lowStrength = (hasPair ? 0.5 : 0.7) * availabilityFactor;
         }
       } else if (uniqueLowCount >= 3) {
         // 3장의 유니크 로우 카드 = 잠재력 있음
-        if (lowRanks.contains(1)) {  // A 보유
-          lowStrength = hasPair ? 0.4 : 0.6;
+        if (lowRanks.contains(1)) {
+          lowStrength = (hasPair ? 0.4 : 0.6) * availabilityFactor;
         } else {
-          lowStrength = hasPair ? 0.3 : 0.5;
+          lowStrength = (hasPair ? 0.3 : 0.5) * availabilityFactor;
         }
       } else if (uniqueLowCount >= 2) {
         // 2장의 유니크 로우 카드 = 약간의 잠재력
         if (lowRanks.contains(1)) {
-          lowStrength = 0.3;
+          lowStrength = 0.3 * availabilityFactor;
         } else {
-          lowStrength = 0.2;
+          lowStrength = 0.2 * availabilityFactor;
         }
       }
 
