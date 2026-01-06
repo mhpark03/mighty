@@ -430,33 +430,33 @@ class HiLoController extends ChangeNotifier {
 
     // 보스인 경우
     if (_state.isCurrentPlayerBoss) {
-      // 6탑 로우: 로얄 스트레이트급 - 매우 공격적
-      if (lowHandStrength >= 0.95) {
-        if (random.nextDouble() < 0.5) {
-          return _AIAction('full', 0);
-        }
-        return _AIAction('half', 0);
-      }
-      // 7탑 로우: 스트레이트 플러시급
-      if (lowHandStrength >= 0.9) {
+      // 6탑 로우: 포카드급 (0.93) - 공격적
+      if (lowHandStrength >= 0.92) {
         if (random.nextDouble() < 0.4) {
           return _AIAction('full', 0);
         }
         return _AIAction('half', 0);
       }
-      // 8탑 로우: 포카드급
-      if (lowHandStrength >= 0.8) {
-        if (random.nextDouble() < 0.4) {
+      // 7탑 로우: 포카드~풀하우스급 (0.88)
+      if (lowHandStrength >= 0.87) {
+        if (random.nextDouble() < 0.35) {
           return _AIAction('half', 0);
         }
         return _AIAction('quarter', 0);
       }
-      // 9탑 로우: 풀하우스급
-      if (lowHandStrength >= 0.7) {
-        if (random.nextDouble() < 0.5) {
+      // 8탑 로우: 풀하우스급 (0.85)
+      if (lowHandStrength >= 0.84) {
+        if (random.nextDouble() < 0.4) {
           return _AIAction('quarter', 0);
         }
         return _AIAction('bing', 0);
+      }
+      // 9탑 로우: 플러시~스트레이트급 (0.72)
+      if (lowHandStrength >= 0.70) {
+        if (random.nextDouble() < 0.5) {
+          return _AIAction('bing', 0);
+        }
+        return _AIAction('call', 0);
       }
 
       if (effectiveStrength > 0.85 && random.nextDouble() < 0.3) {
@@ -480,30 +480,30 @@ class HiLoController extends ChangeNotifier {
 
     // 비보스이면서 강한 로우 핸드가 있으면 공격적으로 레이즈
     if (!_state.isCurrentPlayerBoss && hasCompletedLow) {
-      // 6탑 로우: 로얄 스트레이트급 - 매우 공격적
-      if (lowHandStrength >= 0.95) {
-        if (random.nextDouble() < 0.45) {
-          return _selectRaiseAction(lowHandStrength, availableActions, random);
-        }
-        return _AIAction('call', 0);
-      }
-      // 7탑 로우: 스트레이트 플러시급
-      if (lowHandStrength >= 0.9) {
+      // 6탑 로우: 포카드급 (0.93) - 공격적
+      if (lowHandStrength >= 0.92) {
         if (random.nextDouble() < 0.4) {
           return _selectRaiseAction(lowHandStrength, availableActions, random);
         }
         return _AIAction('call', 0);
       }
-      // 8탑 로우: 포카드급
-      if (lowHandStrength >= 0.8) {
+      // 7탑 로우: 포카드~풀하우스급 (0.88)
+      if (lowHandStrength >= 0.87) {
         if (random.nextDouble() < 0.35) {
           return _selectRaiseAction(lowHandStrength, availableActions, random);
         }
         return _AIAction('call', 0);
       }
-      // 9탑 로우: 풀하우스급
-      if (lowHandStrength >= 0.7) {
+      // 8탑 로우: 풀하우스급 (0.85)
+      if (lowHandStrength >= 0.84) {
         if (random.nextDouble() < 0.3) {
+          return _selectRaiseAction(lowHandStrength, availableActions, random);
+        }
+        return _AIAction('call', 0);
+      }
+      // 9탑 로우: 플러시~스트레이트급 (0.72)
+      if (lowHandStrength >= 0.70) {
+        if (random.nextDouble() < 0.25) {
           return _selectRaiseAction(lowHandStrength, availableActions, random);
         }
         return _AIAction('call', 0);
@@ -813,8 +813,13 @@ class HiLoController extends ChangeNotifier {
     return 0.0;
   }
 
-  /// 완성된 로우 핸드 강도 평가
-  /// 6탑 = 1.0 (로얄 스트레이트급), 7탑 = 0.95, 8탑 = 0.85, 9탑 = 0.75
+  /// 완성된 로우 핸드 강도 평가 (확률 기반)
+  /// 6탑 (~0.4%) = 포카드급 0.93
+  /// 7탑 (~0.8%) = 포카드~풀하우스 0.88
+  /// 8탑 (~2.0%) = 풀하우스급 0.85
+  /// 9탑 (~4.5%) = 플러시~스트레이트 0.72
+  /// 10탑 (~8%) = 트리플급 0.60
+  /// J탑 (~10%) = 트리플~투페어 0.50
   double _evaluateCompletedLowStrength(HiLoPlayer player) {
     final lowHand = player.lowHand;
     if (lowHand == null || !lowHand.isQualified) return 0.0;
@@ -824,23 +829,26 @@ class HiLoController extends ChangeNotifier {
 
     final highCard = lowHand.cardRanks.last;
 
-    // 6탑: A-2-3-4-6 (최강 로우) = 로얄 스트레이트급
-    if (highCard <= 6) return 1.0;
+    // 6탑: A-2-3-4-6 (최강 로우) = 포카드급 (~0.4%)
+    if (highCard <= 6) return 0.93;
 
-    // 7탑: A-2-3-4-7 등 = 스트레이트 플러시급
-    if (highCard == 7) return 0.95;
+    // 7탑: A-2-3-4-7 등 = 포카드~풀하우스급 (~0.8%)
+    if (highCard == 7) return 0.88;
 
-    // 8탑: A-2-3-4-8 등 = 포카드급
+    // 8탑: A-2-3-4-8 등 = 풀하우스급 (~2.0%)
     if (highCard == 8) return 0.85;
 
-    // 9탑: A-2-3-4-9 등 = 풀하우스급
-    if (highCard == 9) return 0.75;
+    // 9탑: A-2-3-4-9 등 = 플러시~스트레이트급 (~4.5%)
+    if (highCard == 9) return 0.72;
 
-    // 10탑: 플러시급
-    if (highCard == 10) return 0.6;
+    // 10탑: 트리플급 (~8%)
+    if (highCard == 10) return 0.60;
 
-    // J탑 이상: 스트레이트급
-    if (highCard >= 11) return 0.45;
+    // J탑: 트리플~투페어급 (~10%)
+    if (highCard == 11) return 0.50;
+
+    // Q탑 이상: 투페어급 이하
+    if (highCard >= 12) return 0.40;
 
     return 0.3;
   }
