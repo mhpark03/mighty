@@ -658,4 +658,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get viewResults => 'View Results';
+
+  @override
+  String get finalResults => 'Final Results';
 }

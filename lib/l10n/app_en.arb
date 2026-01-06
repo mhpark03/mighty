@@ -202,5 +202,6 @@
   "selectedSwing": "Selected Swing",
   "showdownTitle": "Declaration Status",
   "showdownDesc": "Check each player's choice",
-  "viewResults": "View Results"
+  "viewResults": "View Results",
+  "finalResults": "Final Results"
 }

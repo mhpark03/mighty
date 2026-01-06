@@ -653,4 +653,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get viewResults => '查看结果';
+
+  @override
+  String get finalResults => '最终结果';
 }

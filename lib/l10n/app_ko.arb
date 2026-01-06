@@ -293,5 +293,6 @@
   "selectedSwing": "스윙 선택",
   "showdownTitle": "선언 현황",
   "showdownDesc": "각 플레이어의 선택을 확인하세요",
-  "viewResults": "결과 보기"
+  "viewResults": "결과 보기",
+  "finalResults": "최종 결과"
 }

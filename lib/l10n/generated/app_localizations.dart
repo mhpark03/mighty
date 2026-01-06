@@ -1313,6 +1313,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'결과 보기'**
   String get viewResults;
+
+  /// No description provided for @finalResults.
+  ///
+  /// In ko, this message translates to:
+  /// **'최종 결과'**
+  String get finalResults;
 }
 
 class _AppLocalizationsDelegate

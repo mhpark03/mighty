@@ -656,4 +656,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get viewResults => '결과 보기';
+
+  @override
+  String get finalResults => '최종 결과';
 }

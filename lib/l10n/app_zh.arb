@@ -201,5 +201,6 @@
   "selectedSwing": "已选双向",
   "showdownTitle": "声明状况",
   "showdownDesc": "确认各玩家的选择",
-  "viewResults": "查看结果"
+  "viewResults": "查看结果",
+  "finalResults": "最终结果"
 }

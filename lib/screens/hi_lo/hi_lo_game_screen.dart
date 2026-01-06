@@ -1674,6 +1674,19 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // 결과 확인 버튼
+                    ElevatedButton.icon(
+                      onPressed: () => _showDetailedResults(context, controller, state, l10n),
+                      icon: const Icon(Icons.visibility, size: 18),
+                      label: Text(l10n.viewResults),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // 새 게임 버튼
                     ElevatedButton.icon(
                       onPressed: () {
                         _statsRecorded = false;
@@ -1694,6 +1707,262 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
           ),
         );
       },
+    );
+  }
+
+  /// 상세 결과 다이얼로그 표시
+  void _showDetailedResults(BuildContext context, HiLoController controller, HiLoState state, AppLocalizations l10n) {
+    final activePlayers = state.players.where((p) => !p.isFolded).toList();
+    final foldedPlayers = state.players.where((p) => p.isFolded).toList();
+    final result = state.result;
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          decoration: BoxDecoration(
+            color: Colors.purple[900],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.amber, width: 2),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 헤더
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.purple[800],
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.finalResults,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+              // 활성 플레이어 (카드 표시)
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                  child: Column(
+                    children: activePlayers.map((player) =>
+                      _buildActivePlayerResultCard(player, controller, result, l10n)
+                    ).toList(),
+                  ),
+                ),
+              ),
+              // 다이한 플레이어 (카드 표시)
+              if (foldedPlayers.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.fold,
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                      const SizedBox(height: 8),
+                      Column(
+                        children: foldedPlayers.map((player) =>
+                          _buildFoldedPlayerResultCard(player, controller, l10n)
+                        ).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 활성 플레이어 결과 카드
+  Widget _buildActivePlayerResultCard(HiLoPlayer player, HiLoController controller, HiLoResult? result, AppLocalizations l10n) {
+    final isHiWinner = player.id == result?.hiWinner?.id;
+    final isLoWinner = player.id == result?.loWinner?.id;
+    final isWinner = isHiWinner || isLoWinner;
+    final choice = player.hiLoChoice;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: isWinner ? Colors.amber.withValues(alpha: 0.2) : Colors.black26,
+        borderRadius: BorderRadius.circular(10),
+        border: isWinner ? Border.all(color: Colors.amber, width: 2) : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 플레이어 이름, 선택, 족보
+          Row(
+            children: [
+              if (isHiWinner)
+                const Icon(Icons.arrow_upward, color: Colors.red, size: 16),
+              if (isLoWinner)
+                const Icon(Icons.arrow_downward, color: Colors.blue, size: 16),
+              if (isWinner)
+                const SizedBox(width: 4),
+              Text(
+                player.name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              // 선택 배지
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: _getHiLoChoiceColor(choice),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  _getHiLoChoiceText(choice, l10n),
+                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${l10n.bet}: ${player.totalBetInGame}',
+                style: const TextStyle(color: Colors.amber, fontSize: 11),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          // 족보 정보
+          Row(
+            children: [
+              if (choice == HiLoChoice.hi || choice == HiLoChoice.swing)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  margin: const EdgeInsets.only(right: 4),
+                  decoration: BoxDecoration(
+                    color: isHiWinner ? Colors.red : Colors.red.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Hi: ${player.pokerHand != null ? controller.getHandRankDisplayName(player.pokerHand) : "-"}',
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                ),
+              if (choice == HiLoChoice.lo || choice == HiLoChoice.swing)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: isLoWinner ? Colors.blue : Colors.blue.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Lo: ${player.lowHand != null && player.lowHand!.isQualified ? controller.getLowHandDisplayName(player.lowHand) : l10n.noLowHand}',
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          // 카드 표시
+          Wrap(
+            spacing: 3,
+            runSpacing: 3,
+            children: player.hand.map((card) => _buildResultCard(card, false)).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 다이한 플레이어 결과 카드
+  Widget _buildFoldedPlayerResultCard(HiLoPlayer player, HiLoController controller, AppLocalizations l10n) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.black38,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                player.name,
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${l10n.bet}: ${player.totalBetInGame}',
+                style: const TextStyle(color: Colors.grey, fontSize: 10),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          // 카드 표시 (흐리게)
+          Wrap(
+            spacing: 3,
+            runSpacing: 3,
+            children: player.hand.map((card) => _buildResultCard(card, true)).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 결과 카드 위젯
+  Widget _buildResultCard(PlayingCard card, bool isDimmed) {
+    final color = (card.suit == Suit.heart || card.suit == Suit.diamond) ? Colors.red : Colors.black;
+    final suitSymbol = _getSuitSymbol(card.suit);
+    final rankStr = _getRankString(card.rank);
+
+    return Opacity(
+      opacity: isDimmed ? 0.5 : 1.0,
+      child: Container(
+        width: 34,
+        height: 48,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.grey, width: 1),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(rankStr, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
+            Text(suitSymbol, style: TextStyle(color: color, fontSize: 10)),
+          ],
+        ),
+      ),
     );
   }
 

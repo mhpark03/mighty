@@ -656,4 +656,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get viewResults => '結果を見る';
+
+  @override
+  String get finalResults => '最終結果';
 }
