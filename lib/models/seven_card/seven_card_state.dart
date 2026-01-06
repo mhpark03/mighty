@@ -770,9 +770,9 @@ class SevenCardState {
 
   /// 각 베팅 액션의 금액 계산
   int getBingAmount() => basebet;
-  int getCallAmount() => (currentBetAmount - currentPlayer.currentBet).clamp(0, currentPlayer.chips);
-  int getDdadangAmount() => (currentBetAmount * 2 - currentPlayer.currentBet).clamp(0, currentPlayer.chips);
-  int getQuarterAmount() => ((pot * 0.25).ceil() - currentPlayer.currentBet).clamp(0, currentPlayer.chips);
-  int getHalfAmount() => ((pot * 0.5).ceil() - currentPlayer.currentBet).clamp(0, currentPlayer.chips);
-  int getFullAmount() => (pot - currentPlayer.currentBet).clamp(0, currentPlayer.chips);
+  int getCallAmount() => (currentBetAmount - currentPlayer.currentBet).clamp(0, 999999);
+  int getDdadangAmount() => (currentBetAmount * 2 - currentPlayer.currentBet).clamp(0, 999999);
+  int getQuarterAmount() => ((pot * 0.25).ceil() - currentPlayer.currentBet).clamp(0, 999999);
+  int getHalfAmount() => ((pot * 0.5).ceil() - currentPlayer.currentBet).clamp(0, 999999);
+  int getFullAmount() => (pot - currentPlayer.currentBet).clamp(0, 999999);
 }
