@@ -592,4 +592,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gameEnd => 'Game End';
+
+  @override
+  String get hiLoTitle => 'Hi-Lo';
+
+  @override
+  String get hiLoSubtitle => 'Hi/Lo Split Poker';
+
+  @override
+  String get hi => 'Hi';
+
+  @override
+  String get lo => 'Lo';
+
+  @override
+  String get swing => 'Swing';
+
+  @override
+  String get selectHiLo => 'Select Hi/Lo';
+
+  @override
+  String get selectHiLoDesc => 'Choose Hi, Lo, or Swing';
+
+  @override
+  String get hiWinner => 'Hi Winner';
+
+  @override
+  String get loWinner => 'Lo Winner';
+
+  @override
+  String get swingSuccess => 'Swing Success!';
+
+  @override
+  String get swingFailed => 'Swing Failed';
+
+  @override
+  String get hiPot => 'Hi Pot';
+
+  @override
+  String get loPot => 'Lo Pot';
+
+  @override
+  String get noLowHand => 'No Low';
+
+  @override
+  String get bestLow => 'Best Low';
+
+  @override
+  String get waitingForHiLo => 'Waiting for selection...';
+
+  @override
+  String get selectedHi => 'Selected Hi';
+
+  @override
+  String get selectedLo => 'Selected Lo';
+
+  @override
+  String get selectedSwing => 'Selected Swing';
 }

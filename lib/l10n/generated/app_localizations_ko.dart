@@ -590,4 +590,61 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get gameEnd => '게임 종료';
+
+  @override
+  String get hiLoTitle => '하이로우';
+
+  @override
+  String get hiLoSubtitle => '하이/로우 스플릿 포커';
+
+  @override
+  String get hi => '하이';
+
+  @override
+  String get lo => '로우';
+
+  @override
+  String get swing => '스윙';
+
+  @override
+  String get selectHiLo => '하이/로우 선택';
+
+  @override
+  String get selectHiLoDesc => '하이, 로우, 또는 스윙을 선택하세요';
+
+  @override
+  String get hiWinner => '하이 승자';
+
+  @override
+  String get loWinner => '로우 승자';
+
+  @override
+  String get swingSuccess => '스윙 성공!';
+
+  @override
+  String get swingFailed => '스윙 실패';
+
+  @override
+  String get hiPot => '하이 팟';
+
+  @override
+  String get loPot => '로우 팟';
+
+  @override
+  String get noLowHand => '로우 없음';
+
+  @override
+  String get bestLow => '베스트 로우';
+
+  @override
+  String get waitingForHiLo => '선택 대기 중...';
+
+  @override
+  String get selectedHi => '하이 선택';
+
+  @override
+  String get selectedLo => '로우 선택';
+
+  @override
+  String get selectedSwing => '스윙 선택';
 }

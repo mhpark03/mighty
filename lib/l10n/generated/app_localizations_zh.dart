@@ -587,4 +587,61 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get gameEnd => '游戏结束';
+
+  @override
+  String get hiLoTitle => '高低';
+
+  @override
+  String get hiLoSubtitle => '高/低分池扑克';
+
+  @override
+  String get hi => '高';
+
+  @override
+  String get lo => '低';
+
+  @override
+  String get swing => '双向';
+
+  @override
+  String get selectHiLo => '选择高/低';
+
+  @override
+  String get selectHiLoDesc => '选择高、低或双向';
+
+  @override
+  String get hiWinner => '高牌赢家';
+
+  @override
+  String get loWinner => '低牌赢家';
+
+  @override
+  String get swingSuccess => '双向成功！';
+
+  @override
+  String get swingFailed => '双向失败';
+
+  @override
+  String get hiPot => '高牌底池';
+
+  @override
+  String get loPot => '低牌底池';
+
+  @override
+  String get noLowHand => '无低牌';
+
+  @override
+  String get bestLow => '最佳低牌';
+
+  @override
+  String get waitingForHiLo => '等待选择...';
+
+  @override
+  String get selectedHi => '已选高';
+
+  @override
+  String get selectedLo => '已选低';
+
+  @override
+  String get selectedSwing => '已选双向';
 }

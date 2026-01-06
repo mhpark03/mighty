@@ -590,4 +590,61 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get gameEnd => 'ゲーム終了';
+
+  @override
+  String get hiLoTitle => 'ハイロー';
+
+  @override
+  String get hiLoSubtitle => 'ハイ/ロースプリットポーカー';
+
+  @override
+  String get hi => 'ハイ';
+
+  @override
+  String get lo => 'ロー';
+
+  @override
+  String get swing => 'スイング';
+
+  @override
+  String get selectHiLo => 'ハイ/ロー選択';
+
+  @override
+  String get selectHiLoDesc => 'ハイ、ロー、またはスイングを選択';
+
+  @override
+  String get hiWinner => 'ハイ勝者';
+
+  @override
+  String get loWinner => 'ロー勝者';
+
+  @override
+  String get swingSuccess => 'スイング成功！';
+
+  @override
+  String get swingFailed => 'スイング失敗';
+
+  @override
+  String get hiPot => 'ハイポット';
+
+  @override
+  String get loPot => 'ローポット';
+
+  @override
+  String get noLowHand => 'ローなし';
+
+  @override
+  String get bestLow => 'ベストロー';
+
+  @override
+  String get waitingForHiLo => '選択待ち...';
+
+  @override
+  String get selectedHi => 'ハイ選択';
+
+  @override
+  String get selectedLo => 'ロー選択';
+
+  @override
+  String get selectedSwing => 'スイング選択';
 }

@@ -1181,6 +1181,120 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'게임 종료'**
   String get gameEnd;
+
+  /// No description provided for @hiLoTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'하이로우'**
+  String get hiLoTitle;
+
+  /// No description provided for @hiLoSubtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'하이/로우 스플릿 포커'**
+  String get hiLoSubtitle;
+
+  /// No description provided for @hi.
+  ///
+  /// In ko, this message translates to:
+  /// **'하이'**
+  String get hi;
+
+  /// No description provided for @lo.
+  ///
+  /// In ko, this message translates to:
+  /// **'로우'**
+  String get lo;
+
+  /// No description provided for @swing.
+  ///
+  /// In ko, this message translates to:
+  /// **'스윙'**
+  String get swing;
+
+  /// No description provided for @selectHiLo.
+  ///
+  /// In ko, this message translates to:
+  /// **'하이/로우 선택'**
+  String get selectHiLo;
+
+  /// No description provided for @selectHiLoDesc.
+  ///
+  /// In ko, this message translates to:
+  /// **'하이, 로우, 또는 스윙을 선택하세요'**
+  String get selectHiLoDesc;
+
+  /// No description provided for @hiWinner.
+  ///
+  /// In ko, this message translates to:
+  /// **'하이 승자'**
+  String get hiWinner;
+
+  /// No description provided for @loWinner.
+  ///
+  /// In ko, this message translates to:
+  /// **'로우 승자'**
+  String get loWinner;
+
+  /// No description provided for @swingSuccess.
+  ///
+  /// In ko, this message translates to:
+  /// **'스윙 성공!'**
+  String get swingSuccess;
+
+  /// No description provided for @swingFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'스윙 실패'**
+  String get swingFailed;
+
+  /// No description provided for @hiPot.
+  ///
+  /// In ko, this message translates to:
+  /// **'하이 팟'**
+  String get hiPot;
+
+  /// No description provided for @loPot.
+  ///
+  /// In ko, this message translates to:
+  /// **'로우 팟'**
+  String get loPot;
+
+  /// No description provided for @noLowHand.
+  ///
+  /// In ko, this message translates to:
+  /// **'로우 없음'**
+  String get noLowHand;
+
+  /// No description provided for @bestLow.
+  ///
+  /// In ko, this message translates to:
+  /// **'베스트 로우'**
+  String get bestLow;
+
+  /// No description provided for @waitingForHiLo.
+  ///
+  /// In ko, this message translates to:
+  /// **'선택 대기 중...'**
+  String get waitingForHiLo;
+
+  /// No description provided for @selectedHi.
+  ///
+  /// In ko, this message translates to:
+  /// **'하이 선택'**
+  String get selectedHi;
+
+  /// No description provided for @selectedLo.
+  ///
+  /// In ko, this message translates to:
+  /// **'로우 선택'**
+  String get selectedLo;
+
+  /// No description provided for @selectedSwing.
+  ///
+  /// In ko, this message translates to:
+  /// **'스윙 선택'**
+  String get selectedSwing;
 }
 
 class _AppLocalizationsDelegate

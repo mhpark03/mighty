@@ -6,6 +6,7 @@ import '../l10n/generated/app_localizations.dart';
 import '../widgets/banner_ad_widget.dart';
 import 'home_screen.dart';
 import 'seven_card/seven_card_home_screen.dart';
+import 'hi_lo/hi_lo_home_screen.dart';
 
 class GameSelectionScreen extends StatelessWidget {
   const GameSelectionScreen({super.key});
@@ -74,6 +75,23 @@ class GameSelectionScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => const SevenCardHomeScreen()),
+                        );
+                      },
+                      isSmallScreen: isSmallScreen,
+                    ),
+                    SizedBox(height: isSmallScreen ? 16 : 24),
+
+                    // 하이로우 버튼
+                    _buildGameButton(
+                      context: context,
+                      title: l10n.hiLoTitle,
+                      subtitle: l10n.hiLoSubtitle,
+                      icon: Icons.swap_vert,
+                      color: Colors.purple[700]!,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HiLoHomeScreen()),
                         );
                       },
                       isSmallScreen: isSmallScreen,
