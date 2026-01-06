@@ -97,10 +97,21 @@ class SevenCardPlayer {
     return hidden;
   }
 
-  /// 포커 핸드 평가 (전체 카드)
+  /// 포커 핸드 평가 (전체 카드 - 5장 이상)
   PokerHand? get pokerHand {
     if (hand.length < 5) return null;
     return PokerHandEvaluator.evaluate(hand);
+  }
+
+  /// 전체 카드 기준 족보 평가 (부분 평가 포함)
+  PokerHand? get allCardsPokerHand {
+    if (hand.length < 2) return null;
+    // 5장 이상이면 정상 평가
+    if (hand.length >= 5) {
+      return PokerHandEvaluator.evaluate(hand);
+    }
+    // 5장 미만이면 부분 평가 (페어, 트리플 등만 체크)
+    return PokerHandEvaluator.evaluatePartial(hand);
   }
 
   /// 공개 카드 기준 족보 평가
@@ -115,7 +126,7 @@ class SevenCardPlayer {
   }
 
   /// 게임 참여 가능 여부
-  bool get isActive => !isFolded && chips > 0;
+  bool get isActive => !isFolded;
 
   void reset() {
     hand.clear();
@@ -418,7 +429,7 @@ class SevenCardState {
   /// 베팅 액션: 콜
   void call() {
     final player = currentPlayer;
-    final callAmount = (currentBetAmount - player.currentBet).clamp(0, player.chips);
+    final callAmount = (currentBetAmount - player.currentBet).clamp(0, 999999);
     player.chips -= callAmount;
     player.currentBet += callAmount;
     player.totalBetInGame += callAmount;
@@ -426,17 +437,13 @@ class SevenCardState {
     player.lastAction = BettingAction.call;
     player.bettingActionsInRound++;
 
-    if (player.chips == 0) {
-      player.isAllIn = true;
-    }
-
     _moveToNextPlayer();
   }
 
   /// 베팅 액션: 삥 (기본 판돈만 베팅 - 보스만 가능)
   void bing() {
     final player = currentPlayer;
-    final bingAmount = basebet.clamp(0, player.chips);
+    final bingAmount = basebet;
 
     player.chips -= bingAmount;
     player.currentBet = bingAmount;
@@ -447,18 +454,14 @@ class SevenCardState {
     player.lastAction = BettingAction.bing;
     player.bettingActionsInRound++;
 
-    if (player.chips == 0) {
-      player.isAllIn = true;
-    }
-
     _moveToNextPlayer();
   }
 
   /// 베팅 액션: 따당 (앞사람 베팅의 2배)
   void ddadang() {
     final player = currentPlayer;
-    final ddadangAmount = (currentBetAmount * 2).clamp(0, player.chips);
-    final additionalBet = (ddadangAmount - player.currentBet).clamp(0, player.chips);
+    final ddadangAmount = currentBetAmount * 2;
+    final additionalBet = (ddadangAmount - player.currentBet).clamp(0, 999999);
 
     player.chips -= additionalBet;
     player.currentBet += additionalBet;
@@ -469,18 +472,14 @@ class SevenCardState {
     player.lastAction = BettingAction.ddadang;
     player.bettingActionsInRound++;
 
-    if (player.chips == 0) {
-      player.isAllIn = true;
-    }
-
     _moveToNextPlayer();
   }
 
   /// 베팅 액션: 쿼터 (전체 판돈의 25%)
   void quarter() {
     final player = currentPlayer;
-    final quarterAmount = (pot * 0.25).ceil().clamp(basebet, player.chips);
-    final additionalBet = (quarterAmount - player.currentBet).clamp(0, player.chips);
+    final quarterAmount = (pot * 0.25).ceil().clamp(basebet, 999999);
+    final additionalBet = (quarterAmount - player.currentBet).clamp(0, 999999);
 
     player.chips -= additionalBet;
     player.currentBet += additionalBet;
@@ -491,18 +490,14 @@ class SevenCardState {
     player.lastAction = BettingAction.quarter;
     player.bettingActionsInRound++;
 
-    if (player.chips == 0) {
-      player.isAllIn = true;
-    }
-
     _moveToNextPlayer();
   }
 
   /// 베팅 액션: 하프 (전체 판돈의 50%)
   void half() {
     final player = currentPlayer;
-    final halfAmount = (pot * 0.5).ceil().clamp(basebet, player.chips);
-    final additionalBet = (halfAmount - player.currentBet).clamp(0, player.chips);
+    final halfAmount = (pot * 0.5).ceil().clamp(basebet, 999999);
+    final additionalBet = (halfAmount - player.currentBet).clamp(0, 999999);
 
     player.chips -= additionalBet;
     player.currentBet += additionalBet;
@@ -513,18 +508,14 @@ class SevenCardState {
     player.lastAction = BettingAction.half;
     player.bettingActionsInRound++;
 
-    if (player.chips == 0) {
-      player.isAllIn = true;
-    }
-
     _moveToNextPlayer();
   }
 
   /// 베팅 액션: 풀 (전체 판돈의 100%)
   void full() {
     final player = currentPlayer;
-    final fullAmount = pot.clamp(basebet, player.chips);
-    final additionalBet = (fullAmount - player.currentBet).clamp(0, player.chips);
+    final fullAmount = pot.clamp(basebet, 999999);
+    final additionalBet = (fullAmount - player.currentBet).clamp(0, 999999);
 
     player.chips -= additionalBet;
     player.currentBet += additionalBet;
@@ -534,10 +525,6 @@ class SevenCardState {
     lastRaiserIndex = currentPlayerIndex;
     player.lastAction = BettingAction.full;
     player.bettingActionsInRound++;
-
-    if (player.chips == 0) {
-      player.isAllIn = true;
-    }
 
     _moveToNextPlayer();
   }
@@ -734,30 +721,34 @@ class SevenCardState {
     }
 
     if (isCurrentPlayerBoss) {
-      // 보스는 삥 또는 체크 가능
+      // 보스: 삥, 체크, 쿼터, 하프, 풀 가능 (콜/따당 불가)
       actions.add('bing');
       actions.add('check');
+      // 쿼터 (25%)
+      actions.add('quarter');
+      // 하프 (50%)
+      actions.add('half');
+      // 풀 (100%)
+      actions.add('full');
     } else {
       // 콜
       if (player.currentBet < currentBetAmount) {
         actions.add('call');
       }
       // 따당 (2배)
-      if (player.chips >= currentBetAmount * 2 - player.currentBet) {
-        actions.add('ddadang');
-      }
+      actions.add('ddadang');
       // 쿼터 (25%)
       final quarterAmount = (pot * 0.25).ceil();
-      if (quarterAmount > currentBetAmount && player.chips >= quarterAmount - player.currentBet) {
+      if (quarterAmount > currentBetAmount) {
         actions.add('quarter');
       }
       // 하프 (50%)
       final halfAmount = (pot * 0.5).ceil();
-      if (halfAmount > currentBetAmount && player.chips >= halfAmount - player.currentBet) {
+      if (halfAmount > currentBetAmount) {
         actions.add('half');
       }
       // 풀 (100%)
-      if (pot > currentBetAmount && player.chips >= pot - player.currentBet) {
+      if (pot > currentBetAmount) {
         actions.add('full');
       }
     }

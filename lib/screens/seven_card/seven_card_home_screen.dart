@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../services/ad_service.dart';
 import '../../services/seven_card/seven_card_controller.dart';
 import '../../services/seven_card/seven_card_stats_service.dart';
 import '../../widgets/banner_ad_widget.dart';
@@ -339,8 +340,13 @@ class SevenCardHomeScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              statsService.resetStats();
               Navigator.pop(dialogContext);
+              // 보상형 광고 표시 후 초기화
+              AdService().showRewardedAd(
+                onRewarded: () {
+                  statsService.resetStats();
+                },
+              );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: Text(l10n.resetStats, style: const TextStyle(color: Colors.white)),
