@@ -195,6 +195,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                 children: [
                   // 왼쪽 AI 2명
                   Expanded(
+                    flex: 3,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: leftOpponents.map((opponent) =>
@@ -206,6 +207,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                   _buildCenterPotArea(state, l10n),
                   // 오른쪽 AI 2명
                   Expanded(
+                    flex: 3,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: rightOpponents.map((opponent) =>
@@ -331,20 +333,20 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
 
   Widget _buildCenterPotArea(SevenCardState state, AppLocalizations l10n) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 팟 (칩 모양)
+          // 팟 (칩 모양) - 세로 배치
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [Colors.amber[700]!, Colors.amber[500]!],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.amber[300]!, width: 2),
               boxShadow: [
                 BoxShadow(
@@ -354,13 +356,13 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                 ),
               ],
             ),
-            child: Row(
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // 칩 아이콘
                 Container(
-                  width: 28,
-                  height: 28,
+                  width: 36,
+                  height: 36,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
@@ -375,19 +377,19 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                       '\$',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(height: 6),
                 // 팟 금액
                 Text(
                   '${state.pot}',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     shadows: [
                       Shadow(
@@ -568,18 +570,18 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
     // 조커 처리
     if (card.isJoker) {
       return Container(
-        width: 28,
-        height: 38,
+        width: 32,
+        height: 44,
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(3),
+          borderRadius: BorderRadius.circular(4),
           border: Border.all(color: Colors.purple),
         ),
         child: const Center(
           child: Text(
             'JK',
-            style: TextStyle(color: Colors.purple, fontSize: 10, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.purple, fontSize: 11, fontWeight: FontWeight.bold),
           ),
         ),
       );
@@ -590,12 +592,12 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
     final rankStr = _getRankString(card.rank);
 
     return Container(
-      width: 28,
-      height: 38,
+      width: 32,
+      height: 44,
       margin: const EdgeInsets.all(1),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(3),
+        borderRadius: BorderRadius.circular(4),
         border: Border.all(color: Colors.grey),
       ),
       child: Column(
@@ -603,11 +605,11 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
         children: [
           Text(
             rankStr,
-            style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+            style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
           ),
           Text(
             suitSymbol,
-            style: TextStyle(color: color, fontSize: 10),
+            style: TextStyle(color: color, fontSize: 11),
           ),
         ],
       ),
@@ -616,8 +618,8 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
 
   Widget _buildCardBack({bool small = true}) {
     return Container(
-      width: small ? 24 : 40,
-      height: small ? 32 : 56,
+      width: small ? 28 : 40,
+      height: small ? 38 : 56,
       margin: EdgeInsets.all(small ? 1 : 2),
       decoration: BoxDecoration(
         color: Colors.blue[700],
