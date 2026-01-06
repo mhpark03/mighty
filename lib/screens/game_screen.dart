@@ -29,6 +29,7 @@ class _GameScreenState extends State<GameScreen> {
   bool _showRecommendation = true;
   bool _statsRecorded = false;
   bool _bidInitialized = false;
+  bool _showGameResult = true;
 
   /// 배팅을 무늬 기호로 포맷
   String _formatBid(Bid bid) {
@@ -177,7 +178,11 @@ class _GameScreenState extends State<GameScreen> {
       case GamePhase.roundEnd:
         return _buildPlayingScreen(controller);
       case GamePhase.gameEnd:
-        return _buildGameEndScreen(controller);
+        if (_showGameResult) {
+          return _buildGameEndScreen(controller);
+        } else {
+          return _buildPlayingScreen(controller);
+        }
     }
   }
 
@@ -965,6 +970,8 @@ class _GameScreenState extends State<GameScreen> {
       _stopTrickTimer();
     }
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Stack(
       children: [
         Column(
@@ -980,6 +987,56 @@ class _GameScreenState extends State<GameScreen> {
         // 트릭 완료 시 오버레이 (사용자가 선공이 아닐 때만)
         if (controller.waitingForTrickConfirm)
           _buildTrickConfirmOverlay(controller),
+        // 게임 종료 후 결과 보기 버튼
+        if (state.phase == GamePhase.gameEnd && !_showGameResult)
+          Positioned(
+            bottom: 200,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _showGameResult = true;
+                      });
+                    },
+                    icon: const Icon(Icons.emoji_events, color: Colors.black),
+                    label: Text(
+                      l10n.score,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _statsRecorded = false;
+                        _showGameResult = true;
+                      });
+                      controller.reset();
+                      controller.startNewGame();
+                    },
+                    icon: const Icon(Icons.refresh, color: Colors.black),
+                    label: Text(
+                      l10n.newGame,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green[400],
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -2432,23 +2489,46 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _statsRecorded = false;
-                });
-                controller.reset();
-                controller.startNewGame();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              ),
-              child: Text(
-                l10n.newGame,
-                style: const TextStyle(fontSize: 18, color: Colors.black),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _showGameResult = false;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[300],
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  child: Text(
+                    l10n.confirm,
+                    style: const TextStyle(fontSize: 18, color: Colors.black),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _statsRecorded = false;
+                      _showGameResult = true;
+                    });
+                    controller.reset();
+                    controller.startNewGame();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                  child: Text(
+                    l10n.newGame,
+                    style: const TextStyle(fontSize: 18, color: Colors.black),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
