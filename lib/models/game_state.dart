@@ -642,14 +642,13 @@ class GameState {
     if (card == mighty) return true;
     if (other == mighty) return false;
 
+    // 조커는 마이티 다음으로 강함 (조커 콜 시에만 약해짐)
     if (card.isJoker) {
       if (jokerCalled) return false;
-      if (currentTrickNumber == 1) return false;
       return true;
     }
     if (other.isJoker) {
       if (jokerCalled) return true;
-      if (currentTrickNumber == 1) return true;
       return false;
     }
 
