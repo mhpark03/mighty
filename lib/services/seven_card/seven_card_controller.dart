@@ -101,11 +101,11 @@ class SevenCardController extends ChangeNotifier {
     _transitionCountdown = 0;
   }
 
-  /// 라운드 전환 시작 (10초 카운트다운)
+  /// 라운드 전환 시작 (5초 카운트다운)
   void _startRoundTransition(String message) {
     _isRoundTransitioning = true;
     _roundTransitionMessage = message;
-    _transitionCountdown = 10;
+    _transitionCountdown = 5;
     notifyListeners();
 
     _transitionTimer = Timer.periodic(const Duration(seconds: 1), (timer) {

@@ -235,54 +235,55 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
     return GestureDetector(
       onTap: () => controller.skipTransition(),
       child: Container(
-        color: Colors.black.withValues(alpha: 0.7),
-        child: Center(
-          child: Container(
-            margin: const EdgeInsets.all(32),
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.blue[800],
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.amber, width: 2),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.info_outline, color: Colors.amber, size: 48),
-                const SizedBox(height: 16),
-                Text(
-                  controller.roundTransitionMessage,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.amber,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${controller.transitionCountdown}초 후 진행',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+        color: Colors.black.withValues(alpha: 0.3),
+        child: Column(
+          children: [
+            const Spacer(),
+            // 하단에 작게 표시
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.blue[800],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.amber, width: 2),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.amber, size: 20),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      controller.roundTransitionMessage,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  '(화면을 터치하면 바로 진행)',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${controller.transitionCountdown}초',
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            const SizedBox(height: 180), // 버튼 영역 위에 위치
+          ],
         ),
       ),
     );
@@ -1127,12 +1128,17 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
   }
 
   void _showDetailedResults(BuildContext context, SevenCardController controller, SevenCardState state) {
+    // 활성 플레이어와 다이한 플레이어 분리
+    final activePlayers = state.players.where((p) => !p.isFolded).toList();
+    final foldedPlayers = state.players.where((p) => p.isFolded).toList();
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
+          constraints: const BoxConstraints(maxWidth: 400),
           decoration: BoxDecoration(
             color: Colors.blue[900],
             borderRadius: BorderRadius.circular(16),
@@ -1143,7 +1149,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
             children: [
               // 헤더
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: Colors.blue[800],
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
@@ -1155,28 +1161,54 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                       '최종 결과',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.close, color: Colors.white),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
               ),
-              // 플레이어 카드 목록
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: state.players.map((player) =>
-                      _buildPlayerResultCard(player, controller, state)
-                    ).toList(),
-                  ),
+              // 활성 플레이어 (카드 표시)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                child: Column(
+                  children: activePlayers.map((player) =>
+                    _buildActivePlayerResultCard(player, controller, state)
+                  ).toList(),
                 ),
               ),
+              // 다이한 플레이어 (카드 뒷면만)
+              if (foldedPlayers.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                  decoration: BoxDecoration(
+                    color: Colors.black26,
+                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '다이',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: foldedPlayers.map((player) =>
+                          _buildFoldedPlayerResult(player)
+                        ).toList(),
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),
@@ -1184,81 +1216,102 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
     );
   }
 
-  Widget _buildPlayerResultCard(SevenCardPlayer player, SevenCardController controller, SevenCardState state) {
+  Widget _buildActivePlayerResultCard(SevenCardPlayer player, SevenCardController controller, SevenCardState state) {
     final isWinner = player.id == state.winnerId;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: isWinner ? Colors.amber.withValues(alpha: 0.2) : Colors.black26,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: isWinner ? Border.all(color: Colors.amber, width: 2) : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 플레이어 이름과 상태
+          // 플레이어 이름과 족보
           Row(
             children: [
               if (isWinner)
-                const Icon(Icons.emoji_events, color: Colors.amber, size: 20),
+                const Icon(Icons.emoji_events, color: Colors.amber, size: 18),
               if (isWinner)
                 const SizedBox(width: 4),
               Text(
                 player.name,
-                style: TextStyle(
-                  color: player.isFolded ? Colors.grey : Colors.white,
-                  fontSize: 16,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const Spacer(),
-              if (player.isFolded)
+              if (player.pokerHand != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    '다이',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                )
-              else if (player.pokerHand != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.green,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     controller.getHandRankDisplayName(player.pokerHand),
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 ),
+              const SizedBox(width: 8),
+              Text(
+                '베팅: ${player.totalBetInGame}',
+                style: const TextStyle(color: Colors.amber, fontSize: 11),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
-          // 전체 카드 표시
-          if (player.hand.isNotEmpty)
-            Wrap(
-              spacing: 4,
-              runSpacing: 4,
-              children: player.hand.map((card) {
-                // 최고 5장 조합에 포함된 카드인지 확인
-                final isInBestFive = player.pokerHand?.bestFive.any(
-                  (c) => c.suit == card.suit && c.rank == card.rank
-                ) ?? false;
-                return _buildResultCard(card, isInBestFive && !player.isFolded);
-              }).toList(),
-            ),
-          // 총 베팅액
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
+          // 카드 표시 (best 5 하이라이트)
+          Wrap(
+            spacing: 3,
+            runSpacing: 3,
+            children: player.hand.map((card) {
+              final isInBestFive = player.pokerHand?.bestFive.any(
+                (c) => c.suit == card.suit && c.rank == card.rank
+              ) ?? false;
+              return _buildResultCard(card, isInBestFive);
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFoldedPlayerResult(SevenCardPlayer player) {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Colors.black38,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
           Text(
-            '총 베팅: ${player.totalBetInGame}',
-            style: const TextStyle(color: Colors.amber, fontSize: 12),
+            player.name,
+            style: const TextStyle(color: Colors.grey, fontSize: 11),
+          ),
+          const SizedBox(width: 6),
+          // 카드 뒷면 3장만 표시
+          ...List.generate(3, (_) => Container(
+            width: 16,
+            height: 22,
+            margin: const EdgeInsets.only(left: 2),
+            decoration: BoxDecoration(
+              color: Colors.blue[700],
+              borderRadius: BorderRadius.circular(2),
+              border: Border.all(color: Colors.blue[900]!, width: 1),
+            ),
+          )),
+          const SizedBox(width: 4),
+          Text(
+            '(${player.totalBetInGame})',
+            style: const TextStyle(color: Colors.grey, fontSize: 10),
           ),
         ],
       ),
