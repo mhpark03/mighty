@@ -617,7 +617,18 @@ class SevenCardController extends ChangeNotifier {
 
     // 콜 금액이 없으면 (이미 맞춤)
     if (callAmount == 0) {
-      // 레이즈 고려
+      // 트리플 이상이고 마지막 카드가 아니면 공격적으로 레이즈
+      if (handStrength >= 0.60 && cardsRemaining >= 1) {
+        // 트리플~스트레이트: 55% 레이즈
+        if (handStrength < 0.70 && random.nextDouble() < 0.55) {
+          return _selectRaiseAction(handStrength, availableActions, random);
+        }
+        // 스트레이트 이상: 70% 레이즈
+        if (handStrength >= 0.70 && random.nextDouble() < 0.70) {
+          return _selectRaiseAction(handStrength, availableActions, random);
+        }
+      }
+      // 기존 로직: 강한 핸드 레이즈 고려
       if (handStrength > 0.65 && random.nextDouble() < 0.5) {
         return _selectRaiseAction(handStrength, availableActions, random);
       }
@@ -634,6 +645,39 @@ class SevenCardController extends ChangeNotifier {
       // 4장 플러시/스트레이트 드로우: 높은 확률로 콜
       if (random.nextDouble() < 0.85) {
         return _AIAction('call', 0);
+      }
+    }
+
+    // === 트리플 이상 (마지막 카드가 아닌 경우): 공격적 베팅 ===
+    // 트리플(0.60) 이상이고 아직 카드가 남아있으면 레이즈 확률 높임
+    if (handStrength >= 0.60 && cardsRemaining >= 1) {
+      // 트리플~스트레이트 (0.60~0.70): 60% 확률로 레이즈
+      if (handStrength < 0.70) {
+        if (random.nextDouble() < 0.6) {
+          return _selectRaiseAction(handStrength, availableActions, random);
+        }
+      }
+      // 스트레이트 이상 (0.70+): 75% 확률로 레이즈
+      else {
+        if (random.nextDouble() < 0.75) {
+          return _selectRaiseAction(handStrength, availableActions, random);
+        }
+      }
+    }
+
+    // === 마지막 라운드에서 스트레이트 이상: 공격적 베팅 ===
+    if (cardsRemaining == 0 && handStrength >= 0.68) {
+      // 스트레이트~플러시 (0.68~0.75): 70% 레이즈
+      if (handStrength < 0.75) {
+        if (random.nextDouble() < 0.70) {
+          return _selectRaiseAction(handStrength, availableActions, random);
+        }
+      }
+      // 플러시 이상 (0.75+): 85% 레이즈
+      else {
+        if (random.nextDouble() < 0.85) {
+          return _selectRaiseAction(handStrength, availableActions, random);
+        }
       }
     }
 

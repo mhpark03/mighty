@@ -582,7 +582,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                 opacity: 0.5,
                 child: Wrap(
                   spacing: 1,
-                  children: opponent.hand.map((card) => _buildSmallCard(card, sizes)).toList(),
+                  children: opponent.hand.map((card) => _buildSmallCardBackForAI(sizes)).toList(),
                 ),
               ),
           ] else ...[
@@ -590,8 +590,8 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
               spacing: 1,
               alignment: WrapAlignment.center,
               children: [
-                // 히든 카드 (테스트용: 실제 카드 표시)
-                ...opponent.hiddenCards.map((card) => _buildSmallCard(card, sizes)),
+                // 히든 카드 (뒷면 표시)
+                ...opponent.hiddenCards.map((card) => _buildSmallCardBackForAI(sizes)),
                 // 오픈 카드
                 ...opponent.openCards.map((card) => _buildSmallCard(card, sizes)),
                 // 조정 강도 표시 (테스트용)
@@ -664,6 +664,29 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
             style: TextStyle(color: color, fontSize: sizes.aiFontSize),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSmallCardBackForAI(_ResponsiveSizes sizes) {
+    return Container(
+      width: sizes.aiCardWidth,
+      height: sizes.aiCardHeight,
+      margin: const EdgeInsets.all(1),
+      decoration: BoxDecoration(
+        color: Colors.blue[800],
+        borderRadius: BorderRadius.circular(3),
+        border: Border.all(color: Colors.blue[900]!, width: 1),
+      ),
+      child: Center(
+        child: Container(
+          width: sizes.aiCardWidth * 0.6,
+          height: sizes.aiCardHeight * 0.65,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.blue[300]!, width: 1),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
       ),
     );
   }
@@ -743,12 +766,34 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // 오픈 카드
-                ...player.openCards.map((card) => _buildPlayerCard(card, true, sizes)),
-                // 히든 카드
-                ...player.hiddenCards.map((card) => _buildPlayerCard(card, false, sizes)),
-                // 족보 표시 (전체 카드 기준)
-                if (player.allCardsPokerHand != null)
+                // 다이한 경우 모든 카드 뒷면 표시
+                if (player.isFolded) ...[
+                  ...player.hand.map((card) => _buildPlayerCardBack(sizes)),
+                ] else ...[
+                  // 오픈 카드
+                  ...player.openCards.map((card) => _buildPlayerCard(card, true, sizes)),
+                  // 히든 카드
+                  ...player.hiddenCards.map((card) => _buildPlayerCard(card, false, sizes)),
+                ],
+                // 족보 표시 (다이 상태면 "다이" 표시)
+                if (player.isFolded)
+                  Container(
+                    margin: const EdgeInsets.only(left: 4),
+                    padding: EdgeInsets.symmetric(horizontal: isSmall ? 6 : 8, vertical: isSmall ? 4 : 5),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      l10n.fold,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: sizes.nameFontSize,
+                      ),
+                    ),
+                  )
+                else if (player.allCardsPokerHand != null)
                   Container(
                     margin: const EdgeInsets.only(left: 4),
                     padding: EdgeInsets.symmetric(horizontal: isSmall ? 6 : 8, vertical: isSmall ? 4 : 5),
@@ -835,6 +880,32 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPlayerCardBack(_ResponsiveSizes sizes) {
+    return Opacity(
+      opacity: 0.5,
+      child: Container(
+        width: sizes.playerCardWidth,
+        height: sizes.playerCardHeight,
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        decoration: BoxDecoration(
+          color: Colors.blue[800],
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: Colors.blue[900]!, width: 2),
+        ),
+        child: Center(
+          child: Container(
+            width: sizes.playerCardWidth * 0.6,
+            height: sizes.playerCardHeight * 0.65,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.blue[300]!, width: 1),
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+        ),
       ),
     );
   }
