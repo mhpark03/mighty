@@ -224,7 +224,7 @@ class HomeScreen extends StatelessWidget {
                                         Expanded(
                                           child: _buildPlayerStatRow(
                                             statsService.playerStats[i],
-                                            i == 0,
+                                            i,
                                             l10n,
                                             statsNameSize,
                                             statsValueSize,
@@ -288,15 +288,33 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  String _getLocalizedPlayerName(int playerIndex, AppLocalizations l10n) {
+    switch (playerIndex) {
+      case 0:
+        return l10n.player;
+      case 1:
+        return l10n.aiPlayer1;
+      case 2:
+        return l10n.aiPlayer2;
+      case 3:
+        return l10n.aiPlayer3;
+      case 4:
+        return l10n.aiPlayer4;
+      default:
+        return 'Player $playerIndex';
+    }
+  }
+
   Widget _buildPlayerStatRow(
     dynamic playerStats,
-    bool isHuman,
+    int playerIndex,
     AppLocalizations l10n,
     double nameSize,
     double valueSize,
     double scoreSize,
     double iconSize,
   ) {
+    final isHuman = playerIndex == 0;
     final scoreColor = playerStats.totalScore >= 0 ? Colors.lightGreenAccent : Colors.redAccent;
 
     return Container(
@@ -317,7 +335,7 @@ class HomeScreen extends StatelessWidget {
                 if (isHuman) const SizedBox(width: 4),
                 Flexible(
                   child: Text(
-                    playerStats.name,
+                    _getLocalizedPlayerName(playerIndex, l10n),
                     style: TextStyle(
                       color: isHuman ? Colors.amber : Colors.white,
                       fontSize: nameSize,
