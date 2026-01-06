@@ -50,7 +50,7 @@ class SevenCardPlayer {
     required this.name,
     required this.type,
     List<PlayingCard>? hand,
-    this.chips = 1000,
+    this.chips = 0,
     this.currentBet = 0,
     this.totalBetInGame = 0,
     this.bettingActionsInRound = 0,

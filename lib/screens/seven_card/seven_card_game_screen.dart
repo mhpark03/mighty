@@ -4,6 +4,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../models/card.dart';
 import '../../models/seven_card/seven_card_state.dart';
 import '../../services/seven_card/seven_card_controller.dart';
+import '../../services/seven_card/seven_card_stats_service.dart';
 import '../../widgets/banner_ad_widget.dart';
 
 class SevenCardGameScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class SevenCardGameScreen extends StatefulWidget {
 }
 
 class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
+  bool _statsRecorded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -1033,97 +1035,183 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
 
   Widget _buildGameEndScreen(SevenCardController controller, SevenCardState state, AppLocalizations l10n) {
     final winner = state.winnerId != null ? state.players[state.winnerId!] : null;
+    final statsService = Provider.of<SevenCardStatsService>(context, listen: false);
 
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.all(24),
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.emoji_events, color: Colors.amber, size: 60),
-            const SizedBox(height: 16),
-            Text(
-              winner != null ? '${winner.name} ${l10n.wins}!' : l10n.gameEnd,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    // 통계 기록 (한 번만)
+    if (!_statsRecorded && winner != null) {
+      _statsRecorded = true;
+      final playerScores = <int, int>{};
+      for (final player in state.players) {
+        if (player.id == winner.id) {
+          // 승자: +pot - 자신의 베팅액
+          playerScores[player.id] = state.pot - player.totalBetInGame;
+        } else {
+          // 패자: -베팅액
+          playerScores[player.id] = -player.totalBetInGame;
+        }
+      }
+      statsService.recordGameResult(winnerId: winner.id, playerScores: playerScores);
+    }
+
+    return Consumer<SevenCardStatsService>(
+      builder: (context, stats, child) {
+        return Center(
+          child: Container(
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
             ),
-            if (winner?.pokerHand != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                controller.getHandRankName(winner!.pokerHand!.rank),
-                style: const TextStyle(fontSize: 18, color: Colors.green),
-              ),
-            ],
-            const SizedBox(height: 16),
-            Text(
-              '${l10n.pot}: ${state.pot}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 24),
-            // 모든 플레이어의 최종 카드와 칩
-            ...state.players.map((player) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.emoji_events, color: Colors.amber, size: 48),
+                const SizedBox(height: 12),
+                Text(
+                  winner != null ? '${winner.name} ${l10n.wins}!' : l10n.gameEnd,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                if (winner?.pokerHand != null) ...[
+                  const SizedBox(height: 4),
                   Text(
-                    player.name,
-                    style: TextStyle(
-                      fontWeight: player.id == winner?.id ? FontWeight.bold : FontWeight.normal,
-                      color: player.isFolded ? Colors.grey : Colors.black,
-                    ),
-                  ),
-                  Text(
-                    player.isFolded ? l10n.folded : (player.pokerHand != null ? controller.getHandRankName(player.pokerHand!.rank) : '-'),
-                    style: TextStyle(color: player.isFolded ? Colors.grey : Colors.green),
-                  ),
-                  Text(
-                    '${player.chips}',
-                    style: TextStyle(
-                      color: player.id == winner?.id ? Colors.green : Colors.black,
-                      fontWeight: player.id == winner?.id ? FontWeight.bold : FontWeight.normal,
-                    ),
+                    controller.getHandRankName(winner!.pokerHand!.rank),
+                    style: const TextStyle(fontSize: 16, color: Colors.green),
                   ),
                 ],
-              ),
-            )),
-            const SizedBox(height: 24),
-            // 버튼들
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 결과 확인 버튼
-                ElevatedButton.icon(
-                  onPressed: () => _showDetailedResults(context, controller, state),
-                  icon: const Icon(Icons.visibility),
-                  label: const Text('결과 확인'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                const SizedBox(height: 8),
+                Text(
+                  '${l10n.pot}: ${state.pot}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 16),
+                // 누적 통계 테이블
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      // 테이블 헤더
+                      Row(
+                        children: [
+                          const Expanded(flex: 3, child: Text('플레이어', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          const Expanded(flex: 2, child: Text('이번 게임', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          const Expanded(flex: 2, child: Text('승/패', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          const Expanded(flex: 2, child: Text('누적', textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                        ],
+                      ),
+                      const Divider(height: 8),
+                      // 플레이어별 통계
+                      ...state.players.map((player) {
+                        final playerStats = stats.getPlayerStats(player.id);
+                        final gameScore = player.id == winner?.id
+                            ? state.pot - player.totalBetInGame
+                            : -player.totalBetInGame;
+                        final isWinner = player.id == winner?.id;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 3),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Row(
+                                  children: [
+                                    if (isWinner) const Icon(Icons.emoji_events, color: Colors.amber, size: 14),
+                                    if (isWinner) const SizedBox(width: 2),
+                                    Flexible(
+                                      child: Text(
+                                        player.name,
+                                        style: TextStyle(
+                                          fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
+                                          color: player.isFolded ? Colors.grey : Colors.black,
+                                          fontSize: 13,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  '${gameScore >= 0 ? '+' : ''}$gameScore',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: gameScore >= 0 ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  '${playerStats?.wins ?? 0}/${playerStats?.losses ?? 0}',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  '${playerStats?.totalScore ?? 0}',
+                                  textAlign: TextAlign.right,
+                                  style: TextStyle(
+                                    color: (playerStats?.totalScore ?? 0) >= 0 ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 12),
-                // 새 게임 버튼
-                ElevatedButton.icon(
-                  onPressed: () => controller.startNewGame(),
-                  icon: const Icon(Icons.refresh),
-                  label: Text(l10n.newGame),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  ),
+                const SizedBox(height: 16),
+                // 버튼들
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // 결과 확인 버튼
+                    ElevatedButton.icon(
+                      onPressed: () => _showDetailedResults(context, controller, state),
+                      icon: const Icon(Icons.visibility, size: 18),
+                      label: const Text('결과 확인'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // 새 게임 버튼
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        _statsRecorded = false;
+                        controller.startNewGame();
+                      },
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: Text(l10n.newGame),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
