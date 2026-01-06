@@ -169,7 +169,7 @@
   "sevenCardRulesText": "• 每位玩家获得7张牌\n• 前3张为暗牌，其余4张为明牌\n• 通过下注回合，用最佳5张牌决胜负\n• 牌型最大的玩家获胜",
   "pot": "底池",
   "currentBet": "当前下注",
-  "betting": "下注中",
+  "betting": "回合",
   "chips": "筹码",
   "bet": "下注",
   "fold": "弃牌",

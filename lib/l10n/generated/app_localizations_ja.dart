@@ -559,7 +559,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get currentBet => '現在のベット';
 
   @override
-  String get betting => 'ベッティング';
+  String get betting => 'ラウンド';
 
   @override
   String get chips => 'チップ';

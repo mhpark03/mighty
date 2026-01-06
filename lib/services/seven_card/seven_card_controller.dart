@@ -14,6 +14,7 @@ class SevenCardController extends ChangeNotifier {
   int _transitionCountdown = 0;
   Timer? _transitionTimer;
   SevenCardPhase? _previousPhase;
+  int _cardCountBeforeTransition = 0; // 전환 전 카드 수 (새 카드 숨기기용)
 
   SevenCardController() {
     _initializePlayers();
@@ -26,6 +27,7 @@ class SevenCardController extends ChangeNotifier {
   String get roundTransitionMessage => _roundTransitionMessage;
   int get transitionCountdown => _transitionCountdown;
   bool get hasActiveGame => _state.phase != SevenCardPhase.waiting && _state.phase != SevenCardPhase.gameEnd;
+  int get cardCountBeforeTransition => _cardCountBeforeTransition;
 
   void _initializePlayers() {
     final players = [
@@ -129,6 +131,7 @@ class SevenCardController extends ChangeNotifier {
   void _endRoundTransition() {
     _cancelTransitionTimer();
     _isRoundTransitioning = false;
+    _cardCountBeforeTransition = 0; // 전환 완료 - 모든 카드 표시
     notifyListeners();
 
     // AI 턴 처리 계속
@@ -150,11 +153,14 @@ class SevenCardController extends ChangeNotifier {
     String? message;
 
     if (prevPhase == SevenCardPhase.betting1 && currPhase == SevenCardPhase.betting2) {
-      message = '베팅 1 완료!\n5번째 카드가 배분됩니다.';
+      message = '라운드 1 완료!\n5번째 카드가 배분됩니다.\n\nGOOD LUCK!';
+      _cardCountBeforeTransition = 4; // 전환 전 카드 수 (새 카드 숨기기용)
     } else if (prevPhase == SevenCardPhase.betting2 && currPhase == SevenCardPhase.betting3) {
-      message = '베팅 2 완료!\n6번째 카드가 배분됩니다.';
+      message = '라운드 2 완료!\n6번째 카드가 배분됩니다.\n\nGOOD LUCK!';
+      _cardCountBeforeTransition = 5;
     } else if (prevPhase == SevenCardPhase.betting3 && currPhase == SevenCardPhase.betting4) {
-      message = '베팅 3 완료!\n마지막 7번째 카드가 배분됩니다.\n\n7장 중 최고의 5장 족보가 표시됩니다.';
+      message = '라운드 3 완료!\n마지막 7번째 카드가 배분됩니다.\n\nGOOD LUCK!';
+      _cardCountBeforeTransition = 6;
     } else if (currPhase == SevenCardPhase.gameEnd && prevPhase != SevenCardPhase.gameEnd) {
       // 게임 종료는 별도 화면으로 처리
       return;
@@ -521,9 +527,10 @@ class SevenCardController extends ChangeNotifier {
       }
     }
 
-    // === 높은 투페어 이상 (강도 >= 0.50): 중간 라운드에서 공격적으로 콜 ===
-    if (handStrength >= 0.50 && callAmount > 0) {
-      // 중간 라운드에서는 높은 투페어 이상이면 거의 항상 콜
+    // === 높은 투페어 (강도 0.50 ~ 0.60): 중간 라운드에서 공격적으로 콜 ===
+    // 트리플 이상(>= 0.60)은 레이즈 로직으로 넘김
+    if (handStrength >= 0.50 && handStrength < 0.60 && callAmount > 0) {
+      // 중간 라운드에서는 높은 투페어이면 거의 항상 콜
       // 상대가 매우 강해 보이지 않으면 무조건 콜
       if (humanOpenStrength < 0.55) {
         return _AIAction('call', 0);
@@ -555,26 +562,27 @@ class SevenCardController extends ChangeNotifier {
       }
     }
 
-    // 상대(플레이어)가 약해 보이면 버티기
-    if (humanOpenStrength < 0.3 && callAmount > 0) {
+    // 상대(플레이어)가 약해 보이면 버티기 (트리플 미만만)
+    if (humanOpenStrength < 0.3 && callAmount > 0 && handStrength < 0.60) {
       // 상대가 약해 보이고 내가 최소한 하이카드 이상이면 콜 (70%)
       if (handStrength >= 0.15 && random.nextDouble() < 0.7) {
         return _AIAction('call', 0);
       }
     }
 
-    // 내가 상대보다 우세해 보이면 콜
-    if (relativeStrengthVsHuman > 0.05 && callAmount > 0 && handStrength >= 0.2) {
+    // 내가 상대보다 우세해 보이면 콜 (트리플 미만만)
+    if (relativeStrengthVsHuman > 0.05 && callAmount > 0 && handStrength >= 0.2 && handStrength < 0.60) {
       if (random.nextDouble() < 0.75) {
         return _AIAction('call', 0);
       }
     }
 
-    // === 블러프 캐처 로직 ===
+    // === 블러프 캐처 로직 (트리플 미만만) ===
     // 마지막 남은 AI가 플레이어의 블러프를 잡아야 함
+    // 트리플 이상(>= 0.60)은 레이즈 로직으로 넘김
     final isLastActiveAI = _isLastActiveAI(player);
 
-    if (isLastActiveAI && callAmount > 0) {
+    if (isLastActiveAI && callAmount > 0 && handStrength < 0.60) {
       // 팟 오즈 계산: 팟이 크면 블러프 캐치 가치가 있음
       final potOddsForBluffCatch = callAmount / (_state.pot + callAmount);
 
@@ -615,8 +623,27 @@ class SevenCardController extends ChangeNotifier {
     // 강한 드로우 체크 (4장 플러시/스트레이트 드로우)
     final strongDraw = _hasStrongDraw(player);
 
+    // === 라운드 1, 2에서 도전적 베팅 ===
+    final isEarlyRound = _state.phase == SevenCardPhase.betting1 ||
+                         _state.phase == SevenCardPhase.betting2;
+
     // 콜 금액이 없으면 (이미 맞춤)
     if (callAmount == 0) {
+      // 라운드 1, 2: 더 공격적으로 레이즈
+      if (isEarlyRound) {
+        // 투페어 이상 (0.45+): 70% 레이즈
+        if (handStrength >= 0.45 && random.nextDouble() < 0.70) {
+          return _selectRaiseAction(handStrength, availableActions, random);
+        }
+        // 강한 원페어 (0.35~0.45): 50% 레이즈
+        if (handStrength >= 0.35 && random.nextDouble() < 0.50) {
+          return _selectRaiseAction(handStrength, availableActions, random);
+        }
+        // 원페어 (0.25~0.35): 30% 레이즈
+        if (handStrength >= 0.25 && random.nextDouble() < 0.30) {
+          return _selectRaiseAction(handStrength, availableActions, random);
+        }
+      }
       // 트리플 이상이고 마지막 카드가 아니면 공격적으로 레이즈
       if (handStrength >= 0.60 && cardsRemaining >= 1) {
         // 트리플~스트레이트: 55% 레이즈
@@ -645,6 +672,18 @@ class SevenCardController extends ChangeNotifier {
       // 4장 플러시/스트레이트 드로우: 높은 확률로 콜
       if (random.nextDouble() < 0.85) {
         return _AIAction('call', 0);
+      }
+    }
+
+    // === 라운드 1, 2에서 콜 금액이 있을 때 도전적 베팅 ===
+    if (isEarlyRound && callAmount > 0) {
+      // 투페어 이상 (0.45+): 60% 레이즈
+      if (handStrength >= 0.45 && random.nextDouble() < 0.60) {
+        return _selectRaiseAction(handStrength, availableActions, random);
+      }
+      // 강한 원페어 (0.35~0.45): 40% 레이즈
+      if (handStrength >= 0.35 && handStrength < 0.45 && random.nextDouble() < 0.40) {
+        return _selectRaiseAction(handStrength, availableActions, random);
       }
     }
 

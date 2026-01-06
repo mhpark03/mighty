@@ -561,7 +561,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentBet => 'Current Bet';
 
   @override
-  String get betting => 'Betting';
+  String get betting => 'Round';
 
   @override
   String get chips => 'Chips';

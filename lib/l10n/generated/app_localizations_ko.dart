@@ -559,7 +559,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get currentBet => '현재 베팅';
 
   @override
-  String get betting => '베팅';
+  String get betting => '라운드';
 
   @override
   String get chips => '칩';

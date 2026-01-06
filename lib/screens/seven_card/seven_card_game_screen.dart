@@ -41,10 +41,10 @@ class _ResponsiveSizes {
     aiCardHeight = isSmall ? 36 : (isMedium ? 40 : 44);
     aiFontSize = isSmall ? 9 : (isMedium ? 10 : 11);
 
-    // 플레이어 카드
-    playerCardWidth = isSmall ? 38 : (isMedium ? 42 : 46);
-    playerCardHeight = isSmall ? 54 : (isMedium ? 58 : 64);
-    playerFontSize = isSmall ? 13 : (isMedium ? 15 : 16);
+    // 플레이어 카드 (7장 + 족보 표시가 한 줄에 들어오도록 조정)
+    playerCardWidth = isSmall ? 32 : (isMedium ? 36 : 40);
+    playerCardHeight = isSmall ? 46 : (isMedium ? 50 : 56);
+    playerFontSize = isSmall ? 11 : (isMedium ? 13 : 14);
 
     // 폰트
     nameFontSize = isSmall ? 10 : (isMedium ? 11 : 12);
@@ -590,10 +590,18 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
               spacing: 1,
               alignment: WrapAlignment.center,
               children: [
-                // 히든 카드 (뒷면 표시)
-                ...opponent.hiddenCards.map((card) => _buildSmallCardBackForAI(sizes)),
-                // 오픈 카드
-                ...opponent.openCards.map((card) => _buildSmallCard(card, sizes)),
+                // 전환 중이면 이전 카드 수만큼만 표시
+                if (controller.isRoundTransitioning && controller.cardCountBeforeTransition > 0) ...[
+                  ...opponent.hand.take(controller.cardCountBeforeTransition).map((card) {
+                    final isOpen = opponent.openCards.contains(card);
+                    return isOpen ? _buildSmallCard(card, sizes) : _buildSmallCardBackForAI(sizes);
+                  }),
+                ] else ...[
+                  // 히든 카드 (뒷면 표시)
+                  ...opponent.hiddenCards.map((card) => _buildSmallCardBackForAI(sizes)),
+                  // 오픈 카드
+                  ...opponent.openCards.map((card) => _buildSmallCard(card, sizes)),
+                ],
                 // 조정 강도 표시 (테스트용)
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
@@ -770,10 +778,18 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                 if (player.isFolded) ...[
                   ...player.hand.map((card) => _buildPlayerCardBack(sizes)),
                 ] else ...[
-                  // 오픈 카드
-                  ...player.openCards.map((card) => _buildPlayerCard(card, true, sizes)),
-                  // 히든 카드
-                  ...player.hiddenCards.map((card) => _buildPlayerCard(card, false, sizes)),
+                  // 전환 중이면 이전 카드 수만큼만 표시
+                  if (controller.isRoundTransitioning && controller.cardCountBeforeTransition > 0) ...[
+                    ...player.hand.take(controller.cardCountBeforeTransition).map((card) {
+                      final isOpen = player.openCards.contains(card);
+                      return _buildPlayerCard(card, isOpen, sizes);
+                    }),
+                  ] else ...[
+                    // 오픈 카드
+                    ...player.openCards.map((card) => _buildPlayerCard(card, true, sizes)),
+                    // 히든 카드
+                    ...player.hiddenCards.map((card) => _buildPlayerCard(card, false, sizes)),
+                  ],
                 ],
                 // 족보 표시 (다이 상태면 "다이" 표시)
                 if (player.isFolded)
@@ -824,14 +840,14 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
       return Container(
         width: sizes.playerCardWidth,
         height: sizes.playerCardHeight,
-        margin: const EdgeInsets.symmetric(horizontal: 2),
+        margin: const EdgeInsets.symmetric(horizontal: 1),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: isOpen ? Colors.amber : Colors.grey, width: 2),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: isOpen ? Colors.amber : Colors.grey, width: isOpen ? 2 : 1),
         ),
         child: Center(
-          child: Text('🃏', style: TextStyle(fontSize: sizes.playerFontSize + 6)),
+          child: Text('🃏', style: TextStyle(fontSize: sizes.playerFontSize + 4)),
         ),
       );
     }
@@ -845,19 +861,19 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
     return Container(
       width: sizes.playerCardWidth,
       height: sizes.playerCardHeight,
-      margin: const EdgeInsets.symmetric(horizontal: 2),
+      margin: const EdgeInsets.symmetric(horizontal: 1),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: isOpen ? Colors.amber : Colors.grey[400]!,
-          width: isOpen ? 3 : 2,
+          width: isOpen ? 2 : 1,
         ),
         boxShadow: isOpen ? [
           BoxShadow(
             color: Colors.amber.withValues(alpha: 0.5),
-            blurRadius: 4,
-            spreadRadius: 1,
+            blurRadius: 3,
+            spreadRadius: 0,
           ),
         ] : null,
       ),
@@ -890,11 +906,11 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
       child: Container(
         width: sizes.playerCardWidth,
         height: sizes.playerCardHeight,
-        margin: const EdgeInsets.symmetric(horizontal: 2),
+        margin: const EdgeInsets.symmetric(horizontal: 1),
         decoration: BoxDecoration(
           color: Colors.blue[800],
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: Colors.blue[900]!, width: 2),
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.blue[900]!, width: 1),
         ),
         child: Center(
           child: Container(
@@ -902,7 +918,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
             height: sizes.playerCardHeight * 0.65,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.blue[300]!, width: 1),
-              borderRadius: BorderRadius.circular(3),
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
         ),

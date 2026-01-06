@@ -170,7 +170,7 @@
   "sevenCardRulesText": "• Each player receives 7 cards\n• First 3 cards are hidden, remaining 4 are shown\n• Betting rounds determine the winner with best 5 cards\n• Player with the highest hand wins",
   "pot": "Pot",
   "currentBet": "Current Bet",
-  "betting": "Betting",
+  "betting": "Round",
   "chips": "Chips",
   "bet": "Bet",
   "fold": "Die",

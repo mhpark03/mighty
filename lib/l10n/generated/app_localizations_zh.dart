@@ -556,7 +556,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get currentBet => '当前下注';
 
   @override
-  String get betting => '下注中';
+  String get betting => '回合';
 
   @override
   String get chips => '筹码';

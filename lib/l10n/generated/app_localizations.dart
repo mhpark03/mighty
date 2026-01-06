@@ -1119,7 +1119,7 @@ abstract class AppLocalizations {
   /// No description provided for @betting.
   ///
   /// In ko, this message translates to:
-  /// **'베팅'**
+  /// **'라운드'**
   String get betting;
 
   /// No description provided for @chips.
