@@ -30,6 +30,13 @@ class _GameScreenState extends State<GameScreen> {
   bool _statsRecorded = false;
   bool _bidInitialized = false;
 
+  /// 배팅을 무늬 기호로 포맷
+  String _formatBid(Bid bid) {
+    if (bid.passed) return 'Pass';
+    final suitSymbol = bid.suit != null ? _getSuitSymbol(bid.suit!) : 'NT';
+    return '${bid.tricks} $suitSymbol';
+  }
+
   /// 플레이어 ID에 따라 로컬라이즈된 이름 반환
   String _getLocalizedPlayerName(Player player, AppLocalizations l10n) {
     switch (player.id) {
@@ -243,7 +250,7 @@ class _GameScreenState extends State<GameScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    l10n.highestBid(state.currentBid.toString()),
+                    l10n.highestBid(_formatBid(state.currentBid!)),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -463,7 +470,7 @@ class _GameScreenState extends State<GameScreen> {
               spacing: 4,
               children: [
                 for (int i = 13; i <= 20; i++)
-                  _buildBidChip(i, state),
+                  _buildBidChip(i, state, l10n),
               ],
             ),
             const SizedBox(height: 12),
@@ -544,7 +551,7 @@ class _GameScreenState extends State<GameScreen> {
   Suit? _selectedBidSuit = Suit.spade;
   bool _suitManuallySelected = false;  // 사용자가 직접 기루다를 선택했는지
 
-  Widget _buildBidChip(int amount, GameState state) {
+  Widget _buildBidChip(int amount, GameState state, AppLocalizations l10n) {
     final minBid = (state.currentBid?.tricks ?? 12) + 1;
     final isEnabled = amount >= minBid;
     final isSelected = _selectedBidAmount == amount;
@@ -567,7 +574,7 @@ class _GameScreenState extends State<GameScreen> {
                 : (isEnabled ? null : Border.all(color: Colors.grey[700]!, width: 1)),
           ),
           child: Text(
-            amount == 20 ? '풀' : '$amount',
+            amount == 20 ? l10n.fullPoints : '$amount',
             style: TextStyle(
               color: isSelected
                   ? Colors.black
