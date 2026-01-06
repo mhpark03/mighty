@@ -1004,62 +1004,88 @@ class _GameScreenState extends State<GameScreen> {
                       color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
+                    child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // 주공팀 점수
-                        Column(
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              l10n.declarerTeam,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
+                            // 주공팀 점수
+                            Column(
+                              children: [
+                                Text(
+                                  l10n.declarerTeam,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Text(
+                                  state.declarerTeamPoints == 20
+                                      ? l10n.fullPoints
+                                      : '${state.declarerTeamPoints}${l10n.points(0).replaceAll('0', '').trim()}',
+                                  style: TextStyle(
+                                    color: state.declarerWon ? Colors.greenAccent : Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'vs',
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontSize: 16,
                               ),
                             ),
-                            Text(
-                              state.declarerTeamPoints == 20
-                                  ? l10n.fullPoints
-                                  : '${state.declarerTeamPoints}${l10n.points(0).replaceAll('0', '').trim()}',
-                              style: TextStyle(
-                                color: state.declarerWon ? Colors.greenAccent : Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            const SizedBox(width: 8),
+                            // 수비팀 점수
+                            Column(
+                              children: [
+                                Text(
+                                  l10n.defenderTeam,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Text(
+                                  state.defenderTeamPoints == 20
+                                      ? l10n.fullPoints
+                                      : '${state.defenderTeamPoints}${l10n.points(0).replaceAll('0', '').trim()}',
+                                  style: TextStyle(
+                                    color: !state.declarerWon ? Colors.redAccent : Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'vs',
-                          style: TextStyle(
-                            color: Colors.white54,
-                            fontSize: 16,
+                        // 버린 카드 (키티) 표시
+                        if (state.kitty.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                l10n.discardCards,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 11,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              ...state.kitty.map((card) => Padding(
+                                padding: const EdgeInsets.only(right: 3),
+                                child: _buildTinyCard(card, state),
+                              )),
+                            ],
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        // 수비팀 점수
-                        Column(
-                          children: [
-                            Text(
-                              l10n.defenderTeam,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-                            Text(
-                              state.defenderTeamPoints == 20
-                                  ? l10n.fullPoints
-                                  : '${state.defenderTeamPoints}${l10n.points(0).replaceAll('0', '').trim()}',
-                              style: TextStyle(
-                                color: !state.declarerWon ? Colors.redAccent : Colors.white,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       ],
                     ),
                   ),
@@ -2015,8 +2041,8 @@ class _GameScreenState extends State<GameScreen> {
                     ],
                   ),
                 ),
-              // 획득한 점수 카드 (스크롤 가능)
-              if (pointCards.isNotEmpty && controller.state.phase == GamePhase.playing)
+              // 획득한 점수 카드 (스크롤 가능) - 플레이 중 또는 게임 종료 시 표시
+              if (pointCards.isNotEmpty && (controller.state.phase == GamePhase.playing || controller.state.phase == GamePhase.gameEnd))
                 Expanded(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
