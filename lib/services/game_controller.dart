@@ -223,6 +223,17 @@ class GameController extends ChangeNotifier {
         if (card.isJoker) {
           jokerLeadSuit = _aiPlayer.selectJokerLeadSuit(currentPlayer, _state);
         }
+        // 조커콜 카드를 내는데 조커콜을 선언하지 않은 경우 자동 선언
+        // (조커가 없고, 조커가 아직 플레이되지 않았을 때만)
+        final jokerCallCard = _state.jokerCall;
+        if (card.suit == jokerCallCard.suit && card.rank == jokerCallCard.rank) {
+          bool hasJoker = currentPlayer.hand.any((c) => c.isJoker);
+          if (!hasJoker && !_state.isJokerPlayed && _state.currentTrickNumber > 1) {
+            _state.declareJokerCall(jokerCallCard.suit!);
+            notifyListeners();
+            await Future.delayed(const Duration(milliseconds: 500));
+          }
+        }
       }
     } else {
       card = _aiPlayer.selectCard(currentPlayer, _state);
