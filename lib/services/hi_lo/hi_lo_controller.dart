@@ -405,7 +405,7 @@ class HiLoController extends ChangeNotifier {
     return HiLoChoice.hi;
   }
 
-  /// AI 베팅 액션 결정 (세븐카드와 유사)
+  /// AI 베팅 액션 결정 (하이로우 게임 - 로우 잠재력 고려)
   _AIAction _decideAIAction(HiLoPlayer player) {
     final random = Random();
     final hand = player.pokerHand;
@@ -413,6 +413,10 @@ class HiLoController extends ChangeNotifier {
 
     double handStrength = _evaluateHandStrength(player, hand);
     handStrength = _adjustStrengthByOpenCards(handStrength, player);
+
+    // 하이로우 게임: 로우 핸드 잠재력도 고려
+    final lowPotential = _evaluateLowPotential(player);
+    final hasStrongLowDraw = lowPotential >= 0.5;
 
     // 보스인 경우
     if (_state.isCurrentPlayerBoss) {
@@ -439,7 +443,15 @@ class HiLoController extends ChangeNotifier {
     if (cardsRemaining == 0) {
       final opponentStrength = _evaluateOpponentOpenCards();
 
+      // 하이로우: 로우 핸드가 강하면 계속 진행
+      final currentLowHand = player.lowHand;
+      final hasGoodLow = currentLowHand != null && currentLowHand.isQualified;
+
       if (_isLosingToOpponentOpenCards(player, hand)) {
+        // 로우가 좋으면 폴드하지 않음
+        if (hasGoodLow) {
+          return _AIAction('call', 0);
+        }
         if (callAmount > 0) {
           return _AIAction('die', 0);
         }
@@ -470,6 +482,10 @@ class HiLoController extends ChangeNotifier {
       }
 
       if (handStrength < 0.25) {
+        // 로우가 좋으면 계속 진행
+        if (hasGoodLow) {
+          return _AIAction('call', 0);
+        }
         if (opponentStrength >= 0.35 && callAmount > 0) {
           return _AIAction('die', 0);
         }
@@ -511,9 +527,19 @@ class HiLoController extends ChangeNotifier {
 
     final potOdds = callAmount / (_state.pot + callAmount + 1);
     final strongDrawBonus = strongDraw ? 0.25 : 0.0;
-    final adjustedStrength = handStrength + drawBonus + strongDrawBonus;
+    // 하이로우: 로우 잠재력 보너스 추가 (로우로 팟의 절반을 노릴 수 있음)
+    final lowDrawBonus = hasStrongLowDraw ? (lowPotential * 0.3) : 0.0;
+    final adjustedStrength = handStrength + drawBonus + strongDrawBonus + lowDrawBonus;
 
+    // 강한 드로우가 있으면 콜
     if (strongDraw && cardsRemaining >= 1) {
+      if (random.nextDouble() < 0.85) {
+        return _AIAction('call', 0);
+      }
+    }
+
+    // 하이로우: 강한 로우 드로우가 있으면 콜
+    if (hasStrongLowDraw && cardsRemaining >= 1) {
       if (random.nextDouble() < 0.85) {
         return _AIAction('call', 0);
       }
@@ -567,8 +593,12 @@ class HiLoController extends ChangeNotifier {
     }
 
     if (adjustedStrength > potOdds) {
-      final callProbability = (adjustedStrength + 0.2 + drawBonus).clamp(0.0, 0.95);
+      final callProbability = (adjustedStrength + 0.2 + drawBonus + lowDrawBonus).clamp(0.0, 0.95);
       if (random.nextDouble() < callProbability) {
+        return _AIAction('call', 0);
+      }
+      // 로우 드로우가 강하면 폴드하지 않음
+      if (hasStrongLowDraw) {
         return _AIAction('call', 0);
       }
       return _AIAction('die', 0);
@@ -576,7 +606,19 @@ class HiLoController extends ChangeNotifier {
 
     if (cardsRemaining >= 2 && handStrength > 0.25) {
       final cheapCall = callAmount <= _state.pot * 0.3;
-      if (cheapCall && random.nextDouble() < 0.5 + drawBonus) {
+      if (cheapCall && random.nextDouble() < 0.5 + drawBonus + lowDrawBonus) {
+        return _AIAction('call', 0);
+      }
+    }
+
+    // 하이로우: 로우 잠재력이 높으면 폴드하지 않고 콜
+    if (hasStrongLowDraw && cardsRemaining >= 1) {
+      return _AIAction('call', 0);
+    }
+
+    // 초반 라운드에서는 로우 잠재력만으로도 콜
+    if (lowPotential >= 0.3 && cardsRemaining >= 2) {
+      if (random.nextDouble() < 0.6) {
         return _AIAction('call', 0);
       }
     }
@@ -635,6 +677,69 @@ class HiLoController extends ChangeNotifier {
     }
 
     return false;
+  }
+
+  /// 로우 핸드 잠재력 평가 (하이로우 게임 전용)
+  /// 0.0 ~ 1.0 반환 (높을수록 로우 가능성이 높음)
+  double _evaluateLowPotential(HiLoPlayer player) {
+    final cards = player.hand;
+    if (cards.isEmpty) return 0.0;
+
+    // 로우 카드 (A=1, 2~7) 개수 세기
+    // A는 로우에서 1로 사용됨
+    final lowRanks = <int>[];
+    for (final card in cards) {
+      if (card.rank == Rank.ace) {
+        lowRanks.add(1); // A = 1
+      } else {
+        final rankValue = card.rankValue;
+        if (rankValue >= 2 && rankValue <= 7) {
+          lowRanks.add(rankValue);
+        }
+      }
+    }
+
+    // 중복 제거 (페어가 있으면 로우에서 불리)
+    final uniqueLowRanks = lowRanks.toSet();
+    final lowCardCount = uniqueLowRanks.length;
+
+    // 카드 수에 따른 기대치 계산
+    final cardsRemaining = 7 - cards.length;
+
+    // 이미 5장 이상의 유니크 로우 카드가 있으면 매우 좋음
+    if (lowCardCount >= 5) {
+      // 가장 높은 카드 확인 (낮을수록 좋음)
+      final sortedLow = uniqueLowRanks.toList()..sort();
+      final highCard = sortedLow.take(5).last;
+      if (highCard <= 6) return 1.0;  // 6-high 이하 = 최강급
+      if (highCard == 7) return 0.9;  // 7-high = 매우 좋음
+      return 0.75;
+    }
+
+    // 4장의 유니크 로우 카드 + 남은 카드가 있음
+    if (lowCardCount >= 4 && cardsRemaining >= 1) {
+      return 0.7;
+    }
+
+    // 3장의 유니크 로우 카드 + 남은 카드 2장 이상
+    if (lowCardCount >= 3 && cardsRemaining >= 2) {
+      // A가 있으면 더 좋음
+      if (uniqueLowRanks.contains(1)) return 0.6;
+      return 0.5;
+    }
+
+    // 2장의 유니크 로우 카드 + 초반 (카드 3장 이상 남음)
+    if (lowCardCount >= 2 && cardsRemaining >= 3) {
+      if (uniqueLowRanks.contains(1)) return 0.4;
+      return 0.3;
+    }
+
+    // 로우 카드가 적음
+    if (lowCardCount >= 1 && cardsRemaining >= 4) {
+      return 0.2;
+    }
+
+    return 0.0;
   }
 
   _AIAction _selectRaiseAction(double handStrength, List<String> availableActions, Random random) {
