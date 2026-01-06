@@ -183,42 +183,106 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
     final leftOpponents = opponents.length >= 2 ? opponents.sublist(0, 2) : opponents;
     final rightOpponents = opponents.length > 2 ? opponents.sublist(2) : <SevenCardPlayer>[];
 
-    return Column(
+    return Stack(
       children: [
-        // 베팅 단계 표시
-        _buildPotInfo(state, l10n),
-        // AI 플레이어들 + 중앙 팟 영역
-        Expanded(
-          child: Row(
-            children: [
-              // 왼쪽 AI 2명
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: leftOpponents.map((opponent) =>
-                    _buildOpponentArea(opponent, state, l10n, controller)
-                  ).toList(),
-                ),
+        Column(
+          children: [
+            // 베팅 단계 표시
+            _buildPotInfo(state, l10n),
+            // AI 플레이어들 + 중앙 팟 영역
+            Expanded(
+              child: Row(
+                children: [
+                  // 왼쪽 AI 2명
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: leftOpponents.map((opponent) =>
+                        _buildOpponentArea(opponent, state, l10n, controller)
+                      ).toList(),
+                    ),
+                  ),
+                  // 중앙 팟 영역
+                  _buildCenterPotArea(state, l10n),
+                  // 오른쪽 AI 2명
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: rightOpponents.map((opponent) =>
+                        _buildOpponentArea(opponent, state, l10n, controller)
+                      ).toList(),
+                    ),
+                  ),
+                ],
               ),
-              // 중앙 팟 영역
-              _buildCenterPotArea(state, l10n),
-              // 오른쪽 AI 2명
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: rightOpponents.map((opponent) =>
-                    _buildOpponentArea(opponent, state, l10n, controller)
-                  ).toList(),
+            ),
+            // 플레이어 영역
+            _buildPlayerArea(controller, state, l10n),
+            // 액션 버튼 (항상 표시)
+            _buildActionButtons(controller, state, l10n),
+          ],
+        ),
+        // 라운드 전환 오버레이
+        if (controller.isRoundTransitioning)
+          _buildRoundTransitionOverlay(controller),
+      ],
+    );
+  }
+
+  Widget _buildRoundTransitionOverlay(SevenCardController controller) {
+    return GestureDetector(
+      onTap: () => controller.skipTransition(),
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.7),
+        child: Center(
+          child: Container(
+            margin: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.blue[800],
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.amber, width: 2),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.info_outline, color: Colors.amber, size: 48),
+                const SizedBox(height: 16),
+                Text(
+                  controller.roundTransitionMessage,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${controller.transitionCountdown}초 후 진행',
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  '(화면을 터치하면 바로 진행)',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
+            ),
           ),
         ),
-        // 플레이어 영역
-        _buildPlayerArea(controller, state, l10n),
-        // 액션 버튼 (항상 표시)
-        _buildActionButtons(controller, state, l10n),
-      ],
+      ),
     );
   }
 
@@ -459,23 +523,32 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                 children: opponent.hand.map((_) => _buildCardBack()).toList(),
               ),
           ] else ...[
-            // 히든 카드 + 족보 표시 (테스트용: 실제 카드 표시)
+            // 히든 카드 (테스트용: 실제 카드 표시)
             if (opponent.hiddenCards.isNotEmpty)
-              Row(
-                mainAxisSize: MainAxisSize.min,
+              Wrap(
+                spacing: 2,
+                runSpacing: 2,
+                children: opponent.hiddenCards.map((card) => _buildSmallCard(card)).toList(),
+              ),
+            // 오픈 카드 + 족보 표시
+            if (opponent.openCards.isNotEmpty)
+              Wrap(
+                spacing: 2,
+                runSpacing: 2,
+                alignment: WrapAlignment.center,
                 children: [
-                  ...opponent.hiddenCards.map((card) => _buildSmallCard(card)),
-                  // 족보 표시
-                  if (opponent.pokerHand != null)
+                  ...opponent.openCards.map((card) => _buildSmallCard(card)),
+                  // 족보 표시 (오픈 카드 기준)
+                  if (opponent.openPokerHand != null)
                     Container(
-                      margin: const EdgeInsets.only(left: 4),
+                      margin: const EdgeInsets.only(left: 2),
                       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.purple.withValues(alpha: 0.8),
+                        color: Colors.green.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        controller.getHandRankDisplayName(opponent.pokerHand),
+                        controller.getHandRankDisplayName(opponent.openPokerHand),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 8,
@@ -484,12 +557,6 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                       ),
                     ),
                 ],
-              ),
-            // 오픈 카드 표시 - 아래에
-            if (opponent.openCards.isNotEmpty)
-              Wrap(
-                spacing: 2,
-                children: opponent.openCards.map((card) => _buildSmallCard(card)).toList(),
               ),
           ],
         ],
@@ -655,11 +722,43 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // 히든 카드 (뒷면)
+                  // 히든 카드 (실제 카드 표시 - 플레이어 본인 카드)
                   if (player.hiddenCards.isNotEmpty)
-                    ...player.hiddenCards.map((_) => _buildCardBack(small: false)),
-                  // 족보 표시 (히든 카드 옆)
-                  if (player.openPokerHand != null)
+                    ...player.hiddenCards.map((card) => _buildPlayerHiddenCard(card)),
+                  // 족보 표시 (베팅4에서는 전체 7장 기준, 그 외에는 오픈 카드 기준)
+                  if (state.phase == SevenCardPhase.betting4 && player.pokerHand != null)
+                    Container(
+                      margin: const EdgeInsets.only(left: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.purple[700]!, Colors.purple[500]!],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.amber, width: 2),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            '최고 족보',
+                            style: TextStyle(
+                              color: Colors.amber,
+                              fontSize: 10,
+                            ),
+                          ),
+                          Text(
+                            controller.getHandRankDisplayName(player.pokerHand),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else if (player.openPokerHand != null)
                     Container(
                       margin: const EdgeInsets.only(left: 8),
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -743,6 +842,63 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
           Text(
             suitSymbol,
             style: TextStyle(color: color, fontSize: 18),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayerHiddenCard(PlayingCard card) {
+    // 조커 처리
+    if (card.isJoker) {
+      return Container(
+        width: 40,
+        height: 56,
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: Colors.purple, width: 1),
+        ),
+        child: const Center(
+          child: Text(
+            'JK',
+            style: TextStyle(color: Colors.purple, fontSize: 10, fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+    }
+
+    final color = (card.suit == Suit.heart || card.suit == Suit.diamond) ? Colors.red : Colors.black;
+    final suitSymbol = _getSuitSymbol(card.suit);
+    final rankStr = _getRankString(card.rank);
+
+    return Container(
+      width: 40,
+      height: 56,
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: Colors.grey, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 2,
+            offset: const Offset(1, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            rankStr,
+            style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            suitSymbol,
+            style: TextStyle(color: color, fontSize: 14),
           ),
         ],
       ),
@@ -933,18 +1089,229 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
               ),
             )),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () => controller.startNewGame(),
-              icon: const Icon(Icons.refresh),
-              label: Text(l10n.newGame),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-              ),
+            // 버튼들
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // 결과 확인 버튼
+                ElevatedButton.icon(
+                  onPressed: () => _showDetailedResults(context, controller, state),
+                  icon: const Icon(Icons.visibility),
+                  label: const Text('결과 확인'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // 새 게임 버튼
+                ElevatedButton.icon(
+                  onPressed: () => controller.startNewGame(),
+                  icon: const Icon(Icons.refresh),
+                  label: Text(l10n.newGame),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showDetailedResults(BuildContext context, SevenCardController controller, SevenCardState state) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
+          decoration: BoxDecoration(
+            color: Colors.blue[900],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.amber, width: 2),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 헤더
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.blue[800],
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '최종 결과',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+              // 플레이어 카드 목록
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: state.players.map((player) =>
+                      _buildPlayerResultCard(player, controller, state)
+                    ).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlayerResultCard(SevenCardPlayer player, SevenCardController controller, SevenCardState state) {
+    final isWinner = player.id == state.winnerId;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isWinner ? Colors.amber.withValues(alpha: 0.2) : Colors.black26,
+        borderRadius: BorderRadius.circular(12),
+        border: isWinner ? Border.all(color: Colors.amber, width: 2) : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 플레이어 이름과 상태
+          Row(
+            children: [
+              if (isWinner)
+                const Icon(Icons.emoji_events, color: Colors.amber, size: 20),
+              if (isWinner)
+                const SizedBox(width: 4),
+              Text(
+                player.name,
+                style: TextStyle(
+                  color: player.isFolded ? Colors.grey : Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              if (player.isFolded)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    '다이',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                )
+              else if (player.pokerHand != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    controller.getHandRankDisplayName(player.pokerHand),
+                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // 전체 카드 표시
+          if (player.hand.isNotEmpty)
+            Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: player.hand.map((card) {
+                // 최고 5장 조합에 포함된 카드인지 확인
+                final isInBestFive = player.pokerHand?.bestFive.any(
+                  (c) => c.suit == card.suit && c.rank == card.rank
+                ) ?? false;
+                return _buildResultCard(card, isInBestFive && !player.isFolded);
+              }).toList(),
+            ),
+          // 총 베팅액
+          const SizedBox(height: 8),
+          Text(
+            '총 베팅: ${player.totalBetInGame}',
+            style: const TextStyle(color: Colors.amber, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResultCard(PlayingCard card, bool isHighlighted) {
+    if (card.isJoker) {
+      return Container(
+        width: 36,
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: isHighlighted ? Colors.amber : Colors.purple,
+            width: isHighlighted ? 2 : 1,
+          ),
+        ),
+        child: const Center(
+          child: Text(
+            'JK',
+            style: TextStyle(color: Colors.purple, fontSize: 10, fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+    }
+
+    final color = (card.suit == Suit.heart || card.suit == Suit.diamond) ? Colors.red : Colors.black;
+    final suitSymbol = _getSuitSymbol(card.suit);
+    final rankStr = _getRankString(card.rank);
+
+    return Container(
+      width: 36,
+      height: 50,
+      decoration: BoxDecoration(
+        color: isHighlighted ? Colors.amber[50] : Colors.white,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: isHighlighted ? Colors.amber : Colors.grey,
+          width: isHighlighted ? 2 : 1,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            rankStr,
+            style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            suitSymbol,
+            style: TextStyle(color: color, fontSize: 12),
+          ),
+        ],
       ),
     );
   }

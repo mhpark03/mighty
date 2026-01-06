@@ -9,6 +9,11 @@ import '../../models/seven_card/poker_hand.dart';
 class SevenCardController extends ChangeNotifier {
   late SevenCardState _state;
   bool _isProcessing = false;
+  bool _isRoundTransitioning = false;
+  String _roundTransitionMessage = '';
+  int _transitionCountdown = 0;
+  Timer? _transitionTimer;
+  SevenCardPhase? _previousPhase;
 
   SevenCardController() {
     _initializePlayers();
@@ -16,7 +21,10 @@ class SevenCardController extends ChangeNotifier {
 
   SevenCardState get state => _state;
   bool get isProcessing => _isProcessing;
-  bool get isHumanTurn => _state.currentPlayerIndex == 0 && !_isProcessing;
+  bool get isHumanTurn => _state.currentPlayerIndex == 0 && !_isProcessing && !_isRoundTransitioning;
+  bool get isRoundTransitioning => _isRoundTransitioning;
+  String get roundTransitionMessage => _roundTransitionMessage;
+  int get transitionCountdown => _transitionCountdown;
 
   void _initializePlayers() {
     final players = [
@@ -81,8 +89,79 @@ class SevenCardController extends ChangeNotifier {
   }
 
   void reset() {
+    _cancelTransitionTimer();
     _initializePlayers();
     notifyListeners();
+  }
+
+  void _cancelTransitionTimer() {
+    _transitionTimer?.cancel();
+    _transitionTimer = null;
+    _isRoundTransitioning = false;
+    _transitionCountdown = 0;
+  }
+
+  /// 라운드 전환 시작 (10초 카운트다운)
+  void _startRoundTransition(String message) {
+    _isRoundTransitioning = true;
+    _roundTransitionMessage = message;
+    _transitionCountdown = 10;
+    notifyListeners();
+
+    _transitionTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _transitionCountdown--;
+      notifyListeners();
+
+      if (_transitionCountdown <= 0) {
+        _endRoundTransition();
+      }
+    });
+  }
+
+  /// 라운드 전환 종료 (수동 스킵 또는 타이머 완료)
+  void skipTransition() {
+    if (_isRoundTransitioning) {
+      _endRoundTransition();
+    }
+  }
+
+  void _endRoundTransition() {
+    _cancelTransitionTimer();
+    _isRoundTransitioning = false;
+    notifyListeners();
+
+    // AI 턴 처리 계속
+    _processAITurnIfNeeded();
+  }
+
+  /// 페이즈 변경 감지 및 전환 메시지 생성
+  void _checkPhaseTransition() {
+    if (_previousPhase == null) {
+      _previousPhase = _state.phase;
+      return;
+    }
+
+    // 베팅 페이즈 간 전환 감지
+    final prevPhase = _previousPhase!;
+    final currPhase = _state.phase;
+    _previousPhase = currPhase;
+
+    String? message;
+
+    if (prevPhase == SevenCardPhase.betting1 && currPhase == SevenCardPhase.betting2) {
+      message = '베팅 1 완료!\n5번째 카드가 배분됩니다.';
+    } else if (prevPhase == SevenCardPhase.betting2 && currPhase == SevenCardPhase.betting3) {
+      message = '베팅 2 완료!\n6번째 카드가 배분됩니다.';
+    } else if (prevPhase == SevenCardPhase.betting3 && currPhase == SevenCardPhase.betting4) {
+      message = '베팅 3 완료!\n마지막 7번째 카드가 배분됩니다.\n\n7장 중 최고의 5장 족보가 표시됩니다.';
+    } else if (currPhase == SevenCardPhase.gameEnd && prevPhase != SevenCardPhase.gameEnd) {
+      // 게임 종료는 별도 화면으로 처리
+      return;
+    }
+
+    if (message != null) {
+      _startRoundTransition(message);
+    }
   }
 
   // 플레이어 액션
@@ -90,71 +169,88 @@ class SevenCardController extends ChangeNotifier {
     if (!isHumanTurn) return;
     if (!_isBettingPhase()) return;
 
+    final prevPhase = _state.phase;
     _state.bing();
     notifyListeners();
-    _processAITurnIfNeeded();
+    _handlePostAction(prevPhase);
   }
 
   void humanCall() {
     if (!isHumanTurn) return;
     if (!_isBettingPhase()) return;
 
+    final prevPhase = _state.phase;
     _state.call();
     notifyListeners();
-    _processAITurnIfNeeded();
+    _handlePostAction(prevPhase);
   }
 
   void humanDdadang() {
     if (!isHumanTurn) return;
     if (!_isBettingPhase()) return;
 
+    final prevPhase = _state.phase;
     _state.ddadang();
     notifyListeners();
-    _processAITurnIfNeeded();
+    _handlePostAction(prevPhase);
   }
 
   void humanQuarter() {
     if (!isHumanTurn) return;
     if (!_isBettingPhase()) return;
 
+    final prevPhase = _state.phase;
     _state.quarter();
     notifyListeners();
-    _processAITurnIfNeeded();
+    _handlePostAction(prevPhase);
   }
 
   void humanHalf() {
     if (!isHumanTurn) return;
     if (!_isBettingPhase()) return;
 
+    final prevPhase = _state.phase;
     _state.half();
     notifyListeners();
-    _processAITurnIfNeeded();
+    _handlePostAction(prevPhase);
   }
 
   void humanFull() {
     if (!isHumanTurn) return;
     if (!_isBettingPhase()) return;
 
+    final prevPhase = _state.phase;
     _state.full();
     notifyListeners();
-    _processAITurnIfNeeded();
+    _handlePostAction(prevPhase);
   }
 
   void humanDie() {
     if (!isHumanTurn) return;
     if (!_isBettingPhase()) return;
 
+    final prevPhase = _state.phase;
     _state.fold();
     notifyListeners();
-    _processAITurnIfNeeded();
+    _handlePostAction(prevPhase);
   }
 
   void humanCheck() {
     if (!isHumanTurn) return;
     if (!_isBettingPhase()) return;
 
+    final prevPhase = _state.phase;
     _state.check();
     notifyListeners();
+    _handlePostAction(prevPhase);
+  }
+
+  /// 액션 후 처리 (페이즈 전환 체크)
+  void _handlePostAction(SevenCardPhase prevPhase) {
+    if (_state.phase != prevPhase) {
+      _checkPhaseTransition();
+      if (_isRoundTransitioning) return;
+    }
     _processAITurnIfNeeded();
   }
 
@@ -166,6 +262,13 @@ class SevenCardController extends ChangeNotifier {
   }
 
   void _processAITurnIfNeeded() async {
+    // 라운드 전환 중이면 대기
+    if (_isRoundTransitioning) return;
+
+    // 페이즈 전환 체크
+    _checkPhaseTransition();
+    if (_isRoundTransitioning) return;
+
     if (!_isBettingPhase()) return;
     if (_state.currentPlayerIndex == 0) return;
 
@@ -174,8 +277,17 @@ class SevenCardController extends ChangeNotifier {
 
     await Future.delayed(const Duration(milliseconds: 800));
 
+    // 다시 한번 체크 (전환 중에 호출되었을 수 있음)
+    if (_isRoundTransitioning || !_isBettingPhase()) {
+      _isProcessing = false;
+      notifyListeners();
+      return;
+    }
+
     final player = _state.currentPlayer;
     final action = _decideAIAction(player);
+
+    final prevPhase = _state.phase;
 
     switch (action.type) {
       case 'bing':
@@ -206,6 +318,12 @@ class SevenCardController extends ChangeNotifier {
 
     _isProcessing = false;
     notifyListeners();
+
+    // 페이즈가 변경되었는지 확인
+    if (_state.phase != prevPhase) {
+      _checkPhaseTransition();
+      if (_isRoundTransitioning) return;
+    }
 
     // 게임이 아직 진행 중이면 계속
     if (_isBettingPhase()) {
