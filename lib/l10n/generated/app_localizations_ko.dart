@@ -535,4 +535,59 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get multiplierLabel => '배수';
+
+  @override
+  String get selectGame => '게임 선택';
+
+  @override
+  String get sevenCardTitle => '세븐 포커';
+
+  @override
+  String get sevenCardSubtitle => '7장 카드 포커 게임';
+
+  @override
+  String get sevenCardRules => '게임 규칙';
+
+  @override
+  String get sevenCardRulesText =>
+      '• 각 플레이어는 7장의 카드를 받습니다\n• 처음 3장은 비공개, 나머지 4장은 공개\n• 베팅 라운드를 거쳐 최종 5장으로 족보를 만듭니다\n• 가장 높은 족보를 가진 플레이어가 승리';
+
+  @override
+  String get pot => '팟';
+
+  @override
+  String get currentBet => '현재 베팅';
+
+  @override
+  String get betting => '베팅';
+
+  @override
+  String get chips => '칩';
+
+  @override
+  String get bet => '베팅';
+
+  @override
+  String get fold => '다이';
+
+  @override
+  String get call => '콜';
+
+  @override
+  String get raise => '레이즈';
+
+  @override
+  String get check => '체크';
+
+  @override
+  String get allIn => '올인';
+
+  @override
+  String get folded => '다이';
+
+  @override
+  String get wins => '승리';
+
+  @override
+  String get gameEnd => '게임 종료';
 }

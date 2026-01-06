@@ -532,4 +532,59 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get multiplierLabel => '倍数';
+
+  @override
+  String get selectGame => '选择游戏';
+
+  @override
+  String get sevenCardTitle => '七张扑克';
+
+  @override
+  String get sevenCardSubtitle => '7张牌扑克游戏';
+
+  @override
+  String get sevenCardRules => '游戏规则';
+
+  @override
+  String get sevenCardRulesText =>
+      '• 每位玩家获得7张牌\n• 前3张为暗牌，其余4张为明牌\n• 通过下注回合，用最佳5张牌决胜负\n• 牌型最大的玩家获胜';
+
+  @override
+  String get pot => '底池';
+
+  @override
+  String get currentBet => '当前下注';
+
+  @override
+  String get betting => '下注中';
+
+  @override
+  String get chips => '筹码';
+
+  @override
+  String get bet => '下注';
+
+  @override
+  String get fold => '弃牌';
+
+  @override
+  String get call => '跟注';
+
+  @override
+  String get raise => '加注';
+
+  @override
+  String get check => '过牌';
+
+  @override
+  String get allIn => '全押';
+
+  @override
+  String get folded => '弃牌';
+
+  @override
+  String get wins => '获胜';
+
+  @override
+  String get gameEnd => '游戏结束';
 }

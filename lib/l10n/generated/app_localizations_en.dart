@@ -537,4 +537,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get multiplierLabel => 'Multiplier';
+
+  @override
+  String get selectGame => 'Select Game';
+
+  @override
+  String get sevenCardTitle => 'Seven Poker';
+
+  @override
+  String get sevenCardSubtitle => '7-Card Poker Game';
+
+  @override
+  String get sevenCardRules => 'Game Rules';
+
+  @override
+  String get sevenCardRulesText =>
+      '• Each player receives 7 cards\n• First 3 cards are hidden, remaining 4 are shown\n• Betting rounds determine the winner with best 5 cards\n• Player with the highest hand wins';
+
+  @override
+  String get pot => 'Pot';
+
+  @override
+  String get currentBet => 'Current Bet';
+
+  @override
+  String get betting => 'Betting';
+
+  @override
+  String get chips => 'Chips';
+
+  @override
+  String get bet => 'Bet';
+
+  @override
+  String get fold => 'Die';
+
+  @override
+  String get call => 'Call';
+
+  @override
+  String get raise => 'Raise';
+
+  @override
+  String get check => 'Check';
+
+  @override
+  String get allIn => 'All In';
+
+  @override
+  String get folded => 'Die';
+
+  @override
+  String get wins => 'Wins';
+
+  @override
+  String get gameEnd => 'Game End';
 }

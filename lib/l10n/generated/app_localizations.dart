@@ -1073,6 +1073,114 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'배수'**
   String get multiplierLabel;
+
+  /// No description provided for @selectGame.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 선택'**
+  String get selectGame;
+
+  /// No description provided for @sevenCardTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'세븐 포커'**
+  String get sevenCardTitle;
+
+  /// No description provided for @sevenCardSubtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'7장 카드 포커 게임'**
+  String get sevenCardSubtitle;
+
+  /// No description provided for @sevenCardRules.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 규칙'**
+  String get sevenCardRules;
+
+  /// No description provided for @sevenCardRulesText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 각 플레이어는 7장의 카드를 받습니다\n• 처음 3장은 비공개, 나머지 4장은 공개\n• 베팅 라운드를 거쳐 최종 5장으로 족보를 만듭니다\n• 가장 높은 족보를 가진 플레이어가 승리'**
+  String get sevenCardRulesText;
+
+  /// No description provided for @pot.
+  ///
+  /// In ko, this message translates to:
+  /// **'팟'**
+  String get pot;
+
+  /// No description provided for @currentBet.
+  ///
+  /// In ko, this message translates to:
+  /// **'현재 베팅'**
+  String get currentBet;
+
+  /// No description provided for @betting.
+  ///
+  /// In ko, this message translates to:
+  /// **'베팅'**
+  String get betting;
+
+  /// No description provided for @chips.
+  ///
+  /// In ko, this message translates to:
+  /// **'칩'**
+  String get chips;
+
+  /// No description provided for @bet.
+  ///
+  /// In ko, this message translates to:
+  /// **'베팅'**
+  String get bet;
+
+  /// No description provided for @fold.
+  ///
+  /// In ko, this message translates to:
+  /// **'다이'**
+  String get fold;
+
+  /// No description provided for @call.
+  ///
+  /// In ko, this message translates to:
+  /// **'콜'**
+  String get call;
+
+  /// No description provided for @raise.
+  ///
+  /// In ko, this message translates to:
+  /// **'레이즈'**
+  String get raise;
+
+  /// No description provided for @check.
+  ///
+  /// In ko, this message translates to:
+  /// **'체크'**
+  String get check;
+
+  /// No description provided for @allIn.
+  ///
+  /// In ko, this message translates to:
+  /// **'올인'**
+  String get allIn;
+
+  /// No description provided for @folded.
+  ///
+  /// In ko, this message translates to:
+  /// **'다이'**
+  String get folded;
+
+  /// No description provided for @wins.
+  ///
+  /// In ko, this message translates to:
+  /// **'승리'**
+  String get wins;
+
+  /// No description provided for @gameEnd.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 종료'**
+  String get gameEnd;
 }
 
 class _AppLocalizationsDelegate

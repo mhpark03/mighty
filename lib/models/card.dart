@@ -171,6 +171,10 @@ class Deck {
     cards.shuffle();
   }
 
+  void reset() {
+    _initializeDeck();
+  }
+
   List<List<PlayingCard>> deal({int players = 5, int cardsPerPlayer = 10}) {
     shuffle();
     final hands = List.generate(players, (_) => <PlayingCard>[]);

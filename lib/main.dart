@@ -8,6 +8,7 @@ import 'services/game_controller.dart';
 import 'services/stats_service.dart';
 import 'services/ad_service.dart';
 import 'screens/home_screen.dart';
+import 'screens/game_selection_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,7 +60,7 @@ class MightyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        home: const HomeScreen(),
+        home: const GameSelectionScreen(),
       ),
     );
   }

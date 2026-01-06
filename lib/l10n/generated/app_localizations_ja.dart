@@ -535,4 +535,59 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get multiplierLabel => '倍率';
+
+  @override
+  String get selectGame => 'ゲーム選択';
+
+  @override
+  String get sevenCardTitle => 'セブンポーカー';
+
+  @override
+  String get sevenCardSubtitle => '7枚カードポーカーゲーム';
+
+  @override
+  String get sevenCardRules => 'ゲームルール';
+
+  @override
+  String get sevenCardRulesText =>
+      '• 各プレイヤーは7枚のカードを受け取ります\n• 最初の3枚は非公開、残り4枚は公開\n• ベッティングラウンドを経て最終5枚で役を作ります\n• 最も高い役を持つプレイヤーが勝利';
+
+  @override
+  String get pot => 'ポット';
+
+  @override
+  String get currentBet => '現在のベット';
+
+  @override
+  String get betting => 'ベッティング';
+
+  @override
+  String get chips => 'チップ';
+
+  @override
+  String get bet => 'ベット';
+
+  @override
+  String get fold => 'ダイ';
+
+  @override
+  String get call => 'コール';
+
+  @override
+  String get raise => 'レイズ';
+
+  @override
+  String get check => 'チェック';
+
+  @override
+  String get allIn => 'オールイン';
+
+  @override
+  String get folded => 'ダイ';
+
+  @override
+  String get wins => '勝利';
+
+  @override
+  String get gameEnd => 'ゲーム終了';
 }
