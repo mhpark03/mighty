@@ -175,7 +175,7 @@ class SevenCardState {
 
   // 기본 베팅 설정
   static const int basebet = 10;  // 삥 (기본 판돈)
-  static const int ante = 5;
+  static const int ante = 10;
 
   SevenCardState({
     required this.players,
@@ -225,12 +225,11 @@ class SevenCardState {
     // 딜러 이동
     dealerIndex = (dealerIndex + 1) % players.length;
 
-    // 안테 징수
+    // 안테 징수 (각 플레이어 10칩)
     for (final player in players) {
-      final anteAmount = ante.clamp(0, player.chips);
-      player.chips -= anteAmount;
-      player.totalBetInGame += anteAmount;
-      pot += anteAmount;
+      player.chips -= ante;
+      player.totalBetInGame += ante;
+      pot += ante;
     }
 
     // 카드 배분 (각 플레이어에게 3장씩)
