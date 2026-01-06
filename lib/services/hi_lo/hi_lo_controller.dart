@@ -418,18 +418,57 @@ class HiLoController extends ChangeNotifier {
     final lowPotential = _evaluateLowPotential(player);
     final hasStrongLowDraw = lowPotential >= 0.5;
 
+    // 완성된 로우 핸드 강도 평가 (6탑=1.0, 7탑=0.95, 8탑=0.85, 9탑=0.75)
+    final lowHandStrength = _evaluateCompletedLowStrength(player);
+    final hasCompletedLow = lowHandStrength > 0;
+
+    // 하이로우: 하이 또는 로우 중 더 강한 것 기준으로 베팅
+    // 6탑 로우는 로얄 스트레이트와 동급으로 취급
+    final effectiveStrength = hasCompletedLow
+        ? (handStrength > lowHandStrength ? handStrength : lowHandStrength)
+        : handStrength;
+
     // 보스인 경우
     if (_state.isCurrentPlayerBoss) {
-      if (handStrength > 0.85 && random.nextDouble() < 0.3) {
-        return _AIAction('full', 0);
-      }
-      if (handStrength > 0.75 && random.nextDouble() < 0.4) {
+      // 6탑 로우: 로얄 스트레이트급 - 매우 공격적
+      if (lowHandStrength >= 0.95) {
+        if (random.nextDouble() < 0.5) {
+          return _AIAction('full', 0);
+        }
         return _AIAction('half', 0);
       }
-      if (handStrength > 0.6 && random.nextDouble() < 0.5) {
+      // 7탑 로우: 스트레이트 플러시급
+      if (lowHandStrength >= 0.9) {
+        if (random.nextDouble() < 0.4) {
+          return _AIAction('full', 0);
+        }
+        return _AIAction('half', 0);
+      }
+      // 8탑 로우: 포카드급
+      if (lowHandStrength >= 0.8) {
+        if (random.nextDouble() < 0.4) {
+          return _AIAction('half', 0);
+        }
         return _AIAction('quarter', 0);
       }
-      if (handStrength > 0.4 || random.nextDouble() < 0.7) {
+      // 9탑 로우: 풀하우스급
+      if (lowHandStrength >= 0.7) {
+        if (random.nextDouble() < 0.5) {
+          return _AIAction('quarter', 0);
+        }
+        return _AIAction('bing', 0);
+      }
+
+      if (effectiveStrength > 0.85 && random.nextDouble() < 0.3) {
+        return _AIAction('full', 0);
+      }
+      if (effectiveStrength > 0.75 && random.nextDouble() < 0.4) {
+        return _AIAction('half', 0);
+      }
+      if (effectiveStrength > 0.6 && random.nextDouble() < 0.5) {
+        return _AIAction('quarter', 0);
+      }
+      if (effectiveStrength > 0.4 || random.nextDouble() < 0.7) {
         return _AIAction('bing', 0);
       }
       return _AIAction('check', 0);
@@ -438,6 +477,38 @@ class HiLoController extends ChangeNotifier {
     final cardsRemaining = 7 - player.hand.length;
     final drawBonus = cardsRemaining * 0.05;
     final callAmount = _state.getCallAmount();
+
+    // 비보스이면서 강한 로우 핸드가 있으면 공격적으로 레이즈
+    if (!_state.isCurrentPlayerBoss && hasCompletedLow) {
+      // 6탑 로우: 로얄 스트레이트급 - 매우 공격적
+      if (lowHandStrength >= 0.95) {
+        if (random.nextDouble() < 0.45) {
+          return _selectRaiseAction(lowHandStrength, availableActions, random);
+        }
+        return _AIAction('call', 0);
+      }
+      // 7탑 로우: 스트레이트 플러시급
+      if (lowHandStrength >= 0.9) {
+        if (random.nextDouble() < 0.4) {
+          return _selectRaiseAction(lowHandStrength, availableActions, random);
+        }
+        return _AIAction('call', 0);
+      }
+      // 8탑 로우: 포카드급
+      if (lowHandStrength >= 0.8) {
+        if (random.nextDouble() < 0.35) {
+          return _selectRaiseAction(lowHandStrength, availableActions, random);
+        }
+        return _AIAction('call', 0);
+      }
+      // 9탑 로우: 풀하우스급
+      if (lowHandStrength >= 0.7) {
+        if (random.nextDouble() < 0.3) {
+          return _selectRaiseAction(lowHandStrength, availableActions, random);
+        }
+        return _AIAction('call', 0);
+      }
+    }
 
     // 마지막 라운드
     if (cardsRemaining == 0) {
@@ -501,26 +572,26 @@ class HiLoController extends ChangeNotifier {
 
     if (callAmount == 0) {
       if (isEarlyRound) {
-        if (handStrength >= 0.45 && random.nextDouble() < 0.70) {
-          return _selectRaiseAction(handStrength, availableActions, random);
+        if (effectiveStrength >= 0.45 && random.nextDouble() < 0.70) {
+          return _selectRaiseAction(effectiveStrength, availableActions, random);
         }
-        if (handStrength >= 0.35 && random.nextDouble() < 0.50) {
-          return _selectRaiseAction(handStrength, availableActions, random);
+        if (effectiveStrength >= 0.35 && random.nextDouble() < 0.50) {
+          return _selectRaiseAction(effectiveStrength, availableActions, random);
         }
-        if (handStrength >= 0.25 && random.nextDouble() < 0.30) {
-          return _selectRaiseAction(handStrength, availableActions, random);
-        }
-      }
-      if (handStrength >= 0.60 && cardsRemaining >= 1) {
-        if (handStrength < 0.70 && random.nextDouble() < 0.55) {
-          return _selectRaiseAction(handStrength, availableActions, random);
-        }
-        if (handStrength >= 0.70 && random.nextDouble() < 0.70) {
-          return _selectRaiseAction(handStrength, availableActions, random);
+        if (effectiveStrength >= 0.25 && random.nextDouble() < 0.30) {
+          return _selectRaiseAction(effectiveStrength, availableActions, random);
         }
       }
-      if (handStrength > 0.65 && random.nextDouble() < 0.5) {
-        return _selectRaiseAction(handStrength, availableActions, random);
+      if (effectiveStrength >= 0.60 && cardsRemaining >= 1) {
+        if (effectiveStrength < 0.70 && random.nextDouble() < 0.55) {
+          return _selectRaiseAction(effectiveStrength, availableActions, random);
+        }
+        if (effectiveStrength >= 0.70 && random.nextDouble() < 0.70) {
+          return _selectRaiseAction(effectiveStrength, availableActions, random);
+        }
+      }
+      if (effectiveStrength > 0.65 && random.nextDouble() < 0.5) {
+        return _selectRaiseAction(effectiveStrength, availableActions, random);
       }
       return _AIAction('call', 0);
     }
@@ -546,48 +617,48 @@ class HiLoController extends ChangeNotifier {
     }
 
     if (isEarlyRound && callAmount > 0) {
-      if (handStrength >= 0.45 && random.nextDouble() < 0.60) {
-        return _selectRaiseAction(handStrength, availableActions, random);
+      if (effectiveStrength >= 0.45 && random.nextDouble() < 0.60) {
+        return _selectRaiseAction(effectiveStrength, availableActions, random);
       }
-      if (handStrength >= 0.35 && handStrength < 0.45 && random.nextDouble() < 0.40) {
-        return _selectRaiseAction(handStrength, availableActions, random);
+      if (effectiveStrength >= 0.35 && effectiveStrength < 0.45 && random.nextDouble() < 0.40) {
+        return _selectRaiseAction(effectiveStrength, availableActions, random);
       }
     }
 
-    if (handStrength >= 0.60 && cardsRemaining >= 1) {
-      if (handStrength < 0.70) {
+    if (effectiveStrength >= 0.60 && cardsRemaining >= 1) {
+      if (effectiveStrength < 0.70) {
         if (random.nextDouble() < 0.6) {
-          return _selectRaiseAction(handStrength, availableActions, random);
+          return _selectRaiseAction(effectiveStrength, availableActions, random);
         }
       } else {
         if (random.nextDouble() < 0.75) {
-          return _selectRaiseAction(handStrength, availableActions, random);
+          return _selectRaiseAction(effectiveStrength, availableActions, random);
         }
       }
     }
 
-    if (cardsRemaining == 0 && handStrength >= 0.68) {
-      if (handStrength < 0.75) {
+    if (cardsRemaining == 0 && effectiveStrength >= 0.68) {
+      if (effectiveStrength < 0.75) {
         if (random.nextDouble() < 0.70) {
-          return _selectRaiseAction(handStrength, availableActions, random);
+          return _selectRaiseAction(effectiveStrength, availableActions, random);
         }
       } else {
         if (random.nextDouble() < 0.85) {
-          return _selectRaiseAction(handStrength, availableActions, random);
+          return _selectRaiseAction(effectiveStrength, availableActions, random);
         }
       }
     }
 
-    if (handStrength >= 0.75) {
+    if (effectiveStrength >= 0.75) {
       if (random.nextDouble() < 0.9) {
-        return _selectRaiseAction(handStrength, availableActions, random);
+        return _selectRaiseAction(effectiveStrength, availableActions, random);
       }
       return _AIAction('call', 0);
     }
 
     if (adjustedStrength > 0.7) {
       if (random.nextDouble() < 0.7) {
-        return _selectRaiseAction(handStrength, availableActions, random);
+        return _selectRaiseAction(effectiveStrength, availableActions, random);
       }
       return _AIAction('call', 0);
     }
@@ -740,6 +811,38 @@ class HiLoController extends ChangeNotifier {
     }
 
     return 0.0;
+  }
+
+  /// 완성된 로우 핸드 강도 평가
+  /// 6탑 = 1.0 (로얄 스트레이트급), 7탑 = 0.95, 8탑 = 0.85, 9탑 = 0.75
+  double _evaluateCompletedLowStrength(HiLoPlayer player) {
+    final lowHand = player.lowHand;
+    if (lowHand == null || !lowHand.isQualified) return 0.0;
+
+    // lowHand.cardRanks는 정렬된 상태, 마지막이 가장 높은 카드
+    if (lowHand.cardRanks.isEmpty) return 0.0;
+
+    final highCard = lowHand.cardRanks.last;
+
+    // 6탑: A-2-3-4-6 (최강 로우) = 로얄 스트레이트급
+    if (highCard <= 6) return 1.0;
+
+    // 7탑: A-2-3-4-7 등 = 스트레이트 플러시급
+    if (highCard == 7) return 0.95;
+
+    // 8탑: A-2-3-4-8 등 = 포카드급
+    if (highCard == 8) return 0.85;
+
+    // 9탑: A-2-3-4-9 등 = 풀하우스급
+    if (highCard == 9) return 0.75;
+
+    // 10탑: 플러시급
+    if (highCard == 10) return 0.6;
+
+    // J탑 이상: 스트레이트급
+    if (highCard >= 11) return 0.45;
+
+    return 0.3;
   }
 
   _AIAction _selectRaiseAction(double handStrength, List<String> availableActions, Random random) {
