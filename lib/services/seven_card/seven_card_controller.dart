@@ -870,8 +870,85 @@ class SevenCardController extends ChangeNotifier {
     return _AIAction('call', 0);
   }
 
-  /// 상대방 오픈 카드 강도 평가 (슬로우 플레이 여부 결정용)
+  /// 모든 보이는 카드(내 카드 + 모든 오픈 카드) 수집
+  /// 상대방이 가질 수 없는 "데드 카드" 목록
+  Set<String> _collectDeadCards(SevenCardPlayer currentPlayer) {
+    final deadCards = <String>{};
+
+    // 1. 내 모든 카드 (히든 + 오픈)
+    for (final card in currentPlayer.hand) {
+      if (card.suit != null && card.rank != null) {
+        deadCards.add('${card.suit!.name}_${card.rank!.name}');
+      }
+    }
+
+    // 2. 모든 플레이어의 오픈 카드 (다이한 플레이어 포함)
+    for (final player in _state.players) {
+      if (player.id == currentPlayer.id) continue;
+      for (final card in player.openCards) {
+        if (card.suit != null && card.rank != null) {
+          deadCards.add('${card.suit!.name}_${card.rank!.name}');
+        }
+      }
+    }
+
+    return deadCards;
+  }
+
+  /// 특정 랭크의 남은 카드 수 계산 (4장 중 데드 카드 제외)
+  int _countRemainingCardsForRank(int rankValue, Set<String> deadCards) {
+    final rankName = _getRankNameFromValue(rankValue);
+    int remaining = 4;
+
+    for (final suitName in ['spade', 'heart', 'diamond', 'club']) {
+      if (deadCards.contains('${suitName}_$rankName')) {
+        remaining--;
+      }
+    }
+
+    return remaining;
+  }
+
+  /// 특정 무늬의 남은 카드 수 계산 (13장 중 데드 카드 제외)
+  int _countRemainingCardsForSuit(Suit suit, Set<String> deadCards) {
+    int remaining = 13;
+
+    for (final rankName in [
+      'two', 'three', 'four', 'five', 'six', 'seven', 'eight',
+      'nine', 'ten', 'jack', 'queen', 'king', 'ace'
+    ]) {
+      if (deadCards.contains('${suit.name}_$rankName')) {
+        remaining--;
+      }
+    }
+
+    return remaining;
+  }
+
+  String _getRankNameFromValue(int value) {
+    switch (value) {
+      case 2: return 'two';
+      case 3: return 'three';
+      case 4: return 'four';
+      case 5: return 'five';
+      case 6: return 'six';
+      case 7: return 'seven';
+      case 8: return 'eight';
+      case 9: return 'nine';
+      case 10: return 'ten';
+      case 11: return 'jack';
+      case 12: return 'queen';
+      case 13: return 'king';
+      case 14: return 'ace';
+      default: return '';
+    }
+  }
+
+  /// 상대방 오픈 카드 강도 평가 (데드 카드 고려)
   double _evaluateOpponentOpenCards() {
+    final currentPlayer = _state.players[_state.currentPlayerIndex];
+    final deadCards = _collectDeadCards(currentPlayer);
+
     double maxStrength = 0.0;
 
     for (final player in _state.players) {
@@ -893,31 +970,90 @@ class SevenCardController extends ChangeNotifier {
         }
       }
 
-      // 페어/트리플 확인
+      // 페어/트리플 확인 - 데드 카드 고려
       final maxSameRank = ranks.values.isEmpty ? 0 : ranks.values.reduce(max);
       if (maxSameRank >= 3) {
         strength = 0.6; // 트리플 보임
       } else if (maxSameRank >= 2) {
-        strength = 0.4; // 페어 보임
+        // 페어가 보이는 경우, 트리플/포카드 가능성 체크
+        final pairRank = ranks.entries.firstWhere((e) => e.value >= 2).key;
+        final remainingForPair = _countRemainingCardsForRank(pairRank, deadCards);
+        if (remainingForPair >= 2) {
+          strength = 0.45; // 포카드 가능성
+        } else if (remainingForPair >= 1) {
+          strength = 0.4; // 트리플 가능성
+        } else {
+          strength = 0.35; // 페어만 (발전 불가)
+        }
       }
 
-      // 플러시 드로우 (같은 무늬 3장 이상)
-      final maxSameSuit = suits.values.isEmpty ? 0 : suits.values.reduce(max);
-      if (maxSameSuit >= 3) {
-        strength = max(strength, 0.5); // 플러시 드로우 가능성
+      // 플러시 드로우 (같은 무늬 3장 이상) - 데드 카드 고려
+      Suit? flushSuit;
+      int flushCount = 0;
+      for (final entry in suits.entries) {
+        if (entry.value >= 3 && entry.value > flushCount) {
+          flushCount = entry.value;
+          flushSuit = entry.key;
+        }
       }
 
-      // 스트레이트 드로우 (연속 카드)
-      final sortedRanks = ranks.keys.toList()..sort();
-      if (sortedRanks.length >= 3) {
-        int consecutive = 1;
-        for (int i = 1; i < sortedRanks.length; i++) {
-          if (sortedRanks[i] - sortedRanks[i-1] == 1) {
-            consecutive++;
+      if (flushSuit != null && flushCount >= 3) {
+        final remainingForFlush = _countRemainingCardsForSuit(flushSuit, deadCards);
+        final cardsNeeded = 5 - flushCount;
+        final hiddenCards = 7 - openCards.length;  // 히든 카드 수
+
+        if (flushCount >= 4) {
+          // 4장 플러시 드로우 - 완성 가능성 높음
+          if (remainingForFlush >= 1) {
+            strength = max(strength, 0.6);
+          } else {
+            strength = max(strength, 0.35); // 발전 불가
+          }
+        } else if (flushCount >= 3 && hiddenCards >= cardsNeeded) {
+          // 3장 플러시 드로우
+          if (remainingForFlush >= cardsNeeded) {
+            strength = max(strength, 0.5);
+          } else if (remainingForFlush >= 1) {
+            strength = max(strength, 0.4);
           }
         }
-        if (consecutive >= 3) {
-          strength = max(strength, 0.45); // 스트레이트 드로우 가능성
+      }
+
+      // 스트레이트 드로우 (연속 카드) - 데드 카드 고려
+      final sortedRanks = ranks.keys.toList()..sort();
+      if (sortedRanks.length >= 3) {
+        int maxConsecutive = 1;
+        int currentConsecutive = 1;
+        for (int i = 1; i < sortedRanks.length; i++) {
+          if (sortedRanks[i] - sortedRanks[i-1] == 1) {
+            currentConsecutive++;
+            maxConsecutive = max(maxConsecutive, currentConsecutive);
+          } else if (sortedRanks[i] - sortedRanks[i-1] > 1) {
+            currentConsecutive = 1;
+          }
+        }
+
+        if (maxConsecutive >= 4) {
+          // 4장 스트레이트 드로우 - 필요한 카드 확인
+          // 양 끝 카드 중 남은 것 체크
+          final lowEnd = sortedRanks.first - 1;
+          final highEnd = sortedRanks.last + 1;
+          int availableOuts = 0;
+          if (lowEnd >= 2) {
+            availableOuts += _countRemainingCardsForRank(lowEnd, deadCards);
+          }
+          if (highEnd <= 14) {
+            availableOuts += _countRemainingCardsForRank(highEnd, deadCards);
+          }
+          if (availableOuts >= 4) {
+            strength = max(strength, 0.55);
+          } else if (availableOuts >= 2) {
+            strength = max(strength, 0.45);
+          } else {
+            strength = max(strength, 0.35); // 아웃이 적음
+          }
+        } else if (maxConsecutive >= 3) {
+          strength = max(strength, 0.4);
         }
       }
 
