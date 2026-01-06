@@ -6,6 +6,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'services/game_controller.dart';
 import 'services/stats_service.dart';
+import 'services/seven_card/seven_card_controller.dart';
 import 'services/seven_card/seven_card_stats_service.dart';
 import 'services/ad_service.dart';
 import 'screens/game_selection_screen.dart';
@@ -38,6 +39,7 @@ class MightyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => StatsService()..loadStats()),
         ChangeNotifierProvider(create: (context) => SevenCardStatsService()..loadStats()),
         ChangeNotifierProvider(create: (context) => GameController()),
+        ChangeNotifierProvider(create: (context) => SevenCardController()),
       ],
       child: MaterialApp(
         title: 'Mighty',

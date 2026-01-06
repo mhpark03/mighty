@@ -25,6 +25,7 @@ class SevenCardController extends ChangeNotifier {
   bool get isRoundTransitioning => _isRoundTransitioning;
   String get roundTransitionMessage => _roundTransitionMessage;
   int get transitionCountdown => _transitionCountdown;
+  bool get hasActiveGame => _state.phase != SevenCardPhase.waiting && _state.phase != SevenCardPhase.gameEnd;
 
   void _initializePlayers() {
     final players = [
