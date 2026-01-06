@@ -308,13 +308,18 @@ class SevenCardState {
   /// 전체 오픈 카드를 순서대로 비교 (A-A면 두번째 카드 비교)
   int _getHighCardPlayerIndex() {
     int highestIndex = 0;
+    PokerHand? highestHand;
     List<PlayingCard> highestCards = [];
+    bool foundFirst = false;
 
     for (int i = 0; i < players.length; i++) {
       final player = players[i];
       if (!player.isActive) continue;
 
-      // 오픈 카드를 랭크 내림차순으로 정렬 (조커 제외)
+      // 오픈 카드의 족보 평가
+      final currentHand = player.openPokerHand;
+
+      // 오픈 카드를 랭크 내림차순으로 정렬 (조커 제외) - 타이브레이커용
       final sortedCards = player.openCards
           .where((c) => !c.isJoker)
           .toList()
@@ -328,17 +333,44 @@ class SevenCardState {
 
       if (sortedCards.isEmpty) continue;
 
-      // 첫 플레이어이거나 카드 비교
-      if (highestCards.isEmpty) {
+      // 첫 플레이어
+      if (!foundFirst) {
+        highestHand = currentHand;
         highestCards = sortedCards;
         highestIndex = i;
+        foundFirst = true;
       } else {
-        // 카드 순서대로 비교
-        final compareResult = _compareCardLists(sortedCards, highestCards);
-        if (compareResult > 0) {
+        // 족보 비교
+        if (currentHand != null && highestHand != null) {
+          // 둘 다 족보 있음 - 족보로 비교
+          final handCompare = currentHand.compareTo(highestHand);
+          if (handCompare > 0) {
+            highestHand = currentHand;
+            highestCards = sortedCards;
+            highestIndex = i;
+          } else if (handCompare == 0) {
+            // 족보가 같으면 카드로 비교 (무늬 포함)
+            final cardCompare = _compareCardLists(sortedCards, highestCards);
+            if (cardCompare > 0) {
+              highestHand = currentHand;
+              highestCards = sortedCards;
+              highestIndex = i;
+            }
+          }
+        } else if (currentHand != null && highestHand == null) {
+          // 현재만 족보 있음 - 현재 플레이어가 높음
+          highestHand = currentHand;
           highestCards = sortedCards;
           highestIndex = i;
+        } else if (currentHand == null && highestHand == null) {
+          // 둘 다 족보 없으면 카드로 비교
+          final cardCompare = _compareCardLists(sortedCards, highestCards);
+          if (cardCompare > 0) {
+            highestCards = sortedCards;
+            highestIndex = i;
+          }
         }
+        // currentHand == null && highestHand != null 인 경우 현재 플레이어는 패스
       }
     }
 
