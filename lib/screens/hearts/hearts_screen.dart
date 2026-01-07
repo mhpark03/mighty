@@ -900,21 +900,38 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         return playable.first;
       }
 
-      // ★ 슛더문 방어: 상대가 슛더문 근접 시 점수 카드 주지 않기
+      // ★ 슛더문 방어: 상대가 슛더문 근접 시
       if (shootMoonThreat != null) {
-        // 위협 플레이어가 이 트릭을 이길 것 같으면 점수 카드를 주지 않음
-        // 비점수 카드만 버리기 (위협 플레이어에게 하트 주지 않음)
-        final nonPointCards = playable.where((c) => c.points == 0).toList();
-        if (nonPointCards.isNotEmpty) {
-          // 높은 카드 우선 버리기 (나중에 트릭 이기기 위해 낮은 카드 보유)
-          nonPointCards.sort((a, b) => b.rank.compareTo(a.rank));
-          return nonPointCards.first;
+        // 현재 트릭에서 누가 이기고 있는지 확인
+        int currentWinner = leadPlayer;
+        int highestRank = currentTrick[leadPlayer]!.rank;
+        final trickLeadSuit = currentTrick[leadPlayer]!.suit;
+
+        for (int i = 0; i < 4; i++) {
+          final card = currentTrick[i];
+          if (card != null && card.suit == trickLeadSuit && card.rank > highestRank) {
+            highestRank = card.rank;
+            currentWinner = i;
+          }
         }
-        // 점수 카드만 있으면 어쩔 수 없이 버림 (가장 낮은 하트)
-        final hearts = playable.where((c) => c.isHeart).toList();
-        if (hearts.isNotEmpty) {
-          hearts.sort((a, b) => a.rank.compareTo(b.rank));
-          return hearts.first;
+
+        // 위협 플레이어가 이기고 있으면 → 점수 카드 주지 않음
+        if (currentWinner == shootMoonThreat) {
+          final nonPointCards = playable.where((c) => c.points == 0).toList();
+          if (nonPointCards.isNotEmpty) {
+            nonPointCards.sort((a, b) => b.rank.compareTo(a.rank));
+            return nonPointCards.first;
+          }
+        } else {
+          // 다른 플레이어가 이기고 있으면 → 하트 버려서 슛더문 깨기!
+          final hearts = playable.where((c) => c.isHeart).toList();
+          if (hearts.isNotEmpty) {
+            hearts.sort((a, b) => b.rank.compareTo(a.rank)); // 높은 하트 우선
+            return hearts.first;
+          }
+          // 스페이드 Q도 버리기
+          final queenOfSpades = playable.where((c) => c.isQueenOfSpades).toList();
+          if (queenOfSpades.isNotEmpty) return queenOfSpades.first;
         }
       }
 
