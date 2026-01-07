@@ -2,6 +2,45 @@ import '../card.dart';
 import '../player.dart';
 import 'poker_hand.dart';
 
+/// 보너스 핸드 정보 (포카드 이상)
+class SevenCardBonusInfo {
+  final SevenCardPlayer winner;
+  final HandRank handRank;
+  final int bonusAmount;
+  final int totalWinnings; // 보너스 + 팟
+
+  SevenCardBonusInfo({
+    required this.winner,
+    required this.handRank,
+    required this.bonusAmount,
+    required this.totalWinnings,
+  });
+
+  /// 보너스 금액 계산 (포카드 이상)
+  static int getBonusAmount(HandRank rank) {
+    switch (rank) {
+      case HandRank.royalStraightFlush:
+        return 500;
+      case HandRank.backStraightFlush:
+        return 300;
+      case HandRank.straightFlush:
+        return 200;
+      case HandRank.fourOfAKind:
+        return 100;
+      default:
+        return 0;
+    }
+  }
+
+  /// 보너스 핸드인지 확인 (포카드 이상)
+  static bool isBonusHand(HandRank rank) {
+    return rank == HandRank.fourOfAKind ||
+           rank == HandRank.straightFlush ||
+           rank == HandRank.backStraightFlush ||
+           rank == HandRank.royalStraightFlush;
+  }
+}
+
 /// 세븐카드 게임 단계
 enum SevenCardPhase {
   waiting,      // 대기
@@ -183,6 +222,7 @@ class SevenCardState {
   int lastRaiserIndex;    // 마지막 레이즈한 플레이어
   int bettingRoundStarterIndex; // 베팅 라운드 시작 플레이어 (보스)
   int? winnerId;          // 승자 ID
+  SevenCardBonusInfo? bonusInfo; // 보너스 핸드 정보
 
   // 기본 베팅 설정
   static const int basebet = 10;  // 삥 (기본 판돈)
@@ -200,6 +240,7 @@ class SevenCardState {
     this.lastRaiserIndex = -1,
     this.bettingRoundStarterIndex = 0,
     this.winnerId,
+    this.bonusInfo,
   }) : deck = deck ?? Deck();
 
   /// 활성 플레이어 수
@@ -232,6 +273,7 @@ class SevenCardState {
     minRaise = basebet;
     lastRaiserIndex = -1;
     winnerId = null;
+    bonusInfo = null;
 
     // 딜러 이동
     dealerIndex = (dealerIndex + 1) % players.length;
@@ -698,9 +740,40 @@ class SevenCardState {
     }
 
     if (winner != null) {
-      winner.chips += pot;
-      winnerId = winner.id;
+      // 보너스 핸드 확인 (포카드 이상)
+      if (bestHand != null && SevenCardBonusInfo.isBonusHand(bestHand.rank)) {
+        _handleBonusWin(winner, bestHand);
+      } else {
+        winner.chips += pot;
+        winnerId = winner.id;
+      }
     }
+  }
+
+  /// 보너스 핸드 승리 처리
+  void _handleBonusWin(SevenCardPlayer winner, PokerHand hand) {
+    final bonusAmount = SevenCardBonusInfo.getBonusAmount(hand.rank);
+
+    // 다른 모든 플레이어에게서 보너스 금액 징수
+    int totalBonus = 0;
+    for (final player in players) {
+      if (player.id == winner.id) continue;
+      player.chips -= bonusAmount;
+      totalBonus += bonusAmount;
+    }
+
+    // 승자에게 팟 + 보너스 지급
+    final totalWinnings = pot + totalBonus;
+    winner.chips += totalWinnings;
+    winnerId = winner.id;
+
+    // 보너스 정보 저장
+    bonusInfo = SevenCardBonusInfo(
+      winner: winner,
+      handRank: hand.rank,
+      bonusAmount: bonusAmount,
+      totalWinnings: totalWinnings,
+    );
   }
 
   /// 보스인지 확인 (라운드의 첫 번째 플레이어)

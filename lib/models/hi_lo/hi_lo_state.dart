@@ -191,6 +191,45 @@ class HiLoPlayer {
   }
 }
 
+/// 보너스 핸드 정보
+class BonusHandInfo {
+  final HiLoPlayer winner;
+  final HandRank handRank;
+  final int bonusAmount;
+  final int totalWinnings; // 보너스 + 팟
+
+  BonusHandInfo({
+    required this.winner,
+    required this.handRank,
+    required this.bonusAmount,
+    required this.totalWinnings,
+  });
+
+  /// 보너스 금액 계산 (포카드 이상)
+  static int getBonusAmount(HandRank rank) {
+    switch (rank) {
+      case HandRank.royalStraightFlush:
+        return 500;
+      case HandRank.backStraightFlush:
+        return 300;
+      case HandRank.straightFlush:
+        return 200;
+      case HandRank.fourOfAKind:
+        return 100;
+      default:
+        return 0;
+    }
+  }
+
+  /// 보너스 핸드인지 확인 (포카드 이상)
+  static bool isBonusHand(HandRank rank) {
+    return rank == HandRank.fourOfAKind ||
+           rank == HandRank.straightFlush ||
+           rank == HandRank.backStraightFlush ||
+           rank == HandRank.royalStraightFlush;
+  }
+}
+
 /// 하이로우 게임 결과
 class HiLoResult {
   final HiLoPlayer? hiWinner;
@@ -199,6 +238,7 @@ class HiLoResult {
   final int loPot;
   final bool swingSuccess; // 스윙 성공 여부
   final HiLoPlayer? swingPlayer; // 스윙 시도자
+  final BonusHandInfo? bonusInfo; // 보너스 핸드 정보
 
   HiLoResult({
     this.hiWinner,
@@ -207,6 +247,7 @@ class HiLoResult {
     this.loPot = 0,
     this.swingSuccess = false,
     this.swingPlayer,
+    this.bonusInfo,
   });
 }
 
@@ -683,6 +724,13 @@ class HiLoState {
         phase = HiLoPhase.betting4;
         break;
       case HiLoPhase.betting4:
+        // 보너스 핸드 확인 (포카드 이상)
+        final bonusWinner = _checkBonusHand();
+        if (bonusWinner != null) {
+          // 보너스 핸드 발생 - 하이/로우 선택 건너뛰고 바로 쇼다운
+          _handleBonusWin(bonusWinner);
+          return;
+        }
         // 하이/로우 선택 단계로 이동
         phase = HiLoPhase.selectHiLo;
         // 보스부터 선택 시작
@@ -827,6 +875,61 @@ class HiLoState {
 
   /// 보스인지 확인 (라운드의 첫 번째 플레이어)
   bool get isCurrentPlayerBoss => lastRaiserIndex == -1 && currentBetAmount == 0;
+
+  /// 보너스 핸드 확인 (포카드 이상을 가진 플레이어 반환)
+  HiLoPlayer? _checkBonusHand() {
+    HiLoPlayer? bestBonusPlayer;
+    PokerHand? bestBonusHand;
+
+    for (final player in players) {
+      if (!player.isActive) continue;
+
+      final hand = player.pokerHand;
+      if (hand == null) continue;
+
+      if (BonusHandInfo.isBonusHand(hand.rank)) {
+        if (bestBonusHand == null || hand.compareTo(bestBonusHand) > 0) {
+          bestBonusHand = hand;
+          bestBonusPlayer = player;
+        }
+      }
+    }
+
+    return bestBonusPlayer;
+  }
+
+  /// 보너스 핸드 승리 처리
+  void _handleBonusWin(HiLoPlayer winner) {
+    final hand = winner.pokerHand!;
+    final bonusAmount = BonusHandInfo.getBonusAmount(hand.rank);
+
+    // 다른 모든 플레이어에게서 보너스 금액 징수
+    int totalBonus = 0;
+    for (final player in players) {
+      if (player.id == winner.id) continue;
+      player.chips -= bonusAmount;
+      totalBonus += bonusAmount;
+    }
+
+    // 승자에게 팟 + 보너스 지급
+    final totalWinnings = pot + totalBonus;
+    winner.chips += totalWinnings;
+
+    // 결과 저장
+    result = HiLoResult(
+      hiWinner: winner,
+      hiPot: pot,
+      bonusInfo: BonusHandInfo(
+        winner: winner,
+        handRank: hand.rank,
+        bonusAmount: bonusAmount,
+        totalWinnings: totalWinnings,
+      ),
+    );
+
+    // 바로 쇼다운으로 이동 (하이/로우 선택 건너뜀)
+    phase = HiLoPhase.showdown;
+  }
 
   /// 현재 플레이어가 취할 수 있는 액션
   List<String> getAvailableActions() {

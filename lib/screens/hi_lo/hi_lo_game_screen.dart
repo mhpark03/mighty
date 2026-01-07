@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -52,8 +53,44 @@ class HiLoGameScreen extends StatefulWidget {
   State<HiLoGameScreen> createState() => _HiLoGameScreenState();
 }
 
-class _HiLoGameScreenState extends State<HiLoGameScreen> {
+class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStateMixin {
   bool _statsRecorded = false;
+  late AnimationController _fireworksController;
+  late Animation<double> _fireworksAnimation;
+  bool _showFireworks = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fireworksController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    _fireworksAnimation = CurvedAnimation(
+      parent: _fireworksController,
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _fireworksController.dispose();
+    super.dispose();
+  }
+
+  void _triggerFireworks() {
+    setState(() {
+      _showFireworks = true;
+    });
+    _fireworksController.forward(from: 0.0);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _showFireworks = false;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -303,8 +340,16 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
     );
   }
 
-  /// 쇼다운 화면 - 모든 플레이어의 선택 표시
+  /// 쇼다운 화면 - 모든 플레이어의 선택 표시 (또는 보너스 핸드 축하)
   Widget _buildShowdownScreen(HiLoController controller, HiLoState state, AppLocalizations l10n) {
+    final bonusInfo = state.result?.bonusInfo;
+
+    // 보너스 핸드 발생 시 축하 화면
+    if (bonusInfo != null) {
+      return _buildBonusShowdownScreen(controller, state, bonusInfo, l10n);
+    }
+
+    // 일반 쇼다운 화면
     final activePlayers = state.players.where((p) => p.isActive).toList();
 
     return Column(
@@ -366,6 +411,199 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  /// 보너스 핸드 축하 화면 (폭죽 애니메이션 포함)
+  Widget _buildBonusShowdownScreen(HiLoController controller, HiLoState state, BonusHandInfo bonusInfo, AppLocalizations l10n) {
+    // 폭죽 애니메이션 트리거 (한 번만)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_showFireworks && mounted) {
+        _triggerFireworks();
+      }
+    });
+
+    final winner = bonusInfo.winner;
+    final handRankName = controller.getHandRankName(bonusInfo.handRank);
+    final isHumanWinner = winner.id == 0;
+
+    return Stack(
+      children: [
+        // 메인 콘텐츠
+        Column(
+          children: [
+            const Spacer(),
+            // 보너스 핸드 타이틀
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.amber[700]!, Colors.amber[400]!],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.amber.withValues(alpha: 0.5),
+                    blurRadius: 20,
+                    spreadRadius: 5,
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  const Text(
+                    '🎉 보너스 핸드! 🎉',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    handRankName,
+                    style: TextStyle(
+                      color: Colors.red[900],
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            // 승자 정보
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: isHumanWinner ? Colors.amber.withValues(alpha: 0.3) : Colors.black38,
+                borderRadius: BorderRadius.circular(12),
+                border: isHumanWinner ? Border.all(color: Colors.amber, width: 3) : null,
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.emoji_events, color: Colors.amber, size: 32),
+                      const SizedBox(width: 8),
+                      Text(
+                        winner.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // 카드 표시
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: winner.hand.map((card) => _buildShowdownCard(card)).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // 수익 정보
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildBonusInfoChip('팟', '+${state.pot}', Colors.green),
+                      _buildBonusInfoChip('보너스', '+${bonusInfo.bonusAmount * 4}', Colors.amber),
+                      _buildBonusInfoChip('총', '+${bonusInfo.totalWinnings}', Colors.purple),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            // 다른 플레이어들 보너스 차감
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.remove_circle, color: Colors.red, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    '다른 플레이어들: 각 -${bonusInfo.bonusAmount}',
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+            // 결과 보기 버튼
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => controller.proceedToGameEnd(),
+                  icon: const Icon(Icons.emoji_events, size: 20),
+                  label: Text(l10n.viewResults),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        // 폭죽 애니메이션 오버레이
+        if (_showFireworks)
+          AnimatedBuilder(
+            animation: _fireworksAnimation,
+            builder: (context, child) {
+              return IgnorePointer(
+                child: CustomPaint(
+                  size: Size.infinite,
+                  painter: _FireworksPainter(_fireworksAnimation.value),
+                ),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildBonusInfoChip(String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            value,
+            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1569,6 +1807,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
   Widget _buildGameEndScreen(HiLoController controller, HiLoState state, AppLocalizations l10n) {
     final result = state.result;
     final statsService = Provider.of<HiLoStatsService>(context, listen: false);
+    final bonusInfo = result?.bonusInfo;
 
     // 통계 기록 (한 번만)
     if (!_statsRecorded && result != null) {
@@ -1576,7 +1815,15 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
       final playerScores = <int, int>{};
       for (final player in state.players) {
         int score = -player.totalBetInGame;
-        if (result.swingSuccess && player.id == result.swingPlayer?.id) {
+
+        // 보너스 핸드 처리
+        if (bonusInfo != null) {
+          if (player.id == bonusInfo.winner.id) {
+            score = bonusInfo.totalWinnings - player.totalBetInGame;
+          } else {
+            score -= bonusInfo.bonusAmount; // 보너스 금액 차감
+          }
+        } else if (result.swingSuccess && player.id == result.swingPlayer?.id) {
           score = state.pot - player.totalBetInGame;
         } else {
           if (player.id == result.hiWinner?.id) {
@@ -1617,27 +1864,64 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
                   style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                // 하이 승자
-                if (result?.hiWinner != null)
-                  _buildWinnerInfo(l10n.hi, result!.hiWinner!, result.hiPot, Colors.red, controller),
-                const SizedBox(height: 4),
-                // 로우 승자
-                if (result?.loWinner != null)
-                  _buildWinnerInfo(l10n.lo, result!.loWinner!, result.loPot, Colors.blue, controller),
-                // 스윙 성공
-                if (result?.swingSuccess == true)
+                // 보너스 핸드 승자
+                if (bonusInfo != null) ...[
                   Container(
-                    margin: const EdgeInsets.only(top: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.purple,
+                      gradient: LinearGradient(
+                        colors: [Colors.amber[700]!, Colors.amber[400]!],
+                      ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      '${result!.swingPlayer!.name} ${l10n.swingSuccess}!',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    child: Column(
+                      children: [
+                        const Text(
+                          '🎉 보너스 핸드!',
+                          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        Text(
+                          controller.getHandRankName(bonusInfo.handRank),
+                          style: TextStyle(color: Colors.red[900], fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                      ],
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.emoji_events, color: Colors.amber, size: 20),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${bonusInfo.winner.name} +${bonusInfo.totalWinnings}',
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  // 하이 승자
+                  if (result?.hiWinner != null)
+                    _buildWinnerInfo(l10n.hi, result!.hiWinner!, result.hiPot, Colors.red, controller),
+                  const SizedBox(height: 4),
+                  // 로우 승자
+                  if (result?.loWinner != null)
+                    _buildWinnerInfo(l10n.lo, result!.loWinner!, result.loPot, Colors.blue, controller),
+                  // 스윙 성공
+                  if (result?.swingSuccess == true)
+                    Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.purple,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${result!.swingPlayer!.name} ${l10n.swingSuccess}!',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                ],
                 const SizedBox(height: 8),
                 Text(
                   '${l10n.pot}: ${state.pot}',
@@ -1665,7 +1949,15 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
                       ...state.players.map((player) {
                         final playerStats = stats.getPlayerStats(player.id);
                         int gameScore = -player.totalBetInGame;
-                        if (result?.swingSuccess == true && player.id == result?.swingPlayer?.id) {
+
+                        // 보너스 핸드 처리
+                        if (bonusInfo != null) {
+                          if (player.id == bonusInfo.winner.id) {
+                            gameScore = bonusInfo.totalWinnings - player.totalBetInGame;
+                          } else {
+                            gameScore -= bonusInfo.bonusAmount;
+                          }
+                        } else if (result?.swingSuccess == true && player.id == result?.swingPlayer?.id) {
                           gameScore = state.pot - player.totalBetInGame;
                         } else {
                           if (player.id == result?.hiWinner?.id) {
@@ -1675,6 +1967,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
                             gameScore += result!.loPot;
                           }
                         }
+                        final isBonusWinner = bonusInfo != null && player.id == bonusInfo.winner.id;
                         final isHiWinner = player.id == result?.hiWinner?.id;
                         final isLoWinner = player.id == result?.loWinner?.id;
                         return Padding(
@@ -1685,14 +1978,15 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
                                 flex: 3,
                                 child: Row(
                                   children: [
-                                    if (isHiWinner) const Icon(Icons.arrow_upward, color: Colors.red, size: 12),
+                                    if (isBonusWinner) const Icon(Icons.star, color: Colors.amber, size: 12),
+                                    if (isHiWinner && !isBonusWinner) const Icon(Icons.arrow_upward, color: Colors.red, size: 12),
                                     if (isLoWinner) const Icon(Icons.arrow_downward, color: Colors.blue, size: 12),
                                     const SizedBox(width: 2),
                                     Flexible(
                                       child: Text(
                                         player.name,
                                         style: TextStyle(
-                                          fontWeight: (isHiWinner || isLoWinner) ? FontWeight.bold : FontWeight.normal,
+                                          fontWeight: (isBonusWinner || isHiWinner || isLoWinner) ? FontWeight.bold : FontWeight.normal,
                                           color: player.isFolded ? Colors.grey : Colors.black,
                                           fontSize: 13,
                                         ),
@@ -2161,5 +2455,89 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
       case HiLoBettingAction.none:
         return Colors.grey;
     }
+  }
+}
+
+/// 폭죽 애니메이션 페인터
+class _FireworksPainter extends CustomPainter {
+  final double progress;
+
+  _FireworksPainter(this.progress);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final random = [
+      // 폭죽 위치들 (상대 좌표)
+      Offset(0.2, 0.3),
+      Offset(0.5, 0.2),
+      Offset(0.8, 0.35),
+      Offset(0.3, 0.5),
+      Offset(0.7, 0.45),
+      Offset(0.15, 0.6),
+      Offset(0.85, 0.55),
+    ];
+
+    final colors = [
+      Colors.red,
+      Colors.amber,
+      Colors.green,
+      Colors.blue,
+      Colors.purple,
+      Colors.pink,
+      Colors.orange,
+    ];
+
+    for (int i = 0; i < random.length; i++) {
+      final center = Offset(
+        random[i].dx * size.width,
+        random[i].dy * size.height,
+      );
+
+      final color = colors[i % colors.length];
+      final particleProgress = (progress - (i * 0.1)).clamp(0.0, 1.0);
+
+      if (particleProgress > 0) {
+        _drawFirework(canvas, center, color, particleProgress);
+      }
+    }
+  }
+
+  void _drawFirework(Canvas canvas, Offset center, Color color, double progress) {
+    final paint = Paint()
+      ..color = color.withValues(alpha: (1.0 - progress) * 0.8)
+      ..style = PaintingStyle.fill;
+
+    final numParticles = 12;
+    final maxRadius = 80.0 * progress;
+
+    for (int i = 0; i < numParticles; i++) {
+      final angle = (i / numParticles) * 2 * math.pi;
+      final radius = maxRadius * (0.5 + 0.5 * progress);
+      final particleSize = 4.0 * (1.0 - progress * 0.5);
+
+      final x = center.dx + radius * math.cos(angle);
+      final y = center.dy + radius * math.sin(angle);
+
+      canvas.drawCircle(Offset(x, y), particleSize, paint);
+    }
+
+    // 작은 스파클
+    final sparklePaint = Paint()
+      ..color = Colors.white.withValues(alpha: (1.0 - progress) * 0.6)
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < 8; i++) {
+      final angle = (i / 8) * 2 * math.pi + progress * 2;
+      final radius = maxRadius * 0.7;
+      final x = center.dx + radius * math.cos(angle);
+      final y = center.dy + radius * math.sin(angle);
+
+      canvas.drawCircle(Offset(x, y), 2.0, sparklePaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _FireworksPainter oldDelegate) {
+    return oldDelegate.progress != progress;
   }
 }

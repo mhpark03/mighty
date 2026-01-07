@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -64,8 +65,44 @@ class SevenCardGameScreen extends StatefulWidget {
   State<SevenCardGameScreen> createState() => _SevenCardGameScreenState();
 }
 
-class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
+class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerProviderStateMixin {
   bool _statsRecorded = false;
+  late AnimationController _fireworksController;
+  late Animation<double> _fireworksAnimation;
+  bool _showFireworks = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fireworksController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    _fireworksAnimation = CurvedAnimation(
+      parent: _fireworksController,
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _fireworksController.dispose();
+    super.dispose();
+  }
+
+  void _triggerFireworks() {
+    setState(() {
+      _showFireworks = true;
+    });
+    _fireworksController.forward(from: 0.0);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _showFireworks = false;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1067,14 +1104,31 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
   Widget _buildGameEndScreen(SevenCardController controller, SevenCardState state, AppLocalizations l10n) {
     final winner = state.winnerId != null ? state.players[state.winnerId!] : null;
     final statsService = Provider.of<SevenCardStatsService>(context, listen: false);
+    final bonusInfo = state.bonusInfo;
+
+    // 보너스 핸드 발생 시 폭죽 애니메이션 트리거
+    if (bonusInfo != null && !_showFireworks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_showFireworks) {
+          _triggerFireworks();
+        }
+      });
+    }
 
     // 통계 기록 (한 번만)
     if (!_statsRecorded && winner != null) {
       _statsRecorded = true;
       final playerScores = <int, int>{};
       for (final player in state.players) {
-        if (player.id == winner.id) {
-          // 승자: +pot - 자신의 베팅액
+        if (bonusInfo != null) {
+          // 보너스 핸드: 승자는 totalWinnings, 패자는 -베팅액-보너스
+          if (player.id == winner.id) {
+            playerScores[player.id] = bonusInfo.totalWinnings - player.totalBetInGame;
+          } else {
+            playerScores[player.id] = -player.totalBetInGame - bonusInfo.bonusAmount;
+          }
+        } else if (player.id == winner.id) {
+          // 일반 승리: +pot - 자신의 베팅액
           playerScores[player.id] = state.pot - player.totalBetInGame;
         } else {
           // 패자: -베팅액
@@ -1086,35 +1140,87 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
 
     return Consumer<SevenCardStatsService>(
       builder: (context, stats, child) {
-        return Center(
-          child: Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.emoji_events, color: Colors.amber, size: 48),
-                const SizedBox(height: 12),
-                Text(
-                  winner != null ? '${winner.name} ${l10n.wins}!' : l10n.gameEnd,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        return Stack(
+          children: [
+            Center(
+              child: Container(
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                if (winner?.pokerHand != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    controller.getHandRankName(winner!.pokerHand!.rank),
-                    style: const TextStyle(fontSize: 16, color: Colors.green),
-                  ),
-                ],
-                const SizedBox(height: 8),
-                Text(
-                  '${l10n.pot}: ${state.pot}',
-                  style: const TextStyle(fontSize: 16),
-                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 보너스 핸드 표시
+                    if (bonusInfo != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.amber[700]!, Colors.amber[400]!],
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          children: [
+                            const Text(
+                              '🎉 보너스 핸드!',
+                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                            Text(
+                              controller.getHandRankName(bonusInfo.handRank),
+                              style: TextStyle(color: Colors.red[900], fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ] else
+                      const Icon(Icons.emoji_events, color: Colors.amber, size: 48),
+                    if (bonusInfo == null) const SizedBox(height: 12),
+                    Text(
+                      winner != null ? '${winner.name} ${l10n.wins}!' : l10n.gameEnd,
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                    if (winner?.pokerHand != null && bonusInfo == null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        controller.getHandRankName(winner!.pokerHand!.rank),
+                        style: const TextStyle(fontSize: 16, color: Colors.green),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    // 보너스 핸드 수익 정보
+                    if (bonusInfo != null) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildBonusChip('팟', '+${state.pot}', Colors.green),
+                          const SizedBox(width: 8),
+                          _buildBonusChip('보너스', '+${bonusInfo.bonusAmount * 4}', Colors.amber),
+                          const SizedBox(width: 8),
+                          _buildBonusChip('총', '+${bonusInfo.totalWinnings}', Colors.blue),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '다른 플레이어: 각 -${bonusInfo.bonusAmount}',
+                          style: const TextStyle(color: Colors.red, fontSize: 12),
+                        ),
+                      ),
+                    ] else
+                      Text(
+                        '${l10n.pot}: ${state.pot}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
                 const SizedBox(height: 16),
                 // 누적 통계 테이블
                 Container(
@@ -1138,10 +1244,20 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                       // 플레이어별 통계
                       ...state.players.map((player) {
                         final playerStats = stats.getPlayerStats(player.id);
-                        final gameScore = player.id == winner?.id
-                            ? state.pot - player.totalBetInGame
-                            : -player.totalBetInGame;
+                        int gameScore;
+                        if (bonusInfo != null) {
+                          if (player.id == winner?.id) {
+                            gameScore = bonusInfo.totalWinnings - player.totalBetInGame;
+                          } else {
+                            gameScore = -player.totalBetInGame - bonusInfo.bonusAmount;
+                          }
+                        } else if (player.id == winner?.id) {
+                          gameScore = state.pot - player.totalBetInGame;
+                        } else {
+                          gameScore = -player.totalBetInGame;
+                        }
                         final isWinner = player.id == winner?.id;
+                        final isBonusWinner = bonusInfo != null && player.id == bonusInfo.winner.id;
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 3),
                           child: Row(
@@ -1150,7 +1266,8 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
                                 flex: 3,
                                 child: Row(
                                   children: [
-                                    if (isWinner) const Icon(Icons.emoji_events, color: Colors.amber, size: 14),
+                                    if (isBonusWinner) const Icon(Icons.star, color: Colors.amber, size: 14),
+                                    if (isWinner && !isBonusWinner) const Icon(Icons.emoji_events, color: Colors.amber, size: 14),
                                     if (isWinner) const SizedBox(width: 2),
                                     Flexible(
                                       child: Text(
@@ -1241,8 +1358,40 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
               ],
             ),
           ),
+        ),
+        // 폭죽 애니메이션 오버레이
+        if (_showFireworks)
+          AnimatedBuilder(
+            animation: _fireworksAnimation,
+            builder: (context, child) {
+              return IgnorePointer(
+                child: CustomPaint(
+                  size: Size.infinite,
+                  painter: _SevenCardFireworksPainter(_fireworksAnimation.value),
+                ),
+              );
+            },
+          ),
+          ],
         );
       },
+    );
+  }
+
+  Widget _buildBonusChip(String label, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color),
+      ),
+      child: Column(
+        children: [
+          Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
+          Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+        ],
+      ),
     );
   }
 
@@ -1679,5 +1828,87 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> {
       case BettingAction.none:
         return Colors.grey;
     }
+  }
+}
+
+/// 폭죽 애니메이션 페인터
+class _SevenCardFireworksPainter extends CustomPainter {
+  final double progress;
+
+  _SevenCardFireworksPainter(this.progress);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final positions = [
+      Offset(0.2, 0.3),
+      Offset(0.5, 0.2),
+      Offset(0.8, 0.35),
+      Offset(0.3, 0.5),
+      Offset(0.7, 0.45),
+      Offset(0.15, 0.6),
+      Offset(0.85, 0.55),
+    ];
+
+    final colors = [
+      Colors.red,
+      Colors.amber,
+      Colors.green,
+      Colors.blue,
+      Colors.purple,
+      Colors.pink,
+      Colors.orange,
+    ];
+
+    for (int i = 0; i < positions.length; i++) {
+      final center = Offset(
+        positions[i].dx * size.width,
+        positions[i].dy * size.height,
+      );
+
+      final color = colors[i % colors.length];
+      final particleProgress = (progress - (i * 0.1)).clamp(0.0, 1.0);
+
+      if (particleProgress > 0) {
+        _drawFirework(canvas, center, color, particleProgress);
+      }
+    }
+  }
+
+  void _drawFirework(Canvas canvas, Offset center, Color color, double progress) {
+    final paint = Paint()
+      ..color = color.withValues(alpha: (1.0 - progress) * 0.8)
+      ..style = PaintingStyle.fill;
+
+    final numParticles = 12;
+    final maxRadius = 80.0 * progress;
+
+    for (int i = 0; i < numParticles; i++) {
+      final angle = (i / numParticles) * 2 * math.pi;
+      final radius = maxRadius * (0.5 + 0.5 * progress);
+      final particleSize = 4.0 * (1.0 - progress * 0.5);
+
+      final x = center.dx + radius * math.cos(angle);
+      final y = center.dy + radius * math.sin(angle);
+
+      canvas.drawCircle(Offset(x, y), particleSize, paint);
+    }
+
+    final sparklePaint = Paint()
+      ..color = Colors.white.withValues(alpha: (1.0 - progress) * 0.6)
+      ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < 8; i++) {
+      final angle = (i / 8) * 2 * math.pi + progress * 2;
+      final radius = maxRadius * 0.7;
+      final x = center.dx + radius * math.cos(angle);
+      final y = center.dy + radius * math.sin(angle);
+
+      canvas.drawCircle(Offset(x, y), 2.0, sparklePaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SevenCardFireworksPainter oldDelegate) {
+    return oldDelegate.progress != progress;
   }
 }
