@@ -1230,77 +1230,6 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                       ),
                     ),
 
-                  // 테스트용 정보 표시 (상단에 작게)
-                  if (phase == GamePhase.passing || phase == GamePhase.playing)
-                    Positioned(
-                      top: isSmallScreen ? 40 : 50,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '🔍 테스트 정보',
-                              style: TextStyle(
-                                color: Colors.amber,
-                                fontSize: isSmallScreen ? 8 : 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            // 슛더문 확률 + 선유지 가능성 표시
-                            for (int i = 0; i < 4; i++)
-                              Builder(builder: (context) {
-                                final leadPotential = phase == GamePhase.playing
-                                    ? _calculateOverallLeadPotential(i)
-                                    : 0.0;
-                                final leadStr = phase == GamePhase.playing
-                                    ? ' L:${(leadPotential * 100).toInt()}%'
-                                    : '';
-                                return Text(
-                                  '${playerNames[i]}: ${(shootMoonChances[i] * 100).toInt()}%${shootMoonChances[i] >= 0.5 ? "🌙" : ""}$leadStr',
-                                  style: TextStyle(
-                                    color: shootMoonChances[i] >= 0.5 ? Colors.yellow : Colors.white70,
-                                    fontSize: isSmallScreen ? 8 : 10,
-                                    fontWeight: shootMoonChances[i] >= 0.5 ? FontWeight.bold : FontWeight.normal,
-                                  ),
-                                );
-                              }),
-                            // 패싱 페이즈: 패스 카드 표시
-                            if (phase == GamePhase.passing) ...[
-                              const SizedBox(height: 4),
-                              for (int i = 0; i < 4; i++)
-                                if (cardsToReceive[i].isNotEmpty)
-                                  Text(
-                                    '${playerNames[(i + 3) % 4]}→${playerNames[i]}: ${cardsToReceive[i].map((c) => c.toString()).join(' ')}',
-                                    style: TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: isSmallScreen ? 8 : 10,
-                                    ),
-                                  ),
-                            ],
-                            // 플레이 페이즈: 플레이된 카드 수 표시
-                            if (phase == GamePhase.playing) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                '플레이: ${playedCards.length}/52',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: isSmallScreen ? 8 : 10,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-
                   // 패싱 확인 버튼 (화면 중앙)
                   if (phase == GamePhase.passing)
                     Positioned.fill(
@@ -1464,8 +1393,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                     left: (MediaQuery.of(context).size.width / 2) -
                           (hand.length * overlap / 2) +
                           (i * overlap),
-                    // TODO: 테스트용 - AI 카드 보이기
-                    child: _buildPlayingCard(hand[i], cardWidth, cardHeight, false),
+                    child: _buildCardBack(cardWidth, cardHeight),
                   ),
               ],
             ),
@@ -1509,8 +1437,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                     top: i * overlap,
                     child: Transform.rotate(
                       angle: playerIndex == 1 ? -pi / 2 : pi / 2,
-                      // TODO: 테스트용 - AI 카드 보이기
-                      child: _buildPlayingCard(hand[i], cardWidth, cardHeight, false),
+                      child: _buildCardBack(cardWidth, cardHeight),
                     ),
                   ),
               ],
@@ -1655,6 +1582,25 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
           // 두 번째 줄
           if (bottomRow.isNotEmpty) buildCardRow(bottomRow),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCardBack(double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.blue[800],
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: Colors.white24, width: 1),
+      ),
+      child: Center(
+        child: Icon(
+          Icons.favorite,
+          color: Colors.red[300],
+          size: width * 0.5,
+        ),
       ),
     );
   }
