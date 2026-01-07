@@ -1744,6 +1744,89 @@ class SevenCardController extends ChangeNotifier {
       default: return '$rankValue';
     }
   }
+
+  /// AI 추천 베팅 액션 (플레이어용)
+  RecommendedAction? getRecommendedAction() {
+    if (_state.phase == SevenCardPhase.waiting ||
+        _state.phase == SevenCardPhase.gameEnd ||
+        _state.phase == SevenCardPhase.selectOpen) {
+      return null;
+    }
+    if (_state.currentPlayerIndex != 0) return null; // 플레이어 턴이 아님
+
+    final player = _state.humanPlayer;
+    final aiAction = _decideAIAction(player);
+
+    return RecommendedAction(
+      action: aiAction.type,
+      amount: _getActionAmount(aiAction.type),
+    );
+  }
+
+  /// 액션별 금액 계산
+  int _getActionAmount(String action) {
+    switch (action) {
+      case 'bing':
+        return _state.getBingAmount();
+      case 'call':
+        return _state.getCallAmount();
+      case 'ddadang':
+        return _state.getDdadangAmount();
+      case 'quarter':
+        return _state.getQuarterAmount();
+      case 'half':
+        return _state.getHalfAmount();
+      case 'full':
+        return _state.getFullAmount();
+      default:
+        return 0;
+    }
+  }
+
+  /// AI 추천 공개 카드 인덱스 (플레이어용)
+  int? getRecommendedOpenCardIndex() {
+    if (_state.phase != SevenCardPhase.selectOpen) return null;
+    if (_state.currentPlayerIndex != 0) return null;
+
+    final player = _state.humanPlayer;
+    if (player.hand.isEmpty) return null;
+
+    // AI와 동일 로직: 가장 높은 카드 공개 (위협용)
+    int bestIndex = 0;
+    int bestValue = 0;
+    for (int i = 0; i < player.hand.length && i < 3; i++) {
+      final value = player.hand[i].rankValue;
+      if (value > bestValue) {
+        bestValue = value;
+        bestIndex = i;
+      }
+    }
+    return bestIndex;
+  }
+
+  /// 추천 액션 이름 (한글)
+  String getRecommendedActionName(RecommendedAction? action) {
+    if (action == null) return '';
+    switch (action.action) {
+      case 'bing': return '삥';
+      case 'check': return '체크';
+      case 'call': return '콜';
+      case 'ddadang': return '따당';
+      case 'quarter': return '쿼터';
+      case 'half': return '하프';
+      case 'full': return '풀';
+      case 'die': return '다이';
+      default: return action.action;
+    }
+  }
+}
+
+/// AI 추천 액션 클래스
+class RecommendedAction {
+  final String action;
+  final int amount;
+
+  RecommendedAction({required this.action, required this.amount});
 }
 
 class _AIAction {

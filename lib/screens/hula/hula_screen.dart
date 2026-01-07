@@ -244,6 +244,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   String? gameMessage;
   Timer? _messageTimer;
 
+  // 힌트
+  bool _showHint = false;
+
   // 애니메이션
   late AnimationController _animController;
 
@@ -289,6 +292,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               Navigator.pop(dialogContext);
               AdService().showRewardedAd(
                 onRewarded: () {
+                  _showHint = false;
                   _initGame();
                 },
               );
@@ -299,6 +303,22 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         ],
       ),
     );
+  }
+
+  void _onHintButtonPressed() {
+    if (_showHint) {
+      setState(() {
+        _showHint = false;
+      });
+    } else {
+      AdService().showRewardedAd(
+        onRewarded: () {
+          setState(() {
+            _showHint = true;
+          });
+        },
+      );
+    }
   }
 
   void _initGame() {
@@ -1174,6 +1194,15 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     }
 
     melds[meldIndex] = Meld(cards: newCards, isRun: newIsRun);
+  }
+
+  // AI 추천 버릴 카드 인덱스 (플레이어용)
+  int? _getRecommendedDiscardCardIndex() {
+    if (playerHand.isEmpty) return null;
+    if (currentTurn != 0 || !hasDrawn) return null; // 버리기 단계가 아님
+
+    final recommendedCard = _selectCardToDiscard(playerHand);
+    return playerHand.indexOf(recommendedCard);
   }
 
   // 스마트 카드 버리기: 버릴 카드 선택
@@ -2961,6 +2990,11 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         ),
         actions: [
           IconButton(
+            icon: Icon(Icons.lightbulb, color: _showHint ? Colors.yellow : Colors.white),
+            tooltip: _showHint ? '힌트 OFF' : '힌트',
+            onPressed: _onHintButtonPressed,
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: _showNewGameDialog,
           ),
@@ -3584,6 +3618,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     const symbolSize = 20.0;
     const rankSize = 16.0;
 
+    // AI 추천 카드 인덱스
+    final recommendedIndex = _showHint ? _getRecommendedDiscardCardIndex() : null;
+
     // 세로 모드: 2줄
     final int cardsPerRow = (playerHand.length / 2).ceil();
 
@@ -3601,6 +3638,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     Widget buildCard(int index) {
       final card = playerHand[index];
       final isSelected = selectedCardIndices.contains(index);
+      final isRecommended = _showHint && recommendedIndex == index;
 
       return GestureDetector(
         onTap: () => _toggleCardSelection(index),
@@ -3611,18 +3649,20 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
           width: cardWidth,
           height: cardHeight,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isRecommended ? Colors.lightBlueAccent.withValues(alpha: 0.2) : Colors.white,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(
-              color: isSelected ? Colors.amber : Colors.grey.shade400,
-              width: isSelected ? 3 : 1,
+              color: isRecommended ? Colors.lightBlueAccent : (isSelected ? Colors.amber : Colors.grey.shade400),
+              width: isRecommended ? 3 : (isSelected ? 3 : 1),
             ),
             boxShadow: [
               BoxShadow(
-                color: isSelected
-                    ? Colors.amber.withValues(alpha: 0.5)
-                    : Colors.black.withValues(alpha: 0.2),
-                blurRadius: isSelected ? 8 : 4,
+                color: isRecommended
+                    ? Colors.lightBlueAccent.withValues(alpha: 0.5)
+                    : (isSelected
+                        ? Colors.amber.withValues(alpha: 0.5)
+                        : Colors.black.withValues(alpha: 0.2)),
+                blurRadius: isRecommended ? 10 : (isSelected ? 8 : 4),
                 offset: const Offset(1, 2),
               ),
             ],
@@ -3630,6 +3670,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              if (isRecommended)
+                const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 12),
               Text(
                 card.suitSymbol,
                 style: TextStyle(

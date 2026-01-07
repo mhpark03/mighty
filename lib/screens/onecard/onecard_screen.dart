@@ -207,6 +207,9 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
   int _messageTimeLeft = 0;
   static const int messageDisplayTime = 5;
 
+  // 힌트 모드
+  bool _showHint = false;
+
   @override
   void initState() {
     super.initState();
@@ -360,6 +363,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     gameMessage = null;
     _messageTimeLeft = 0;
     selectedCardIndex = null;
+    _showHint = false;
   }
 
   // 게임 상태 저장
@@ -976,6 +980,58 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     HapticFeedback.mediumImpact();
   }
 
+  void _onHintButtonPressed() {
+    if (_showHint) {
+      setState(() {
+        _showHint = false;
+      });
+    } else {
+      AdService().showRewardedAd(
+        onRewarded: () {
+          setState(() {
+            _showHint = true;
+          });
+        },
+      );
+    }
+  }
+
+  // AI 추천 카드 계산
+  PlayingCard? _getRecommendedCard() {
+    if (!isPlayerTurn || gameOver) return null;
+
+    final playable = _getPlayableCards(playerHand);
+    if (playable.isEmpty) return null;
+
+    // 공격 상태면 가장 강한 공격 카드
+    if (attackStack > 0) {
+      playable.sort((a, b) => b.attackPower.compareTo(a.attackPower));
+      return playable.first;
+    }
+
+    // 일반 상태: 전략적 선택
+    // 우선순위: 일반 > 공격 > 특수 (공격/특수 카드는 아껴둠)
+    final normals = playable.where((c) =>
+        !c.isAttack && !c.isJump && !c.isReverse && !c.isChain && !c.isChange).toList();
+    final attacks = playable.where((c) => c.isAttack).toList();
+    final specials = playable.where((c) =>
+        c.isJump || c.isReverse || c.isChain || c.isChange).toList();
+
+    if (normals.isNotEmpty) {
+      // 높은 숫자 카드 우선 (빨리 처리)
+      normals.sort((a, b) => b.rank.compareTo(a.rank));
+      return normals.first;
+    } else if (specials.isNotEmpty) {
+      return specials.first;
+    } else if (attacks.isNotEmpty) {
+      // 공격 카드는 약한 것부터 (강한 건 방어용)
+      attacks.sort((a, b) => a.attackPower.compareTo(b.attackPower));
+      return attacks.first;
+    }
+
+    return playable.first;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -989,6 +1045,11 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: Icon(Icons.lightbulb, color: _showHint ? Colors.yellow : Colors.white),
+            tooltip: _showHint ? '힌트 OFF' : '힌트',
+            onPressed: _onHintButtonPressed,
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _restartGame,
@@ -1715,6 +1776,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
 
   Widget _buildPlayerHand() {
     final playable = _getPlayableCards(playerHand);
+    final recommendedCard = _showHint ? _getRecommendedCard() : null;
 
     // 2줄로 배열
     final int cardsPerRow = (playerHand.length / 2).ceil();
@@ -1733,6 +1795,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         children: indices.map((index) {
           final card = playerHand[index];
           final canPlay = playable.contains(card) && isPlayerTurn && !gameOver;
+          final isRecommended = _showHint && recommendedCard == card;
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -1740,7 +1803,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
               onTap: () => _onPlayerCardTap(index),
               child: Opacity(
                 opacity: canPlay ? 1.0 : 0.7,
-                child: _buildPlayingCard(card, size: 0.85, highlight: canPlay),
+                child: _buildPlayingCard(card, size: 0.85, highlight: isRecommended || (!_showHint && canPlay)),
               ),
             ),
           );
@@ -1754,28 +1817,61 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         mainAxisSize: MainAxisSize.min,
         children: [
           // 플레이어 정보 (카드 수 표시)
-          Container(
-            margin: const EdgeInsets.only(bottom: 4),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: isPlayerTurn ? Colors.blue : Colors.black38,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.person, color: Colors.white, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  '${playerHand.length}장',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isPlayerTurn ? Colors.blue : Colors.black38,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.person, color: Colors.white, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${playerHand.length}장',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // AI 추천 표시
+              if (_showHint && isPlayerTurn && !gameOver && recommendedCard != null) ...[
+                const SizedBox(width: 8),
+                Container(
+                  margin: const EdgeInsets.only(bottom: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.lightBlueAccent.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.lightBlueAccent, width: 1),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 14),
+                      const SizedBox(width: 4),
+                      Text(
+                        'AI 추천: ${recommendedCard.suitSymbol}${recommendedCard.rankString}',
+                        style: const TextStyle(
+                          color: Colors.lightBlueAccent,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
+            ],
           ),
           // 카드 (2줄, 스크롤 가능)
           SingleChildScrollView(

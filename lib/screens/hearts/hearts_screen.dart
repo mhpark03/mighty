@@ -1317,7 +1317,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       child: Row(
         children: [
           IconButton(
-            onPressed: () => _showExitDialog(),
+            onPressed: _exitGame,
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
@@ -1907,27 +1907,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     );
   }
 
-  void _showExitDialog() {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('게임 종료'),
-        content: const Text('게임을 종료하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('종료', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
+  void _exitGame() {
+    Navigator.pop(context);
   }
 }

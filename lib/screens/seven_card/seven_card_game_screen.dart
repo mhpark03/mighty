@@ -68,6 +68,7 @@ class SevenCardGameScreen extends StatefulWidget {
 
 class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerProviderStateMixin {
   bool _statsRecorded = false;
+  bool _showHint = false;
   late AnimationController _fireworksController;
   late Animation<double> _fireworksAnimation;
   bool _showFireworks = false;
@@ -122,6 +123,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               AdService().showRewardedAd(
                 onRewarded: () {
                   _statsRecorded = false;
+                  _showHint = false;
                   controller.startNewGame();
                 },
               );
@@ -132,6 +134,22 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
         ],
       ),
     );
+  }
+
+  void _onHintButtonPressed() {
+    if (_showHint) {
+      setState(() {
+        _showHint = false;
+      });
+    } else {
+      AdService().showRewardedAd(
+        onRewarded: () {
+          setState(() {
+            _showHint = true;
+          });
+        },
+      );
+    }
   }
 
   @override
@@ -147,16 +165,20 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
           appBar: AppBar(
             backgroundColor: Colors.blue[800],
             title: Text(l10n.sevenCardTitle),
-            automaticallyImplyLeading: false,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
+            ),
             actions: [
+              IconButton(
+                icon: Icon(Icons.lightbulb, color: _showHint ? Colors.yellow : Colors.white),
+                tooltip: _showHint ? '힌트 OFF' : '힌트',
+                onPressed: _onHintButtonPressed,
+              ),
               IconButton(
                 icon: const Icon(Icons.refresh),
                 tooltip: l10n.newGame,
                 onPressed: () => _showNewGameDialog(controller, l10n),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
               ),
             ],
           ),
@@ -190,6 +212,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
   Widget _buildSelectOpenScreen(SevenCardController controller, SevenCardState state, AppLocalizations l10n) {
     final player = state.humanPlayer;
     final isMyTurn = state.currentPlayerIndex == 0;
+    final recommendedIndex = _showHint ? controller.getRecommendedOpenCardIndex() : null;
 
     return Column(
       children: [
@@ -214,6 +237,33 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                 '선택한 카드가 상대에게 공개됩니다',
                 style: const TextStyle(color: Colors.white70, fontSize: 14),
               ),
+              // AI 추천 표시
+              if (_showHint && isMyTurn && recommendedIndex != null) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.lightBlueAccent.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.lightBlueAccent, width: 1),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        'AI 추천: ${recommendedIndex + 1}번째 카드',
+                        style: const TextStyle(
+                          color: Colors.lightBlueAccent,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -227,7 +277,8 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               children: player.hand.asMap().entries.map((entry) {
                 final index = entry.key;
                 final card = entry.value;
-                return _buildSelectableCard(card, index, controller);
+                final isRecommended = _showHint && recommendedIndex == index;
+                return _buildSelectableCard(card, index, controller, isRecommended: isRecommended);
               }).toList(),
             ),
           )
@@ -250,7 +301,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
     );
   }
 
-  Widget _buildSelectableCard(PlayingCard card, int index, SevenCardController controller) {
+  Widget _buildSelectableCard(PlayingCard card, int index, SevenCardController controller, {bool isRecommended = false}) {
     final color = (card.suit == Suit.heart || card.suit == Suit.diamond) ? Colors.red : Colors.black;
     final suitSymbol = _getSuitSymbol(card.suit);
     final rankStr = _getRankString(card.rank);
@@ -262,13 +313,18 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
         height: 120,
         margin: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isRecommended ? Colors.lightBlueAccent.withValues(alpha: 0.2) : Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.amber, width: 2),
+          border: Border.all(
+            color: isRecommended ? Colors.lightBlueAccent : Colors.amber,
+            width: isRecommended ? 3 : 2,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
-              blurRadius: 4,
+              color: isRecommended
+                  ? Colors.lightBlueAccent.withValues(alpha: 0.5)
+                  : Colors.black.withValues(alpha: 0.3),
+              blurRadius: isRecommended ? 8 : 4,
               offset: const Offset(2, 2),
             ),
           ],
@@ -276,6 +332,8 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            if (isRecommended)
+              const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
             Text(
               rankStr,
               style: TextStyle(color: color, fontSize: 28, fontWeight: FontWeight.bold),
@@ -1005,6 +1063,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
     final isMyTurn = controller.isHumanTurn;
     final availableActions = isMyTurn ? state.getAvailableActions() : <String>[];
     final isSmall = sizes.screenHeight < 700;
+    final recommendedAction = _showHint && isMyTurn ? controller.getRecommendedAction() : null;
 
     // 버튼 활성화 여부 확인 헬퍼
     VoidCallback? getAction(String actionName, VoidCallback action) {
@@ -1016,6 +1075,33 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
       color: Colors.black38,
       child: Column(
         children: [
+          // AI 추천 표시
+          if (_showHint && isMyTurn && recommendedAction != null) ...[
+            Container(
+              margin: EdgeInsets.only(bottom: isSmall ? 4 : 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.lightBlueAccent.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.lightBlueAccent, width: 1),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    'AI 추천: ${controller.getRecommendedActionName(recommendedAction)}${recommendedAction.amount > 0 ? ' (${recommendedAction.amount})' : ''}',
+                    style: const TextStyle(
+                      color: Colors.lightBlueAccent,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           // 상단 행: 삥, 콜, 따당, 다이
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1473,7 +1559,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close, color: Colors.white),
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),

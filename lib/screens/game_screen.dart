@@ -27,7 +27,7 @@ class _GameScreenState extends State<GameScreen> {
   Timer? _trickTimer;
   int _trickCountdown = 10;
   bool _timerRunning = false;
-  bool _showRecommendation = true;
+  bool _showHint = false;
   bool _statsRecorded = false;
   bool _bidInitialized = false;
   bool _showGameResult = true;
@@ -94,6 +94,22 @@ class _GameScreenState extends State<GameScreen> {
     Navigator.pop(context); // Go back to home screen
   }
 
+  void _onHintButtonPressed() {
+    if (_showHint) {
+      setState(() {
+        _showHint = false;
+      });
+    } else {
+      AdService().showRewardedAd(
+        onRewarded: () {
+          setState(() {
+            _showHint = true;
+          });
+        },
+      );
+    }
+  }
+
   void _showNewGameDialog(GameController controller, AppLocalizations l10n) {
     showDialog(
       context: context,
@@ -114,6 +130,7 @@ class _GameScreenState extends State<GameScreen> {
                   _allPassedDialogShown = false;
                   _bidInitialized = false;
                   _showGameResult = true;
+                  _showHint = false;
                   controller.startNewGame();
                 },
               );
@@ -138,16 +155,20 @@ class _GameScreenState extends State<GameScreen> {
             title: Text(l10n.appTitle, style: const TextStyle(color: Colors.white)),
             backgroundColor: Colors.green[900],
             iconTheme: const IconThemeData(color: Colors.white),
-            automaticallyImplyLeading: false,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: _exitGame,
+            ),
             actions: [
+              IconButton(
+                icon: Icon(Icons.lightbulb, color: _showHint ? Colors.yellow : Colors.white),
+                tooltip: _showHint ? '힌트 OFF' : '힌트',
+                onPressed: _onHintButtonPressed,
+              ),
               IconButton(
                 icon: const Icon(Icons.refresh, color: Colors.white),
                 tooltip: l10n.newGame,
                 onPressed: () => _showNewGameDialog(controller, l10n),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.white),
-                onPressed: _exitGame,
               ),
             ],
           ),
@@ -452,8 +473,8 @@ class _GameScreenState extends State<GameScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          // AI 추천 표시
-          if (isHumanTurn && recommendedBid != null) ...[
+          // AI 추천 표시 (힌트 모드일 때만)
+          if (_showHint && isHumanTurn && recommendedBid != null) ...[
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -1134,6 +1155,7 @@ class _GameScreenState extends State<GameScreen> {
                           setState(() {
                             _statsRecorded = false;
                             _showGameResult = true;
+                            _showHint = false;
                           });
                           controller.reset();
                           controller.startNewGame();
@@ -2010,7 +2032,7 @@ class _GameScreenState extends State<GameScreen> {
         controller.state.currentTrick!.leadPlayerId == 0;
 
     // 추천 카드 가져오기
-    final recommendedCard = _showRecommendation ? controller.getRecommendedCard() : null;
+    final recommendedCard = _showHint ? controller.getRecommendedCard() : null;
 
     // 플레이어가 획득한 점수 카드 (조커 제외)
     final pointCards = controller.humanPlayer.wonCards
@@ -2631,6 +2653,7 @@ class _GameScreenState extends State<GameScreen> {
                     setState(() {
                       _statsRecorded = false;
                       _showGameResult = true;
+                      _showHint = false;
                     });
                     controller.reset();
                     controller.startNewGame();

@@ -962,7 +962,9 @@ class HiLoController extends ChangeNotifier {
 
   bool _hasStrongDraw(HiLoPlayer player) {
     final cards = player.hand;
-    if (cards.length < 4) return false;
+    if (cards.length < 3) return false;
+
+    final cardsRemaining = 7 - cards.length;
 
     final suits = <Suit, int>{};
     for (final card in cards) {
@@ -970,7 +972,12 @@ class HiLoController extends ChangeNotifier {
         suits[card.suit!] = (suits[card.suit!] ?? 0) + 1;
       }
     }
+    // 4장 이상 같은 무늬 = 강한 플러시 드로우
     if (suits.values.any((count) => count >= 4)) {
+      return true;
+    }
+    // 3장 같은 무늬 + 2장 이상 남음 = 플러시 드로우 가능성
+    if (suits.values.any((count) => count >= 3) && cardsRemaining >= 2) {
       return true;
     }
 
@@ -997,11 +1004,23 @@ class HiLoController extends ChangeNotifier {
     }
 
     if (maxConsecutive >= 4) return true;
+    // 3장 연속 + 2장 이상 남음 = 스트레이트 드로우 가능성
+    if (maxConsecutive >= 3 && cardsRemaining >= 2) return true;
 
     if (ranks.length >= 4) {
       for (int i = 0; i <= ranks.length - 4; i++) {
         final span = ranks[i + 3] - ranks[i];
         if (span == 4) {
+          return true;
+        }
+      }
+    }
+
+    // 3장이 5 범위 내 + 2장 이상 남음 = 스트레이트 드로우 가능성
+    if (ranks.length >= 3 && cardsRemaining >= 2) {
+      for (int i = 0; i <= ranks.length - 3; i++) {
+        final span = ranks[i + 2] - ranks[i];
+        if (span <= 4) {
           return true;
         }
       }
@@ -1766,6 +1785,112 @@ class HiLoController extends ChangeNotifier {
 
     return 'none';
   }
+
+  // ==================== AI 추천 기능 ====================
+
+  /// AI 추천 베팅 액션 (플레이어용)
+  RecommendedHiLoAction? getRecommendedAction() {
+    if (_state.phase != HiLoPhase.betting1 &&
+        _state.phase != HiLoPhase.betting2 &&
+        _state.phase != HiLoPhase.betting3 &&
+        _state.phase != HiLoPhase.betting4) {
+      return null;
+    }
+    if (_state.currentPlayerIndex != 0) return null;
+
+    final player = _state.humanPlayer;
+    final aiAction = _decideAIAction(player);
+
+    return RecommendedHiLoAction(
+      action: aiAction.type,
+      amount: _getActionAmount(aiAction.type),
+    );
+  }
+
+  /// 액션별 금액 계산
+  int _getActionAmount(String action) {
+    switch (action) {
+      case 'bing':
+        return _state.getBingAmount();
+      case 'call':
+        return _state.getCallAmount();
+      case 'ddadang':
+        return _state.getDdadangAmount();
+      case 'quarter':
+        return _state.getQuarterAmount();
+      case 'half':
+        return _state.getHalfAmount();
+      case 'full':
+        return _state.getFullAmount();
+      default:
+        return 0;
+    }
+  }
+
+  /// AI 추천 하이/로우/스윙 선택 (플레이어용)
+  HiLoChoice? getRecommendedHiLoChoice() {
+    if (_state.phase != HiLoPhase.selectHiLo) return null;
+    if (_state.currentPlayerIndex != 0) return null;
+
+    final player = _state.humanPlayer;
+    return _decideAIHiLoChoice(player);
+  }
+
+  /// AI 추천 공개 카드 인덱스 (플레이어용)
+  int? getRecommendedOpenCardIndex() {
+    if (_state.phase != HiLoPhase.selectOpen) return null;
+    if (_state.currentPlayerIndex != 0) return null;
+
+    final player = _state.humanPlayer;
+    if (player.hand.isEmpty) return null;
+
+    // AI와 동일 로직: 가장 높은 카드 공개 (위협용)
+    int bestIndex = 0;
+    int bestValue = 0;
+    for (int i = 0; i < player.hand.length && i < 3; i++) {
+      final value = player.hand[i].rankValue;
+      if (value > bestValue) {
+        bestValue = value;
+        bestIndex = i;
+      }
+    }
+    return bestIndex;
+  }
+
+  /// 추천 액션 이름 (한글)
+  String getRecommendedActionName(RecommendedHiLoAction? action) {
+    if (action == null) return '';
+    switch (action.action) {
+      case 'bing': return '삥';
+      case 'check': return '체크';
+      case 'call': return '콜';
+      case 'ddadang': return '따당';
+      case 'quarter': return '쿼터';
+      case 'half': return '하프';
+      case 'full': return '풀';
+      case 'die': return '다이';
+      default: return action.action;
+    }
+  }
+
+  /// 추천 하이/로우/스윙 이름 (한글)
+  String getRecommendedHiLoChoiceName(HiLoChoice? choice) {
+    if (choice == null) return '';
+    switch (choice) {
+      case HiLoChoice.hi: return '하이';
+      case HiLoChoice.lo: return '로우';
+      case HiLoChoice.swing: return '스윙';
+      case HiLoChoice.none: return '';
+    }
+  }
+}
+
+/// AI 추천 액션 클래스
+class RecommendedHiLoAction {
+  final String action;
+  final int amount;
+
+  RecommendedHiLoAction({required this.action, required this.amount});
 }
 
 class _AIAction {
