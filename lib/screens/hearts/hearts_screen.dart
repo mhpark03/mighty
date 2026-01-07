@@ -77,6 +77,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   // 패싱
   List<PlayingCard> selectedForPassing = [];
   List<List<PlayingCard>> cardsToReceive = [[], [], [], []];
+  List<double> shootMoonChances = [0.0, 0.0, 0.0, 0.0]; // 테스트용: 슛더문 확률
 
   // 게임 진행
   GamePhase phase = GamePhase.passing;
@@ -85,6 +86,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   int trickNumber = 0;
   bool heartsBroken = false;
   bool isProcessingTrick = false;
+  List<PlayingCard> playedCards = []; // 플레이된 카드 추적
 
   // UI
   String message = '';
@@ -116,6 +118,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       trickNumber = 0;
       heartsBroken = false;
       isProcessingTrick = false;
+      playedCards = []; // 플레이된 카드 초기화
       message = '';
     });
 
@@ -155,14 +158,31 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   }
 
   void _aiSelectPassingCards() {
+    // 플레이어(0)의 슛더문 확률도 계산
+    shootMoonChances[0] = _checkShootMoonPossibility(hands[0]);
+
     for (int i = 1; i < 4; i++) {
       final hand = List<PlayingCard>.from(hands[i]);
       final selected = <PlayingCard>[];
 
-      // 우선순위: 스페이드 퀸, 높은 스페이드, 높은 하트, 높은 카드
+      // 수트별 카드 개수 계산
+      final suitCounts = {
+        Suit.spade: hand.where((c) => c.suit == Suit.spade).length,
+        Suit.heart: hand.where((c) => c.suit == Suit.heart).length,
+        Suit.diamond: hand.where((c) => c.suit == Suit.diamond).length,
+        Suit.club: hand.where((c) => c.suit == Suit.club).length,
+      };
+      final lowSpadeCount = hand.where((c) => c.suit == Suit.spade && c.rank < 12).length;
+      final lowHeartCount = hand.where((c) => c.suit == Suit.heart && c.rank < 10).length;
+
+      // 슛 더 문 가능성 체크
+      final shootMoonChance = _checkShootMoonPossibility(hand);
+      shootMoonChances[i] = shootMoonChance; // 저장
+
+      // 우선순위 계산하여 정렬
       hand.sort((a, b) {
-        int scoreA = _getPassPriority(a);
-        int scoreB = _getPassPriority(b);
+        int scoreA = _getPassPriority(a, suitCounts, lowSpadeCount, lowHeartCount, shootMoonChance);
+        int scoreB = _getPassPriority(b, suitCounts, lowSpadeCount, lowHeartCount, shootMoonChance);
         return scoreB.compareTo(scoreA);
       });
 
@@ -177,12 +197,193 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     }
   }
 
-  int _getPassPriority(PlayingCard card) {
+  // 슛 더 문 가능성 체크 (0.0 ~ 1.0)
+  double _checkShootMoonPossibility(List<PlayingCard> hand) {
+    double score = 0.0;
+
+    // 높은 하트 개수 (A, K, Q, J = 14, 13, 12, 11)
+    final highHearts = hand.where((c) => c.isHeart && c.rank >= 11).length;
+    score += highHearts * 0.15; // 최대 0.6 (4장)
+
+    // 하트 총 개수
+    final heartCount = hand.where((c) => c.isHeart).length;
+    if (heartCount >= 6) score += 0.15;
+    if (heartCount >= 8) score += 0.15;
+
+    // 스페이드 Q 보유
+    final hasQueenOfSpades = hand.any((c) => c.isQueenOfSpades);
+    if (hasQueenOfSpades) score += 0.1;
+
+    // 높은 스페이드 (A, K)
+    final highSpades = hand.where((c) => c.suit == Suit.spade && c.rank >= 13).length;
+    score += highSpades * 0.1; // 최대 0.2 (A, K)
+
+    // 다른 수트의 A 개수 (컨트롤)
+    final aceCount = hand.where((c) => c.rank == 14).length;
+    score += aceCount * 0.05;
+
+    // 보이드 수트 (한 수트가 0장이면 유리)
+    final clubCount = hand.where((c) => c.suit == Suit.club).length;
+    final diamondCount = hand.where((c) => c.suit == Suit.diamond).length;
+    if (clubCount == 0 || diamondCount == 0) score += 0.1;
+
+    return score.clamp(0.0, 1.0);
+  }
+
+  // 선 유지 가능 여부 계산 (수트별)
+  // 반환: 각 수트별로 이길 수 있는 카드 수
+  Map<Suit, int> _calculateLeadPotential(int playerIndex) {
+    final hand = hands[playerIndex];
+    final result = <Suit, int>{};
+
+    for (final suit in Suit.values) {
+      final myCards = hand.where((c) => c.suit == suit).toList();
+      if (myCards.isEmpty) {
+        result[suit] = 0;
+        continue;
+      }
+
+      // 아직 플레이되지 않은 상대방 카드 계산
+      final remainingCards = <PlayingCard>[];
+      for (int rank = 2; rank <= 14; rank++) {
+        final card = PlayingCard(suit, rank);
+        // 내 카드도 아니고, 이미 플레이된 카드도 아닌 것
+        if (!myCards.any((c) => c.rank == rank) &&
+            !playedCards.any((c) => c.suit == suit && c.rank == rank)) {
+          remainingCards.add(card);
+        }
+      }
+
+      // 내 카드 중 이길 수 있는 카드 수 계산
+      int winningCards = 0;
+      myCards.sort((a, b) => b.rank.compareTo(a.rank)); // 높은 순 정렬
+
+      for (final myCard in myCards) {
+        // 남은 카드 중 내 카드보다 높은 것이 있는지
+        final higherCards = remainingCards.where((c) => c.rank > myCard.rank).length;
+        if (higherCards == 0) {
+          winningCards++;
+          // 이 카드를 내면 다음 높은 카드도 이길 수 있음
+          remainingCards.removeWhere((c) => c.rank < myCard.rank);
+        } else {
+          break; // 이길 수 없으면 나머지도 불가
+        }
+      }
+
+      result[suit] = winningCards;
+    }
+
+    return result;
+  }
+
+  // 전체 선 유지 가능성 점수 (0.0 ~ 1.0)
+  double _calculateOverallLeadPotential(int playerIndex) {
+    final potential = _calculateLeadPotential(playerIndex);
+    final hand = hands[playerIndex];
+
+    if (hand.isEmpty) return 0.0;
+
+    int totalWinningCards = 0;
+    for (final suit in Suit.values) {
+      totalWinningCards += potential[suit]!;
+    }
+
+    // 보유 카드 대비 이길 수 있는 카드 비율
+    return (totalWinningCards / hand.length).clamp(0.0, 1.0);
+  }
+
+  // 슛더문 해제 조건 체크
+  void _updateShootMoonStatus() {
+    for (int playerIndex = 0; playerIndex < 4; playerIndex++) {
+      // 이미 슛더문 시도 중이 아니면 스킵
+      if (shootMoonChances[playerIndex] < 0.5) continue;
+
+      // 조건 1: 다른 플레이어가 점수를 획득했는지 확인
+      bool otherPlayerHasPoints = false;
+      for (int i = 0; i < 4; i++) {
+        if (i != playerIndex) {
+          final points = wonCards[i].fold(0, (sum, c) => sum + c.points);
+          if (points > 0) {
+            otherPlayerHasPoints = true;
+            break;
+          }
+        }
+      }
+
+      if (otherPlayerHasPoints) {
+        shootMoonChances[playerIndex] = 0.0; // 슛더문 해제
+        continue;
+      }
+
+      // 조건 2: 선유지 가능성이 30% 미만
+      final leadPotential = _calculateOverallLeadPotential(playerIndex);
+      if (leadPotential < 0.3) {
+        shootMoonChances[playerIndex] = 0.0; // 슛더문 해제
+        continue;
+      }
+
+      // 조건 3: 남은 하트 + 스페이드Q를 모을 수 없는 경우
+      // (이미 다른 플레이어가 하트를 가져갔으면 조건 1에서 걸림)
+      // 추가로: 내가 하트를 하나도 못 먹었는데 하트가 많이 나갔으면 해제
+      final myPoints = wonCards[playerIndex].fold(0, (sum, c) => sum + c.points);
+      final totalPlayedHearts = playedCards.where((c) => c.isHeart).length;
+      if (totalPlayedHearts >= 5 && myPoints == 0) {
+        // 하트가 5장 이상 나갔는데 내가 하나도 못 먹었으면 해제
+        shootMoonChances[playerIndex] = 0.0;
+      }
+    }
+  }
+
+  int _getPassPriority(PlayingCard card, Map<Suit, int> suitCounts, int lowSpadeCount, int lowHeartCount, double shootMoonChance) {
     // 높을수록 패스하고 싶은 카드
-    if (card.isQueenOfSpades) return 1000;
-    if (card.suit == Suit.spade && card.rank >= 12) return 500 + card.rank;
-    if (card.isHeart && card.rank >= 10) return 300 + card.rank;
+    final spadeCount = suitCounts[Suit.spade]!;
+    final heartCount = suitCounts[Suit.heart]!;
+    final cardSuitCount = suitCounts[card.suit]!;
+
+    // 슛 더 문 가능성이 높으면 (0.5 이상) 높은 카드 보유
+    if (shootMoonChance >= 0.5) {
+      // 높은 하트, 스페이드 Q, 높은 스페이드는 보유
+      if (card.isHeart && card.rank >= 11) return 5; // 보유
+      if (card.isQueenOfSpades) return 5; // 보유
+      if (card.suit == Suit.spade && card.rank >= 13) return 10; // 보유
+      // 낮은 카드를 패스
+      if (card.rank <= 8) return 200 + (14 - card.rank); // 낮을수록 패스
+      return 50 + card.rank;
+    }
+
+    // ★ 3장 이하 수트: 보이드 만들기 위해 우선 패스 (하트/스페이드 제외)
+    // 클럽이나 다이아몬드가 3장 이하면 해당 수트 카드를 패스하여 보이드 생성
+    if ((card.suit == Suit.club || card.suit == Suit.diamond) && cardSuitCount <= 3 && cardSuitCount > 0) {
+      // 높은 카드일수록 우선 패스 (보이드 생성 + 높은 카드 제거)
+      return 600 + card.rank;
+    }
+
+    // 일반 패싱 로직
+    // 스페이드 Q: 스페이드가 5장 이상이고 낮은 스페이드가 3장 이상이면 방어 가능
+    if (card.isQueenOfSpades) {
+      if (spadeCount >= 5 && lowSpadeCount >= 3) return 50; // 보유 가능
+      if (spadeCount >= 4 && lowSpadeCount >= 2) return 500; // 약간 위험
+      return 1000; // 위험 - 패스
+    }
+
+    // 스페이드 K, A: 스페이드가 많으면 방어 가능
+    if (card.suit == Suit.spade && card.rank >= 13) {
+      if (spadeCount >= 5 && lowSpadeCount >= 3) return 30 + card.rank; // 보유 가능
+      if (spadeCount >= 4) return 200 + card.rank; // 약간 위험
+      return 500 + card.rank; // 위험 - 패스
+    }
+
+    // 높은 하트 (10+): 하트가 많으면 방어 가능
+    if (card.isHeart && card.rank >= 10) {
+      if (heartCount >= 5 && lowHeartCount >= 3) return 20 + card.rank; // 보유 가능
+      if (heartCount >= 4) return 150 + card.rank; // 약간 위험
+      return 300 + card.rank; // 위험 - 패스
+    }
+
+    // 다른 높은 카드 (K, Q, A)
     if (card.rank >= 12) return 100 + card.rank;
+
+    // 낮은 카드는 보유
     return card.rank;
   }
 
@@ -303,6 +504,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     setState(() {
       hands[playerIndex].remove(card);
       currentTrick[playerIndex] = card;
+      playedCards.add(card); // 플레이된 카드 추적
 
       if (card.isHeart) {
         heartsBroken = true;
@@ -342,9 +544,56 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   }
 
   PlayingCard _selectBestCard(int playerIndex, List<PlayingCard> playable) {
+    // 슛더문 시도 중인지 확인
+    final isShootingMoon = shootMoonChances[playerIndex] >= 0.5;
+
     // 선공이면
     if (currentTrick.every((c) => c == null)) {
-      // 낮은 카드 선호, 하트/스페이드 퀸 피하기
+      // ★ 스페이드 Q 유도 전략
+      // 조건: 스페이드 Q가 아직 안 나왔고, 내가 가지고 있지 않음
+      final queenOfSpadesPlayed = playedCards.any((c) => c.isQueenOfSpades);
+      final iHaveQueenOfSpades = playable.any((c) => c.isQueenOfSpades);
+
+      if (!queenOfSpadesPlayed && !iHaveQueenOfSpades && !isShootingMoon) {
+        // 낮은 스페이드가 있으면 우선 공격 (Q 유도)
+        final lowSpades = playable
+            .where((c) => c.suit == Suit.spade && c.rank < 12) // Q(12) 미만
+            .toList();
+        if (lowSpades.isNotEmpty) {
+          lowSpades.sort((a, b) => a.rank.compareTo(b.rank));
+          return lowSpades.first; // 가장 낮은 스페이드로 공격
+        }
+      }
+
+      // ★ 스페이드 Q가 나왔거나 스페이드가 없으면 낮은 하트 선공
+      final hasSpades = playable.any((c) => c.suit == Suit.spade && !c.isQueenOfSpades);
+      if ((queenOfSpadesPlayed || !hasSpades) && heartsBroken && !isShootingMoon) {
+        final lowHearts = playable.where((c) => c.isHeart).toList();
+        if (lowHearts.isNotEmpty) {
+          lowHearts.sort((a, b) => a.rank.compareTo(b.rank));
+          return lowHearts.first; // 가장 낮은 하트로 공격
+        }
+      }
+
+      // ★ 한 번도 나오지 않은 무늬가 있으면 최상위 카드 선공
+      // (다른 플레이어가 해당 무늬를 가지고 있을 확률 높음 → 안전하게 높은 카드 처리)
+      if (!isShootingMoon) {
+        final playedSuits = playedCards.map((c) => c.suit).toSet();
+        for (final suit in [Suit.club, Suit.diamond]) {
+          // 클럽, 다이아만 체크 (하트/스페이드는 위험)
+          if (!playedSuits.contains(suit)) {
+            final unplayedSuitCards = playable
+                .where((c) => c.suit == suit)
+                .toList();
+            if (unplayedSuitCards.isNotEmpty) {
+              unplayedSuitCards.sort((a, b) => b.rank.compareTo(a.rank));
+              return unplayedSuitCards.first; // 최상위 카드
+            }
+          }
+        }
+      }
+
+      // 기본: 낮은 카드 선호, 하트/스페이드 퀸 피하기
       playable.sort((a, b) {
         if (a.isQueenOfSpades) return 1;
         if (b.isQueenOfSpades) return -1;
@@ -370,49 +619,140 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         }
       }
 
-      // 이길 수 없으면 가장 높은 카드 (점수 먹이기)
+      final playedCount = currentTrick.where((c) => c != null).length;
+      final isLastPlayer = playedCount == 3;
       final canWin = sameSuitCards.where((c) => c.rank > highestRank).toList();
+      final cantWin = sameSuitCards.where((c) => c.rank <= highestRank).toList();
+      final hasPointsInTrick = currentTrick.any((c) => c != null && c.points > 0);
+
+      // ★ 슛더문 시도 중
+      if (isShootingMoon) {
+        // 이길 수 있을 때: 스페이드Q는 나중에 (다른 카드로 이기기)
+        if (canWin.isNotEmpty) {
+          final withoutQueen = canWin.where((c) => !c.isQueenOfSpades).toList();
+          if (withoutQueen.isNotEmpty) {
+            // Q 제외하고 가장 낮은 승리 카드 (Q 보존)
+            withoutQueen.sort((a, b) => a.rank.compareTo(b.rank));
+            return withoutQueen.first;
+          }
+          // Q만 이길 수 있으면 Q 냄
+          return canWin.first;
+        }
+        // 이길 수 없으면 가장 낮은 카드
+        sameSuitCards.sort((a, b) => a.rank.compareTo(b.rank));
+        return sameSuitCards.first;
+      }
+
+      // ★ 일반 (슛더문 아님): 스페이드Q는 가장 나중에
+      // 마지막 순서 + 어떤 카드를 내도 이김 + 점수 없음 → 높은 카드 버리기 (Q 제외)
+      final allCardsWin = sameSuitCards.every((c) => c.rank > highestRank);
+      if (isLastPlayer && allCardsWin && !hasPointsInTrick) {
+        final safeHighCards = sameSuitCards.where((c) => !c.isQueenOfSpades).toList();
+        if (safeHighCards.isNotEmpty) {
+          safeHighCards.sort((a, b) => b.rank.compareTo(a.rank));
+          return safeHighCards.first;
+        }
+      }
+
+      // 이길 수 없으면 가장 높은 카드 (Q 제외)
       if (canWin.isEmpty) {
+        final withoutQueen = sameSuitCards.where((c) => !c.isQueenOfSpades).toList();
+        if (withoutQueen.isNotEmpty) {
+          withoutQueen.sort((a, b) => b.rank.compareTo(a.rank));
+          return withoutQueen.first;
+        }
         sameSuitCards.sort((a, b) => b.rank.compareTo(a.rank));
         return sameSuitCards.first;
       }
 
-      // 점수 카드가 있는 트릭이면 피하기
-      bool hasPoints = currentTrick.any((c) => c != null && c.points > 0);
-      if (hasPoints) {
-        // 이기지 않을 카드 중 가장 높은 것
-        final cantWin = sameSuitCards.where((c) => c.rank <= highestRank).toList();
-        if (cantWin.isNotEmpty) {
-          cantWin.sort((a, b) => b.rank.compareTo(a.rank));
-          return cantWin.first;
+      // 점수 트릭이면 피하기 (Q 제외)
+      if (hasPointsInTrick && cantWin.isNotEmpty) {
+        final withoutQueen = cantWin.where((c) => !c.isQueenOfSpades).toList();
+        if (withoutQueen.isNotEmpty) {
+          withoutQueen.sort((a, b) => b.rank.compareTo(a.rank));
+          return withoutQueen.first;
         }
+        cantWin.sort((a, b) => b.rank.compareTo(a.rank));
+        return cantWin.first;
       }
 
-      // 낮은 카드로 안전하게
+      // 낮은 카드로 안전하게 (Q 제외)
+      final withoutQueen = sameSuitCards.where((c) => !c.isQueenOfSpades).toList();
+      if (withoutQueen.isNotEmpty) {
+        withoutQueen.sort((a, b) => a.rank.compareTo(b.rank));
+        return withoutQueen.first;
+      }
       sameSuitCards.sort((a, b) => a.rank.compareTo(b.rank));
       return sameSuitCards.first;
     } else {
       // 다른 무늬 - 점수 카드 버리기 기회
-      // 스페이드 퀸 우선
+
+      // ★ 슛더문 시도 중이면 선유지 가능한 카드 보유
+      if (isShootingMoon) {
+        final hand = hands[playerIndex];
+        final leadPotential = _calculateLeadPotential(playerIndex);
+
+        // 점수 없는 카드 중 버릴 카드 선택
+        final nonPointCards = playable.where((c) => c.points == 0).toList();
+        if (nonPointCards.isNotEmpty) {
+          nonPointCards.sort((a, b) {
+            // 선유지 가능성 (낮을수록 우선 버림)
+            final potentialA = leadPotential[a.suit]!;
+            final potentialB = leadPotential[b.suit]!;
+            if (potentialA != potentialB) return potentialA.compareTo(potentialB);
+
+            // 수트 개수 (적을수록 우선 버림)
+            final countA = hand.where((c) => c.suit == a.suit).length;
+            final countB = hand.where((c) => c.suit == b.suit).length;
+            if (countA != countB) return countA.compareTo(countB);
+
+            // 같은 수트면 낮은 카드 우선 버림 (높은 카드 보유)
+            return a.rank.compareTo(b.rank);
+          });
+          return nonPointCards.first;
+        }
+        // 점수 카드만 있으면 가장 낮은 하트
+        final hearts = playable.where((c) => c.isHeart).toList();
+        if (hearts.isNotEmpty) {
+          hearts.sort((a, b) => a.rank.compareTo(b.rank));
+          return hearts.first;
+        }
+        return playable.first;
+      }
+
+      // ★ 일반: 높은 카드 우선 버리기
+      // 1. 스페이드 퀸 우선
       final queenOfSpades = playable.where((c) => c.isQueenOfSpades).toList();
       if (queenOfSpades.isNotEmpty) return queenOfSpades.first;
 
-      // 높은 하트
+      // 2. 높은 하트 (A부터)
       final hearts = playable.where((c) => c.isHeart).toList();
       if (hearts.isNotEmpty) {
         hearts.sort((a, b) => b.rank.compareTo(a.rank));
         return hearts.first;
       }
 
-      // 높은 스페이드 (퀸 위험 방지)
-      final highSpades = playable.where((c) => c.suit == Suit.spade && c.rank >= 12).toList();
-      if (highSpades.isNotEmpty) {
-        highSpades.sort((a, b) => b.rank.compareTo(a.rank));
-        return highSpades.first;
+      // 3. 높은 스페이드 (K, A) - ♠Q가 아직 안 나왔을 때만 위험
+      final queenOfSpadesPlayed = playedCards.any((c) => c.isQueenOfSpades);
+      if (!queenOfSpadesPlayed) {
+        final highSpades = playable.where((c) => c.suit == Suit.spade && c.rank >= 13).toList();
+        if (highSpades.isNotEmpty) {
+          highSpades.sort((a, b) => b.rank.compareTo(a.rank));
+          return highSpades.first;
+        }
       }
 
-      // 가장 높은 카드
-      playable.sort((a, b) => b.rank.compareTo(a.rank));
+      // 4. 선유지 가능성 낮은 카드 우선 버리기
+      final leadPotential = _calculateLeadPotential(playerIndex);
+      playable.sort((a, b) {
+        // 선유지 가능성 (낮을수록 우선 버림) - 이길 수 없는 높은 카드 제거
+        final potentialA = leadPotential[a.suit]!;
+        final potentialB = leadPotential[b.suit]!;
+        if (potentialA != potentialB) return potentialA.compareTo(potentialB);
+
+        // 같은 선유지면 높은 카드 우선 버림
+        return b.rank.compareTo(a.rank);
+      });
       return playable.first;
     }
   }
@@ -442,6 +782,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       wonCards[winnerIndex].add(card);
     }
     scores[winnerIndex] += trickPoints;
+
+    // 슛더문 상태 업데이트
+    _updateShootMoonStatus();
 
     _showMessage('${playerNames[winnerIndex]} 트릭 획득! (+$trickPoints점)');
 
@@ -580,6 +923,77 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                       ),
                     ),
 
+                  // 테스트용 정보 표시 (상단에 작게)
+                  if (phase == GamePhase.passing || phase == GamePhase.playing)
+                    Positioned(
+                      top: isSmallScreen ? 40 : 50,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '🔍 테스트 정보',
+                              style: TextStyle(
+                                color: Colors.amber,
+                                fontSize: isSmallScreen ? 8 : 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            // 슛더문 확률 + 선유지 가능성 표시
+                            for (int i = 0; i < 4; i++)
+                              Builder(builder: (context) {
+                                final leadPotential = phase == GamePhase.playing
+                                    ? _calculateOverallLeadPotential(i)
+                                    : 0.0;
+                                final leadStr = phase == GamePhase.playing
+                                    ? ' L:${(leadPotential * 100).toInt()}%'
+                                    : '';
+                                return Text(
+                                  '${playerNames[i]}: ${(shootMoonChances[i] * 100).toInt()}%${shootMoonChances[i] >= 0.5 ? "🌙" : ""}$leadStr',
+                                  style: TextStyle(
+                                    color: shootMoonChances[i] >= 0.5 ? Colors.yellow : Colors.white70,
+                                    fontSize: isSmallScreen ? 8 : 10,
+                                    fontWeight: shootMoonChances[i] >= 0.5 ? FontWeight.bold : FontWeight.normal,
+                                  ),
+                                );
+                              }),
+                            // 패싱 페이즈: 패스 카드 표시
+                            if (phase == GamePhase.passing) ...[
+                              const SizedBox(height: 4),
+                              for (int i = 0; i < 4; i++)
+                                if (cardsToReceive[i].isNotEmpty)
+                                  Text(
+                                    '${playerNames[(i + 3) % 4]}→${playerNames[i]}: ${cardsToReceive[i].map((c) => c.toString()).join(' ')}',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: isSmallScreen ? 8 : 10,
+                                    ),
+                                  ),
+                            ],
+                            // 플레이 페이즈: 플레이된 카드 수 표시
+                            if (phase == GamePhase.playing) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                '플레이: ${playedCards.length}/52',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: isSmallScreen ? 8 : 10,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+
                   // 패싱 확인 버튼 (화면 중앙)
                   if (phase == GamePhase.passing)
                     Positioned.fill(
@@ -695,7 +1109,8 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                     left: (MediaQuery.of(context).size.width / 2) -
                           (hand.length * overlap / 2) +
                           (i * overlap),
-                    child: _buildCardBack(cardWidth, cardHeight),
+                    // TODO: 테스트용 - AI 카드 보이기
+                    child: _buildPlayingCard(hand[i], cardWidth, cardHeight, false),
                   ),
               ],
             ),
@@ -709,7 +1124,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     final hand = hands[playerIndex];
     final cardWidth = isSmallScreen ? 24.0 : 30.0;
     final cardHeight = isSmallScreen ? 34.0 : 42.0;
-    final overlap = isSmallScreen ? 12.0 : 15.0;
+    final overlap = isSmallScreen ? 18.0 : 22.0;
 
     return Container(
       width: isSmallScreen ? 50 : 60,
@@ -739,7 +1154,8 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                     top: i * overlap,
                     child: Transform.rotate(
                       angle: playerIndex == 1 ? -pi / 2 : pi / 2,
-                      child: _buildCardBack(cardWidth, cardHeight),
+                      // TODO: 테스트용 - AI 카드 보이기
+                      child: _buildPlayingCard(hand[i], cardWidth, cardHeight, false),
                     ),
                   ),
               ],
@@ -753,6 +1169,11 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   Widget _buildCenterArea(bool isSmallScreen) {
     final cardWidth = isSmallScreen ? 45.0 : 55.0;
     final cardHeight = isSmallScreen ? 65.0 : 80.0;
+
+    // 패싱 페이즈일 때는 빈 공간 반환 (테스트 패널은 오버레이로 표시)
+    if (phase == GamePhase.passing) {
+      return const SizedBox.shrink();
+    }
 
     return Center(
       child: SizedBox(
