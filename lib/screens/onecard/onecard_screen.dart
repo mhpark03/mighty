@@ -1046,11 +1046,6 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.lightbulb, color: _showHint ? Colors.yellow : Colors.white),
-            tooltip: _showHint ? '힌트 OFF' : '힌트',
-            onPressed: _onHintButtonPressed,
-          ),
-          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _restartGame,
             tooltip: '다시 시작',
@@ -1157,7 +1152,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                 const Icon(Icons.computer, color: Colors.white, size: 10),
                 const SizedBox(width: 2),
                 Text(
-                  '${computerIndex + 1}',
+                  aiNames[computerIndex],
                   style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -1247,7 +1242,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                 const Icon(Icons.computer, color: Colors.white, size: 14),
                 const SizedBox(width: 4),
                 Text(
-                  '${computerIndex + 1} (${'${hand.length}장'})',
+                  '${aiNames[computerIndex]} (${hand.length}장)',
                   style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ],
