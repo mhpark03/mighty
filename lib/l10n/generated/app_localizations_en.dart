@@ -661,4 +661,95 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get finalResults => 'Final Results';
+
+  @override
+  String get sevenCardGuideOverview => 'Game Overview';
+
+  @override
+  String get sevenCardGuideOverviewText =>
+      'Seven Card Poker is a poker game for 5 players. Create the best hand using 5 of your 7 cards to win.';
+
+  @override
+  String get sevenCardGuideDealing => 'Card Dealing';
+
+  @override
+  String get sevenCardGuideDealingText =>
+      '• Initially receive 4 cards (3 hidden, 1 open)\n• Receive one open card after each betting round\n• Make a hand with 5 of your final 7 cards';
+
+  @override
+  String get sevenCardGuideBetting => 'Betting Rules';
+
+  @override
+  String get sevenCardGuideBettingText =>
+      '• Check: Pass without betting\n• Call: Match current bet\n• Raise: Increase bet amount\n• Fold: Give up the hand\n• All In: Bet all chips';
+
+  @override
+  String get sevenCardGuideHands => 'Hand Rankings';
+
+  @override
+  String get sevenCardGuideHandsText =>
+      '1. Royal Straight Flush\n2. Back Straight Flush\n3. Straight Flush\n4. Four of a Kind\n5. Full House\n6. Flush\n7. Mountain (A-K-Q-J-10)\n8. Back Straight (A-2-3-4-5)\n9. Straight\n10. Three of a Kind\n11. Two Pair\n12. One Pair\n13. High Card';
+
+  @override
+  String get sevenCardGuideTips => 'Game Tips';
+
+  @override
+  String get sevenCardGuideTipsText =>
+      '• Predict opponent hands from open cards\n• Avoid excessive betting without strong hands\n• Bluffing is also a strategy';
+
+  @override
+  String get sevenCardGuideBonus => 'Bonus Hands';
+
+  @override
+  String get sevenCardGuideBonusText =>
+      '• Royal Straight Flush: 500 chips\n• Back Straight Flush: 300 chips\n• Straight Flush: 200 chips\n• Four of a Kind: 100 chips\n\nBonus hands earn bonus from all other players!';
+
+  @override
+  String get hiLoGuideOverview => 'Game Overview';
+
+  @override
+  String get hiLoGuideOverviewText =>
+      'Hi-Lo is a variation of Seven Card Poker where the pot is split between the highest and lowest hand.';
+
+  @override
+  String get hiLoGuideDealing => 'Card Dealing';
+
+  @override
+  String get hiLoGuideDealingText =>
+      '• Same dealing as Seven Card Poker\n• Make a hand with 5 of your 7 cards\n• Choose Hi/Lo/Swing after final betting';
+
+  @override
+  String get hiLoGuideHiLo => 'Hi/Lo Selection';
+
+  @override
+  String get hiLoGuideHiLoText =>
+      '• Hi: Compete with highest hand\n• Lo: Compete with lowest hand\n• Swing: Challenge both Hi and Lo\n\n50% of pot goes to Hi winner, 50% to Lo winner.';
+
+  @override
+  String get hiLoGuideLow => 'Low Hand Rules';
+
+  @override
+  String get hiLoGuideLowText =>
+      '• Only hands without straights/flushes qualify\n• Lower is better (A is lowest)\n• Best low: A-2-3-4-6\n• No pair hands are advantageous';
+
+  @override
+  String get hiLoGuideSwing => 'Swing Rules';
+
+  @override
+  String get hiLoGuideSwingText =>
+      '• Split 7 cards into two 5-card hands\n• Must win both Hi and Lo to succeed\n• Success: Win entire pot\n• Failure: That portion goes to other winner';
+
+  @override
+  String get hiLoGuideTips => 'Game Tips';
+
+  @override
+  String get hiLoGuideTipsText =>
+      '• Low cards like A-2-3-4 favor Lo\n• Swing is risky but rewarding if successful\n• Observe opponent cards for strategy';
+
+  @override
+  String get hiLoGuideBonus => 'Bonus Hands';
+
+  @override
+  String get hiLoGuideBonusText =>
+      '• Royal Straight Flush: 500 chips\n• Back Straight Flush: 300 chips\n• Straight Flush: 200 chips\n• Four of a Kind: 100 chips\n\nBonus hands automatically win the entire pot!';
 }

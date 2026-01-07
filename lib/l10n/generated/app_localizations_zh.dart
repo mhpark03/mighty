@@ -656,4 +656,93 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get finalResults => '最终结果';
+
+  @override
+  String get sevenCardGuideOverview => '游戏概述';
+
+  @override
+  String get sevenCardGuideOverviewText => '七张扑克是5人扑克游戏。用7张牌中的5张组成最好的牌型来获胜。';
+
+  @override
+  String get sevenCardGuideDealing => '发牌';
+
+  @override
+  String get sevenCardGuideDealingText =>
+      '• 首先收到4张牌（3张暗牌，1张明牌）\n• 每轮下注后收到一张明牌\n• 最终用7张中的5张组成牌型';
+
+  @override
+  String get sevenCardGuideBetting => '下注规则';
+
+  @override
+  String get sevenCardGuideBettingText =>
+      '• 过牌: 不下注跳过\n• 跟注: 匹配当前下注\n• 加注: 提高下注金额\n• 弃牌: 放弃本局\n• 全押: 下注所有筹码';
+
+  @override
+  String get sevenCardGuideHands => '牌型排名';
+
+  @override
+  String get sevenCardGuideHandsText =>
+      '1. 皇家同花顺\n2. 反向同花顺\n3. 同花顺\n4. 四条\n5. 葫芦\n6. 同花\n7. 山 (A-K-Q-J-10)\n8. 反向顺子 (A-2-3-4-5)\n9. 顺子\n10. 三条\n11. 两对\n12. 一对\n13. 高牌';
+
+  @override
+  String get sevenCardGuideTips => '游戏技巧';
+
+  @override
+  String get sevenCardGuideTipsText =>
+      '• 从明牌预测对手的牌型\n• 没有强牌时避免过度下注\n• 虚张声势也是策略';
+
+  @override
+  String get sevenCardGuideBonus => '奖励牌型';
+
+  @override
+  String get sevenCardGuideBonusText =>
+      '• 皇家同花顺: 500筹码\n• 反向同花顺: 300筹码\n• 同花顺: 200筹码\n• 四条: 100筹码\n\n达成奖励牌型时，从所有其他玩家获得奖励！';
+
+  @override
+  String get hiLoGuideOverview => '游戏概述';
+
+  @override
+  String get hiLoGuideOverviewText => '高低是七张扑克的变体，底池分给高牌（最高牌型）和低牌（最低牌型）赢家。';
+
+  @override
+  String get hiLoGuideDealing => '发牌';
+
+  @override
+  String get hiLoGuideDealingText =>
+      '• 与七张扑克相同的方式进行\n• 用7张牌中的5张组成牌型\n• 最后下注后选择高/低/双向';
+
+  @override
+  String get hiLoGuideHiLo => '高/低选择';
+
+  @override
+  String get hiLoGuideHiLoText =>
+      '• 高: 用最高牌型竞争\n• 低: 用最低牌型竞争\n• 双向: 同时挑战高和低\n\n底池的50%归高牌赢家，50%归低牌赢家。';
+
+  @override
+  String get hiLoGuideLow => '低牌规则';
+
+  @override
+  String get hiLoGuideLowText =>
+      '• 只有没有顺子/同花的牌才有资格\n• 越低越好（A最低）\n• 最强低牌: A-2-3-4-6\n• 没有对子的牌更有利';
+
+  @override
+  String get hiLoGuideSwing => '双向规则';
+
+  @override
+  String get hiLoGuideSwingText =>
+      '• 将7张牌分成两个5张的牌\n• 必须同时赢得高和低才能成功\n• 成功: 赢得整个底池\n• 失败: 该部分归其他赢家';
+
+  @override
+  String get hiLoGuideTips => '游戏技巧';
+
+  @override
+  String get hiLoGuideTipsText =>
+      '• A-2-3-4这样的低牌对低牌有利\n• 双向有风险但成功则回报丰厚\n• 观察对手的牌制定策略';
+
+  @override
+  String get hiLoGuideBonus => '奖励牌型';
+
+  @override
+  String get hiLoGuideBonusText =>
+      '• 皇家同花顺: 500筹码\n• 反向同花顺: 300筹码\n• 同花顺: 200筹码\n• 四条: 100筹码\n\n达成奖励牌型时，自动赢得整个底池！';
 }

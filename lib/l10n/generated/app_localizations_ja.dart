@@ -659,4 +659,95 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get finalResults => '最終結果';
+
+  @override
+  String get sevenCardGuideOverview => 'ゲーム概要';
+
+  @override
+  String get sevenCardGuideOverviewText =>
+      'セブンカードポーカーは5人でプレイするポーカーゲームです。7枚のカードから5枚で最高の役を作って勝利しましょう。';
+
+  @override
+  String get sevenCardGuideDealing => 'カード配布';
+
+  @override
+  String get sevenCardGuideDealingText =>
+      '• 最初に4枚を受け取ります（3枚伏せ、1枚オープン）\n• ベッティング後に1枚ずつオープンカードを受け取ります\n• 最終的に7枚から5枚で役を作ります';
+
+  @override
+  String get sevenCardGuideBetting => 'ベッティングルール';
+
+  @override
+  String get sevenCardGuideBettingText =>
+      '• チェック: ベットなしでパス\n• コール: 現在のベットに合わせる\n• レイズ: ベット額を上げる\n• ダイ: ゲームを降りる\n• オールイン: 全チップをベット';
+
+  @override
+  String get sevenCardGuideHands => '役のランキング';
+
+  @override
+  String get sevenCardGuideHandsText =>
+      '1. ロイヤルストレートフラッシュ\n2. バックストレートフラッシュ\n3. ストレートフラッシュ\n4. フォーカード\n5. フルハウス\n6. フラッシュ\n7. マウンテン (A-K-Q-J-10)\n8. バックストレート (A-2-3-4-5)\n9. ストレート\n10. スリーカード\n11. ツーペア\n12. ワンペア\n13. ハイカード';
+
+  @override
+  String get sevenCardGuideTips => 'ゲームのコツ';
+
+  @override
+  String get sevenCardGuideTipsText =>
+      '• オープンカードから相手の役を予測しましょう\n• 強い手でなければ過度なベットを避けましょう\n• ブラフも戦略です';
+
+  @override
+  String get sevenCardGuideBonus => 'ボーナスハンド';
+
+  @override
+  String get sevenCardGuideBonusText =>
+      '• ロイヤルストレートフラッシュ: 500チップ\n• バックストレートフラッシュ: 300チップ\n• ストレートフラッシュ: 200チップ\n• フォーカード: 100チップ\n\nボーナスハンド達成時、他の全プレイヤーからボーナスを獲得！';
+
+  @override
+  String get hiLoGuideOverview => 'ゲーム概要';
+
+  @override
+  String get hiLoGuideOverviewText =>
+      'ハイローはセブンカードポーカーの変形で、ポットがハイ（高い役）とロー（低い役）の勝者に分けられます。';
+
+  @override
+  String get hiLoGuideDealing => 'カード配布';
+
+  @override
+  String get hiLoGuideDealingText =>
+      '• セブンカードポーカーと同じ方式で進行\n• 7枚のカードから5枚で役を作ります\n• 最後のベット後にハイ/ロー/スイングを選択';
+
+  @override
+  String get hiLoGuideHiLo => 'ハイ/ロー選択';
+
+  @override
+  String get hiLoGuideHiLoText =>
+      '• ハイ: 最高の役で競争\n• ロー: 最低の役で競争\n• スイング: ハイとロー両方に挑戦\n\nポットの50%はハイ勝者、50%はロー勝者が獲得。';
+
+  @override
+  String get hiLoGuideLow => 'ロー役のルール';
+
+  @override
+  String get hiLoGuideLowText =>
+      '• ストレート/フラッシュのない手のみ資格あり\n• 低いほど良い（Aが最低）\n• 最強ロー: A-2-3-4-6\n• ペアなしの手が有利';
+
+  @override
+  String get hiLoGuideSwing => 'スイングルール';
+
+  @override
+  String get hiLoGuideSwingText =>
+      '• 7枚を2つの5枚の手に分けます\n• ハイとロー両方で1位になる必要があります\n• 成功: ポット全体を獲得\n• 失敗: その部分は他の勝者へ';
+
+  @override
+  String get hiLoGuideTips => 'ゲームのコツ';
+
+  @override
+  String get hiLoGuideTipsText =>
+      '• A-2-3-4のような低いカードはローに有利\n• スイングはリスクがありますが成功すれば大きな報酬\n• 相手のカードを見て戦略を立てましょう';
+
+  @override
+  String get hiLoGuideBonus => 'ボーナスハンド';
+
+  @override
+  String get hiLoGuideBonusText =>
+      '• ロイヤルストレートフラッシュ: 500チップ\n• バックストレートフラッシュ: 300チップ\n• ストレートフラッシュ: 200チップ\n• フォーカード: 100チップ\n\nボーナスハンド達成時、自動的にポット全体を獲得！';
 }

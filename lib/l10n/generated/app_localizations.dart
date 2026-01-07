@@ -1319,6 +1319,162 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'최종 결과'**
   String get finalResults;
+
+  /// No description provided for @sevenCardGuideOverview.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 개요'**
+  String get sevenCardGuideOverview;
+
+  /// No description provided for @sevenCardGuideOverviewText.
+  ///
+  /// In ko, this message translates to:
+  /// **'세븐 포커는 5명이 즐기는 포커 게임입니다. 7장의 카드 중 5장으로 가장 높은 족보를 만들어 승리하세요.'**
+  String get sevenCardGuideOverviewText;
+
+  /// No description provided for @sevenCardGuideDealing.
+  ///
+  /// In ko, this message translates to:
+  /// **'카드 배분'**
+  String get sevenCardGuideDealing;
+
+  /// No description provided for @sevenCardGuideDealingText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 처음에 4장을 받습니다 (3장 비공개, 1장 공개)\n• 베팅 후 한 장씩 공개 카드를 받습니다\n• 최종 7장 중 5장으로 족보를 만듭니다'**
+  String get sevenCardGuideDealingText;
+
+  /// No description provided for @sevenCardGuideBetting.
+  ///
+  /// In ko, this message translates to:
+  /// **'베팅 규칙'**
+  String get sevenCardGuideBetting;
+
+  /// No description provided for @sevenCardGuideBettingText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 체크: 베팅 없이 넘기기\n• 콜: 현재 베팅에 맞추기\n• 레이즈: 베팅 금액 올리기\n• 다이: 게임 포기\n• 올인: 모든 칩 베팅'**
+  String get sevenCardGuideBettingText;
+
+  /// No description provided for @sevenCardGuideHands.
+  ///
+  /// In ko, this message translates to:
+  /// **'족보 순위'**
+  String get sevenCardGuideHands;
+
+  /// No description provided for @sevenCardGuideHandsText.
+  ///
+  /// In ko, this message translates to:
+  /// **'1. 로열 스트레이트 플러시\n2. 백 스트레이트 플러시\n3. 스트레이트 플러시\n4. 포카드\n5. 풀하우스\n6. 플러시\n7. 마운틴 (A-K-Q-J-10)\n8. 백스트레이트 (A-2-3-4-5)\n9. 스트레이트\n10. 트리플\n11. 투페어\n12. 원페어\n13. 하이카드'**
+  String get sevenCardGuideHandsText;
+
+  /// No description provided for @sevenCardGuideTips.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 팁'**
+  String get sevenCardGuideTips;
+
+  /// No description provided for @sevenCardGuideTipsText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 공개 카드로 상대방 족보를 예측하세요\n• 강한 핸드가 아니면 과도한 베팅을 피하세요\n• 블러핑도 전략입니다'**
+  String get sevenCardGuideTipsText;
+
+  /// No description provided for @sevenCardGuideBonus.
+  ///
+  /// In ko, this message translates to:
+  /// **'보너스 핸드'**
+  String get sevenCardGuideBonus;
+
+  /// No description provided for @sevenCardGuideBonusText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 로열 스트레이트 플러시: 500칩\n• 백 스트레이트 플러시: 300칩\n• 스트레이트 플러시: 200칩\n• 포카드: 100칩\n\n보너스 핸드 달성 시 다른 모든 플레이어에게 보너스를 받습니다!'**
+  String get sevenCardGuideBonusText;
+
+  /// No description provided for @hiLoGuideOverview.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 개요'**
+  String get hiLoGuideOverview;
+
+  /// No description provided for @hiLoGuideOverviewText.
+  ///
+  /// In ko, this message translates to:
+  /// **'하이로우는 세븐 포커의 변형으로, 팟이 하이(높은 족보)와 로우(낮은 족보) 승자에게 나뉩니다.'**
+  String get hiLoGuideOverviewText;
+
+  /// No description provided for @hiLoGuideDealing.
+  ///
+  /// In ko, this message translates to:
+  /// **'카드 배분'**
+  String get hiLoGuideDealing;
+
+  /// No description provided for @hiLoGuideDealingText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 세븐 포커와 동일한 방식으로 진행\n• 7장의 카드 중 5장으로 족보를 만듭니다\n• 마지막 베팅 후 하이/로우/스윙 선택'**
+  String get hiLoGuideDealingText;
+
+  /// No description provided for @hiLoGuideHiLo.
+  ///
+  /// In ko, this message translates to:
+  /// **'하이/로우 선택'**
+  String get hiLoGuideHiLo;
+
+  /// No description provided for @hiLoGuideHiLoText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 하이: 가장 높은 족보로 경쟁\n• 로우: 가장 낮은 족보로 경쟁\n• 스윙: 하이와 로우 모두 도전\n\n팟의 50%는 하이 승자, 50%는 로우 승자가 가져갑니다.'**
+  String get hiLoGuideHiLoText;
+
+  /// No description provided for @hiLoGuideLow.
+  ///
+  /// In ko, this message translates to:
+  /// **'로우 족보'**
+  String get hiLoGuideLow;
+
+  /// No description provided for @hiLoGuideLowText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 스트레이트/플러시 없는 핸드만 로우 자격\n• 낮을수록 좋음 (A가 가장 낮음)\n• 최강 로우: A-2-3-4-6\n• 페어가 없는 핸드가 유리'**
+  String get hiLoGuideLowText;
+
+  /// No description provided for @hiLoGuideSwing.
+  ///
+  /// In ko, this message translates to:
+  /// **'스윙 규칙'**
+  String get hiLoGuideSwing;
+
+  /// No description provided for @hiLoGuideSwingText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 7장을 두 개의 5장 핸드로 나눕니다\n• 하이와 로우 모두 1등해야 성공\n• 성공 시 전체 팟 획득\n• 실패 시 해당 부분은 다른 승자에게'**
+  String get hiLoGuideSwingText;
+
+  /// No description provided for @hiLoGuideTips.
+  ///
+  /// In ko, this message translates to:
+  /// **'게임 팁'**
+  String get hiLoGuideTips;
+
+  /// No description provided for @hiLoGuideTipsText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• A-2-3-4 같은 낮은 카드는 로우에 유리\n• 스윙은 위험하지만 성공 시 큰 보상\n• 상대 카드를 보고 전략을 세우세요'**
+  String get hiLoGuideTipsText;
+
+  /// No description provided for @hiLoGuideBonus.
+  ///
+  /// In ko, this message translates to:
+  /// **'보너스 핸드'**
+  String get hiLoGuideBonus;
+
+  /// No description provided for @hiLoGuideBonusText.
+  ///
+  /// In ko, this message translates to:
+  /// **'• 로열 스트레이트 플러시: 500칩\n• 백 스트레이트 플러시: 300칩\n• 스트레이트 플러시: 200칩\n• 포카드: 100칩\n\n보너스 핸드 달성 시 자동으로 전체 팟을 획득합니다!'**
+  String get hiLoGuideBonusText;
 }
 
 class _AppLocalizationsDelegate
