@@ -1253,51 +1253,93 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
                     ),
                   )
                 else
-                  // 하이/로우 족보를 세로로 배치
-                  Container(
-                    margin: const EdgeInsets.only(left: 4),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 하이 족보 표시
-                        if (player.allCardsPokerHand != null)
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: isSmall ? 4 : 6, vertical: isSmall ? 2 : 3),
-                            decoration: BoxDecoration(
-                              color: Colors.red.shade700,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'Hi ${controller.getHandRankDisplayName(player.allCardsPokerHand)}',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: sizes.nameFontSize - 1,
+                  // 하이/로우 족보를 세로로 배치 (승리 가능성 높은 쪽 하이라이트)
+                  Builder(builder: (context) {
+                    final betterHand = controller.evaluateBetterHand(player);
+                    final highlightHi = betterHand == 'hi' || betterHand == 'both';
+                    final highlightLo = betterHand == 'lo' || betterHand == 'both';
+
+                    return Container(
+                      margin: const EdgeInsets.only(left: 4),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 하이 족보 표시
+                          if (player.allCardsPokerHand != null)
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: isSmall ? 4 : 6, vertical: isSmall ? 2 : 3),
+                              decoration: BoxDecoration(
+                                color: highlightHi ? Colors.red.shade600 : Colors.red.shade700,
+                                borderRadius: BorderRadius.circular(4),
+                                border: highlightHi ? Border.all(color: Colors.amber, width: 2) : null,
+                                boxShadow: highlightHi ? [
+                                  BoxShadow(
+                                    color: Colors.amber.withValues(alpha: 0.6),
+                                    blurRadius: 6,
+                                    spreadRadius: 1,
+                                  ),
+                                ] : null,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (highlightHi)
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 2),
+                                      child: Icon(Icons.star, color: Colors.amber, size: sizes.nameFontSize),
+                                    ),
+                                  Text(
+                                    'Hi ${controller.getHandRankDisplayName(player.allCardsPokerHand)}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: sizes.nameFontSize - 1,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        // 로우 족보 표시
-                        if (player.lowHand != null && player.lowHand!.isQualified)
-                          Container(
-                            margin: const EdgeInsets.only(top: 2),
-                            padding: EdgeInsets.symmetric(horizontal: isSmall ? 4 : 6, vertical: isSmall ? 2 : 3),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade700,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'Lo ${controller.getLowHandDisplayName(player.lowHand)}',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: sizes.nameFontSize - 1,
+                          // 로우 족보 표시
+                          if (player.lowHand != null && player.lowHand!.isQualified)
+                            Container(
+                              margin: const EdgeInsets.only(top: 2),
+                              padding: EdgeInsets.symmetric(horizontal: isSmall ? 4 : 6, vertical: isSmall ? 2 : 3),
+                              decoration: BoxDecoration(
+                                color: highlightLo ? Colors.blue.shade600 : Colors.blue.shade700,
+                                borderRadius: BorderRadius.circular(4),
+                                border: highlightLo ? Border.all(color: Colors.amber, width: 2) : null,
+                                boxShadow: highlightLo ? [
+                                  BoxShadow(
+                                    color: Colors.amber.withValues(alpha: 0.6),
+                                    blurRadius: 6,
+                                    spreadRadius: 1,
+                                  ),
+                                ] : null,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (highlightLo)
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 2),
+                                      child: Icon(Icons.star, color: Colors.amber, size: sizes.nameFontSize),
+                                    ),
+                                  Text(
+                                    'Lo ${controller.getLowHandDisplayName(player.lowHand)}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: sizes.nameFontSize - 1,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                      ],
-                    ),
-                  ),
+                        ],
+                      ),
+                    );
+                  }),
               ],
             ),
           ),

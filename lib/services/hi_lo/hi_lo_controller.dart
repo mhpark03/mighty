@@ -1663,6 +1663,76 @@ class HiLoController extends ChangeNotifier {
 
     return '$rankName탑';
   }
+
+  /// 플레이어의 Hi/Lo 중 승리 가능성이 높은 쪽 반환
+  /// 'hi': 하이가 유리, 'lo': 로우가 유리, 'both': 둘 다 유리, 'none': 판단 어려움
+  String evaluateBetterHand(HiLoPlayer player) {
+    final hiHand = player.pokerHand;
+    final loHand = player.lowHand;
+
+    // 하이 핸드 강도 계산
+    double hiWinChance = 0.0;
+    if (hiHand != null) {
+      final myHiStrength = _evaluateHandStrength(player, hiHand);
+      final opponentHiStrength = _evaluateOpponentOpenCards();
+      // 상대보다 얼마나 강한지 (0.0 ~ 1.0)
+      hiWinChance = ((myHiStrength - opponentHiStrength) + 1.0) / 2.0;
+      hiWinChance = hiWinChance.clamp(0.0, 1.0);
+
+      // 강한 하이 핸드면 가산점
+      if (myHiStrength >= 0.68) hiWinChance += 0.15; // 스트레이트 이상
+      if (myHiStrength >= 0.85) hiWinChance += 0.15; // 풀하우스 이상
+      hiWinChance = hiWinChance.clamp(0.0, 1.0);
+    }
+
+    // 로우 핸드 강도 계산
+    double loWinChance = 0.0;
+    if (loHand != null && loHand.isQualified) {
+      final myLoStrength = _evaluateCompletedLowStrength(player);
+      final opponentLoThreat = _evaluateOpponentLowPotential();
+
+      // 상대 로우 위협이 낮을수록 승리 확률 높음
+      loWinChance = myLoStrength * (1.0 - opponentLoThreat * 0.5);
+
+      // 강한 로우 핸드면 가산점
+      if (myLoStrength >= 0.85) loWinChance += 0.2; // 8탑 이상
+      if (myLoStrength >= 0.92) loWinChance += 0.15; // 6탑
+      loWinChance = loWinChance.clamp(0.0, 1.0);
+    }
+
+    // 결과 판단
+    const threshold = 0.15; // 차이가 이 이상이면 한쪽이 유리
+
+    if (hiWinChance > 0.5 && loWinChance > 0.5) {
+      // 둘 다 좋음
+      if ((hiWinChance - loWinChance).abs() < threshold) {
+        return 'both';
+      }
+    }
+
+    if (hiWinChance >= 0.5 && loWinChance < 0.4) {
+      return 'hi';
+    }
+
+    if (loWinChance >= 0.5 && hiWinChance < 0.4) {
+      return 'lo';
+    }
+
+    if (hiWinChance - loWinChance >= threshold) {
+      return 'hi';
+    }
+
+    if (loWinChance - hiWinChance >= threshold) {
+      return 'lo';
+    }
+
+    // 둘 다 비슷하거나 판단 어려움
+    if (hiWinChance >= 0.45 && loWinChance >= 0.45) {
+      return 'both';
+    }
+
+    return 'none';
+  }
 }
 
 class _AIAction {
