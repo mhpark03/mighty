@@ -374,20 +374,30 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
 
     // 슛 더 문 가능성이 높거나 잠재력이 있으면
     if (shootMoonChance >= 0.5 || hasShootMoonPotential) {
-      // 높은 하트, 스페이드 Q, 높은 스페이드는 보유
+      // ★ 높은 하트는 보유 (슛더문 핵심)
       if (card.isHeart && card.rank >= 11) return 5; // 보유
-      if (card.isQueenOfSpades) return 5; // 보유
-      if (card.suit == Suit.spade && card.rank >= 10) return 10; // 높은 스페이드 보유
 
-      // ★ 보이드 만들기: 1-2장 남은 수트 우선 패스
-      if (cardSuitCount == 1) return 800 + (14 - card.rank); // 1장만 있으면 최우선 패스
-      if (cardSuitCount == 2) return 700 + (14 - card.rank); // 2장이면 우선 패스
+      // ★ 모든 스페이드 보유 (슛더문 실패 시 ♠Q 방어용)
+      // 슛더문 시도 중 스페이드를 버리면 실패 시 ♠Q를 받을 위험이 큼
+      if (card.suit == Suit.spade) return 10 + (14 - card.rank); // 모든 스페이드 보유
 
-      // 낮은 카드를 패스 (클럽/다이아 우선)
+      // ★ 보이드 만들기: 클럽/다이아만 대상 (스페이드는 보유)
+      if ((card.suit == Suit.club || card.suit == Suit.diamond) && cardSuitCount == 1) {
+        return 800 + (14 - card.rank); // 1장만 있으면 최우선 패스
+      }
+      if ((card.suit == Suit.club || card.suit == Suit.diamond) && cardSuitCount == 2) {
+        return 700 + (14 - card.rank); // 2장이면 우선 패스
+      }
+
+      // 낮은 카드를 패스 (클럽/다이아만)
       if ((card.suit == Suit.club || card.suit == Suit.diamond) && card.rank <= 8) {
         return 600 + (14 - card.rank);
       }
-      if (card.rank <= 8) return 500 + (14 - card.rank); // 낮을수록 패스
+
+      // 하트 낮은 카드 (슛더문에 필요하지만 높은 하트보다는 낮음)
+      if (card.isHeart) return 20 + card.rank; // 보유
+
+      // 그 외 클럽/다이아 높은 카드
       return 50 + card.rank;
     }
 
