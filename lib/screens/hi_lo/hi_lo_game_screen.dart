@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../models/card.dart';
 import '../../models/hi_lo/hi_lo_state.dart';
+import '../../services/ad_service.dart';
 import '../../services/hi_lo/hi_lo_controller.dart';
 import '../../services/hi_lo/hi_lo_stats_service.dart';
 import '../../widgets/banner_ad_widget.dart';
@@ -92,6 +93,35 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
     });
   }
 
+  void _showNewGameDialog(HiLoController controller, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.newGame),
+        content: const Text('광고를 시청하면 새 게임을 시작합니다.\n계속하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              AdService().showRewardedAd(
+                onRewarded: () {
+                  _statsRecorded = false;
+                  controller.startNewGame();
+                },
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: Text(l10n.newGame, style: const TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -105,10 +135,18 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
           appBar: AppBar(
             backgroundColor: Colors.purple[800],
             title: Text(l10n.hiLoTitle),
-            leading: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () => Navigator.pop(context),
-            ),
+            automaticallyImplyLeading: false,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                tooltip: l10n.newGame,
+                onPressed: () => _showNewGameDialog(controller, l10n),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
           ),
           body: SafeArea(
             child: Column(

@@ -6,6 +6,7 @@ import '../l10n/generated/app_localizations.dart';
 import '../models/card.dart';
 import '../models/player.dart';
 import '../models/game_state.dart';
+import '../services/ad_service.dart';
 import '../services/game_controller.dart';
 import '../services/stats_service.dart';
 import '../widgets/card_widget.dart';
@@ -115,6 +116,38 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  void _showNewGameDialog(GameController controller, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.newGame),
+        content: const Text('광고를 시청하면 새 게임을 시작합니다.\n계속하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              AdService().showRewardedAd(
+                onRewarded: () {
+                  _statsRecorded = false;
+                  _allPassedDialogShown = false;
+                  _bidInitialized = false;
+                  _showGameResult = true;
+                  controller.startNewGame();
+                },
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: Text(l10n.newGame, style: const TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -129,6 +162,11 @@ class _GameScreenState extends State<GameScreen> {
             iconTheme: const IconThemeData(color: Colors.white),
             automaticallyImplyLeading: false,
             actions: [
+              IconButton(
+                icon: const Icon(Icons.refresh, color: Colors.white),
+                tooltip: l10n.newGame,
+                onPressed: () => _showNewGameDialog(controller, l10n),
+              ),
               IconButton(
                 icon: const Icon(Icons.close, color: Colors.white),
                 onPressed: () => _showExitDialog(controller),
