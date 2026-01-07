@@ -963,6 +963,18 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       // ★ 트릭 승자가 점수 독점자면 → 점수 카드 주지 않기 (슛더문 방지)
       // (승자가 독점자가 아니면 일반 로직으로 하트 버리기)
       if (isSoloScorerSituation && currentWinner == soloScorer) {
+        // 독점자가 모든 하트를 가지고 있는지 확인 (슛더문 확정 상황)
+        final soloScorerHearts = wonCards[soloScorer].where((c) => c.isHeart).length;
+        final totalHeartsPlayed = playedCards.where((c) => c.isHeart).length;
+        final isShootMoonConfirmed = soloScorerHearts == totalHeartsPlayed && soloScorerHearts > 0;
+
+        // 슛더문 확정이 아니면 스페이드 Q 먼저 버리기 (13점 부담 제거)
+        if (!isShootMoonConfirmed) {
+          final queenOfSpades = playable.where((c) => c.isQueenOfSpades).toList();
+          if (queenOfSpades.isNotEmpty) return queenOfSpades.first;
+        }
+
+        // 슛더문 확정이면 비점수 카드만 (Q 주지 않음)
         final nonPointCards = playable.where((c) => c.points == 0).toList();
         if (nonPointCards.isNotEmpty) {
           nonPointCards.sort((a, b) => b.rank.compareTo(a.rank));
