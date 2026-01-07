@@ -610,9 +610,32 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     _executePlayCard(currentPlayer, selectedCard);
   }
 
+  // ★ 슛더문 위협 감지: 특정 플레이어가 20점 이상이고 다른 플레이어가 0점일 때
+  int? _detectShootMoonThreat(int myIndex) {
+    for (int i = 0; i < 4; i++) {
+      if (i == myIndex) continue;
+      // 상대가 20점 이상 (6점만 더 필요)
+      if (scores[i] >= 20) {
+        // 다른 모든 플레이어가 0점인지 확인
+        bool othersHaveZero = true;
+        for (int j = 0; j < 4; j++) {
+          if (j != i && scores[j] > 0) {
+            othersHaveZero = false;
+            break;
+          }
+        }
+        if (othersHaveZero) return i;
+      }
+    }
+    return null;
+  }
+
   PlayingCard _selectBestCard(int playerIndex, List<PlayingCard> playable) {
     // 슛더문 시도 중인지 확인
     final isShootingMoon = shootMoonChances[playerIndex] >= 0.5;
+
+    // ★ 슛더문 방어: 상대가 슛더문 근접 시
+    final shootMoonThreat = _detectShootMoonThreat(playerIndex);
 
     // 선공이면
     if (currentTrick.every((c) => c == null)) {
@@ -729,6 +752,16 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         }
       }
 
+      // ★ 슛더문 방어: 상대가 슛더문 근접 시 하트로 선공하여 직접 획득
+      if (shootMoonThreat != null && heartsBroken) {
+        // 높은 하트로 선공하여 직접 하트를 가져옴 (슛더문 저지)
+        final hearts = playable.where((c) => c.isHeart).toList();
+        if (hearts.isNotEmpty) {
+          hearts.sort((a, b) => b.rank.compareTo(a.rank)); // 높은 순
+          return hearts.first;
+        }
+      }
+
       // 기본: 낮은 카드 선호, 하트/스페이드 퀸 피하기
       playable.sort((a, b) {
         if (a.isQueenOfSpades) return 1;
@@ -777,6 +810,17 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         // 이길 수 없으면 가장 낮은 카드
         sameSuitCards.sort((a, b) => a.rank.compareTo(b.rank));
         return sameSuitCards.first;
+      }
+
+      // ★ 슛더문 방어: 상대가 슛더문 근접 시 트릭을 이겨서 점수 가져오기
+      if (shootMoonThreat != null && hasPointsInTrick) {
+        // 현재 트릭에 점수 카드가 있고, 위협 플레이어가 이길 것 같으면
+        // 내가 이길 수 있으면 이겨서 점수를 가져옴 (슛더문 방지)
+        if (canWin.isNotEmpty) {
+          // 가장 낮은 승리 카드로 이기기
+          canWin.sort((a, b) => a.rank.compareTo(b.rank));
+          return canWin.first;
+        }
       }
 
       // ★ 일반 (슛더문 아님): 스페이드Q는 가장 나중에
@@ -854,6 +898,24 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
           return hearts.first;
         }
         return playable.first;
+      }
+
+      // ★ 슛더문 방어: 상대가 슛더문 근접 시 점수 카드 주지 않기
+      if (shootMoonThreat != null) {
+        // 위협 플레이어가 이 트릭을 이길 것 같으면 점수 카드를 주지 않음
+        // 비점수 카드만 버리기 (위협 플레이어에게 하트 주지 않음)
+        final nonPointCards = playable.where((c) => c.points == 0).toList();
+        if (nonPointCards.isNotEmpty) {
+          // 높은 카드 우선 버리기 (나중에 트릭 이기기 위해 낮은 카드 보유)
+          nonPointCards.sort((a, b) => b.rank.compareTo(a.rank));
+          return nonPointCards.first;
+        }
+        // 점수 카드만 있으면 어쩔 수 없이 버림 (가장 낮은 하트)
+        final hearts = playable.where((c) => c.isHeart).toList();
+        if (hearts.isNotEmpty) {
+          hearts.sort((a, b) => a.rank.compareTo(b.rank));
+          return hearts.first;
+        }
       }
 
       // ★ 일반: 높은 카드 우선 버리기
