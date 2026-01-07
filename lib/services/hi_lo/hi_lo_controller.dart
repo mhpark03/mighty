@@ -416,7 +416,10 @@ class HiLoController extends ChangeNotifier {
 
     // 하이로우 게임: 로우 핸드 잠재력도 고려
     final lowPotential = _evaluateLowPotential(player);
-    final hasStrongLowDraw = lowPotential >= 0.5;
+    final cardsRemaining = 7 - player.hand.length;
+    // 초반에는 로우 드로우 기준을 낮춤 (3장 이상 남았으면 0.4, 그 외 0.5)
+    final lowDrawThreshold = cardsRemaining >= 3 ? 0.4 : 0.5;
+    final hasStrongLowDraw = lowPotential >= lowDrawThreshold;
 
     // 완성된 로우 핸드 강도 평가 (확률 기반)
     final lowHandStrength = _evaluateCompletedLowStrength(player);
@@ -527,7 +530,6 @@ class HiLoController extends ChangeNotifier {
       return _AIAction('check', 0);
     }
 
-    final cardsRemaining = 7 - player.hand.length;
     final drawBonus = cardsRemaining * 0.05;
     final callAmount = _state.getCallAmount();
 
@@ -768,9 +770,21 @@ class HiLoController extends ChangeNotifier {
       return _AIAction('call', 0);
     }
 
-    // 초반 라운드에서는 로우 잠재력만으로도 콜
-    if (lowPotential >= 0.3 && cardsRemaining >= 2) {
-      if (random.nextDouble() < 0.6) {
+    // 초반 라운드 (3장 이상 남음)에서는 로우 잠재력만으로도 적극적으로 콜
+    if (cardsRemaining >= 3) {
+      // 로우 잠재력이 조금이라도 있으면 콜 (3, 4 같은 로우 카드 2장)
+      if (lowPotential >= 0.3) {
+        return _AIAction('call', 0);  // 확정적으로 콜
+      }
+      // 로우 카드 1장이라도 있으면 높은 확률로 콜
+      if (lowPotential >= 0.2 && random.nextDouble() < 0.7) {
+        return _AIAction('call', 0);
+      }
+    }
+
+    // 중반 라운드 (2장 남음)에서도 로우 잠재력 있으면 콜
+    if (lowPotential >= 0.35 && cardsRemaining >= 2) {
+      if (random.nextDouble() < 0.75) {
         return _AIAction('call', 0);
       }
     }
@@ -882,12 +896,27 @@ class HiLoController extends ChangeNotifier {
 
     // 2장의 유니크 로우 카드 + 초반 (카드 3장 이상 남음)
     if (lowCardCount >= 2 && cardsRemaining >= 3) {
-      if (uniqueLowRanks.contains(1)) return 0.4;
-      return 0.3;
+      // 연속된 로우 카드 (예: 3,4 또는 2,3)는 더 가치 있음
+      final sortedLow = uniqueLowRanks.toList()..sort();
+      bool hasConsecutive = false;
+      for (int i = 0; i < sortedLow.length - 1; i++) {
+        if (sortedLow[i + 1] - sortedLow[i] == 1) {
+          hasConsecutive = true;
+          break;
+        }
+      }
+
+      if (uniqueLowRanks.contains(1)) {
+        // A가 있으면 로우에서 매우 유리
+        return hasConsecutive ? 0.55 : 0.45;
+      }
+      // A 없이 2개의 로우 카드
+      return hasConsecutive ? 0.45 : 0.35;
     }
 
     // 로우 카드가 적음
     if (lowCardCount >= 1 && cardsRemaining >= 4) {
+      if (uniqueLowRanks.contains(1)) return 0.3;
       return 0.2;
     }
 
