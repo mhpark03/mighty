@@ -717,6 +717,11 @@ class HiLoController extends ChangeNotifier {
           return _AIAction('call', 0);
         }
         if (callAmount > 0) {
+          // 상대가 로우로 갈 것 같으면 하이 팟 노리기
+          final opponentsLikelyLoHere = 1.0 - _estimateOpponentsGoingHi(player);
+          if (opponentsLikelyLoHere >= 0.5 && handStrength >= 0.15) {
+            return _AIAction('call', 0);
+          }
           return _AIAction('die', 0);
         }
         return _AIAction('call', 0);
@@ -757,6 +762,11 @@ class HiLoController extends ChangeNotifier {
           }
         }
         if (opponentStrength >= 0.35 && callAmount > 0) {
+          // 상대가 로우로 갈 것 같으면 하이 팟 노리기
+          final opponentsLikelyLoHere = 1.0 - _estimateOpponentsGoingHi(player);
+          if (opponentsLikelyLoHere >= 0.5) {
+            return _AIAction('call', 0);
+          }
           return _AIAction('die', 0);
         }
         return _AIAction('call', 0);
@@ -919,6 +929,29 @@ class HiLoController extends ChangeNotifier {
       if (random.nextDouble() < 0.75) {
         return _AIAction('call', 0);
       }
+    }
+
+    // === 상대가 로우로 갈 것 같으면 약한 하이로도 하이 팟을 노림 ===
+    final opponentsLikelyHi = _estimateOpponentsGoingHi(player);
+    final opponentsLikelyLo = 1.0 - opponentsLikelyHi;
+
+    // 상대 50% 이상이 로우로 갈 것 같으면 하이 팟을 노릴 수 있음
+    if (opponentsLikelyLo >= 0.5) {
+      // 약한 하이 핸드라도 유지 (원페어 이상이면 콜)
+      if (handStrength >= 0.2) {
+        if (random.nextDouble() < 0.8) {
+          return _AIAction('call', 0);
+        }
+      }
+      // 하이카드만 있어도 상대가 대부분 로우면 콜 확률 높임
+      if (opponentsLikelyLo >= 0.7 && random.nextDouble() < 0.6) {
+        return _AIAction('call', 0);
+      }
+    }
+
+    // 상대 70% 이상이 로우로 갈 것 같고 내가 하이 팟 경쟁자가 적으면 콜
+    if (opponentsLikelyLo >= 0.7 && handStrength >= 0.15) {
+      return _AIAction('call', 0);
     }
 
     if (random.nextDouble() < 0.08) {
