@@ -90,30 +90,8 @@ class _GameScreenState extends State<GameScreen> {
     _trickCountdown = 10;
   }
 
-  void _showExitDialog(GameController controller) {
-    final l10n = AppLocalizations.of(context)!;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.exitGame),
-        content: Text(l10n.exitGameConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Close dialog
-              Navigator.pop(context); // Go back to home screen
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(l10n.exit, style: const TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
+  void _exitGame() {
+    Navigator.pop(context); // Go back to home screen
   }
 
   void _showNewGameDialog(GameController controller, AppLocalizations l10n) {
@@ -169,7 +147,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.close, color: Colors.white),
-                onPressed: () => _showExitDialog(controller),
+                onPressed: _exitGame,
               ),
             ],
           ),

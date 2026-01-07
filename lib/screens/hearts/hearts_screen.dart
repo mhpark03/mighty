@@ -91,6 +91,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   // UI
   String message = '';
   Timer? _messageTimer;
+  bool _showHint = false; // 힌트 표시 여부
 
   final playerNames = ['플레이어', '민준', '서연', '지호'];
 
@@ -120,6 +121,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       isProcessingTrick = false;
       playedCards = []; // 플레이된 카드 초기화
       message = '';
+      _showHint = false; // 힌트 초기화
     });
 
     _dealCards();
@@ -138,22 +140,25 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       hands[i % 4].add(deck[i]);
     }
 
-    for (int i = 0; i < 4; i++) {
-      _sortHand(i);
-    }
-
-    setState(() {});
+    setState(() {
+      // 정렬은 setState 내에서 호출하여 UI 갱신 보장
+      for (int i = 0; i < 4; i++) {
+        _sortHand(i);
+      }
+    });
 
     // AI가 패싱할 카드 선택
     _aiSelectPassingCards();
   }
 
   void _sortHand(int playerIndex) {
+    // 정렬: 무늬별 그룹 (♠ > ♥ > ◆ > ♣) → 랭크 내림차순 (A > K > Q > ...)
+    final suitOrder = {Suit.spade: 0, Suit.heart: 1, Suit.diamond: 2, Suit.club: 3};
     hands[playerIndex].sort((a, b) {
-      final suitOrder = [Suit.spade, Suit.heart, Suit.diamond, Suit.club];
-      final suitCompare = suitOrder.indexOf(a.suit).compareTo(suitOrder.indexOf(b.suit));
-      if (suitCompare != 0) return suitCompare;
-      return b.rank.compareTo(a.rank);
+      final suitA = suitOrder[a.suit]!;
+      final suitB = suitOrder[b.suit]!;
+      if (suitA != suitB) return suitA - suitB; // 무늬순
+      return b.rank - a.rank; // 랭크 내림차순 (높은 것 먼저)
     });
   }
 
@@ -483,6 +488,36 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     return card.rank;
   }
 
+  // ★ 플레이어용 패싱 추천 카드 계산 (우선순위 높은 3장)
+  List<PlayingCard> _getRecommendedPassingCards() {
+    final hand = List<PlayingCard>.from(hands[0]);
+    if (hand.length < 3) return [];
+
+    // 수트별 카드 개수 계산
+    final suitCounts = {
+      Suit.spade: hand.where((c) => c.suit == Suit.spade).length,
+      Suit.heart: hand.where((c) => c.suit == Suit.heart).length,
+      Suit.diamond: hand.where((c) => c.suit == Suit.diamond).length,
+      Suit.club: hand.where((c) => c.suit == Suit.club).length,
+    };
+    final lowSpadeCount = hand.where((c) => c.suit == Suit.spade && c.rank < 12).length;
+    final lowHeartCount = hand.where((c) => c.suit == Suit.heart && c.rank < 10).length;
+
+    // 슛 더 문 가능성 체크
+    final shootMoonChance = _checkShootMoonPossibility(hand);
+
+    // 우선순위 계산하여 정렬
+    final handCopy = List<PlayingCard>.from(hand);
+    hand.sort((a, b) {
+      int scoreA = _getPassPriority(a, suitCounts, lowSpadeCount, lowHeartCount, shootMoonChance, handCopy);
+      int scoreB = _getPassPriority(b, suitCounts, lowSpadeCount, lowHeartCount, shootMoonChance, handCopy);
+      return scoreB.compareTo(scoreA); // 높은 우선순위 먼저
+    });
+
+    // 상위 3장 반환
+    return hand.take(3).toList();
+  }
+
   void _toggleCardForPassing(PlayingCard card) {
     if (phase != GamePhase.passing) return;
 
@@ -508,7 +543,6 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     // 모든 플레이어에게 받을 카드 추가
     for (int i = 0; i < 4; i++) {
       hands[i].addAll(cardsToReceive[i]);
-      _sortHand(i);
     }
 
     // 클럽 2를 가진 플레이어 찾기
@@ -521,6 +555,10 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     }
 
     setState(() {
+      // 정렬은 setState 내에서 호출하여 UI 갱신 보장
+      for (int i = 0; i < 4; i++) {
+        _sortHand(i);
+      }
       selectedForPassing = [];
       cardsToReceive = [[], [], [], []];
       phase = GamePhase.playing;
@@ -1311,6 +1349,29 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
               ],
             ),
           const SizedBox(width: 8),
+          // 힌트 버튼
+          if (phase != GamePhase.roundEnd)
+            TextButton.icon(
+              onPressed: _onHintButtonPressed,
+              icon: Icon(
+                Icons.lightbulb,
+                color: _showHint ? Colors.yellow : Colors.green,
+                size: isSmallScreen ? 16 : 18,
+              ),
+              label: Text(
+                _showHint ? '힌트 OFF' : '힌트',
+                style: TextStyle(
+                  color: _showHint ? Colors.yellow : Colors.green,
+                  fontSize: isSmallScreen ? 11 : 13,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 6 : 8),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+          const SizedBox(width: 4),
           // 새 게임 버튼
           TextButton.icon(
             onPressed: () => _showNewGameDialog(),
@@ -1361,6 +1422,25 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         ],
       ),
     );
+  }
+
+  void _onHintButtonPressed() {
+    if (_showHint) {
+      // 힌트가 켜져 있으면 광고 없이 끄기
+      setState(() {
+        _showHint = false;
+      });
+    } else {
+      // 힌트가 꺼져 있으면 광고 보고 켜기
+      AdService().showRewardedAd(
+        onRewarded: () {
+          setState(() {
+            _showHint = true;
+          });
+          _showMessage('힌트가 활성화되었습니다!');
+        },
+      );
+    }
   }
 
   Widget _buildOpponentHand(int playerIndex, bool isSmallScreen) {
@@ -1512,6 +1592,20 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         ? _getPlayableCards(0)
         : <PlayingCard>[];
 
+    // ★ AI 추천 카드 계산 (힌트 활성화 시에만)
+    PlayingCard? recommendedCard;
+    List<PlayingCard> recommendedForPassing = [];
+
+    if (_showHint) {
+      if (phase == GamePhase.passing) {
+        // 패싱 단계: 패스 우선순위가 높은 3장 추천
+        recommendedForPassing = _getRecommendedPassingCards();
+      } else if (playable.isNotEmpty) {
+        // 플레이 단계: 최선의 카드 1장 추천
+        recommendedCard = _selectBestCard(0, playable);
+      }
+    }
+
     // 카드를 두 줄로 분배
     final topRowCount = (hand.length + 1) ~/ 2;
     final topRow = hand.take(topRowCount).toList();
@@ -1543,6 +1637,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                     cardHeight,
                     phase == GamePhase.passing ? true : playable.contains(cards[i]),
                     isSelected: selectedForPassing.contains(cards[i]),
+                    isRecommended: recommendedCard == cards[i] || recommendedForPassing.contains(cards[i]),
                   ),
                 ),
               ),
@@ -1556,13 +1651,44 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            '${playerNames[0]} (${scores[0]}점)',
-            style: TextStyle(
-              color: currentPlayer == 0 ? Colors.amber : Colors.white,
-              fontSize: isSmallScreen ? 12 : 14,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${playerNames[0]} (${scores[0]}점)',
+                style: TextStyle(
+                  color: currentPlayer == 0 ? Colors.amber : Colors.white,
+                  fontSize: isSmallScreen ? 12 : 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              // ★ 추천 카드 힌트 표시
+              if (recommendedCard != null || recommendedForPassing.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.star, color: Colors.yellow, size: isSmallScreen ? 12 : 14),
+                      const SizedBox(width: 2),
+                      Text(
+                        recommendedForPassing.isNotEmpty ? '패스 추천' : '추천',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: isSmallScreen ? 10 : 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
           ),
           if (phase == GamePhase.passing)
             Padding(
@@ -1605,45 +1731,69 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     );
   }
 
-  Widget _buildPlayingCard(PlayingCard card, double width, double height, bool isPlayable, {bool isSelected = false}) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: isSelected ? Colors.amber : (isPlayable ? Colors.yellow : Colors.grey),
-          width: isSelected ? 3 : (isPlayable ? 2 : 1),
+  Widget _buildPlayingCard(PlayingCard card, double width, double height, bool isPlayable, {bool isSelected = false, bool isRecommended = false}) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(
+              color: isSelected ? Colors.amber : (isRecommended ? Colors.green : (isPlayable ? Colors.yellow : Colors.grey)),
+              width: isSelected ? 3 : (isRecommended ? 3 : (isPlayable ? 2 : 1)),
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.3),
+                blurRadius: 4,
+                offset: Offset(2, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                card.suitSymbol,
+                style: TextStyle(
+                  color: card.color,
+                  fontSize: width * 0.4,
+                ),
+              ),
+              Text(
+                card.rankSymbol,
+                style: TextStyle(
+                  color: card.color,
+                  fontSize: width * 0.35,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color.fromRGBO(0, 0, 0, 0.3),
-            blurRadius: 4,
-            offset: Offset(2, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            card.suitSymbol,
-            style: TextStyle(
-              color: card.color,
-              fontSize: width * 0.4,
+        // ★ 추천 카드 표시
+        if (isRecommended)
+          Positioned(
+            top: -6,
+            right: -6,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.green,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1),
+              ),
+              child: Icon(
+                Icons.star,
+                color: Colors.yellow,
+                size: width * 0.25,
+              ),
             ),
           ),
-          Text(
-            card.rankSymbol,
-            style: TextStyle(
-              color: card.color,
-              fontSize: width * 0.35,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -6,8 +8,17 @@ class AdService {
   factory AdService() => _instance;
   AdService._internal();
 
-  // 보상형 광고 ID
-  static const String _rewardedAdUnitId = 'ca-app-pub-8361977398389047/8967396668';
+  // 보상형 광고 ID (디버그 모드에서는 테스트 ID 사용)
+  static String get _rewardedAdUnitId {
+    if (kDebugMode) {
+      // 테스트 광고 ID
+      return Platform.isAndroid
+          ? 'ca-app-pub-3940256099942544/5224354917'
+          : 'ca-app-pub-3940256099942544/1712485313';
+    }
+    // 실제 광고 ID
+    return 'ca-app-pub-8361977398389047/8967396668';
+  }
 
   RewardedAd? _rewardedAd;
   bool _isRewardedAdReady = false;
