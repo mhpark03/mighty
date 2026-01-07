@@ -580,12 +580,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                       ),
                     ),
 
-                  // 패싱 확인 버튼
+                  // 패싱 확인 버튼 (화면 중앙)
                   if (phase == GamePhase.passing)
-                    Positioned(
-                      bottom: isSmallScreen ? 160 : 200,
-                      left: 0,
-                      right: 0,
+                    Positioned.fill(
                       child: Center(
                         child: ElevatedButton(
                           onPressed: selectedForPassing.length == 3 ? _confirmPassing : null,
