@@ -352,23 +352,70 @@ class SevenCardController extends ChangeNotifier {
 
     // 보스인 경우 (삥/체크/쿼터/하프/풀 선택 가능)
     if (_state.isCurrentPlayerBoss) {
-      // 매우 강한 핸드 - 풀 고려
-      if (handStrength > 0.85 && random.nextDouble() < 0.3) {
-        return _AIAction('full', 0);
-      }
-      // 강한 핸드 - 하프 고려
-      if (handStrength > 0.75 && random.nextDouble() < 0.4) {
-        return _AIAction('half', 0);
-      }
-      // 중상 핸드 - 쿼터 고려
-      if (handStrength > 0.6 && random.nextDouble() < 0.5) {
+      final opponentStrength = _evaluateOpponentOpenCards();
+
+      // 스트레이트 이상 (0.68+): 하프 이상 베팅
+      // 스트레이트=0.68, 백스트=0.72, 마운틴=0.75, 플러시=0.78, 풀하우스=0.85, 포카드=0.93, SF=0.97+
+      if (handStrength >= 0.68) {
+        // 상대가 매우 강해 보이면 쿼터 (방어적)
+        if (opponentStrength >= 0.6) {
+          if (random.nextDouble() < 0.6) {
+            return _AIAction('quarter', 0);
+          }
+          return _AIAction('half', 0);
+        }
+
+        // 포카드 이상 (0.93+): 풀 또는 하프
+        if (handStrength >= 0.93) {
+          if (random.nextDouble() < 0.6) {
+            return _AIAction('full', 0);
+          }
+          return _AIAction('half', 0);
+        }
+
+        // 풀하우스 (0.85+): 하프 또는 풀
+        if (handStrength >= 0.85) {
+          if (random.nextDouble() < 0.5) {
+            return _AIAction('full', 0);
+          }
+          return _AIAction('half', 0);
+        }
+
+        // 플러시/마운틴/백스트 (0.72~0.84): 하프 또는 쿼터
+        if (handStrength >= 0.72) {
+          if (random.nextDouble() < 0.6) {
+            return _AIAction('half', 0);
+          }
+          return _AIAction('quarter', 0);
+        }
+
+        // 스트레이트 (0.68~0.71): 하프 또는 쿼터
+        if (random.nextDouble() < 0.5) {
+          return _AIAction('half', 0);
+        }
         return _AIAction('quarter', 0);
       }
-      // 중간 핸드 - 삥
-      if (handStrength > 0.4 || random.nextDouble() < 0.7) {
+
+      // 트리플 (0.60~0.67): 쿼터 또는 빙
+      if (handStrength >= 0.60) {
+        if (random.nextDouble() < 0.5) {
+          return _AIAction('quarter', 0);
+        }
         return _AIAction('bing', 0);
       }
-      // 약한 핸드 - 체크
+
+      // 투페어 (0.45~0.59): 빙 또는 체크
+      if (handStrength >= 0.45) {
+        if (random.nextDouble() < 0.7) {
+          return _AIAction('bing', 0);
+        }
+        return _AIAction('check', 0);
+      }
+
+      // 원페어 이하: 빙 또는 체크
+      if (handStrength > 0.25 || random.nextDouble() < 0.5) {
+        return _AIAction('bing', 0);
+      }
       return _AIAction('check', 0);
     }
 
@@ -829,40 +876,69 @@ class SevenCardController extends ChangeNotifier {
     // 상대방들의 오픈 카드 강도 평가
     final opponentStrength = _evaluateOpponentOpenCards();
 
-    // 최강 핸드 (로열/스플/포카드: 0.93+)
-    if (handStrength > 0.93) {
-      // 상대가 약해 보이면 슬로우 플레이 (작게 베팅해서 게임에 남게 함)
-      if (opponentStrength < 0.3) {
-        // 상대가 매우 약함 → 삥/쿼터로 유인
+    // 스트레이트 이상 (0.68+): 하프 이상 베팅 (상대가 매우 강하면 쿼터)
+    if (handStrength >= 0.68) {
+      // 상대가 매우 강해 보이면 쿼터 (방어적)
+      if (opponentStrength >= 0.6) {
+        if (availableActions.contains('quarter')) {
+          if (random.nextDouble() < 0.6) {
+            return _AIAction('quarter', 0);
+          }
+        }
+        if (availableActions.contains('half')) {
+          return _AIAction('half', 0);
+        }
+      }
+
+      // 최강 핸드 (로열/스플/포카드: 0.93+)
+      if (handStrength >= 0.93) {
+        // 상대가 약해 보이면 슬로우 플레이 (하프로 유인)
+        if (opponentStrength < 0.3 && availableActions.contains('half')) {
+          return _AIAction('half', 0);
+        }
+        // 상대가 중간 이상이면 풀 베팅
+        if (availableActions.contains('full')) {
+          if (random.nextDouble() < 0.6) return _AIAction('full', 0);
+        }
+        if (availableActions.contains('half')) {
+          return _AIAction('half', 0);
+        }
+      }
+
+      // 풀하우스 (0.85+): 풀 또는 하프
+      if (handStrength >= 0.85) {
+        if (availableActions.contains('full') && random.nextDouble() < 0.5) {
+          return _AIAction('full', 0);
+        }
+        if (availableActions.contains('half')) {
+          return _AIAction('half', 0);
+        }
+      }
+
+      // 플러시/마운틴/백스트레이트 (0.72~0.84): 하프 또는 쿼터
+      if (handStrength >= 0.72) {
+        if (availableActions.contains('half') && random.nextDouble() < 0.6) {
+          return _AIAction('half', 0);
+        }
         if (availableActions.contains('quarter')) {
           return _AIAction('quarter', 0);
         }
-        if (availableActions.contains('ddadang')) {
-          return _AIAction('ddadang', 0);
-        }
       }
-      // 상대가 중간 정도면 하프
-      if (opponentStrength < 0.5 && availableActions.contains('half')) {
+
+      // 스트레이트 (0.68~0.71): 하프 또는 쿼터
+      if (availableActions.contains('half') && random.nextDouble() < 0.5) {
         return _AIAction('half', 0);
       }
-      // 상대가 강해 보이면 풀 베팅
-      if (availableActions.contains('full')) {
-        return _AIAction('full', 0);
+      if (availableActions.contains('quarter')) {
+        return _AIAction('quarter', 0);
       }
     }
 
-    // 풀하우스 이상 (0.85+): 풀 베팅 (70% 확률)
-    if (handStrength > 0.85 && availableActions.contains('full') && random.nextDouble() < 0.7) {
-      return _AIAction('full', 0);
-    }
-    // 마운틴 이상 (0.75+): 하프 베팅 (70% 확률)
-    if (handStrength > 0.75 && availableActions.contains('half') && random.nextDouble() < 0.7) {
-      return _AIAction('half', 0);
-    }
-    // 스트레이트 이상 (0.65+): 쿼터 베팅 (70% 확률)
-    if (handStrength > 0.65 && availableActions.contains('quarter') && random.nextDouble() < 0.7) {
+    // 트리플 (0.55~0.67): 쿼터 또는 따당
+    if (handStrength >= 0.55 && availableActions.contains('quarter') && random.nextDouble() < 0.5) {
       return _AIAction('quarter', 0);
     }
+
     // 기본 레이즈: 따당
     if (availableActions.contains('ddadang')) {
       return _AIAction('ddadang', 0);

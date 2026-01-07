@@ -488,13 +488,37 @@ class HiLoController extends ChangeNotifier {
         }
       }
 
-      if (effectiveStrength > 0.85 && random.nextDouble() < 0.3) {
-        return _AIAction('full', 0);
+      // 하이 핸드가 스트레이트 이상 (0.68+): 하프 이상 베팅
+      final opponentStrength = _evaluateOpponentOpenCards();
+      if (effectiveStrength >= 0.68) {
+        // 상대가 매우 강해 보이면 쿼터 (방어적)
+        if (opponentStrength >= 0.6) {
+          if (random.nextDouble() < 0.6) {
+            return _AIAction('quarter', 0);
+          }
+          return _AIAction('half', 0);
+        }
+        // 포카드 이상 (0.93+): 풀 또는 하프
+        if (effectiveStrength >= 0.93) {
+          if (random.nextDouble() < 0.6) return _AIAction('full', 0);
+          return _AIAction('half', 0);
+        }
+        // 풀하우스 (0.85+): 하프 또는 풀
+        if (effectiveStrength >= 0.85) {
+          if (random.nextDouble() < 0.5) return _AIAction('full', 0);
+          return _AIAction('half', 0);
+        }
+        // 플러시/마운틴/백스트 (0.72~0.84): 하프 또는 쿼터
+        if (effectiveStrength >= 0.72) {
+          if (random.nextDouble() < 0.6) return _AIAction('half', 0);
+          return _AIAction('quarter', 0);
+        }
+        // 스트레이트 (0.68~0.71): 하프 또는 쿼터
+        if (random.nextDouble() < 0.5) return _AIAction('half', 0);
+        return _AIAction('quarter', 0);
       }
-      if (effectiveStrength > 0.75 && random.nextDouble() < 0.4) {
-        return _AIAction('half', 0);
-      }
-      if (effectiveStrength > 0.6 && random.nextDouble() < 0.5) {
+
+      if (effectiveStrength > 0.55 && random.nextDouble() < 0.5) {
         return _AIAction('quarter', 0);
       }
       if (effectiveStrength > 0.4 || random.nextDouble() < 0.7) {
@@ -913,32 +937,70 @@ class HiLoController extends ChangeNotifier {
   _AIAction _selectRaiseAction(double handStrength, List<String> availableActions, Random random) {
     final opponentStrength = _evaluateOpponentOpenCards();
 
-    if (handStrength > 0.93) {
-      if (opponentStrength < 0.3) {
+    // 스트레이트 이상 (0.68+): 하프 이상 베팅 (상대가 매우 강하면 쿼터)
+    if (handStrength >= 0.68) {
+      // 상대가 매우 강해 보이면 쿼터 (방어적)
+      if (opponentStrength >= 0.6) {
+        if (availableActions.contains('quarter')) {
+          if (random.nextDouble() < 0.6) {
+            return _AIAction('quarter', 0);
+          }
+        }
+        if (availableActions.contains('half')) {
+          return _AIAction('half', 0);
+        }
+      }
+
+      // 최강 핸드 (로열/스플/포카드: 0.93+)
+      if (handStrength >= 0.93) {
+        // 상대가 약해 보이면 슬로우 플레이 (하프로 유인)
+        if (opponentStrength < 0.3 && availableActions.contains('half')) {
+          return _AIAction('half', 0);
+        }
+        // 상대가 중간 이상이면 풀 베팅
+        if (availableActions.contains('full')) {
+          if (random.nextDouble() < 0.6) return _AIAction('full', 0);
+        }
+        if (availableActions.contains('half')) {
+          return _AIAction('half', 0);
+        }
+      }
+
+      // 풀하우스 (0.85+): 풀 또는 하프
+      if (handStrength >= 0.85) {
+        if (availableActions.contains('full') && random.nextDouble() < 0.5) {
+          return _AIAction('full', 0);
+        }
+        if (availableActions.contains('half')) {
+          return _AIAction('half', 0);
+        }
+      }
+
+      // 플러시/마운틴/백스트레이트 (0.72~0.84): 하프 또는 쿼터
+      if (handStrength >= 0.72) {
+        if (availableActions.contains('half') && random.nextDouble() < 0.6) {
+          return _AIAction('half', 0);
+        }
         if (availableActions.contains('quarter')) {
           return _AIAction('quarter', 0);
         }
-        if (availableActions.contains('ddadang')) {
-          return _AIAction('ddadang', 0);
-        }
       }
-      if (opponentStrength < 0.5 && availableActions.contains('half')) {
+
+      // 스트레이트 (0.68~0.71): 하프 또는 쿼터
+      if (availableActions.contains('half') && random.nextDouble() < 0.5) {
         return _AIAction('half', 0);
       }
-      if (availableActions.contains('full')) {
-        return _AIAction('full', 0);
+      if (availableActions.contains('quarter')) {
+        return _AIAction('quarter', 0);
       }
     }
 
-    if (handStrength > 0.85 && availableActions.contains('full') && random.nextDouble() < 0.7) {
-      return _AIAction('full', 0);
-    }
-    if (handStrength > 0.75 && availableActions.contains('half') && random.nextDouble() < 0.7) {
-      return _AIAction('half', 0);
-    }
-    if (handStrength > 0.65 && availableActions.contains('quarter') && random.nextDouble() < 0.7) {
+    // 트리플 (0.55~0.67): 쿼터 또는 따당
+    if (handStrength >= 0.55 && availableActions.contains('quarter') && random.nextDouble() < 0.5) {
       return _AIAction('quarter', 0);
     }
+
+    // 기본 레이즈: 따당
     if (availableActions.contains('ddadang')) {
       return _AIAction('ddadang', 0);
     }
