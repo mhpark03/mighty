@@ -674,6 +674,22 @@ class SevenCardController extends ChangeNotifier {
     final isEarlyRound = _state.phase == SevenCardPhase.betting1 ||
                          _state.phase == SevenCardPhase.betting2;
 
+    // 스트레이트 이상 완성된 핸드 (0.68+): 비보스도 적극적으로 레이즈
+    if (handStrength >= 0.68) {
+      // 플러시 이상 (0.72+): 거의 항상 레이즈
+      if (handStrength >= 0.72) {
+        if (random.nextDouble() < 0.9) {
+          return _selectRaiseAction(handStrength, availableActions, random);
+        }
+        return _AIAction('call', 0);
+      }
+      // 스트레이트 (0.68~0.71): 높은 확률로 레이즈
+      if (random.nextDouble() < 0.8) {
+        return _selectRaiseAction(handStrength, availableActions, random);
+      }
+      return _AIAction('call', 0);
+    }
+
     // 콜 금액이 없으면 (이미 맞춤)
     if (callAmount == 0) {
       // 라운드 1, 2: 더 공격적으로 레이즈

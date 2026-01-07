@@ -653,6 +653,22 @@ class HiLoController extends ChangeNotifier {
     final isEarlyRound = _state.phase == HiLoPhase.betting1 ||
                          _state.phase == HiLoPhase.betting2;
 
+    // 스트레이트 이상 완성된 핸드 (0.68+): 비보스도 적극적으로 레이즈
+    if (effectiveStrength >= 0.68) {
+      // 플러시 이상 (0.72+): 거의 항상 레이즈
+      if (effectiveStrength >= 0.72) {
+        if (random.nextDouble() < 0.9) {
+          return _selectRaiseAction(effectiveStrength, availableActions, random);
+        }
+        return _AIAction('call', 0);
+      }
+      // 스트레이트 (0.68~0.71): 높은 확률로 레이즈
+      if (random.nextDouble() < 0.8) {
+        return _selectRaiseAction(effectiveStrength, availableActions, random);
+      }
+      return _AIAction('call', 0);
+    }
+
     if (callAmount == 0) {
       if (isEarlyRound) {
         if (effectiveStrength >= 0.45 && random.nextDouble() < 0.70) {
