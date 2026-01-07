@@ -804,8 +804,17 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
 
   String _getBankruptcyWinner() {
     // 파산하지 않은 플레이어 중 카드가 가장 적은 사람
-    if (playerCount == 2) return playerHand.length >= bankruptcyLimit ? aiNames[0] : '플레이어';
-    return '플레이어';
+    int minCards = playerHand.length;
+    int winnerIndex = 0; // 0 = 플레이어
+
+    for (int i = 0; i < computerHands.length; i++) {
+      if (computerHands[i].length < minCards) {
+        minCards = computerHands[i].length;
+        winnerIndex = i + 1; // AI 인덱스는 1부터 시작
+      }
+    }
+
+    return winnerIndex == 0 ? '플레이어' : aiNames[winnerIndex - 1];
   }
 
   void _computerTurn(int computerIndex) {
