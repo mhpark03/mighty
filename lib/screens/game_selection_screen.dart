@@ -8,6 +8,7 @@ import 'home_screen.dart';
 import 'seven_card/seven_card_home_screen.dart';
 import 'hi_lo/hi_lo_home_screen.dart';
 import 'hula/hula_home_screen.dart';
+import 'onecard/onecard_home_screen.dart';
 
 class GameSelectionScreen extends StatelessWidget {
   const GameSelectionScreen({super.key});
@@ -110,6 +111,23 @@ class GameSelectionScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => const HulaHomeScreen()),
+                        );
+                      },
+                      isSmallScreen: isSmallScreen,
+                    ),
+                    SizedBox(height: isSmallScreen ? 16 : 24),
+
+                    // 원카드 버튼
+                    _buildGameButton(
+                      context: context,
+                      title: '원카드',
+                      subtitle: '4인 대전',
+                      icon: Icons.filter_1,
+                      color: Colors.orange[700]!,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const OneCardHomeScreen()),
                         );
                       },
                       isSmallScreen: isSmallScreen,

@@ -173,11 +173,13 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ],
           ),
-          body: Column(
-            children: [
-              Expanded(child: _buildGameBody(controller)),
-              const BannerAdWidget(),
-            ],
+          body: SafeArea(
+            child: Column(
+              children: [
+                Expanded(child: _buildGameBody(controller)),
+                const BannerAdWidget(),
+              ],
+            ),
           ),
         );
       },

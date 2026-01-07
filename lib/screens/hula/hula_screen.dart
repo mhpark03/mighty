@@ -2,7 +2,11 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../../services/game_save_service.dart';
+import '../../services/ad_service.dart';
+import '../../services/hula/hula_stats_service.dart';
+import '../../widgets/banner_ad_widget.dart';
 
 // 카드 무늬
 enum Suit { spade, heart, diamond, club }
@@ -130,7 +134,7 @@ class ThankYouOption {
       case ThankYouType.attachPlayer:
         return '${discardCard.suitSymbol}${discardCard.rankString} 내 멜드에 붙이기';
       case ThankYouType.attachComputer:
-        return '${discardCard.suitSymbol}${discardCard.rankString} 컴퓨터${computerIndex! + 1} 멜드에 붙이기';
+        return '${discardCard.suitSymbol}${discardCard.rankString} ${_HulaScreenState.aiNames[computerIndex!]} 멜드에 붙이기';
       case ThankYouType.newMeld:
         final allCards = [...handCards, discardCard];
         if (isRun) {
@@ -195,6 +199,9 @@ class HulaScreen extends StatefulWidget {
 }
 
 class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
+  // AI 이름 (마이티와 동일)
+  static const List<String> aiNames = ['민준', '서연', '지호'];
+
   // 카드 덱
   List<PlayingCard> deck = [];
   List<PlayingCard> discardPile = [];
@@ -230,7 +237,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   VoidCallback? _pendingComputerAction; // 대기 후 실행할 컴퓨터 동작
 
   // 점수
-  List<int> scores = [];
+  List<int> scores = [];      // 손패 점수 (남은 카드 합)
+  List<int> roundScores = []; // 라운드 점수 (승자와의 차이)
 
   // 메시지
   String? gameMessage;
@@ -265,6 +273,34 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  void _showNewGameDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('새 게임'),
+        content: const Text('광고를 시청하면 새 게임을 시작합니다.\n계속하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              AdService().showRewardedAd(
+                onRewarded: () {
+                  _initGame();
+                },
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+            child: const Text('새 게임', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _initGame() {
     // 타이머 모두 취소
     _cancelNextTurnTimer();
@@ -280,6 +316,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     playerMelds = [];
     computerMelds = List.generate(playerCount - 1, (_) => []);
     scores = List.generate(playerCount, (_) => 0);
+    roundScores = List.generate(playerCount, (_) => 0);
 
     // 컴퓨터 난이도 설정 (선택된 난이도 적용)
     final difficultyValue = widget.difficulty.index; // 0=쉬움, 1=보통, 2=어려움
@@ -323,7 +360,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     // 컴퓨터가 먼저 시작하면 대기 상태로 전환
     if (currentTurn != 0) {
       final startingComputer = currentTurn;
-      _showMessage('컴퓨터$startingComputer이 먼저 시작합니다');
+      _showMessage('${aiNames[startingComputer - 1]}이 먼저 시작합니다');
       setState(() {
         waitingForNextTurn = true;
       });
@@ -759,7 +796,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
       case ThankYouType.attachComputer:
         _attachToMeldList(option.meldIndex!, card, computerMelds[option.computerIndex!]);
-        meldMessage = '땡큐! ${card.suitSymbol}${card.rankString} 컴퓨터${option.computerIndex! + 1} 멜드에 붙이기';
+        meldMessage = '땡큐! ${card.suitSymbol}${card.rankString} ${aiNames[option.computerIndex!]} 멜드에 붙이기';
 
       case ThankYouType.newMeld:
         final newMeldCards = [...option.handCards, card];
@@ -1595,7 +1632,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 컴퓨터가 스톱 선언
   void _computerCallStop(int computerIndex) {
-    _showMessage('컴퓨터${computerIndex + 1}이 스탑!');
+    _showMessage('${aiNames[computerIndex]}이 스톱!');
     _calculateScoresAndEnd(stopperIndex: computerIndex + 1); // 컴퓨터 인덱스 + 1
   }
 
@@ -1965,7 +2002,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
     if (takeDiscard && discardPile.isNotEmpty) {
       drawnCard = discardPile.removeLast();
-      _showMessage('컴퓨터${computerIndex + 1} 땡큐! ${drawnCard.suitSymbol}${drawnCard.rankString}');
+      _showMessage('${aiNames[computerIndex]} 땡큐! ${drawnCard.suitSymbol}${drawnCard.rankString}');
     } else {
       if (deck.isEmpty && discardPile.length > 1) {
         final topCard = discardPile.removeLast();
@@ -1978,7 +2015,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         return;
       }
       drawnCard = deck.removeLast();
-      _showMessage('컴퓨터${computerIndex + 1}이 카드를 뽑음');
+      _showMessage('${aiNames[computerIndex]}이 카드를 뽑음');
     }
 
     hand.add(drawnCard);
@@ -2075,12 +2112,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
     // 메시지 표시
     if (type == '7group') {
-      _showMessage('컴퓨터${computerIndex + 1}: 7 그룹 등록');
+      _showMessage('${aiNames[computerIndex]}: 7 그룹 등록');
     } else if (type == '7') {
-      _showMessage('컴퓨터${computerIndex + 1}: 7 단독 등록');
+      _showMessage('${aiNames[computerIndex]}: 7 단독 등록');
     } else {
       final cardStr = cards.map((c) => '${c.suitSymbol}${c.rankString}').join(' ');
-      _showMessage('컴퓨터${computerIndex + 1}: ${isRun ? 'Run' : 'Group'} 등록 $cardStr');
+      _showMessage('${aiNames[computerIndex]}: ${isRun ? 'Run' : 'Group'} 등록 $cardStr');
     }
 
     setState(() {});
@@ -2123,7 +2160,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       if (ownMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
         _attachToMeldList(ownMeldIndex, card, melds);
         hand.removeAt(i);
-        _showMessage('컴퓨터${computerIndex + 1}: ${card.suitSymbol}${card.rankString} 멜드에 붙임');
+        _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} 멜드에 붙임');
         setState(() {});
         _saveGame();
 
@@ -2142,7 +2179,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       if (playerMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
         _attachToMeldList(playerMeldIndex, card, playerMelds);
         hand.removeAt(i);
-        _showMessage('컴퓨터${computerIndex + 1}: ${card.suitSymbol}${card.rankString} 플레이어 멜드에 붙임');
+        _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} 플레이어 멜드에 붙임');
         setState(() {});
         _saveGame();
 
@@ -2163,7 +2200,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         if (otherMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
           _attachToMeldList(otherMeldIndex, card, computerMelds[c]);
           hand.removeAt(i);
-          _showMessage('컴퓨터${computerIndex + 1}: ${card.suitSymbol}${card.rankString} 컴퓨터${c + 1} 멜드에 붙임');
+          _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} ${aiNames[c]} 멜드에 붙임');
           setState(() {});
           _saveGame();
 
@@ -2196,7 +2233,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       final seven = sevens.first;
       hand.remove(seven);
       melds.add(Meld(cards: [seven], isRun: false));
-      _showMessage('컴퓨터${computerIndex + 1}: 7 단독 등록');
+      _showMessage('${aiNames[computerIndex]}: 7 단독 등록');
       setState(() {});
       _saveGame();
 
@@ -2220,7 +2257,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     discardPile.add(discardCard);
     _sortHand(hand);
 
-    _showMessage('${'컴퓨터${computerIndex + 1}'}: ${discardCard.suitSymbol}${discardCard.rankString} ${'버림'}');
+    _showMessage('${aiNames[computerIndex]}: ${discardCard.suitSymbol}${discardCard.rankString} 버림');
     setState(() {});
     _saveGame();
 
@@ -2328,7 +2365,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
     hand.add(card);
     _sortHand(hand);
-    _showMessage('컴퓨터${computerIndex + 1} 땡큐! ${card.suitSymbol}${card.rankString}');
+    _showMessage('${aiNames[computerIndex]} 땡큐! ${card.suitSymbol}${card.rankString}');
     setState(() {});
     _saveGame();
 
@@ -2425,12 +2462,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
     // 메시지 표시
     if (type == '7group') {
-      _showMessage('컴퓨터${computerIndex + 1}: 7 그룹 등록');
+      _showMessage('${aiNames[computerIndex]}: 7 그룹 등록');
     } else if (type == '7') {
-      _showMessage('컴퓨터${computerIndex + 1}: 7 단독 등록');
+      _showMessage('${aiNames[computerIndex]}: 7 단독 등록');
     } else {
       final cardStr = cards.map((c) => '${c.suitSymbol}${c.rankString}').join(' ');
-      _showMessage('컴퓨터${computerIndex + 1}: ${isRun ? 'Run' : 'Group'} 등록 $cardStr');
+      _showMessage('${aiNames[computerIndex]}: ${isRun ? 'Run' : 'Group'} 등록 $cardStr');
     }
 
     setState(() {});
@@ -2473,7 +2510,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       if (ownMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
         _attachToMeldList(ownMeldIndex, card, melds);
         hand.removeAt(i);
-        _showMessage('컴퓨터${computerIndex + 1}: ${card.suitSymbol}${card.rankString} 멜드에 붙임');
+        _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} 멜드에 붙임');
         setState(() {});
         _saveGame();
 
@@ -2492,7 +2529,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       if (playerMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
         _attachToMeldList(playerMeldIndex, card, playerMelds);
         hand.removeAt(i);
-        _showMessage('컴퓨터${computerIndex + 1}: ${card.suitSymbol}${card.rankString} 플레이어 멜드에 붙임');
+        _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} 플레이어 멜드에 붙임');
         setState(() {});
         _saveGame();
 
@@ -2513,7 +2550,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         if (otherMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
           _attachToMeldList(otherMeldIndex, card, computerMelds[c]);
           hand.removeAt(i);
-          _showMessage('컴퓨터${computerIndex + 1}: ${card.suitSymbol}${card.rankString} 컴퓨터${c + 1} 멜드에 붙임');
+          _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} ${aiNames[c]} 멜드에 붙임');
           setState(() {});
           _saveGame();
 
@@ -2544,7 +2581,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       final seven = sevens.first;
       hand.remove(seven);
       melds.add(Meld(cards: [seven], isRun: false));
-      _showMessage('컴퓨터${computerIndex + 1}: 7 단독 등록');
+      _showMessage('${aiNames[computerIndex]}: 7 단독 등록');
       setState(() {});
       _saveGame();
 
@@ -2568,7 +2605,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     discardPile.add(discardCard);
     _sortHand(hand);
 
-    _showMessage('${'컴퓨터${computerIndex + 1}'}: ${discardCard.suitSymbol}${discardCard.rankString} ${'버림'}');
+    _showMessage('${aiNames[computerIndex]}: ${discardCard.suitSymbol}${discardCard.rankString} 버림');
     setState(() {});
     _saveGame();
 
@@ -2665,32 +2702,68 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       }
     }
 
+    int winnerIdx;
     // 동점자가 여러 명인 경우
     if (minIndices.length > 1) {
       // 스톱한 사람이 동점자에 포함되어 있으면 스톱한 사람은 패배
       if (minIndices.contains(stopperIndex)) {
         // 스톱한 사람을 제외한 동점자 중 첫 번째가 승리
         minIndices.remove(stopperIndex);
-        _endGame(minIndices.first);
+        winnerIdx = minIndices.first;
       } else {
         // 스톱한 사람이 동점자가 아니면 첫 번째 동점자가 승리
-        _endGame(minIndices.first);
+        winnerIdx = minIndices.first;
       }
     } else {
       // 단독 최저 점수면 그 사람이 승리
-      _endGame(minIndices.first);
+      winnerIdx = minIndices.first;
     }
+
+    // 스톱 실패 여부 확인 후 게임 종료
+    final stopFailed = stopperIndex != winnerIdx;
+    _endGame(winnerIdx, stopperIndex: stopFailed ? stopperIndex : null);
   }
 
   int _calculateHandScore(List<PlayingCard> hand) {
     return hand.fold(0, (sum, card) => sum + card.point);
   }
 
-  void _endGame(int winnerIdx) {
-    // 점수 계산
+  // stopperIndex: 스톱 실패한 플레이어 인덱스 (null이면 일반 종료)
+  void _endGame(int winnerIdx, {int? stopperIndex}) {
+    // 손패 점수 계산
     scores[0] = _calculateHandScore(playerHand);
     for (int i = 0; i < computerHands.length; i++) {
       scores[i + 1] = _calculateHandScore(computerHands[i]);
+    }
+
+    // 라운드 점수 계산
+    final multiplier = (isHula && winnerIdx == 0) ? 2 : 1;
+    final winnerHandScore = scores[winnerIdx];
+    int winnerGain = 0;
+
+    roundScores = List.generate(playerCount, (_) => 0);
+
+    // 승자가 얻을 총 점수 계산 (모든 플레이어와의 차이 합)
+    for (int i = 0; i < playerCount; i++) {
+      if (i == winnerIdx) continue;
+      final diff = (scores[i] - winnerHandScore) * multiplier;
+      winnerGain += diff;
+    }
+
+    if (stopperIndex != null) {
+      // 스톱 실패: 승자가 얻은 점수를 스톱한 플레이어가 모두 부담
+      // 다른 플레이어는 감점 없음
+      roundScores[winnerIdx] = winnerGain;
+      roundScores[stopperIndex] = -winnerGain;
+      // 나머지 플레이어는 0 (이미 초기화됨)
+    } else {
+      // 일반 종료: 각자 승자와의 차이만큼 감점
+      for (int i = 0; i < playerCount; i++) {
+        if (i == winnerIdx) continue;
+        final diff = (scores[i] - winnerHandScore) * multiplier;
+        roundScores[i] = -diff;
+      }
+      roundScores[winnerIdx] = winnerGain;
     }
 
     setState(() {
@@ -2699,9 +2772,16 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       if (winnerIdx == 0) {
         winner = '플레이어';
       } else {
-        winner = '${'컴퓨터'}$winnerIdx';
+        winner = aiNames[winnerIdx - 1];
       }
     });
+
+    // 통계 저장 (스톱 실패 시 특별 처리)
+    final statsService = Provider.of<HulaStatsService>(context, listen: false);
+    statsService.recordGameResultWithRoundScores(
+      winnerId: winnerIdx,
+      roundScores: roundScores,
+    );
 
     // 게임 종료 시 저장된 게임 삭제
     _saveGame();
@@ -2710,6 +2790,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   void _showGameOverDialog() {
+    final statsService = Provider.of<HulaStatsService>(context, listen: false);
+    final playerNames = ['플레이어', ...aiNames];
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -2735,11 +2818,11 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
             ),
             if (isHula && winnerIndex == 0)
               Text(
-                '훌라로 승리!',
+                '훌라로 승리! (x2)',
                 style: const TextStyle(
                   color: Colors.orange,
                   fontWeight: FontWeight.bold,
-                  fontSize: 20,
+                  fontSize: 18,
                 ),
               ),
           ],
@@ -2752,25 +2835,94 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               style: const TextStyle(color: Colors.white, fontSize: 18),
             ),
             const SizedBox(height: 16),
-            Text(
-              '남은 점수',
-              style: const TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${'플레이어'}: ${scores[0]}${'점'}',
-              style: TextStyle(
-                color: winnerIndex == 0 ? Colors.amber : Colors.white70,
+            // 점수 테이블 헤더
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+              decoration: BoxDecoration(
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                children: [
+                  const Expanded(flex: 2, child: Text('', style: TextStyle(color: Colors.white70, fontSize: 12))),
+                  const Expanded(child: Text('손패', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 12))),
+                  const Expanded(child: Text('점수', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 12))),
+                  const Expanded(child: Text('누적', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 12))),
+                ],
               ),
             ),
+            const SizedBox(height: 4),
+            // 각 플레이어 점수
             ...List.generate(
-              computerHands.length,
-              (i) => Text(
-                '${'컴퓨터'}${i + 1}: ${scores[i + 1]}${'점'}',
-                style: TextStyle(
-                  color: winnerIndex == i + 1 ? Colors.red : Colors.white70,
-                ),
-              ),
+              playerCount,
+              (i) {
+                final isWinner = winnerIndex == i;
+                final stats = statsService.getPlayerStats(i);
+                final roundScore = roundScores[i];
+                final roundScoreStr = roundScore >= 0 ? '+$roundScore' : '$roundScore';
+                final totalScore = stats?.totalScore ?? 0;
+                final totalScoreStr = totalScore >= 0 ? '+$totalScore' : '$totalScore';
+
+                return Container(
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                  decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(color: Colors.white12)),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Row(
+                          children: [
+                            if (isWinner)
+                              const Icon(Icons.emoji_events, color: Colors.amber, size: 16),
+                            if (isWinner) const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                playerNames[i],
+                                style: TextStyle(
+                                  color: isWinner ? Colors.amber : Colors.white,
+                                  fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
+                                  fontSize: 14,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          '${scores[i]}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          roundScoreStr,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: roundScore >= 0 ? Colors.lightGreenAccent : Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          totalScoreStr,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: totalScore >= 0 ? Colors.lightGreenAccent : Colors.redAccent,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -2780,14 +2932,14 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               Navigator.pop(context);
               _initGame();
             },
-            child: Text('새 게임'),
+            child: const Text('새 게임'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context);
             },
-            child: Text('닫기'),
+            child: const Text('닫기'),
           ),
         ],
       ),
@@ -2797,25 +2949,11 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: OrientationBuilder(
-        builder: (context, orientation) {
-          if (orientation == Orientation.landscape) {
-            return _buildLandscapeLayout();
-          } else {
-            return _buildPortraitLayout();
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildPortraitLayout() {
-    return Scaffold(
       backgroundColor: const Color(0xFF0D5C2E),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('${'훌라'} (${playerCount}${'인'})',
+        title: Text('훌라 (${playerCount}인)',
             style: const TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -2824,106 +2962,27 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: _initGame,
-          ),
-          IconButton(
-            icon: const Icon(Icons.help_outline, color: Colors.white),
-            onPressed: _showRulesDialog,
+            onPressed: _showNewGameDialog,
           ),
         ],
       ),
       body: SafeArea(
-        child: _buildGameContent(false),
-      ),
-    );
-  }
-
-  Widget _buildLandscapeLayout() {
-    return Container(
-      color: const Color(0xFF0D5C2E),
-      child: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            _buildGameContent(true),
-            // 왼쪽 상단: 뒤로가기 버튼 + 제목
-            Positioned(
-              top: 4,
-              left: 8,
-              child: Row(
-                children: [
-                  _buildCircleButton(
-                    icon: Icons.arrow_back,
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${'훌라'} (${playerCount}${'인'})',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // 오른쪽 상단: 새 게임 + 도움말 버튼
-            Positioned(
-              top: 4,
-              right: 8,
-              child: Row(
-                children: [
-                  _buildCircleButton(
-                    icon: Icons.refresh,
-                    onPressed: _initGame,
-                  ),
-                  const SizedBox(width: 8),
-                  _buildCircleButton(
-                    icon: Icons.help_outline,
-                    onPressed: _showRulesDialog,
-                  ),
-                ],
-              ),
-            ),
+            Expanded(child: _buildGameContent()),
+            const BannerAdWidget(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCircleButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.5),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, color: Colors.white, size: 18),
-      ),
-    );
-  }
-
-  Widget _buildGameContent(bool isLandscape) {
+  Widget _buildGameContent() {
     return Column(
       children: [
         // 상단 컴퓨터: 2인은 COM1, 3인은 COM2, 4인은 COM2
         if (computerHands.isNotEmpty)
-          _buildTopComputerHand(
-              computerHands.length == 1 ? 0 : 1, isLandscape),
+          _buildTopComputerHand(computerHands.length == 1 ? 0 : 1),
 
         // 중앙 영역 (좌우 컴퓨터 + 덱/버린더미)
         Expanded(
@@ -2932,55 +2991,112 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                   children: [
                     // 왼쪽 컴퓨터 (COM3) - 4인 게임만
                     if (computerHands.length >= 3)
-                      _buildSideComputerHand(2, isLandscape),
+                      _buildSideComputerHand(2),
                     // 중앙 카드 영역
-                    Expanded(child: _buildCenterArea(isLandscape)),
+                    Expanded(child: _buildCenterArea()),
                     // 오른쪽 컴퓨터 (COM1) - 3인 이상
-                    _buildSideComputerHand(0, isLandscape),
+                    _buildSideComputerHand(0),
                   ],
                 )
-              : _buildCenterArea(isLandscape),
+              : _buildCenterArea(),
         ),
 
         // 하단 영역 (메시지, 멜드, 손패, 버튼)
-        _buildBottomSection(isLandscape),
+        _buildBottomSection(),
       ],
     );
   }
 
   // 하단 영역 (스크롤 가능)
-  Widget _buildBottomSection(bool isLandscape) {
+  Widget _buildBottomSection() {
     return Flexible(
       flex: 0,
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 메시지
-            if (gameMessage != null)
-              Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: 12, vertical: isLandscape ? 2 : 8),
-                margin: EdgeInsets.only(bottom: isLandscape ? 2 : 8),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  gameMessage!,
-                  style: TextStyle(
-                      color: Colors.white, fontSize: isLandscape ? 11 : 14),
+            // 현재 차례 표시 + 메시지 (위아래로 표시)
+            if (!gameOver)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 상단: 현재 순서 표시 + 시작 버튼
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: currentTurn == 0 ? Colors.green : Colors.orange,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            currentTurn == 0
+                                ? '내 차례'
+                                : (waitingForNextTurn ? '${aiNames[currentTurn - 1]} ($_autoPlayCountdown)' : '${aiNames[currentTurn - 1]} 차례'),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        // 시작하기 버튼 (컴퓨터 차례 대기 중일 때만 표시)
+                        if (waitingForNextTurn && currentTurn != 0) ...[
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: _onNextTurn,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text(
+                              '시작',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    // 하단: 메시지
+                    if (gameMessage != null) ...[
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          gameMessage!,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
 
             // 등록된 멜드
-            if (playerMelds.isNotEmpty) _buildPlayerMelds(isLandscape),
+            if (playerMelds.isNotEmpty) _buildPlayerMelds(),
 
             // 플레이어 손패
-            _buildPlayerHand(isLandscape),
+            _buildPlayerHand(),
 
             // 액션 버튼
-            _buildActionButtons(isLandscape),
+            _buildActionButtons(),
           ],
         ),
       ),
@@ -2988,7 +3104,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   // 상단 컴퓨터 (가로 배치)
-  Widget _buildTopComputerHand(int computerIndex, bool isLandscape) {
+  Widget _buildTopComputerHand(int computerIndex) {
     if (computerIndex >= computerHands.length) return const SizedBox();
 
     final hand = computerHands[computerIndex];
@@ -2996,7 +3112,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     final isCurrentTurn = currentTurn == computerIndex + 1;
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: isLandscape ? 4 : 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -3015,7 +3131,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                     const Icon(Icons.computer, color: Colors.white, size: 14),
                     const SizedBox(width: 4),
                     Text(
-                      'COM${computerIndex + 1}',
+                      aiNames[computerIndex],
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                     const SizedBox(width: 8),
@@ -3026,7 +3142,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                     if (melds.isNotEmpty) ...[
                       const SizedBox(width: 8),
                       Text(
-                        '(${'${melds.length}개 멜드'})',
+                        '(${melds.length}개 멜드)',
                         style: const TextStyle(color: Colors.green, fontSize: 11),
                       ),
                     ],
@@ -3040,10 +3156,10 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-              min(hand.length, isLandscape ? 10 : 8),
+              min(hand.length, 8),
               (j) => Container(
-                width: isLandscape ? 20 : 24,
-                height: isLandscape ? 28 : 34,
+                width: 24,
+                height: 34,
                 margin: const EdgeInsets.only(left: 2),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -3061,7 +3177,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   // 좌/우측 컴퓨터 (세로 배치)
-  Widget _buildSideComputerHand(int computerIndex, bool isLandscape) {
+  Widget _buildSideComputerHand(int computerIndex) {
     if (computerIndex >= computerHands.length) return const SizedBox();
 
     final hand = computerHands[computerIndex];
@@ -3069,7 +3185,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     final isCurrentTurn = currentTurn == computerIndex + 1;
 
     return Container(
-      width: isLandscape ? 45 : 55,
+      width: 55,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -3081,20 +3197,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               color: isCurrentTurn ? Colors.amber.shade700 : Colors.grey.shade800,
               borderRadius: BorderRadius.circular(4),
             ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.computer, color: Colors.white, size: 10),
-                    const SizedBox(width: 2),
-                    Text(
-                      '${computerIndex + 1}',
-                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ],
+            child: Text(
+              aiNames[computerIndex],
+              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 4),
@@ -3111,7 +3216,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
           const SizedBox(height: 8),
           // 세로 카드 스택
           Expanded(
-            child: _buildVerticalCardStack(hand.length, isLandscape),
+            child: _buildVerticalCardStack(hand.length),
           ),
         ],
       ),
@@ -3119,10 +3224,10 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   // 세로 카드 스택
-  Widget _buildVerticalCardStack(int cardCount, bool isLandscape) {
+  Widget _buildVerticalCardStack(int cardCount) {
     const overlap = 10.0;
-    final cardHeight = isLandscape ? 28.0 : 32.0;
-    final cardWidth = isLandscape ? 22.0 : 26.0;
+    const cardHeight = 32.0;
+    const cardWidth = 26.0;
     const maxVisible = 7;
     final visibleCount = cardCount > maxVisible ? maxVisible : cardCount;
     final totalHeight = cardHeight + (visibleCount - 1) * overlap;
@@ -3153,9 +3258,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildCenterArea(bool isLandscape) {
-    final cardWidth = isLandscape ? 50.0 : 70.0;
-    final cardHeight = isLandscape ? 70.0 : 100.0;
+  Widget _buildCenterArea() {
+    const cardWidth = 70.0;
+    const cardHeight = 100.0;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -3205,7 +3310,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-              SizedBox(width: isLandscape ? 12 : 20),
+              const SizedBox(width: 20),
               // 버린 더미
               Builder(
                 builder: (context) {
@@ -3253,58 +3358,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
-          // 현재 순서 표시 (항상 표시)
-          if (!gameOver)
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // 현재 순서 표시
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: currentTurn == 0 ? Colors.green : Colors.orange,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      currentTurn == 0
-                          ? '내 차례'
-                          : (waitingForNextTurn ? '${'컴퓨터'}$currentTurn ($_autoPlayCountdown)' : '${'컴퓨터'}$currentTurn ${'차례'}'),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  // 시작하기 버튼 (컴퓨터 차례 대기 중일 때만 표시)
-                  if (waitingForNextTurn && currentTurn != 0) ...[
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: _onNextTurn,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        '시작',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
           // 모든 등록된 멜드 표시
-          _buildAllMeldsArea(isLandscape),
+          _buildAllMeldsArea(),
         ],
       ),
     );
@@ -3341,7 +3396,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   // 모든 플레이어의 멜드를 표시 (붙여놓기 가능)
-  Widget _buildAllMeldsArea(bool isLandscape) {
+  Widget _buildAllMeldsArea() {
     // 모든 멜드 수집
     final List<Map<String, dynamic>> allMelds = [];
 
@@ -3366,20 +3421,20 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     }
 
     // 고정 높이 영역 (멜드가 없어도 공간 유지)
-    final fixedHeight = isLandscape ? 50.0 : 70.0;
-    final cardHeight = isLandscape ? 22.0 : 28.0;
-    final cardWidth = isLandscape ? 16.0 : 20.0;
-    final overlap = isLandscape ? 10.0 : 12.0;
+    const fixedHeight = 70.0;
+    const cardHeight = 28.0;
+    const cardWidth = 20.0;
+    const overlap = 12.0;
 
     return Container(
       height: fixedHeight,
-      margin: EdgeInsets.only(top: isLandscape ? 4 : 8),
+      margin: const EdgeInsets.only(top: 8),
       child: allMelds.isEmpty
           ? const SizedBox()
           : SingleChildScrollView(
               child: Wrap(
-                spacing: isLandscape ? 8 : 12,
-                runSpacing: isLandscape ? 4 : 6,
+                spacing: 12,
+                runSpacing: 6,
                 alignment: WrapAlignment.center,
                 children: allMelds.map((meldInfo) {
                   final meld = meldInfo['meld'] as Meld;
@@ -3450,7 +3505,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                                   Text(
                                     card.suitSymbol,
                                     style: TextStyle(
-                                      fontSize: isLandscape ? 8 : 10,
+                                      fontSize: 10,
                                       color: card.suitColor,
                                       height: 1,
                                     ),
@@ -3458,7 +3513,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                                   Text(
                                     card.rankString,
                                     style: TextStyle(
-                                      fontSize: isLandscape ? 7 : 9,
+                                      fontSize: 9,
                                       fontWeight: FontWeight.bold,
                                       color: card.suitColor,
                                       height: 1,
@@ -3478,9 +3533,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildPlayerMelds(bool isLandscape) {
+  Widget _buildPlayerMelds() {
     return Container(
-      height: isLandscape ? 28 : 50,
+      height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -3489,7 +3544,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
           final meld = playerMelds[meldIndex];
           return Container(
             margin: const EdgeInsets.only(right: 8),
-            padding: EdgeInsets.symmetric(horizontal: isLandscape ? 6 : 8, vertical: isLandscape ? 2 : 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: Colors.green.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(8),
@@ -3500,7 +3555,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               children: [
                 Text(
                   meld.isRun ? 'Run: ' : 'Set: ',
-                  style: TextStyle(color: Colors.green, fontSize: isLandscape ? 9 : 10),
+                  style: const TextStyle(color: Colors.green, fontSize: 10),
                 ),
                 ...meld.cards.map((card) => Padding(
                       padding: const EdgeInsets.only(left: 2),
@@ -3510,7 +3565,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                           color: card.suitColor == Colors.red
                               ? Colors.red.shade300
                               : Colors.white,
-                          fontSize: isLandscape ? 10 : 12,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -3523,29 +3578,25 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildPlayerHand(bool isLandscape) {
-    final cardWidth = isLandscape ? 40.0 : 50.0;
-    final cardHeight = isLandscape ? 58.0 : 72.0;
-    final symbolSize = isLandscape ? 16.0 : 20.0;
-    final rankSize = isLandscape ? 14.0 : 16.0;
+  Widget _buildPlayerHand() {
+    const cardWidth = 50.0;
+    const cardHeight = 72.0;
+    const symbolSize = 20.0;
+    const rankSize = 16.0;
 
-    // 세로 모드: 2줄, 가로 모드: 1줄
-    final int cardsPerRow = isLandscape
-        ? playerHand.length
-        : (playerHand.length / 2).ceil();
+    // 세로 모드: 2줄
+    final int cardsPerRow = (playerHand.length / 2).ceil();
 
     final List<int> row1 = List.generate(
       cardsPerRow > playerHand.length ? playerHand.length : cardsPerRow,
       (i) => i,
     );
-    final List<int> row2 = isLandscape
-        ? []
-        : List.generate(
-            playerHand.length - cardsPerRow > 0
-                ? playerHand.length - cardsPerRow
-                : 0,
-            (i) => cardsPerRow + i,
-          );
+    final List<int> row2 = List.generate(
+      playerHand.length - cardsPerRow > 0
+          ? playerHand.length - cardsPerRow
+          : 0,
+      (i) => cardsPerRow + i,
+    );
 
     Widget buildCard(int index) {
       final card = playerHand[index];
@@ -3555,14 +3606,13 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         onTap: () => _toggleCardSelection(index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          transform: Matrix4.translationValues(
-              0, isSelected ? (isLandscape ? -8 : -10) : 0, 0),
-          margin: EdgeInsets.symmetric(horizontal: isLandscape ? 2 : 2),
+          transform: Matrix4.translationValues(0, isSelected ? -10 : 0, 0),
+          margin: const EdgeInsets.symmetric(horizontal: 2),
           width: cardWidth,
           height: cardHeight,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(isLandscape ? 6 : 6),
+            borderRadius: BorderRadius.circular(6),
             border: Border.all(
               color: isSelected ? Colors.amber : Colors.grey.shade400,
               width: isSelected ? 3 : 1,
@@ -3609,7 +3659,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: isLandscape ? 4 : 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Column(
@@ -3626,7 +3676,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildActionButtons(bool isLandscape) {
+  Widget _buildActionButtons() {
     // 7 단독: 특별 규칙, 1~2장: 붙이기 가능 여부, 3장+: 새 멜드 가능 여부
     bool canMeld = false;
     if (selectedCardIndices.length >= 3) {
@@ -3655,56 +3705,60 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       }
     }
     final canDiscard = hasDrawn && selectedCardIndices.length == 1;
-    final iconSize = isLandscape ? 14.0 : 18.0;
-    final buttonPadding = isLandscape
-        ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
-        : null;
 
     return Container(
-      padding: EdgeInsets.all(isLandscape ? 6 : 12),
+      padding: const EdgeInsets.all(8),
+      color: Colors.black38,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           // 멜드 등록 (드로우 후에만 가능)
-          ElevatedButton.icon(
+          _buildActionButton(
+            label: '등록',
+            color: Colors.green,
             onPressed: currentTurn == 0 && hasDrawn && canMeld ? _registerMeld : null,
-            icon: Icon(Icons.check_circle, size: iconSize),
-            label: Text('등록', style: TextStyle(fontSize: isLandscape ? 12 : 14)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.grey.shade700,
-              padding: buttonPadding,
-              minimumSize: isLandscape ? const Size(70, 32) : null,
-            ),
           ),
           // 버리기
-          ElevatedButton.icon(
+          _buildActionButton(
+            label: '버리기',
+            color: Colors.orange,
             onPressed: currentTurn == 0 && canDiscard ? _discardCard : null,
-            icon: Icon(Icons.delete_outline, size: iconSize),
-            label: Text('버리기', style: TextStyle(fontSize: isLandscape ? 12 : 14)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.grey.shade700,
-              padding: buttonPadding,
-              minimumSize: isLandscape ? const Size(70, 32) : null,
-            ),
           ),
           // 스톱
-          ElevatedButton.icon(
+          _buildActionButton(
+            label: '스톱',
+            color: Colors.red,
             onPressed: currentTurn == 0 && !gameOver ? _callStop : null,
-            icon: Icon(Icons.stop_circle, size: iconSize),
-            label: Text('스탑', style: TextStyle(fontSize: isLandscape ? 12 : 14)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.grey.shade700,
-              padding: buttonPadding,
-              minimumSize: isLandscape ? const Size(70, 32) : null,
-            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required String label,
+    required Color color,
+    required VoidCallback? onPressed,
+  }) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: onPressed != null ? color : Colors.grey,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -3792,7 +3846,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 12),
               Text(
-                '스탑',
+                '스톱',
                 style: const TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.bold,
@@ -3800,7 +3854,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 4),
               Text(
-                '언제든 스탑을 외쳐 게임을 끝낼 수 있습니다. 남은 카드 점수가 가장 적은 사람이 승리합니다.',
+                '언제든 스톱을 외쳐 게임을 끝낼 수 있습니다. 남은 카드 점수가 가장 적은 사람이 승리합니다.',
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 12),

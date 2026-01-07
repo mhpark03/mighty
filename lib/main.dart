@@ -10,6 +10,8 @@ import 'services/seven_card/seven_card_controller.dart';
 import 'services/seven_card/seven_card_stats_service.dart';
 import 'services/hi_lo/hi_lo_controller.dart';
 import 'services/hi_lo/hi_lo_stats_service.dart';
+import 'services/hula/hula_stats_service.dart';
+import 'services/onecard/onecard_stats_service.dart';
 import 'services/ad_service.dart';
 import 'screens/game_selection_screen.dart';
 
@@ -41,6 +43,8 @@ class MightyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => StatsService()..loadStats()),
         ChangeNotifierProvider(create: (context) => SevenCardStatsService()..loadStats()),
         ChangeNotifierProvider(create: (context) => HiLoStatsService()..loadStats()),
+        ChangeNotifierProvider(create: (context) => HulaStatsService()..loadStats()),
+        ChangeNotifierProvider(create: (context) => OneCardStatsService()..loadStats()),
         ChangeNotifierProvider(create: (context) => GameController()),
         ChangeNotifierProvider(create: (context) => SevenCardController()),
         ChangeNotifierProvider(create: (context) => HiLoController()),

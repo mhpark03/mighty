@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../services/hula/hula_stats_service.dart';
+import '../../services/onecard/onecard_stats_service.dart';
 import '../../services/ad_service.dart';
 import '../../widgets/banner_ad_widget.dart';
-import 'hula_screen.dart';
+import 'onecard_screen.dart';
 
-class HulaHomeScreen extends StatelessWidget {
-  const HulaHomeScreen({super.key});
+class OneCardHomeScreen extends StatelessWidget {
+  const OneCardHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +31,12 @@ class HulaHomeScreen extends StatelessWidget {
     final statsLabelSize = isSmallScreen ? 11.0 : 12.0;
     final statsNameSize = isSmallScreen ? 13.0 : 15.0;
     final statsValueSize = isSmallScreen ? 12.0 : 14.0;
-    final statsScoreSize = isSmallScreen ? 14.0 : 16.0;
     final statsIconSize = isSmallScreen ? 16.0 : 18.0;
 
-    return Consumer<HulaStatsService>(
+    return Consumer<OneCardStatsService>(
       builder: (context, statsService, child) {
         return Scaffold(
-          backgroundColor: Colors.teal[900],
+          backgroundColor: Colors.green[900],
           body: SafeArea(
             child: Column(
               children: [
@@ -60,7 +59,7 @@ class HulaHomeScreen extends StatelessWidget {
 
                         // 타이틀
                         Text(
-                          l10n.hulaTitle,
+                          '원카드',
                           style: TextStyle(
                             fontSize: titleSize,
                             fontWeight: FontWeight.bold,
@@ -76,7 +75,7 @@ class HulaHomeScreen extends StatelessWidget {
                         ),
                         SizedBox(height: isSmallScreen ? 2 : 4),
                         Text(
-                          l10n.hulaSubtitle,
+                          '4인 대전',
                           style: TextStyle(
                             fontSize: subtitleSize,
                             color: Colors.white70,
@@ -92,10 +91,8 @@ class HulaHomeScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const HulaScreen(
+                                  builder: (context) => const OneCardScreen(
                                     playerCount: 4,
-                                    difficulty: HulaDifficulty.hard,
-                                    resumeGame: false,
                                   ),
                                 ),
                               );
@@ -198,7 +195,7 @@ class HulaHomeScreen extends StatelessWidget {
                                             Expanded(
                                               flex: 2,
                                               child: Text(
-                                                l10n.totalScore,
+                                                '승률',
                                                 textAlign: TextAlign.right,
                                                 style: TextStyle(
                                                   color: Colors.white70,
@@ -223,7 +220,6 @@ class HulaHomeScreen extends StatelessWidget {
                                                   l10n,
                                                   statsNameSize,
                                                   statsValueSize,
-                                                  statsScoreSize,
                                                   statsIconSize,
                                                 ),
                                               ),
@@ -265,16 +261,16 @@ class HulaHomeScreen extends StatelessWidget {
   }
 
   Widget _buildPlayerStatRow(
-    HulaPlayerStats playerStats,
+    OneCardPlayerStats playerStats,
     int playerIndex,
     AppLocalizations l10n,
     double nameSize,
     double valueSize,
-    double scoreSize,
     double iconSize,
   ) {
     final isHuman = playerIndex == 0;
-    final scoreColor = playerStats.totalScore >= 0 ? Colors.lightGreenAccent : Colors.redAccent;
+    final winRate = playerStats.winRate;
+    final winRateColor = winRate >= 0.5 ? Colors.lightGreenAccent : Colors.redAccent;
     final playerNames = ['플레이어', '민준', '서연', '지호'];
 
     return Container(
@@ -321,11 +317,13 @@ class HulaHomeScreen extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Text(
-              '${playerStats.totalScore >= 0 ? '+' : ''}${playerStats.totalScore}',
+              playerStats.gamesPlayed > 0
+                  ? '${(winRate * 100).toStringAsFixed(1)}%'
+                  : '-',
               textAlign: TextAlign.right,
               style: TextStyle(
-                color: scoreColor,
-                fontSize: scoreSize,
+                color: playerStats.gamesPlayed > 0 ? winRateColor : Colors.white54,
+                fontSize: valueSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -335,7 +333,7 @@ class HulaHomeScreen extends StatelessWidget {
     );
   }
 
-  void _showResetStatsDialog(BuildContext context, HulaStatsService statsService, AppLocalizations l10n) {
+  void _showResetStatsDialog(BuildContext context, OneCardStatsService statsService, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -364,25 +362,6 @@ class HulaHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String text, bool isSmallScreen) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: Colors.amber, size: isSmallScreen ? 18 : 20),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: isSmallScreen ? 13 : 14,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   void _showGameGuideDialog(BuildContext context, bool isSmallScreen) {
     final titleSize = isSmallScreen ? 14.0 : 16.0;
     final textSize = isSmallScreen ? 12.0 : 14.0;
@@ -390,7 +369,7 @@ class HulaHomeScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => Dialog(
-        backgroundColor: Colors.teal[900],
+        backgroundColor: Colors.green[900],
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
           constraints: BoxConstraints(
@@ -403,7 +382,7 @@ class HulaHomeScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.teal[800],
+                  color: Colors.green[800],
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16),
@@ -439,23 +418,19 @@ class HulaHomeScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildGuideSection('목표', '손패의 카드를 모두 등록하거나 버려서 가장 먼저 없애는 것이 목표입니다.', Icons.info_outline, titleSize, textSize),
+                      _buildGuideSection('목표', '손에 든 카드를 가장 먼저 모두 내려놓는 것이 목표입니다.', Icons.info_outline, titleSize, textSize),
                       const SizedBox(height: 16),
-                      _buildGuideSection('진행 방법', '매 턴마다 덱 또는 버린 더미에서 카드 1장을 뽑고, 등록 또는 버리기를 합니다.', Icons.play_arrow, titleSize, textSize),
+                      _buildGuideSection('카드 내기', '이전에 낸 카드와 같은 무늬 또는 같은 숫자의 카드를 낼 수 있습니다.', Icons.style, titleSize, textSize),
                       const SizedBox(height: 16),
-                      _buildGuideSection('멜드 종류', '• Run: 같은 무늬의 연속된 숫자 3장 이상 (예: ♠3-4-5)\n• Group: 같은 숫자 다른 무늬 3장 이상 (예: ♠7-♥7-♦7)', Icons.style, titleSize, textSize),
+                      _buildGuideSection('공격 카드', '• 2: +2장 공격\n• A: +3장 공격 (♠A는 +5장)\n• 조커: +5장(흑백) / +7장(컬러)', Icons.bolt, titleSize, textSize, Colors.red),
                       const SizedBox(height: 16),
-                      _buildGuideSection('7의 특수 규칙', '7은 단독으로 등록할 수 있습니다.', Icons.star, titleSize, textSize, Colors.amber),
+                      _buildGuideSection('특수 카드', '• J: 다음 순서 건너뛰기\n• Q: 방향 반대\n• K: 2턴 건너뛰기\n• 7: 무늬 변경', Icons.star, titleSize, textSize, Colors.amber),
                       const SizedBox(height: 16),
-                      _buildGuideSection('땡큐', '버린 더미에서 7을 뽑으면 "땡큐"를 외치고 특별한 등록을 할 수 있습니다.', Icons.celebration, titleSize, textSize, Colors.cyan),
+                      _buildGuideSection('조커 방어', '조커로 공격받으면 조커로만 방어할 수 있습니다.', Icons.shield, titleSize, textSize, Colors.cyan),
                       const SizedBox(height: 16),
-                      _buildGuideSection('스톱', '언제든 스톱을 외쳐 게임을 끝낼 수 있습니다.\n남은 카드 점수가 가장 적은 사람이 승리합니다.', Icons.stop_circle, titleSize, textSize, Colors.red),
+                      _buildGuideSection('원카드!', '손패가 1장 남으면 "원카드!" 버튼을 눌러야 합니다.\n누르지 않으면 패널티로 2장을 받습니다.', Icons.warning, titleSize, textSize, Colors.orange),
                       const SizedBox(height: 16),
-                      _buildGuideSection('카드 점수', 'A=1점, 2~9=숫자점, J=10점, Q=11점, K=12점', Icons.style, titleSize, textSize),
-                      const SizedBox(height: 16),
-                      _buildGuideSection('점수 계산', '• 승자: 다른 플레이어 손패와의 차이 합계를 획득\n• 패자: 승자와의 손패 차이만큼 감점\n• 훌라(등록 없이 승리): 점수 2배', Icons.calculate, titleSize, textSize, Colors.lightGreenAccent),
-                      const SizedBox(height: 16),
-                      _buildGuideSection('스톱 실패 페널티', '스톱을 외쳤지만 최저 점수가 아닌 경우:\n• 승자가 받을 점수 전부를 스톱한 사람이 부담\n• 다른 플레이어는 감점 없음', Icons.warning, titleSize, textSize, Colors.orange),
+                      _buildGuideSection('파산', '손패가 20장 이상이 되면 파산! 가장 적은 카드를 가진 플레이어가 승리합니다.', Icons.dangerous, titleSize, textSize, Colors.redAccent),
                     ],
                   ),
                 ),
