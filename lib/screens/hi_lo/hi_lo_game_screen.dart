@@ -2272,34 +2272,49 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
         color: Colors.black38,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Text(
-                player.name,
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                '${l10n.bet}: ${player.totalBetInGame}',
-                style: const TextStyle(color: Colors.grey, fontSize: 10),
-              ),
-            ],
+          Text(
+            player.name,
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 6),
-          // 카드 표시 (흐리게)
-          Wrap(
-            spacing: 3,
-            runSpacing: 3,
-            children: player.hand.map((card) => _buildResultCard(card, true)).toList(),
+          const SizedBox(width: 8),
+          // 카드 뒷면 표시
+          ...List.generate(player.hand.length, (index) => _buildSmallCardBack()),
+          const Spacer(),
+          Text(
+            '${l10n.bet}: ${player.totalBetInGame}',
+            style: const TextStyle(color: Colors.grey, fontSize: 10),
           ),
         ],
+      ),
+    );
+  }
+
+  /// 작은 카드 뒷면 위젯
+  Widget _buildSmallCardBack() {
+    return Container(
+      width: 20,
+      height: 28,
+      margin: const EdgeInsets.only(right: 2),
+      decoration: BoxDecoration(
+        color: Colors.purple[800],
+        borderRadius: BorderRadius.circular(2),
+        border: Border.all(color: Colors.purple[900]!, width: 1),
+      ),
+      child: Center(
+        child: Container(
+          width: 12,
+          height: 18,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.purple[600]!, width: 1),
+            borderRadius: BorderRadius.circular(1),
+          ),
+        ),
       ),
     );
   }
