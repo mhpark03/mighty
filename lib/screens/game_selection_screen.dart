@@ -9,6 +9,7 @@ import 'seven_card/seven_card_home_screen.dart';
 import 'hi_lo/hi_lo_home_screen.dart';
 import 'hula/hula_home_screen.dart';
 import 'onecard/onecard_home_screen.dart';
+import 'hearts/hearts_home_screen.dart';
 
 class GameSelectionScreen extends StatelessWidget {
   const GameSelectionScreen({super.key});
@@ -127,6 +128,23 @@ class GameSelectionScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => const OneCardHomeScreen()),
+                        );
+                      },
+                      isSmallScreen: isSmallScreen,
+                    ),
+                    SizedBox(height: isSmallScreen ? 16 : 24),
+
+                    // 하트 버튼
+                    _buildGameButton(
+                      context: context,
+                      title: l10n.heartsTitle,
+                      subtitle: l10n.heartsSubtitle,
+                      icon: Icons.favorite,
+                      color: Colors.red[700]!,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HeartsHomeScreen()),
                         );
                       },
                       isSmallScreen: isSmallScreen,

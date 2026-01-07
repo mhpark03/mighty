@@ -230,5 +230,7 @@
   "hiLoGuideBonus": "奖励牌型",
   "hiLoGuideBonusText": "• 皇家同花顺: 500筹码\n• 反向同花顺: 300筹码\n• 同花顺: 200筹码\n• 四条: 100筹码\n\n达成奖励牌型时，自动赢得整个底池！",
   "hulaTitle": "胡拉",
-  "hulaSubtitle": "4人拉米纸牌游戏"
+  "hulaSubtitle": "4人拉米纸牌游戏",
+  "heartsTitle": "红心大战",
+  "heartsSubtitle": "4人吃墩游戏"
 }

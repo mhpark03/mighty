@@ -751,4 +751,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get hulaSubtitle => '4人拉米纸牌游戏';
+
+  @override
+  String get heartsTitle => '红心大战';
+
+  @override
+  String get heartsSubtitle => '4人吃墩游戏';
 }

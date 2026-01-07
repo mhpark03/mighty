@@ -1487,6 +1487,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'4인용 러미 카드 게임'**
   String get hulaSubtitle;
+
+  /// No description provided for @heartsTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'하트'**
+  String get heartsTitle;
+
+  /// No description provided for @heartsSubtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'4인 트릭 테이킹 게임'**
+  String get heartsSubtitle;
 }
 
 class _AppLocalizationsDelegate

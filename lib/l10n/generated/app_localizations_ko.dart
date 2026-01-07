@@ -756,4 +756,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get hulaSubtitle => '4인용 러미 카드 게임';
+
+  @override
+  String get heartsTitle => '하트';
+
+  @override
+  String get heartsSubtitle => '4인 트릭 테이킹 게임';
 }

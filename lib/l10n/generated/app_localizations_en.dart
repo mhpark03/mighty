@@ -758,4 +758,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hulaSubtitle => '4-Player Rummy Card Game';
+
+  @override
+  String get heartsTitle => 'Hearts';
+
+  @override
+  String get heartsSubtitle => '4-Player Trick-Taking Game';
 }

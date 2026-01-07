@@ -756,4 +756,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get hulaSubtitle => '4人用ラミーカードゲーム';
+
+  @override
+  String get heartsTitle => 'ハーツ';
+
+  @override
+  String get heartsSubtitle => '4人トリックテイキングゲーム';
 }
