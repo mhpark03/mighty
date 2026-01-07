@@ -228,5 +228,7 @@
   "hiLoGuideTips": "游戏技巧",
   "hiLoGuideTipsText": "• A-2-3-4这样的低牌对低牌有利\n• 双向有风险但成功则回报丰厚\n• 观察对手的牌制定策略",
   "hiLoGuideBonus": "奖励牌型",
-  "hiLoGuideBonusText": "• 皇家同花顺: 500筹码\n• 反向同花顺: 300筹码\n• 同花顺: 200筹码\n• 四条: 100筹码\n\n达成奖励牌型时，自动赢得整个底池！"
+  "hiLoGuideBonusText": "• 皇家同花顺: 500筹码\n• 反向同花顺: 300筹码\n• 同花顺: 200筹码\n• 四条: 100筹码\n\n达成奖励牌型时，自动赢得整个底池！",
+  "hulaTitle": "胡拉",
+  "hulaSubtitle": "4人拉米纸牌游戏"
 }

@@ -229,5 +229,7 @@
   "hiLoGuideTips": "Game Tips",
   "hiLoGuideTipsText": "• Low cards like A-2-3-4 favor Lo\n• Swing is risky but rewarding if successful\n• Observe opponent cards for strategy",
   "hiLoGuideBonus": "Bonus Hands",
-  "hiLoGuideBonusText": "• Royal Straight Flush: 500 chips\n• Back Straight Flush: 300 chips\n• Straight Flush: 200 chips\n• Four of a Kind: 100 chips\n\nBonus hands automatically win the entire pot!"
+  "hiLoGuideBonusText": "• Royal Straight Flush: 500 chips\n• Back Straight Flush: 300 chips\n• Straight Flush: 200 chips\n• Four of a Kind: 100 chips\n\nBonus hands automatically win the entire pot!",
+  "hulaTitle": "Hula",
+  "hulaSubtitle": "4-Player Rummy Card Game"
 }

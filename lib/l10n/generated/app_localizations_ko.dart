@@ -750,4 +750,10 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get hiLoGuideBonusText =>
       '• 로열 스트레이트 플러시: 500칩\n• 백 스트레이트 플러시: 300칩\n• 스트레이트 플러시: 200칩\n• 포카드: 100칩\n\n보너스 핸드 달성 시 자동으로 전체 팟을 획득합니다!';
+
+  @override
+  String get hulaTitle => '훌라';
+
+  @override
+  String get hulaSubtitle => '4인용 러미 카드 게임';
 }

@@ -7,6 +7,7 @@ import '../widgets/banner_ad_widget.dart';
 import 'home_screen.dart';
 import 'seven_card/seven_card_home_screen.dart';
 import 'hi_lo/hi_lo_home_screen.dart';
+import 'hula/hula_home_screen.dart';
 
 class GameSelectionScreen extends StatelessWidget {
   const GameSelectionScreen({super.key});
@@ -92,6 +93,23 @@ class GameSelectionScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => const HiLoHomeScreen()),
+                        );
+                      },
+                      isSmallScreen: isSmallScreen,
+                    ),
+                    SizedBox(height: isSmallScreen ? 16 : 24),
+
+                    // 훌라 버튼
+                    _buildGameButton(
+                      context: context,
+                      title: l10n.hulaTitle,
+                      subtitle: l10n.hulaSubtitle,
+                      icon: Icons.style,
+                      color: Colors.teal[700]!,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HulaHomeScreen()),
                         );
                       },
                       isSmallScreen: isSmallScreen,

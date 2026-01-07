@@ -750,4 +750,10 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get hiLoGuideBonusText =>
       '• ロイヤルストレートフラッシュ: 500チップ\n• バックストレートフラッシュ: 300チップ\n• ストレートフラッシュ: 200チップ\n• フォーカード: 100チップ\n\nボーナスハンド達成時、自動的にポット全体を獲得！';
+
+  @override
+  String get hulaTitle => 'フラ';
+
+  @override
+  String get hulaSubtitle => '4人用ラミーカードゲーム';
 }

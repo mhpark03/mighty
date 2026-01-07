@@ -745,4 +745,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get hiLoGuideBonusText =>
       '• 皇家同花顺: 500筹码\n• 反向同花顺: 300筹码\n• 同花顺: 200筹码\n• 四条: 100筹码\n\n达成奖励牌型时，自动赢得整个底池！';
+
+  @override
+  String get hulaTitle => '胡拉';
+
+  @override
+  String get hulaSubtitle => '4人拉米纸牌游戏';
 }

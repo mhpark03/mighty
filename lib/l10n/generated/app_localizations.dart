@@ -1475,6 +1475,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'• 로열 스트레이트 플러시: 500칩\n• 백 스트레이트 플러시: 300칩\n• 스트레이트 플러시: 200칩\n• 포카드: 100칩\n\n보너스 핸드 달성 시 자동으로 전체 팟을 획득합니다!'**
   String get hiLoGuideBonusText;
+
+  /// No description provided for @hulaTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'훌라'**
+  String get hulaTitle;
+
+  /// No description provided for @hulaSubtitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'4인용 러미 카드 게임'**
+  String get hulaSubtitle;
 }
 
 class _AppLocalizationsDelegate

@@ -752,4 +752,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get hiLoGuideBonusText =>
       '• Royal Straight Flush: 500 chips\n• Back Straight Flush: 300 chips\n• Straight Flush: 200 chips\n• Four of a Kind: 100 chips\n\nBonus hands automatically win the entire pot!';
+
+  @override
+  String get hulaTitle => 'Hula';
+
+  @override
+  String get hulaSubtitle => '4-Player Rummy Card Game';
 }
