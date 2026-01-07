@@ -670,14 +670,14 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
 
   Widget _buildOpponentHand(int playerIndex, bool isSmallScreen) {
     final hand = hands[playerIndex];
-    final cardWidth = isSmallScreen ? 28.0 : 35.0;
-    final cardHeight = isSmallScreen ? 40.0 : 50.0;
-    final overlap = isSmallScreen ? 18.0 : 22.0;
+    final cardWidth = isSmallScreen ? 26.0 : 32.0;
+    final cardHeight = isSmallScreen ? 36.0 : 45.0;
+    final overlap = isSmallScreen ? 16.0 : 20.0;
 
     return Container(
-      height: cardHeight + 20,
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             '${playerNames[playerIndex]} (${scores[playerIndex]}점)',
@@ -797,75 +797,87 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
 
   Widget _buildPlayerHand(bool isSmallScreen) {
     final hand = hands[0];
-    final cardWidth = isSmallScreen ? 42.0 : 52.0;
-    final cardHeight = isSmallScreen ? 60.0 : 75.0;
-    final overlap = isSmallScreen ? 28.0 : 35.0;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // 7장이 한 줄에 들어가도록 카드 크기 계산
+    final cardsPerRow = 7;
+    final horizontalPadding = 16.0;
+    final availableWidth = screenWidth - (horizontalPadding * 2);
+    final overlap = isSmallScreen ? 0.55 : 0.5; // 겹침 비율
+    final cardWidth = availableWidth / (cardsPerRow * (1 - overlap) + overlap);
+    final cardHeight = cardWidth * 1.4;
+    final cardSpacing = cardWidth * (1 - overlap);
 
     final playable = phase == GamePhase.playing && currentPlayer == 0 && !isProcessingTrick
         ? _getPlayableCards(0)
         : <PlayingCard>[];
 
+    // 카드를 두 줄로 분배 (위 7장, 아래 나머지)
+    final topRowCount = (hand.length + 1) ~/ 2; // 반올림
+    final topRow = hand.take(topRowCount).toList();
+    final bottomRow = hand.skip(topRowCount).toList();
+
+    Widget buildCardRow(List<PlayingCard> cards, bool isTopRow) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (int i = 0; i < cards.length; i++)
+            Transform.translate(
+              offset: Offset(i > 0 ? -cardSpacing * i : 0, 0),
+              child: GestureDetector(
+                onTap: () {
+                  if (phase == GamePhase.passing) {
+                    _toggleCardForPassing(cards[i]);
+                  } else if (playable.contains(cards[i])) {
+                    _playCard(cards[i]);
+                  }
+                },
+                child: Transform.translate(
+                  offset: Offset(0, selectedForPassing.contains(cards[i]) ? -10 : 0),
+                  child: _buildPlayingCard(
+                    cards[i],
+                    cardWidth,
+                    cardHeight,
+                    phase == GamePhase.passing ? true : playable.contains(cards[i]),
+                    isSelected: selectedForPassing.contains(cards[i]),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      );
+    }
+
     return Container(
-      padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 8 : 12),
+      padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 4 : 8, horizontal: horizontalPadding),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             '${playerNames[0]} (${scores[0]}점)',
             style: TextStyle(
               color: currentPlayer == 0 ? Colors.amber : Colors.white,
-              fontSize: isSmallScreen ? 13 : 15,
+              fontSize: isSmallScreen ? 12 : 14,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
           if (phase == GamePhase.passing)
-            Text(
-              '왼쪽으로 보낼 카드 3장을 선택하세요',
-              style: TextStyle(
-                color: Colors.amber,
-                fontSize: isSmallScreen ? 11 : 13,
-              ),
-            ),
-          const SizedBox(height: 4),
-          SizedBox(
-            height: cardHeight + 20,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (int i = 0; i < hand.length; i++)
-                      Padding(
-                        padding: EdgeInsets.only(right: i < hand.length - 1 ? -overlap + cardWidth : 0),
-                        child: GestureDetector(
-                          onTap: () {
-                            if (phase == GamePhase.passing) {
-                              _toggleCardForPassing(hand[i]);
-                            } else if (playable.contains(hand[i])) {
-                              _playCard(hand[i]);
-                            }
-                          },
-                          child: Transform.translate(
-                            offset: Offset(0, selectedForPassing.contains(hand[i]) ? -15 : 0),
-                            child: _buildPlayingCard(
-                              hand[i],
-                              cardWidth,
-                              cardHeight,
-                              phase == GamePhase.passing
-                                  ? true
-                                  : playable.contains(hand[i]),
-                              isSelected: selectedForPassing.contains(hand[i]),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                '왼쪽으로 보낼 카드 3장을 선택하세요',
+                style: TextStyle(
+                  color: Colors.amber,
+                  fontSize: isSmallScreen ? 10 : 12,
                 ),
               ),
             ),
-          ),
+          const SizedBox(height: 4),
+          // 첫 번째 줄
+          buildCardRow(topRow, true),
+          SizedBox(height: isSmallScreen ? 4 : 6),
+          // 두 번째 줄
+          if (bottomRow.isNotEmpty) buildCardRow(bottomRow, false),
         ],
       ),
     );
