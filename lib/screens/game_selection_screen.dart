@@ -26,10 +26,9 @@ class GameSelectionScreen extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: EdgeInsets.all(isSmallScreen ? 16 : 24),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // 앱 타이틀
                     Text(
@@ -47,7 +46,7 @@ class GameSelectionScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(height: isSmallScreen ? 32 : 48),
+                    SizedBox(height: isSmallScreen ? 24 : 32),
 
                     // 마이티 버튼
                     _buildGameButton(
@@ -133,7 +132,7 @@ class GameSelectionScreen extends StatelessWidget {
                       isSmallScreen: isSmallScreen,
                     ),
 
-                    const Spacer(),
+                    SizedBox(height: isSmallScreen ? 16 : 24),
 
                     // 앱 종료 버튼
                     TextButton.icon(
