@@ -960,20 +960,8 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       }
       final isSoloScorerSituation = playersWithPoints == 1 && soloScorer != -1;
 
-      // 트릭 승자가 점수 독점자가 아니면 → 하트 버려서 점수 분산!
-      if (isSoloScorerSituation && currentWinner != soloScorer) {
-        // 높은 하트 우선 버리기
-        final hearts = playable.where((c) => c.isHeart).toList();
-        if (hearts.isNotEmpty) {
-          hearts.sort((a, b) => b.rank.compareTo(a.rank));
-          return hearts.first;
-        }
-        // 스페이드 Q도 버리기
-        final queenOfSpades = playable.where((c) => c.isQueenOfSpades).toList();
-        if (queenOfSpades.isNotEmpty) return queenOfSpades.first;
-      }
-
-      // 트릭 승자가 점수 독점자면 → 점수 카드 주지 않기
+      // ★ 트릭 승자가 점수 독점자면 → 점수 카드 주지 않기 (슛더문 방지)
+      // (승자가 독점자가 아니면 일반 로직으로 하트 버리기)
       if (isSoloScorerSituation && currentWinner == soloScorer) {
         final nonPointCards = playable.where((c) => c.points == 0).toList();
         if (nonPointCards.isNotEmpty) {
