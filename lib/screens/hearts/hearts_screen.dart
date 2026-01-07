@@ -310,11 +310,43 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     return count;
   }
 
-  // 슛더문 해제 조건 체크
+  // 슛더문 해제/활성화 조건 체크
   void _updateShootMoonStatus() {
     for (int playerIndex = 0; playerIndex < 4; playerIndex++) {
-      // 이미 슛더문 시도 중이 아니면 스킵
-      if (shootMoonChances[playerIndex] < 0.5) continue;
+      final myPoints = wonCards[playerIndex].fold(0, (sum, c) => sum + c.points);
+      final hand = hands[playerIndex];
+
+      // ★ 역전 슛더문 활성화: 이미 점수가 높고(♠Q 등) 강한 하트 보유 시
+      if (shootMoonChances[playerIndex] < 0.5) {
+        // 다른 플레이어가 점수를 가지고 있는지 확인
+        bool otherPlayerHasPoints = false;
+        for (int i = 0; i < 4; i++) {
+          if (i != playerIndex) {
+            final otherPoints = wonCards[i].fold(0, (sum, c) => sum + c.points);
+            if (otherPoints > 0) {
+              otherPlayerHasPoints = true;
+              break;
+            }
+          }
+        }
+
+        // 나만 점수를 가지고 있고, 10점 이상이면 역전 슛더문 검토
+        if (!otherPlayerHasPoints && myPoints >= 10) {
+          // 강한 하트 보유 확인 (A 또는 K)
+          final hasHeartA = hand.any((c) => c.isHeart && c.rank == 14);
+          final hasHeartK = hand.any((c) => c.isHeart && c.rank == 13);
+          final heartCount = hand.where((c) => c.isHeart).length;
+
+          // 하트 A/K 중 하나 이상 + 하트 3장 이상이면 역전 슛더문 시도
+          if ((hasHeartA || hasHeartK) && heartCount >= 3) {
+            shootMoonChances[playerIndex] = 0.6; // 역전 슛더문 활성화
+            continue;
+          }
+        }
+        continue; // 슛더문 시도 중 아니면 스킵
+      }
+
+      // === 이하 기존 슛더문 해제 로직 ===
 
       // 조건 1: 다른 플레이어가 점수를 획득했는지 확인
       bool otherPlayerHasPoints = false;
@@ -341,9 +373,6 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       }
 
       // 조건 3: 남은 하트 + 스페이드Q를 모을 수 없는 경우
-      // (이미 다른 플레이어가 하트를 가져갔으면 조건 1에서 걸림)
-      // 추가로: 내가 하트를 하나도 못 먹었는데 하트가 많이 나갔으면 해제
-      final myPoints = wonCards[playerIndex].fold(0, (sum, c) => sum + c.points);
       final totalPlayedHearts = playedCards.where((c) => c.isHeart).length;
       if (totalPlayedHearts >= 5 && myPoints == 0) {
         // 하트가 5장 이상 나갔는데 내가 하나도 못 먹었으면 해제
