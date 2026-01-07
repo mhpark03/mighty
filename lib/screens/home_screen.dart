@@ -61,6 +61,18 @@ class HomeScreen extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(8, topPadding, 8, bottomPadding),
                     child: Column(
                       children: [
+                  // 홈으로 돌아가기 버튼
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.arrow_back, color: Colors.white, size: isSmallScreen ? 22 : 26),
+                      tooltip: '게임 선택',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ),
+                  SizedBox(height: isSmallScreen ? 4 : 8),
                   // 타이틀
                   Text(
                     l10n.appTitle,
@@ -242,38 +254,19 @@ class HomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: isSmallScreen ? 4 : 8),
 
-                        // 가이드 버튼과 앱 종료 버튼
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton.icon(
-                              onPressed: () => _showGameGuideDialog(context, l10n, isSmallScreen),
-                              icon: Icon(Icons.help_outline, color: Colors.white54, size: isSmallScreen ? 16 : 18),
-                              label: Text(
-                                l10n.gameGuide,
-                                style: TextStyle(color: Colors.white54, fontSize: isSmallScreen ? 12 : 13),
-                              ),
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: isSmallScreen ? 4 : 6),
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                            ),
-                            SizedBox(width: isSmallScreen ? 16 : 24),
-                            TextButton.icon(
-                              onPressed: () => _showExitAppDialog(context, l10n),
-                              icon: Icon(Icons.power_settings_new, color: Colors.white54, size: isSmallScreen ? 16 : 18),
-                              label: Text(
-                                l10n.exitApp,
-                                style: TextStyle(color: Colors.white54, fontSize: isSmallScreen ? 12 : 13),
-                              ),
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: isSmallScreen ? 4 : 6),
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                            ),
-                          ],
+                        // 가이드 버튼
+                        TextButton.icon(
+                          onPressed: () => _showGameGuideDialog(context, l10n, isSmallScreen),
+                          icon: Icon(Icons.help_outline, color: Colors.white54, size: isSmallScreen ? 16 : 18),
+                          label: Text(
+                            l10n.gameGuide,
+                            style: TextStyle(color: Colors.white54, fontSize: isSmallScreen ? 12 : 13),
+                          ),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: isSmallScreen ? 4 : 6),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                         ),
                       ],
                     ),

@@ -79,7 +79,7 @@ class SevenCardStatsService extends ChangeNotifier {
   }
 
   void _updatePlayerNames() {
-    final defaultNames = ['플레이어', 'AI 1', 'AI 2', 'AI 3', 'AI 4'];
+    final defaultNames = ['플레이어', '민준', '서연', '지호', '수빈'];
     for (int i = 0; i < _playerStats.length && i < defaultNames.length; i++) {
       _playerStats[i].name = defaultNames[i];
     }
@@ -88,10 +88,10 @@ class SevenCardStatsService extends ChangeNotifier {
   void _initDefaultStats() {
     _playerStats = [
       SevenCardPlayerStats(name: '플레이어'),
-      SevenCardPlayerStats(name: 'AI 1'),
-      SevenCardPlayerStats(name: 'AI 2'),
-      SevenCardPlayerStats(name: 'AI 3'),
-      SevenCardPlayerStats(name: 'AI 4'),
+      SevenCardPlayerStats(name: '민준'),
+      SevenCardPlayerStats(name: '서연'),
+      SevenCardPlayerStats(name: '지호'),
+      SevenCardPlayerStats(name: '수빈'),
     ];
   }
 

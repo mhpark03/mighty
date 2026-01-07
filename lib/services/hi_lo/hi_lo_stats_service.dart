@@ -95,7 +95,7 @@ class HiLoStatsService extends ChangeNotifier {
   }
 
   void _updatePlayerNames() {
-    final defaultNames = ['플레이어', 'AI 1', 'AI 2', 'AI 3', 'AI 4'];
+    final defaultNames = ['플레이어', '민준', '서연', '지호', '수빈'];
     for (int i = 0; i < _playerStats.length && i < defaultNames.length; i++) {
       _playerStats[i].name = defaultNames[i];
     }
@@ -104,10 +104,10 @@ class HiLoStatsService extends ChangeNotifier {
   void _initDefaultStats() {
     _playerStats = [
       HiLoPlayerStats(name: '플레이어'),
-      HiLoPlayerStats(name: 'AI 1'),
-      HiLoPlayerStats(name: 'AI 2'),
-      HiLoPlayerStats(name: 'AI 3'),
-      HiLoPlayerStats(name: 'AI 4'),
+      HiLoPlayerStats(name: '민준'),
+      HiLoPlayerStats(name: '서연'),
+      HiLoPlayerStats(name: '지호'),
+      HiLoPlayerStats(name: '수빈'),
     ];
   }
 
