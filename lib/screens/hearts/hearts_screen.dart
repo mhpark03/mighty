@@ -935,7 +935,54 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         }
       }
 
-      // ★ 일반: 높은 카드 우선 버리기
+      // ★ 일반: 트릭 승자 확인 후 버리기 전략 결정
+      // 현재 트릭에서 누가 이기고 있는지 확인
+      int currentWinner = leadPlayer;
+      int highestRank = currentTrick[leadPlayer]!.rank;
+      final trickLeadSuit = currentTrick[leadPlayer]!.suit;
+
+      for (int i = 0; i < 4; i++) {
+        final card = currentTrick[i];
+        if (card != null && card.suit == trickLeadSuit && card.rank > highestRank) {
+          highestRank = card.rank;
+          currentWinner = i;
+        }
+      }
+
+      // 한 명만 점수를 가지고 있는지 확인 (슛더문 가능성)
+      int playersWithPoints = 0;
+      int soloScorer = -1;
+      for (int i = 0; i < 4; i++) {
+        if (scores[i] > 0) {
+          playersWithPoints++;
+          soloScorer = i;
+        }
+      }
+      final isSoloScorerSituation = playersWithPoints == 1 && soloScorer != -1;
+
+      // 트릭 승자가 점수 독점자가 아니면 → 하트 버려서 점수 분산!
+      if (isSoloScorerSituation && currentWinner != soloScorer) {
+        // 높은 하트 우선 버리기
+        final hearts = playable.where((c) => c.isHeart).toList();
+        if (hearts.isNotEmpty) {
+          hearts.sort((a, b) => b.rank.compareTo(a.rank));
+          return hearts.first;
+        }
+        // 스페이드 Q도 버리기
+        final queenOfSpades = playable.where((c) => c.isQueenOfSpades).toList();
+        if (queenOfSpades.isNotEmpty) return queenOfSpades.first;
+      }
+
+      // 트릭 승자가 점수 독점자면 → 점수 카드 주지 않기
+      if (isSoloScorerSituation && currentWinner == soloScorer) {
+        final nonPointCards = playable.where((c) => c.points == 0).toList();
+        if (nonPointCards.isNotEmpty) {
+          nonPointCards.sort((a, b) => b.rank.compareTo(a.rank));
+          return nonPointCards.first;
+        }
+      }
+
+      // 일반 상황: 높은 카드 우선 버리기
       // 1. 스페이드 퀸 우선
       final queenOfSpades = playable.where((c) => c.isQueenOfSpades).toList();
       if (queenOfSpades.isNotEmpty) return queenOfSpades.first;
