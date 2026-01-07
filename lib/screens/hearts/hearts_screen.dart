@@ -798,42 +798,45 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   Widget _buildPlayerHand(bool isSmallScreen) {
     final hand = hands[0];
     final screenWidth = MediaQuery.of(context).size.width;
+    final horizontalPadding = isSmallScreen ? 12.0 : 16.0;
+    final availableWidth = screenWidth - (horizontalPadding * 2);
 
     // 7장이 한 줄에 들어가도록 카드 크기 계산
-    final cardsPerRow = 7;
-    final horizontalPadding = 16.0;
-    final availableWidth = screenWidth - (horizontalPadding * 2);
-    final overlap = isSmallScreen ? 0.55 : 0.5; // 겹침 비율
-    final cardWidth = availableWidth / (cardsPerRow * (1 - overlap) + overlap);
-    final cardHeight = cardWidth * 1.4;
-    final cardSpacing = cardWidth * (1 - overlap);
+    final maxCardsPerRow = 7;
+    final overlapRatio = 0.35; // 카드 겹침 비율 (35% 겹침)
+    final cardWidth = availableWidth / (maxCardsPerRow - (maxCardsPerRow - 1) * overlapRatio);
+    final cardHeight = cardWidth * 1.35;
+    final cardStep = cardWidth * (1 - overlapRatio); // 카드 간 간격
 
     final playable = phase == GamePhase.playing && currentPlayer == 0 && !isProcessingTrick
         ? _getPlayableCards(0)
         : <PlayingCard>[];
 
-    // 카드를 두 줄로 분배 (위 7장, 아래 나머지)
-    final topRowCount = (hand.length + 1) ~/ 2; // 반올림
+    // 카드를 두 줄로 분배
+    final topRowCount = (hand.length + 1) ~/ 2;
     final topRow = hand.take(topRowCount).toList();
     final bottomRow = hand.skip(topRowCount).toList();
 
-    Widget buildCardRow(List<PlayingCard> cards, bool isTopRow) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          for (int i = 0; i < cards.length; i++)
-            Transform.translate(
-              offset: Offset(i > 0 ? -cardSpacing * i : 0, 0),
-              child: GestureDetector(
-                onTap: () {
-                  if (phase == GamePhase.passing) {
-                    _toggleCardForPassing(cards[i]);
-                  } else if (playable.contains(cards[i])) {
-                    _playCard(cards[i]);
-                  }
-                },
-                child: Transform.translate(
-                  offset: Offset(0, selectedForPassing.contains(cards[i]) ? -10 : 0),
+    Widget buildCardRow(List<PlayingCard> cards) {
+      final rowWidth = cardWidth + (cards.length - 1) * cardStep;
+      return SizedBox(
+        width: rowWidth,
+        height: cardHeight + 12, // 선택 시 위로 올라가는 공간
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            for (int i = 0; i < cards.length; i++)
+              Positioned(
+                left: i * cardStep,
+                top: selectedForPassing.contains(cards[i]) ? 0 : 12,
+                child: GestureDetector(
+                  onTap: () {
+                    if (phase == GamePhase.passing) {
+                      _toggleCardForPassing(cards[i]);
+                    } else if (playable.contains(cards[i])) {
+                      _playCard(cards[i]);
+                    }
+                  },
                   child: _buildPlayingCard(
                     cards[i],
                     cardWidth,
@@ -843,13 +846,13 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       );
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 4 : 8, horizontal: horizontalPadding),
+      padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 4 : 6, horizontal: horizontalPadding),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -874,10 +877,10 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
             ),
           const SizedBox(height: 4),
           // 첫 번째 줄
-          buildCardRow(topRow, true),
-          SizedBox(height: isSmallScreen ? 4 : 6),
+          buildCardRow(topRow),
+          SizedBox(height: isSmallScreen ? 2 : 4),
           // 두 번째 줄
-          if (bottomRow.isNotEmpty) buildCardRow(bottomRow, false),
+          if (bottomRow.isNotEmpty) buildCardRow(bottomRow),
         ],
       ),
     );
