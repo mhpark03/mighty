@@ -1640,10 +1640,28 @@ class HiLoController extends ChangeNotifier {
     }
   }
 
-  /// 로우 핸드 표시명
+  /// 로우 핸드 표시명 (족보 형식: "6탑", "7탑" 등)
   String getLowHandDisplayName(LowHand? hand) {
     if (hand == null || !hand.isQualified) return 'No Low';
-    return hand.name;
+    if (hand.cardRanks.isEmpty) return 'No Low';
+
+    // 가장 높은 카드 (탑 카드)
+    final highCard = hand.cardRanks.last;
+
+    String rankName;
+    if (highCard == 1) {
+      rankName = 'A';
+    } else if (highCard == 11) {
+      rankName = 'J';
+    } else if (highCard == 12) {
+      rankName = 'Q';
+    } else if (highCard == 13) {
+      rankName = 'K';
+    } else {
+      rankName = highCard.toString();
+    }
+
+    return '$rankName탑';
   }
 }
 

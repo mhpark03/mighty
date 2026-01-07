@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../models/card.dart';
 import '../../models/hi_lo/hi_lo_state.dart';
-import '../../models/hi_lo/hi_lo_hand.dart';
 import '../../services/hi_lo/hi_lo_controller.dart';
 import '../../services/hi_lo/hi_lo_stats_service.dart';
 import '../../widgets/banner_ad_widget.dart';
@@ -1073,56 +1072,6 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
                 ],
               ],
             ),
-            // AI 플레이어 족보 표시 (오픈 카드 기준)
-            if (opponent.openCards.length >= 2) ...[
-              const SizedBox(height: 2),
-              Wrap(
-                spacing: 2,
-                alignment: WrapAlignment.center,
-                children: [
-                  // 하이 족보
-                  if (opponent.openPokerHand != null)
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade700,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: Text(
-                        'Hi ${controller.getHandRankDisplayName(opponent.openPokerHand)}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: sizes.badgeFontSize,
-                        ),
-                      ),
-                    ),
-                  // 로우 족보 표시 (오픈 카드 기반 추정)
-                  if (opponent.openCards.length >= 4)
-                    Builder(builder: (context) {
-                      final openLow = HiLoHandEvaluator.evaluateLow(opponent.openCards);
-                      if (openLow != null && openLow.isQualified) {
-                        return Container(
-                          padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade700,
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                          child: Text(
-                            'Lo ${controller.getLowHandDisplayName(openLow)}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: sizes.badgeFontSize,
-                            ),
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    }),
-                ],
-              ),
-            ],
           ],
         ],
       ),
@@ -1303,70 +1252,52 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> {
                       ),
                     ),
                   )
-                else ...[
-                  // 하이 족보 표시
-                  if (player.allCardsPokerHand != null)
-                    Container(
-                      margin: const EdgeInsets.only(left: 4),
-                      padding: EdgeInsets.symmetric(horizontal: isSmall ? 6 : 8, vertical: isSmall ? 4 : 5),
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade700,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Hi ',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold,
-                              fontSize: sizes.nameFontSize - 2,
+                else
+                  // 하이/로우 족보를 세로로 배치
+                  Container(
+                    margin: const EdgeInsets.only(left: 4),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 하이 족보 표시
+                        if (player.allCardsPokerHand != null)
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: isSmall ? 4 : 6, vertical: isSmall ? 2 : 3),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade700,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'Hi ${controller.getHandRankDisplayName(player.allCardsPokerHand)}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: sizes.nameFontSize - 1,
+                              ),
                             ),
                           ),
-                          Text(
-                            controller.getHandRankDisplayName(player.allCardsPokerHand),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: sizes.nameFontSize,
+                        // 로우 족보 표시
+                        if (player.lowHand != null && player.lowHand!.isQualified)
+                          Container(
+                            margin: const EdgeInsets.only(top: 2),
+                            padding: EdgeInsets.symmetric(horizontal: isSmall ? 4 : 6, vertical: isSmall ? 2 : 3),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade700,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'Lo ${controller.getLowHandDisplayName(player.lowHand)}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: sizes.nameFontSize - 1,
+                              ),
                             ),
                           ),
-                        ],
-                      ),
+                      ],
                     ),
-                  // 로우 족보 표시
-                  if (player.lowHand != null && player.lowHand!.isQualified)
-                    Container(
-                      margin: const EdgeInsets.only(left: 4),
-                      padding: EdgeInsets.symmetric(horizontal: isSmall ? 6 : 8, vertical: isSmall ? 4 : 5),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade700,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Lo ',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold,
-                              fontSize: sizes.nameFontSize - 2,
-                            ),
-                          ),
-                          Text(
-                            controller.getLowHandDisplayName(player.lowHand),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: sizes.nameFontSize,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
+                  ),
               ],
             ),
           ),
