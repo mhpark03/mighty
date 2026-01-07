@@ -230,7 +230,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   List<int> selectedCardIndices = []; // 선택된 카드 인덱스들
   bool waitingForNextTurn = false; // 다음 턴 대기 중
   Timer? _nextTurnTimer; // 자동 진행 타이머
-  int _autoPlayCountdown = 10; // 자동 진행 카운트다운
+  int _autoPlayCountdown = 5; // 자동 진행 카운트다운
   int _lastDiscardTurn = 0; // 마지막으로 카드를 버린 플레이어 턴
   Timer? _computerActionTimer; // 컴퓨터 액션 딜레이 타이머
   static const int _computerActionDelay = 2000; // 컴퓨터 액션 딜레이 (밀리초)
@@ -392,7 +392,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   // 다음 턴 자동 진행 타이머 시작
-  void _startNextTurnTimer({int seconds = 10}) {
+  void _startNextTurnTimer({int seconds = 5}) {
     _cancelNextTurnTimer();
     _autoPlayCountdown = seconds;
 
@@ -423,7 +423,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   // 컴퓨터 동작 후 대기 상태로 전환 (다음 동작을 콜백으로 저장)
-  void _startWaitWithAction(VoidCallback nextAction, {int seconds = 10}) {
+  void _startWaitWithAction(VoidCallback nextAction, {int seconds = 5}) {
     setState(() {
       waitingForNextTurn = true;
       _pendingComputerAction = nextAction;
