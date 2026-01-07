@@ -632,6 +632,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     if (phase != GamePhase.playing || isProcessingTrick) return;
     if (currentPlayer == 0) return;
 
+    // ★ AI 턴 시작 시 슛더문 상태 업데이트 (역전 슛더문 활성화 체크)
+    _updateShootMoonStatus();
+
     final playable = _getPlayableCards(currentPlayer);
     if (playable.isEmpty) return;
 
