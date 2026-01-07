@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../services/game_save_service.dart';
 import '../../services/onecard/onecard_stats_service.dart';
+import '../../services/ad_service.dart';
 import '../../widgets/banner_ad_widget.dart';
 
 // 카드 무늬
@@ -989,11 +990,6 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: _showRulesDialog,
-            tooltip: '규칙',
-          ),
-          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _restartGame,
             tooltip: '다시 시작',
@@ -1916,7 +1912,11 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _restartGame,
+                onPressed: () {
+                  AdService().showRewardedAd(
+                    onRewarded: _restartGame,
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green.shade700,
                   foregroundColor: Colors.white,
