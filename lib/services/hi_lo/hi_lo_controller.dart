@@ -401,8 +401,124 @@ class HiLoController extends ChangeNotifier {
       }
     }
 
+    // === 전략적 로우 선택: 하이가 약하고 상대가 하이로 갈 것 같으면 로우 선택 ===
+    // 투페어 이하 (0.50 미만)에서 상대 오픈 카드가 강한 하이를 보이면 로우로 무승부 노리기
+    if (hiStrength < 0.50) {
+      final opponentsLikelyHi = _estimateOpponentsGoingHi(player);
+
+      if (opponentsLikelyHi >= 0.7) {
+        // 대부분의 상대가 하이로 갈 것 같음
+        // 내 로우 카드 상황 확인 (페어 있어도 낮은 카드가 많으면 로우 선택)
+        final myLowCardScore = _evaluateLowestCards(player);
+
+        // 낮은 카드가 많으면 로우 선택 (페어 있어도)
+        if (myLowCardScore >= 0.4) {
+          if (random.nextDouble() < 0.75) {
+            return HiLoChoice.lo;
+          }
+        }
+        // 하이가 매우 약하면 (원페어 이하) 로우 선택 확률 높임
+        if (hiStrength < 0.35 && myLowCardScore >= 0.3) {
+          if (random.nextDouble() < 0.6) {
+            return HiLoChoice.lo;
+          }
+        }
+      }
+    }
+
     // 기본적으로 하이 선택
     return HiLoChoice.hi;
+  }
+
+  /// 상대방이 하이로 갈 확률 추정 (오픈 카드 기준)
+  double _estimateOpponentsGoingHi(HiLoPlayer currentPlayer) {
+    int likelyHiCount = 0;
+    int totalOpponents = 0;
+
+    for (final opponent in _state.players) {
+      if (opponent.id == currentPlayer.id || opponent.isFolded) continue;
+      totalOpponents++;
+
+      final openCards = opponent.openCards;
+      if (openCards.isEmpty) {
+        likelyHiCount++; // 오픈 카드 없으면 하이로 추정
+        continue;
+      }
+
+      // 오픈 카드로 하이/로우 성향 판단
+      // 페어/트리플 보이면 하이
+      final ranks = <int, int>{};
+      int lowCardCount = 0;
+
+      for (final card in openCards) {
+        ranks[card.rankValue] = (ranks[card.rankValue] ?? 0) + 1;
+        // 8 이하 카드 (로우용)
+        if (card.rankValue <= 8 || card.rank == Rank.ace) {
+          lowCardCount++;
+        }
+      }
+
+      final maxSameRank = ranks.values.isEmpty ? 0 : ranks.values.reduce(max);
+
+      // 페어/트리플이 보이면 하이 가능성 높음
+      if (maxSameRank >= 2) {
+        likelyHiCount++;
+        continue;
+      }
+
+      // 높은 카드(J, Q, K)가 많으면 하이
+      int highCardCount = 0;
+      for (final card in openCards) {
+        if (card.rankValue >= 11) highCardCount++;
+      }
+      if (highCardCount >= 2) {
+        likelyHiCount++;
+        continue;
+      }
+
+      // 낮은 카드가 대부분이면 로우 가능성
+      if (lowCardCount >= openCards.length * 0.7) {
+        continue; // 로우 가능성 있음, likelyHi 안 셈
+      }
+
+      likelyHiCount++; // 기본적으로 하이 추정
+    }
+
+    if (totalOpponents == 0) return 1.0;
+    return likelyHiCount / totalOpponents;
+  }
+
+  /// 플레이어의 낮은 카드 점수 평가 (페어 있어도 낮은 카드가 많으면 높은 점수)
+  double _evaluateLowestCards(HiLoPlayer player) {
+    final cards = player.hand;
+    if (cards.isEmpty) return 0.0;
+
+    // 각 카드의 로우 가치 계산 (낮을수록 좋음)
+    // A=1, 2=2, ..., K=13
+    List<int> lowValues = [];
+    for (final card in cards) {
+      int value = card.rank == Rank.ace ? 1 : card.rankValue;
+      lowValues.add(value);
+    }
+    lowValues.sort();
+
+    // 가장 낮은 5장의 평균 (낮을수록 좋음)
+    final topFive = lowValues.take(5).toList();
+    if (topFive.isEmpty) return 0.0;
+
+    final avgValue = topFive.reduce((a, b) => a + b) / topFive.length;
+
+    // avgValue가 낮을수록 점수가 높음
+    // avgValue 3~4 → 1.0 (최상)
+    // avgValue 5~6 → 0.7
+    // avgValue 7~8 → 0.5
+    // avgValue 9~10 → 0.3
+    // avgValue 11+ → 0.1
+    if (avgValue <= 4) return 1.0;
+    if (avgValue <= 6) return 0.7;
+    if (avgValue <= 8) return 0.5;
+    if (avgValue <= 10) return 0.3;
+    return 0.1;
   }
 
   /// AI 베팅 액션 결정 (하이로우 게임 - 상대 로우 잠재력 고려)
