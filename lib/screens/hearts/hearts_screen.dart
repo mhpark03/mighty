@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../services/hearts/hearts_stats_service.dart';
 import '../../services/ad_service.dart';
-import '../../widgets/banner_ad_widget.dart';
 
 enum Suit { spade, heart, diamond, club }
 
@@ -1300,7 +1299,6 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                 ],
               ),
             ),
-            const BannerAdWidget(),
           ],
         ),
       ),
@@ -1414,6 +1412,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
               Navigator.pop(dialogContext);
               AdService().showRewardedAd(
                 onRewarded: _startNewGame,
+                onAdNotAvailable: _startNewGame,
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
@@ -1431,16 +1430,47 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         _showHint = false;
       });
     } else {
-      // 힌트가 꺼져 있으면 광고 보고 켜기
-      AdService().showRewardedAd(
-        onRewarded: () {
-          setState(() {
-            _showHint = true;
-          });
-          _showMessage('힌트가 활성화되었습니다!');
-        },
-      );
+      // 힌트가 꺼져 있으면 다이얼로그 표시
+      _showHintDialog();
     }
+  }
+
+  void _showHintDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('힌트'),
+        content: const Text('광고를 시청하면 힌트가 활성화됩니다.\n계속하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              AdService().showRewardedAd(
+                onRewarded: () {
+                  setState(() {
+                    _showHint = true;
+                  });
+                  _showMessage('힌트가 활성화되었습니다!');
+                },
+                onAdNotAvailable: () {
+                  // 광고 로드 실패 시에도 힌트 활성화
+                  setState(() {
+                    _showHint = true;
+                  });
+                  _showMessage('힌트가 활성화되었습니다!');
+                },
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: const Text('광고 보기', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildOpponentHand(int playerIndex, bool isSmallScreen) {

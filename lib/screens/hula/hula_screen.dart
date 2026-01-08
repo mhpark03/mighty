@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../../services/game_save_service.dart';
 import '../../services/ad_service.dart';
 import '../../services/hula/hula_stats_service.dart';
-import '../../widgets/banner_ad_widget.dart';
 
 // 카드 무늬
 enum Suit { spade, heart, diamond, club }
@@ -295,6 +294,10 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                   _showHint = false;
                   _initGame();
                 },
+                onAdNotAvailable: () {
+                  _showHint = false;
+                  _initGame();
+                },
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
@@ -311,14 +314,44 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         _showHint = false;
       });
     } else {
-      AdService().showRewardedAd(
-        onRewarded: () {
-          setState(() {
-            _showHint = true;
-          });
-        },
-      );
+      _showHintDialog();
     }
+  }
+
+  void _showHintDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('힌트'),
+        content: const Text('광고를 시청하면 힌트가 활성화됩니다.\n계속하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              AdService().showRewardedAd(
+                onRewarded: () {
+                  setState(() {
+                    _showHint = true;
+                  });
+                },
+                onAdNotAvailable: () {
+                  // 광고 로드 실패 시에도 힌트 활성화
+                  setState(() {
+                    _showHint = true;
+                  });
+                },
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: const Text('광고 보기', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _initGame() {
@@ -3001,12 +3034,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(child: _buildGameContent()),
-            const BannerAdWidget(),
-          ],
-        ),
+        child: _buildGameContent(),
       ),
     );
   }

@@ -8,7 +8,6 @@ import '../models/game_state.dart';
 import '../services/game_controller.dart';
 import '../services/stats_service.dart';
 import '../services/ad_service.dart';
-import '../widgets/banner_ad_widget.dart';
 import 'game_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -272,7 +271,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const BannerAdWidget(),
               ],
             ),
           ),
@@ -385,6 +383,9 @@ class HomeScreen extends StatelessWidget {
               // 보상형 광고 표시 후 초기화
               AdService().showRewardedAd(
                 onRewarded: () {
+                  statsService.resetStats();
+                },
+                onAdNotAvailable: () {
                   statsService.resetStats();
                 },
               );

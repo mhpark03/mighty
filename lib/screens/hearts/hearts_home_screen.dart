@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../services/hearts/hearts_stats_service.dart';
 import '../../services/ad_service.dart';
-import '../../widgets/banner_ad_widget.dart';
 import 'hearts_screen.dart';
 
 class HeartsHomeScreen extends StatelessWidget {
@@ -251,7 +250,6 @@ class HeartsHomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const BannerAdWidget(),
               ],
             ),
           ),
@@ -348,6 +346,9 @@ class HeartsHomeScreen extends StatelessWidget {
               Navigator.pop(dialogContext);
               AdService().showRewardedAd(
                 onRewarded: () {
+                  statsService.resetStats();
+                },
+                onAdNotAvailable: () {
                   statsService.resetStats();
                 },
               );

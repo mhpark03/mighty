@@ -47,15 +47,18 @@ class AdService {
   /// 보상형 광고 표시
   /// [onRewarded] 광고 시청 완료 시 호출되는 콜백
   /// [onAdDismissed] 광고가 닫혔을 때 호출되는 콜백
-  void showRewardedAd({
+  /// [onAdNotAvailable] 광고가 준비되지 않았을 때 호출되는 콜백
+  /// 반환값: 광고가 표시되었으면 true, 아니면 false
+  Future<bool> showRewardedAd({
     required Function() onRewarded,
     Function()? onAdDismissed,
-  }) {
+    Function()? onAdNotAvailable,
+  }) async {
     if (!_isRewardedAdReady || _rewardedAd == null) {
       debugPrint('RewardedAd is not ready');
-      // 광고가 준비되지 않았으면 바로 보상 지급
-      onRewarded();
-      return;
+      onAdNotAvailable?.call();
+      loadRewardedAd(); // 다음 광고 로드 시도
+      return false;
     }
 
     _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
@@ -70,17 +73,18 @@ class AdService {
         ad.dispose();
         _isRewardedAdReady = false;
         loadRewardedAd();
-        // 광고 표시 실패 시 보상 지급
-        onRewarded();
+        // 광고 표시 실패 시 보상 지급하지 않음
+        onAdNotAvailable?.call();
       },
     );
 
-    _rewardedAd!.show(
+    await _rewardedAd!.show(
       onUserEarnedReward: (ad, reward) {
         debugPrint('User earned reward: ${reward.amount} ${reward.type}');
         onRewarded();
       },
     );
+    return true;
   }
 
   /// 리소스 정리

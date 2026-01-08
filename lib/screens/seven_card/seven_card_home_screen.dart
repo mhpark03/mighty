@@ -4,7 +4,6 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../services/ad_service.dart';
 import '../../services/seven_card/seven_card_controller.dart';
 import '../../services/seven_card/seven_card_stats_service.dart';
-import '../../widgets/banner_ad_widget.dart';
 import 'seven_card_game_screen.dart';
 
 class SevenCardHomeScreen extends StatelessWidget {
@@ -263,7 +262,6 @@ class SevenCardHomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const BannerAdWidget(),
               ],
             ),
           ),
@@ -359,6 +357,9 @@ class SevenCardHomeScreen extends StatelessWidget {
               // 보상형 광고 표시 후 초기화
               AdService().showRewardedAd(
                 onRewarded: () {
+                  statsService.resetStats();
+                },
+                onAdNotAvailable: () {
                   statsService.resetStats();
                 },
               );

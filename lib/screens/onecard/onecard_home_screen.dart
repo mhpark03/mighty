@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../services/onecard/onecard_stats_service.dart';
 import '../../services/ad_service.dart';
-import '../../widgets/banner_ad_widget.dart';
 import 'onecard_screen.dart';
 
 class OneCardHomeScreen extends StatelessWidget {
@@ -251,7 +250,6 @@ class OneCardHomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const BannerAdWidget(),
               ],
             ),
           ),
@@ -350,6 +348,9 @@ class OneCardHomeScreen extends StatelessWidget {
               // 보상형 광고 표시 후 초기화
               AdService().showRewardedAd(
                 onRewarded: () {
+                  statsService.resetStats();
+                },
+                onAdNotAvailable: () {
                   statsService.resetStats();
                 },
               );

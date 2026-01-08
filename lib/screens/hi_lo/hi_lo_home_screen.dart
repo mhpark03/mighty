@@ -4,7 +4,6 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../services/ad_service.dart';
 import '../../services/hi_lo/hi_lo_controller.dart';
 import '../../services/hi_lo/hi_lo_stats_service.dart';
-import '../../widgets/banner_ad_widget.dart';
 import 'hi_lo_game_screen.dart';
 
 class HiLoHomeScreen extends StatelessWidget {
@@ -263,7 +262,6 @@ class HiLoHomeScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const BannerAdWidget(),
               ],
             ),
           ),
@@ -358,6 +356,9 @@ class HiLoHomeScreen extends StatelessWidget {
               Navigator.pop(dialogContext);
               AdService().showRewardedAd(
                 onRewarded: () {
+                  statsService.resetStats();
+                },
+                onAdNotAvailable: () {
                   statsService.resetStats();
                 },
               );

@@ -7,7 +7,6 @@ import '../../models/hi_lo/hi_lo_state.dart';
 import '../../services/ad_service.dart';
 import '../../services/hi_lo/hi_lo_controller.dart';
 import '../../services/hi_lo/hi_lo_stats_service.dart';
-import '../../widgets/banner_ad_widget.dart';
 
 /// 반응형 사이즈 헬퍼
 class _ResponsiveSizes {
@@ -114,6 +113,11 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                   _showHint = false;
                   controller.startNewGame();
                 },
+                onAdNotAvailable: () {
+                  _statsRecorded = false;
+                  _showHint = false;
+                  controller.startNewGame();
+                },
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
@@ -130,14 +134,44 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
         _showHint = false;
       });
     } else {
-      AdService().showRewardedAd(
-        onRewarded: () {
-          setState(() {
-            _showHint = true;
-          });
-        },
-      );
+      _showHintDialog();
     }
+  }
+
+  void _showHintDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('힌트'),
+        content: const Text('광고를 시청하면 힌트가 활성화됩니다.\n계속하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              AdService().showRewardedAd(
+                onRewarded: () {
+                  setState(() {
+                    _showHint = true;
+                  });
+                },
+                onAdNotAvailable: () {
+                  // 광고 로드 실패 시에도 힌트 활성화
+                  setState(() {
+                    _showHint = true;
+                  });
+                },
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+            child: const Text('광고 보기', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -171,14 +205,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
             ],
           ),
           body: SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: _buildGameArea(controller, state, l10n),
-                ),
-                const BannerAdWidget(),
-              ],
-            ),
+            child: _buildGameArea(controller, state, l10n),
           ),
         );
       },
