@@ -182,7 +182,6 @@ class GameSelectionScreen extends StatelessWidget {
     required double titleSize,
     required double subtitleSize,
   }) {
-    final isSmall = iconSize < 32;
     return Material(
       color: game.color,
       borderRadius: BorderRadius.circular(16),
@@ -195,48 +194,61 @@ class GameSelectionScreen extends StatelessWidget {
           );
         },
         borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: EdgeInsets.all(isSmall ? 10 : 16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.all(iconSize * 0.4),
-                decoration: BoxDecoration(
-                  color: Colors.white24,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  game.icon,
-                  color: Colors.white,
-                  size: iconSize,
-                ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // 사용 가능한 공간에 맞춰 동적 크기 계산
+            final availableHeight = constraints.maxHeight;
+            final padding = availableHeight * 0.08;
+            final dynamicIconSize = (availableHeight * 0.35).clamp(20.0, iconSize);
+            final iconPadding = dynamicIconSize * 0.3;
+            final dynamicTitleSize = (availableHeight * 0.12).clamp(12.0, titleSize);
+            final dynamicSubtitleSize = (availableHeight * 0.09).clamp(9.0, subtitleSize);
+            final spacing = availableHeight * 0.05;
+
+            return Container(
+              padding: EdgeInsets.all(padding),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(iconPadding),
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      game.icon,
+                      color: Colors.white,
+                      size: dynamicIconSize,
+                    ),
+                  ),
+                  SizedBox(height: spacing),
+                  Text(
+                    game.title,
+                    style: TextStyle(
+                      fontSize: dynamicTitleSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: spacing * 0.3),
+                  Text(
+                    game.subtitle,
+                    style: TextStyle(
+                      fontSize: dynamicSubtitleSize,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-              SizedBox(height: iconSize * 0.3),
-              Text(
-                game.title,
-                style: TextStyle(
-                  fontSize: titleSize,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                game.subtitle,
-                style: TextStyle(
-                  fontSize: subtitleSize,
-                  color: Colors.white70,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
