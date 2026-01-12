@@ -6,8 +6,32 @@ import '../../services/hi_lo/hi_lo_controller.dart';
 import '../../services/hi_lo/hi_lo_stats_service.dart';
 import 'hi_lo_game_screen.dart';
 
-class HiLoHomeScreen extends StatelessWidget {
+class HiLoHomeScreen extends StatefulWidget {
   const HiLoHomeScreen({super.key});
+
+  @override
+  State<HiLoHomeScreen> createState() => _HiLoHomeScreenState();
+}
+
+class _HiLoHomeScreenState extends State<HiLoHomeScreen> {
+  bool _hasSavedGame = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedGame();
+  }
+
+  Future<void> _checkSavedGame() async {
+    final hasSaved = await HiLoController.hasSavedGame();
+    if (mounted) {
+      setState(() {
+        _hasSavedGame = hasSaved;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +58,7 @@ class HiLoHomeScreen extends StatelessWidget {
 
     return Consumer2<HiLoController, HiLoStatsService>(
       builder: (context, controller, statsService, child) {
-        final hasActiveGame = controller.hasActiveGame;
+        final hasActiveGame = controller.hasActiveGame || _hasSavedGame;
 
         return Scaffold(
           backgroundColor: Colors.purple[900],
@@ -94,12 +118,18 @@ class HiLoHomeScreen extends StatelessWidget {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
-                            onPressed: () {
+                            onPressed: _isLoading ? null : () async {
                               if (hasActiveGame) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const HiLoGameScreen()),
-                                );
+                                // 저장된 게임이 있고 메모리에 없으면 불러오기
+                                if (!controller.hasActiveGame && _hasSavedGame) {
+                                  await controller.loadGame();
+                                }
+                                if (mounted) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const HiLoGameScreen()),
+                                  );
+                                }
                               } else {
                                 controller.startNewGame();
                                 Navigator.push(

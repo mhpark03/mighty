@@ -207,6 +207,39 @@ class SevenCardPlayer {
       lastAction: lastAction ?? this.lastAction,
     );
   }
+
+  // JSON 직렬화
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'type': type.index,
+    'hand': hand.map((c) => c.toJson()).toList(),
+    'chips': chips,
+    'currentBet': currentBet,
+    'totalBetInGame': totalBetInGame,
+    'bettingActionsInRound': bettingActionsInRound,
+    'isFolded': isFolded,
+    'isAllIn': isAllIn,
+    'openCardIndex': openCardIndex,
+    'lastAction': lastAction.index,
+  };
+
+  factory SevenCardPlayer.fromJson(Map<String, dynamic> json) {
+    return SevenCardPlayer(
+      id: json['id'],
+      name: json['name'],
+      type: PlayerType.values[json['type']],
+      hand: (json['hand'] as List).map((c) => PlayingCard.fromJson(c)).toList(),
+      chips: json['chips'],
+      currentBet: json['currentBet'],
+      totalBetInGame: json['totalBetInGame'],
+      bettingActionsInRound: json['bettingActionsInRound'],
+      isFolded: json['isFolded'],
+      isAllIn: json['isAllIn'],
+      openCardIndex: json['openCardIndex'],
+      lastAction: BettingAction.values[json['lastAction']],
+    );
+  }
 }
 
 /// 세븐카드 게임 상태
@@ -839,4 +872,45 @@ class SevenCardState {
   int getQuarterAmount() => ((pot * 0.25).ceil() - currentPlayer.currentBet).clamp(0, 999999);
   int getHalfAmount() => ((pot * 0.5).ceil() - currentPlayer.currentBet).clamp(0, 999999);
   int getFullAmount() => (pot - currentPlayer.currentBet).clamp(0, 999999);
+
+  // JSON 직렬화
+  Map<String, dynamic> toJson() => {
+    'players': players.map((p) => p.toJson()).toList(),
+    'deckCards': deck.cards.map((c) => c.toJson()).toList(),
+    'phase': phase.index,
+    'dealerIndex': dealerIndex,
+    'currentPlayerIndex': currentPlayerIndex,
+    'pot': pot,
+    'currentBetAmount': currentBetAmount,
+    'minRaise': minRaise,
+    'lastRaiserIndex': lastRaiserIndex,
+    'bettingRoundStarterIndex': bettingRoundStarterIndex,
+    'winnerId': winnerId,
+  };
+
+  factory SevenCardState.fromJson(Map<String, dynamic> json) {
+    final players = (json['players'] as List)
+        .map((p) => SevenCardPlayer.fromJson(p))
+        .toList();
+
+    final deck = Deck();
+    deck.cards.clear();
+    deck.cards.addAll(
+      (json['deckCards'] as List).map((c) => PlayingCard.fromJson(c)),
+    );
+
+    return SevenCardState(
+      players: players,
+      deck: deck,
+      phase: SevenCardPhase.values[json['phase']],
+      dealerIndex: json['dealerIndex'],
+      currentPlayerIndex: json['currentPlayerIndex'],
+      pot: json['pot'],
+      currentBetAmount: json['currentBetAmount'],
+      minRaise: json['minRaise'],
+      lastRaiserIndex: json['lastRaiserIndex'],
+      bettingRoundStarterIndex: json['bettingRoundStarterIndex'],
+      winnerId: json['winnerId'],
+    );
+  }
 }

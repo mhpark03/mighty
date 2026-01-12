@@ -5,6 +5,7 @@ import '../../models/card.dart';
 import '../../models/player.dart';
 import '../../models/seven_card/seven_card_state.dart';
 import '../../models/seven_card/poker_hand.dart';
+import '../game_save_service.dart';
 
 class SevenCardController extends ChangeNotifier {
   late SevenCardState _state;
@@ -16,8 +17,54 @@ class SevenCardController extends ChangeNotifier {
   SevenCardPhase? _previousPhase;
   int _cardCountBeforeTransition = 0; // 전환 전 카드 수 (새 카드 숨기기용)
 
+  static const String _gameType = 'sevencard';
+
   SevenCardController() {
     _initializePlayers();
+  }
+
+  // 저장된 게임이 있는지 확인
+  static Future<bool> hasSavedGame() async {
+    return await GameSaveService.hasSavedGame(_gameType);
+  }
+
+  // 게임 저장
+  Future<void> saveGame() async {
+    if (_state.phase == SevenCardPhase.waiting || _state.phase == SevenCardPhase.gameEnd) {
+      return;
+    }
+    await GameSaveService.saveGame(_gameType, _state.toJson());
+  }
+
+  // 저장된 게임 불러오기
+  Future<bool> loadGame() async {
+    final savedData = await GameSaveService.loadGame(_gameType);
+    if (savedData == null) {
+      return false;
+    }
+    try {
+      _state = SevenCardState.fromJson(savedData);
+      _previousPhase = _state.phase;
+      notifyListeners();
+      _resumeAIIfNeeded();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // 저장된 게임 삭제
+  Future<void> clearSavedGame() async {
+    await GameSaveService.clearSave();
+  }
+
+  // AI 턴 재개 (불러오기 후)
+  void _resumeAIIfNeeded() {
+    if (_state.phase == SevenCardPhase.selectOpen && _state.currentPlayerIndex != 0) {
+      _processAISelectionIfNeeded();
+    } else if (_isBettingPhase() && _state.currentPlayerIndex != 0) {
+      _processAITurnIfNeeded();
+    }
   }
 
   SevenCardState get state => _state;
@@ -44,6 +91,7 @@ class SevenCardController extends ChangeNotifier {
   void startNewGame() {
     _state.startNewGame();
     notifyListeners();
+    saveGame();
     _processAISelectionIfNeeded();
   }
 
@@ -54,6 +102,7 @@ class SevenCardController extends ChangeNotifier {
 
     _state.selectOpenCard(cardIndex);
     notifyListeners();
+    saveGame();
     _processAISelectionIfNeeded();
   }
 
@@ -94,6 +143,7 @@ class SevenCardController extends ChangeNotifier {
   void reset() {
     _cancelTransitionTimer();
     _initializePlayers();
+    clearSavedGame();
     notifyListeners();
   }
 
@@ -254,6 +304,7 @@ class SevenCardController extends ChangeNotifier {
 
   /// 액션 후 처리 (페이즈 전환 체크)
   void _handlePostAction(SevenCardPhase prevPhase) {
+    saveGame();
     if (_state.phase != prevPhase) {
       _checkPhaseTransition();
       if (_isRoundTransitioning) return;

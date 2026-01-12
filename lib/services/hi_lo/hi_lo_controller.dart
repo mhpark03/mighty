@@ -6,6 +6,7 @@ import '../../models/player.dart';
 import '../../models/hi_lo/hi_lo_state.dart';
 import '../../models/hi_lo/hi_lo_hand.dart';
 import '../../models/seven_card/poker_hand.dart';
+import '../game_save_service.dart';
 
 class HiLoController extends ChangeNotifier {
   late HiLoState _state;
@@ -17,8 +18,63 @@ class HiLoController extends ChangeNotifier {
   HiLoPhase? _previousPhase;
   int _cardCountBeforeTransition = 0;
 
+  static const String _gameType = 'hilo';
+
   HiLoController() {
     _initializePlayers();
+  }
+
+  // 저장된 게임이 있는지 확인
+  static Future<bool> hasSavedGame() async {
+    return await GameSaveService.hasSavedGame(_gameType);
+  }
+
+  // 게임 저장
+  Future<void> saveGame() async {
+    if (_state.phase == HiLoPhase.waiting || _state.phase == HiLoPhase.gameEnd) {
+      return;
+    }
+    await GameSaveService.saveGame(_gameType, _state.toJson());
+  }
+
+  // 저장된 게임 불러오기
+  Future<bool> loadGame() async {
+    final savedData = await GameSaveService.loadGame(_gameType);
+    if (savedData == null) {
+      return false;
+    }
+    try {
+      _state = HiLoState.fromJson(savedData);
+      _previousPhase = _state.phase;
+      notifyListeners();
+      _resumeAIIfNeeded();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // 저장된 게임 삭제
+  Future<void> clearSavedGame() async {
+    await GameSaveService.clearSave();
+  }
+
+  // AI 턴 재개 (불러오기 후)
+  void _resumeAIIfNeeded() {
+    if (_state.phase == HiLoPhase.selectOpen && _state.currentPlayerIndex != 0) {
+      _processAISelectionIfNeeded();
+    } else if (_isBettingPhase() && _state.currentPlayerIndex != 0) {
+      _processAITurnIfNeeded();
+    } else if (_state.phase == HiLoPhase.selectHiLo && _state.currentPlayerIndex != 0) {
+      _processAIHiLoSelectionIfNeeded();
+    }
+  }
+
+  bool _isBettingPhase() {
+    return _state.phase == HiLoPhase.betting1 ||
+        _state.phase == HiLoPhase.betting2 ||
+        _state.phase == HiLoPhase.betting3 ||
+        _state.phase == HiLoPhase.betting4;
   }
 
   HiLoState get state => _state;
@@ -45,6 +101,7 @@ class HiLoController extends ChangeNotifier {
   void startNewGame() {
     _state.startNewGame();
     notifyListeners();
+    saveGame();
     _processAISelectionIfNeeded();
   }
 
@@ -55,6 +112,7 @@ class HiLoController extends ChangeNotifier {
 
     _state.selectOpenCard(cardIndex);
     notifyListeners();
+    saveGame();
     _processAISelectionIfNeeded();
   }
 
@@ -92,6 +150,7 @@ class HiLoController extends ChangeNotifier {
   void reset() {
     _cancelTransitionTimer();
     _initializePlayers();
+    clearSavedGame();
     notifyListeners();
   }
 
@@ -261,18 +320,12 @@ class HiLoController extends ChangeNotifier {
   }
 
   void _handlePostAction(HiLoPhase prevPhase) {
+    saveGame();
     if (_state.phase != prevPhase) {
       _checkPhaseTransition();
       if (_isRoundTransitioning) return;
     }
     _processAITurnIfNeeded();
-  }
-
-  bool _isBettingPhase() {
-    return _state.phase == HiLoPhase.betting1 ||
-        _state.phase == HiLoPhase.betting2 ||
-        _state.phase == HiLoPhase.betting3 ||
-        _state.phase == HiLoPhase.betting4;
   }
 
   void _processAITurnIfNeeded() async {

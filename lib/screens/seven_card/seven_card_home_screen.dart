@@ -6,8 +6,32 @@ import '../../services/seven_card/seven_card_controller.dart';
 import '../../services/seven_card/seven_card_stats_service.dart';
 import 'seven_card_game_screen.dart';
 
-class SevenCardHomeScreen extends StatelessWidget {
+class SevenCardHomeScreen extends StatefulWidget {
   const SevenCardHomeScreen({super.key});
+
+  @override
+  State<SevenCardHomeScreen> createState() => _SevenCardHomeScreenState();
+}
+
+class _SevenCardHomeScreenState extends State<SevenCardHomeScreen> {
+  bool _hasSavedGame = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedGame();
+  }
+
+  Future<void> _checkSavedGame() async {
+    final hasSaved = await SevenCardController.hasSavedGame();
+    if (mounted) {
+      setState(() {
+        _hasSavedGame = hasSaved;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +58,7 @@ class SevenCardHomeScreen extends StatelessWidget {
 
     return Consumer2<SevenCardController, SevenCardStatsService>(
       builder: (context, controller, statsService, child) {
-        final hasActiveGame = controller.hasActiveGame;
+        final hasActiveGame = controller.hasActiveGame || _hasSavedGame;
 
         return Scaffold(
           backgroundColor: Colors.blue[900],
@@ -94,12 +118,18 @@ class SevenCardHomeScreen extends StatelessWidget {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
-                            onPressed: () {
+                            onPressed: _isLoading ? null : () async {
                               if (hasActiveGame) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const SevenCardGameScreen()),
-                                );
+                                // 저장된 게임이 있고 메모리에 없으면 불러오기
+                                if (!controller.hasActiveGame && _hasSavedGame) {
+                                  await controller.loadGame();
+                                }
+                                if (mounted) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const SevenCardGameScreen()),
+                                  );
+                                }
                               } else {
                                 controller.startNewGame();
                                 Navigator.push(

@@ -189,6 +189,41 @@ class HiLoPlayer {
       hiLoChoice: hiLoChoice ?? this.hiLoChoice,
     );
   }
+
+  // JSON 직렬화
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'type': type.index,
+    'hand': hand.map((c) => c.toJson()).toList(),
+    'chips': chips,
+    'currentBet': currentBet,
+    'totalBetInGame': totalBetInGame,
+    'bettingActionsInRound': bettingActionsInRound,
+    'isFolded': isFolded,
+    'isAllIn': isAllIn,
+    'openCardIndex': openCardIndex,
+    'lastAction': lastAction.index,
+    'hiLoChoice': hiLoChoice.index,
+  };
+
+  factory HiLoPlayer.fromJson(Map<String, dynamic> json) {
+    return HiLoPlayer(
+      id: json['id'],
+      name: json['name'],
+      type: PlayerType.values[json['type']],
+      hand: (json['hand'] as List).map((c) => PlayingCard.fromJson(c)).toList(),
+      chips: json['chips'],
+      currentBet: json['currentBet'],
+      totalBetInGame: json['totalBetInGame'],
+      bettingActionsInRound: json['bettingActionsInRound'],
+      isFolded: json['isFolded'],
+      isAllIn: json['isAllIn'],
+      openCardIndex: json['openCardIndex'],
+      lastAction: HiLoBettingAction.values[json['lastAction']],
+      hiLoChoice: HiLoChoice.values[json['hiLoChoice']],
+    );
+  }
 }
 
 /// 보너스 핸드 정보
@@ -981,4 +1016,44 @@ class HiLoState {
   int getQuarterAmount() => ((pot * 0.25).ceil() - currentPlayer.currentBet).clamp(0, 999999);
   int getHalfAmount() => ((pot * 0.5).ceil() - currentPlayer.currentBet).clamp(0, 999999);
   int getFullAmount() => (pot - currentPlayer.currentBet).clamp(0, 999999);
+
+  // JSON 직렬화
+  Map<String, dynamic> toJson() => {
+    'players': players.map((p) => p.toJson()).toList(),
+    'deckCards': deck.cards.map((c) => c.toJson()).toList(),
+    'phase': phase.index,
+    'dealerIndex': dealerIndex,
+    'currentPlayerIndex': currentPlayerIndex,
+    'pot': pot,
+    'currentBetAmount': currentBetAmount,
+    'minRaise': minRaise,
+    'lastRaiserIndex': lastRaiserIndex,
+    'bettingRoundStarterIndex': bettingRoundStarterIndex,
+  };
+
+  factory HiLoState.fromJson(Map<String, dynamic> json) {
+    final players = (json['players'] as List)
+        .map((p) => HiLoPlayer.fromJson(p))
+        .toList();
+
+    final deck = Deck();
+    deck.cards.clear();
+    // 조커 제거된 덱 복원
+    deck.cards.addAll(
+      (json['deckCards'] as List).map((c) => PlayingCard.fromJson(c)),
+    );
+
+    return HiLoState(
+      players: players,
+      deck: deck,
+      phase: HiLoPhase.values[json['phase']],
+      dealerIndex: json['dealerIndex'],
+      currentPlayerIndex: json['currentPlayerIndex'],
+      pot: json['pot'],
+      currentBetAmount: json['currentBetAmount'],
+      minRaise: json['minRaise'],
+      lastRaiserIndex: json['lastRaiserIndex'],
+      bettingRoundStarterIndex: json['bettingRoundStarterIndex'],
+    );
+  }
 }
