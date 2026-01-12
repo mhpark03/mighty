@@ -1544,6 +1544,18 @@ class _GameScreenState extends State<GameScreen> {
     final state = controller.state;
     final trick = state.currentTrick;
 
+    // 반응형 크기 계산
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // 중앙 영역 크기: 화면의 비율에 따라 계산
+    final centerWidth = (screenWidth * 0.75).clamp(260.0, 500.0);
+    final centerHeight = (screenHeight * 0.22).clamp(100.0, 200.0);
+
+    // 트릭 카드 크기: 중앙 영역에 맞춰 계산
+    final trickCardWidth = (centerWidth / 6).clamp(30.0, 55.0);
+    final trickCardHeight = trickCardWidth * 1.4;
+
     return Stack(
       children: [
         Positioned(
@@ -1554,19 +1566,17 @@ class _GameScreenState extends State<GameScreen> {
         ),
         Center(
           child: Container(
-            constraints: const BoxConstraints(
-              minWidth: 280,
-              maxWidth: 340,
-              minHeight: 120,
-              maxHeight: 180,
-            ),
-            padding: const EdgeInsets.all(8),
+            width: centerWidth,
+            height: centerHeight,
+            padding: EdgeInsets.all(centerWidth * 0.02),
             decoration: BoxDecoration(
               color: Colors.green[700],
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.green[600]!, width: 2),
             ),
-            child: _buildTrickCards(trick, state, controller),
+            child: ClipRect(
+              child: _buildTrickCards(trick, state, controller, trickCardWidth, trickCardHeight),
+            ),
           ),
         ),
         Positioned(
@@ -1635,69 +1645,107 @@ class _GameScreenState extends State<GameScreen> {
     final isLeadPlayer = state.currentTrick != null &&
         state.currentTrick!.leadPlayerId == index;
 
-    return Stack(
-      clipBehavior: Clip.none,
+    // 플레이어가 획득한 점수 카드 (조커 제외)
+    final pointCards = player.wonCards
+        .where((c) => c.isPointCard && !c.isJoker)
+        .toList();
+    pointCards.sort((a, b) {
+      if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
+      return b.rankValue.compareTo(a.rankValue);
+    });
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          decoration: BoxDecoration(
-            color: isCurrentPlayer ? Colors.amber.withValues(alpha: 0.3) : Colors.black26,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isDeclarer
-                  ? Colors.red
-                  : (isFriend ? Colors.blue : Colors.transparent),
-              width: 2,
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                _getLocalizedPlayerName(player, l10n),
-                style: TextStyle(
-                  color: isCurrentPlayer ? Colors.amber : Colors.white,
-                  fontWeight: isCurrentPlayer ? FontWeight.bold : FontWeight.normal,
-                  fontSize: 12,
-                ),
-              ),
-              Text(
-                l10n.cards(player.hand.length),
-                style: const TextStyle(color: Colors.white70, fontSize: 10),
-              ),
-              if (isDeclarer)
-                Text(
-                  l10n.declarer,
-                  style: const TextStyle(color: Colors.red, fontSize: 9),
-                ),
-              if (isFriend)
-                Text(
-                  l10n.friend,
-                  style: const TextStyle(color: Colors.blue, fontSize: 9),
-                ),
-            ],
-          ),
-        ),
-        // 선공 표시
-        if (isLeadPlayer)
-          Positioned(
-            top: -6,
-            right: -6,
-            child: Container(
-              padding: const EdgeInsets.all(3),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.orange,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1),
-              ),
-              child: const Text(
-                '1',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 9,
-                  fontWeight: FontWeight.bold,
+                color: isCurrentPlayer ? Colors.amber.withValues(alpha: 0.3) : Colors.black26,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isDeclarer
+                      ? Colors.red
+                      : (isFriend ? Colors.blue : Colors.transparent),
+                  width: 2,
                 ),
               ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _getLocalizedPlayerName(player, l10n),
+                    style: TextStyle(
+                      color: isCurrentPlayer ? Colors.amber : Colors.white,
+                      fontWeight: isCurrentPlayer ? FontWeight.bold : FontWeight.normal,
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    l10n.cards(player.hand.length),
+                    style: const TextStyle(color: Colors.white70, fontSize: 10),
+                  ),
+                  if (isDeclarer)
+                    Text(
+                      l10n.declarer,
+                      style: const TextStyle(color: Colors.red, fontSize: 9),
+                    ),
+                  if (isFriend)
+                    Text(
+                      l10n.friend,
+                      style: const TextStyle(color: Colors.blue, fontSize: 9),
+                    ),
+                ],
+              ),
+            ),
+            // 선공 표시
+            if (isLeadPlayer)
+              Positioned(
+                top: -6,
+                right: -6,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                  child: const Text(
+                    '1',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        // 획득한 점수 카드 표시 (최대 3열)
+        if (pointCards.isNotEmpty)
+          Container(
+            width: maxWidth - 8,
+            margin: const EdgeInsets.only(top: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Builder(
+              builder: (context) {
+                // 3열로 제한하기 위한 카드 너비 계산
+                final containerWidth = maxWidth - 8 - 4; // 패딩 제외
+                final cardWidth = (containerWidth - 4) / 3; // 3열, spacing 2*2
+                return Wrap(
+                  spacing: 2,
+                  runSpacing: 2,
+                  alignment: WrapAlignment.center,
+                  children: pointCards.map((card) => _buildTinyCardFixed(card, state, cardWidth)).toList(),
+                );
+              },
             ),
           ),
       ],
@@ -1820,105 +1868,112 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _buildTrickCards(Trick? trick, GameState state, GameController controller) {
+  Widget _buildTrickCards(Trick? trick, GameState state, GameController controller, double cardWidth, double cardHeight) {
     final l10n = AppLocalizations.of(context)!;
     final isHumanLeading = state.currentPlayer == 0 && (trick == null || trick.cards.isEmpty);
     final lastTrick = controller.lastCompletedTrick;
     final showPreviousTrick = isHumanLeading && lastTrick != null;
+
+    // 이전 트릭용 작은 카드 크기
+    final prevCardWidth = cardWidth * 0.85;
+    final prevCardHeight = cardHeight * 0.85;
 
     if (trick == null || trick.cards.isEmpty) {
       // 이전 트릭이 있고 사용자가 선공이면 이전 트릭 표시
       if (showPreviousTrick) {
         final winner = state.players[lastTrick.winnerId ?? 0];
         return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 이전 트릭 헤더
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-                margin: const EdgeInsets.only(bottom: 4),
-                decoration: BoxDecoration(
-                  color: Colors.black38,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${l10n.previousTrick} ',
-                      style: const TextStyle(color: Colors.white70, fontSize: 11),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.amber,
-                        borderRadius: BorderRadius.circular(4),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 이전 트릭 헤더
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  margin: const EdgeInsets.only(bottom: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black38,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${l10n.previousTrick} ',
+                        style: const TextStyle(color: Colors.white70, fontSize: 10),
                       ),
-                      child: Text(
-                        '${_getLocalizedPlayerName(winner, l10n)} ${l10n.winShort}',
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.amber,
+                          borderRadius: BorderRadius.circular(4),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // 이전 트릭 카드들
-              Wrap(
-                spacing: 4,
-                children: [
-                  for (int i = 0; i < lastTrick.cards.length; i++)
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _getLocalizedPlayerName(state.players[lastTrick.playerOrder[i]], l10n),
-                          style: TextStyle(
-                            color: lastTrick.playerOrder[i] == lastTrick.winnerId
-                                ? Colors.amber
-                                : Colors.white70,
+                        child: Text(
+                          '${_getLocalizedPlayerName(winner, l10n)} ${l10n.winShort}',
+                          style: const TextStyle(
+                            color: Colors.black,
                             fontSize: 9,
-                            fontWeight: lastTrick.playerOrder[i] == lastTrick.winnerId
-                                ? FontWeight.bold
-                                : FontWeight.normal,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Container(
-                          decoration: lastTrick.playerOrder[i] == lastTrick.winnerId
-                              ? BoxDecoration(
-                                  border: Border.all(color: Colors.amber, width: 1),
-                                  borderRadius: BorderRadius.circular(3),
-                                )
-                              : null,
-                          child: Opacity(
-                            opacity: 0.7,
-                            child: CardWidget(
-                              card: lastTrick.cards[i],
-                              width: 34,
-                              height: 47,
-                              compact: true,
+                      ),
+                    ],
+                  ),
+                ),
+                // 이전 트릭 카드들
+                Wrap(
+                  spacing: 2,
+                  children: [
+                    for (int i = 0; i < lastTrick.cards.length; i++)
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _getLocalizedPlayerName(state.players[lastTrick.playerOrder[i]], l10n),
+                            style: TextStyle(
+                              color: lastTrick.playerOrder[i] == lastTrick.winnerId
+                                  ? Colors.amber
+                                  : Colors.white70,
+                              fontSize: 8,
+                              fontWeight: lastTrick.playerOrder[i] == lastTrick.winnerId
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              // 선공 안내
-              Text(
-                l10n.leadPlayerSelectCard,
-                style: const TextStyle(
-                  color: Colors.amber,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
+                          Container(
+                            decoration: lastTrick.playerOrder[i] == lastTrick.winnerId
+                                ? BoxDecoration(
+                                    border: Border.all(color: Colors.amber, width: 1),
+                                    borderRadius: BorderRadius.circular(3),
+                                  )
+                                : null,
+                            child: Opacity(
+                              opacity: 0.7,
+                              child: CardWidget(
+                                card: lastTrick.cards[i],
+                                width: prevCardWidth,
+                                height: prevCardHeight,
+                                compact: true,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                // 선공 안내
+                Text(
+                  l10n.leadPlayerSelectCard,
+                  style: const TextStyle(
+                    color: Colors.amber,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }
@@ -1969,65 +2024,70 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 조커 콜 표시
-          if (trick.jokerCall == JokerCallType.jokerCall && trick.jokerCallSuit != null)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                l10n.jokerCallAnnouncement(_getSuitSymbol(trick.jokerCallSuit!)),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 조커 콜 표시
+            if (trick.jokerCall == JokerCallType.jokerCall && trick.jokerCallSuit != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                margin: const EdgeInsets.only(bottom: 4),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  l10n.jokerCallAnnouncement(_getSuitSymbol(trick.jokerCallSuit!)),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
               ),
+            // 조커 선공 무늬 표시
+            if (trick.jokerLeadSuit != null && trick.cards.isNotEmpty && trick.cards.first.isJoker)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                margin: const EdgeInsets.only(bottom: 4),
+                decoration: BoxDecoration(
+                  color: Colors.purple,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '조커 선공: ${_getSuitSymbol(trick.jokerLeadSuit!)}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            Wrap(
+              spacing: 2,
+              children: [
+                for (int i = 0; i < trick.cards.length; i++)
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getLocalizedPlayerName(state.players[trick.playerOrder[i]], l10n),
+                        style: const TextStyle(color: Colors.white70, fontSize: 9),
+                      ),
+                      CardWidget(
+                        card: trick.cards[i],
+                        width: cardWidth,
+                        height: cardHeight,
+                        compact: true,
+                      ),
+                    ],
+                  ),
+              ],
             ),
-          // 조커 선공 무늬 표시
-          if (trick.jokerLeadSuit != null && trick.cards.isNotEmpty && trick.cards.first.isJoker)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: Colors.purple,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '조커 선공: ${_getSuitSymbol(trick.jokerLeadSuit!)}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          Wrap(
-            spacing: 4,
-            children: [
-              for (int i = 0; i < trick.cards.length; i++)
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _getLocalizedPlayerName(state.players[trick.playerOrder[i]], l10n),
-                      style: const TextStyle(color: Colors.white70, fontSize: 9),
-                    ),
-                    CardWidget(
-                      card: trick.cards[i],
-                      width: 42,
-                      height: 60,
-                      compact: true,
-                    ),
-                  ],
-                ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -2052,8 +2112,10 @@ class _GameScreenState extends State<GameScreen> {
       return b.rankValue.compareTo(a.rankValue);
     });
 
-    // 사용자 차례인지 확인
-    final isHumanTurn = controller.isHumanTurn;
+    // 화면 크기에 따른 획득 카드 크기
+    final screenWidth = MediaQuery.of(context).size.width;
+    final pointCardWidth = (screenWidth / 14).clamp(24.0, 36.0);
+    final pointCardHeight = pointCardWidth * 1.4;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -2061,64 +2123,52 @@ class _GameScreenState extends State<GameScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 상단: 선공 표시 & 획득한 점수 카드 & 추천 버튼
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // 선공 표시
-              if (isLeadPlayer && controller.state.phase == GamePhase.playing)
-                Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.star, color: Colors.white, size: 14),
-                      const SizedBox(width: 4),
-                      Text(
-                        l10n.leadPlayer,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              // 획득한 점수 카드 (스크롤 가능) - 플레이 중 또는 게임 종료 시 표시
-              if (pointCards.isNotEmpty && (controller.state.phase == GamePhase.playing || controller.state.phase == GamePhase.gameEnd))
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: pointCards.map((card) => Padding(
-                          padding: const EdgeInsets.only(right: 4),
-                          child: CardWidget(
-                            card: card,
-                            width: 36,
-                            height: 50,
-                            compact: true,
-                          ),
-                        )).toList(),
-                      ),
+          // 선공 표시
+          if (isLeadPlayer && controller.state.phase == GamePhase.playing)
+            Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.star, color: Colors.white, size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    l10n.leadPlayer,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 4),
+                ],
+              ),
+            ),
+          // 획득한 점수 카드 (1~2줄) - 플레이 중 또는 게임 종료 시 표시
+          if (pointCards.isNotEmpty && (controller.state.phase == GamePhase.playing || controller.state.phase == GamePhase.gameEnd))
+            Container(
+              margin: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Wrap(
+                spacing: 3,
+                runSpacing: 3,
+                alignment: WrapAlignment.center,
+                children: pointCards.map((card) => CardWidget(
+                  card: card,
+                  width: pointCardWidth,
+                  height: pointCardHeight,
+                  compact: true,
+                )).toList(),
+              ),
+            ),
           // 카드 목록 - 세로 모드: 2줄, 가로 모드: 1줄 스크롤
           _buildGamePlayerCards(
             hand,
