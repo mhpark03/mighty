@@ -10,8 +10,32 @@ import '../services/stats_service.dart';
 import '../services/ad_service.dart';
 import 'game_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _hasSavedGame = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedGame();
+  }
+
+  Future<void> _checkSavedGame() async {
+    final hasSaved = await GameController.hasSavedGame();
+    if (mounted) {
+      setState(() {
+        _hasSavedGame = hasSaved;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,17 +122,37 @@ class HomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: sectionGap),
 
-                  // 게임 시작하기 버튼
+                  // 게임 시작하기/이어하기 버튼
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: _isLoading ? null : () async {
                         if (hasActiveGame) {
+                          // 진행 중인 게임이 있으면 이어하기
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const GameScreen()),
                           );
+                        } else if (_hasSavedGame) {
+                          // 저장된 게임이 있으면 불러오기
+                          final loaded = await controller.loadGame();
+                          if (loaded && context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const GameScreen()),
+                            );
+                          } else {
+                            // 불러오기 실패 시 새 게임 시작
+                            controller.startNewGame();
+                            if (context.mounted) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const GameScreen()),
+                              );
+                            }
+                          }
                         } else {
+                          // 새 게임 시작
                           controller.startNewGame();
                           Navigator.push(
                             context,
@@ -122,7 +166,7 @@ class HomeScreen extends StatelessWidget {
                         size: buttonIconSize,
                       ),
                       label: Text(
-                        hasActiveGame ? l10n.continueGame : l10n.startGame,
+                        (hasActiveGame || _hasSavedGame) ? l10n.continueGame : l10n.startGame,
                         style: TextStyle(
                           fontSize: buttonFontSize,
                           fontWeight: FontWeight.bold,

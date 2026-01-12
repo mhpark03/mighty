@@ -148,6 +148,23 @@ class PlayingCard {
 
   @override
   int get hashCode => Object.hash(suit, rank, isJoker);
+
+  // JSON 직렬화
+  Map<String, dynamic> toJson() => {
+    'suit': suit?.index,
+    'rank': rank?.index,
+    'isJoker': isJoker,
+  };
+
+  factory PlayingCard.fromJson(Map<String, dynamic> json) {
+    if (json['isJoker'] == true) {
+      return PlayingCard.joker();
+    }
+    return PlayingCard(
+      suit: json['suit'] != null ? Suit.values[json['suit']] : null,
+      rank: json['rank'] != null ? Rank.values[json['rank']] : null,
+    );
+  }
 }
 
 class Deck {

@@ -4,6 +4,7 @@ import '../models/card.dart';
 import '../models/player.dart';
 import '../models/game_state.dart';
 import 'ai_player.dart';
+import 'game_save_service.dart';
 
 class GameController extends ChangeNotifier {
   late GameState _state;
@@ -11,9 +12,59 @@ class GameController extends ChangeNotifier {
   bool _isProcessing = false;
   bool _waitingForTrickConfirm = false;
   Trick? _lastCompletedTrick;
+  static const String _gameType = 'mighty';
 
   GameController() {
     _initializePlayers();
+  }
+
+  // 저장된 게임이 있는지 확인
+  static Future<bool> hasSavedGame() async {
+    return await GameSaveService.hasSavedGame(_gameType);
+  }
+
+  // 게임 저장
+  Future<void> saveGame() async {
+    // 진행 중인 게임만 저장
+    if (_state.phase == GamePhase.waiting || _state.phase == GamePhase.gameEnd) {
+      return;
+    }
+    await GameSaveService.saveGame(_gameType, _state.toJson());
+  }
+
+  // 저장된 게임 불러오기
+  Future<bool> loadGame() async {
+    final savedData = await GameSaveService.loadGame(_gameType);
+    if (savedData == null) {
+      return false;
+    }
+    try {
+      _state = GameState.fromJson(savedData);
+      notifyListeners();
+      // AI 턴이면 자동 진행
+      _resumeAIIfNeeded();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // 저장된 게임 삭제
+  Future<void> clearSavedGame() async {
+    await GameSaveService.clearSave();
+  }
+
+  // 게임 재개 시 AI 턴이면 자동 진행
+  void _resumeAIIfNeeded() {
+    if (_state.phase == GamePhase.bidding && _state.currentBidder != 0) {
+      _processBiddingIfNeeded();
+    } else if (_state.phase == GamePhase.selectingKitty && _state.declarerId != 0) {
+      _processAIKittySelection();
+    } else if (_state.phase == GamePhase.declaringFriend && _state.declarerId != 0) {
+      _processAIFriendDeclaration();
+    } else if (_state.phase == GamePhase.playing && _state.currentPlayer != 0) {
+      _processAIPlayIfNeeded();
+    }
   }
 
   GameState get state => _state;
@@ -41,6 +92,7 @@ class GameController extends ChangeNotifier {
   void startNewGame() {
     _state.startNewGame();
     notifyListeners();
+    saveGame(); // 자동 저장
     _processBiddingIfNeeded();
   }
 
@@ -59,6 +111,7 @@ class GameController extends ChangeNotifier {
 
     _isProcessing = false;
     notifyListeners();
+    saveGame(); // 자동 저장
 
     if (_state.phase == GamePhase.bidding) {
       _processBiddingIfNeeded();
@@ -73,6 +126,7 @@ class GameController extends ChangeNotifier {
 
     _state.placeBid(bid);
     notifyListeners();
+    saveGame(); // 자동 저장
 
     if (_state.phase == GamePhase.bidding) {
       _processBiddingIfNeeded();
@@ -155,6 +209,7 @@ class GameController extends ChangeNotifier {
 
     _isProcessing = false;
     notifyListeners();
+    saveGame(); // 자동 저장
 
     _processAIFriendDeclaration();
   }
@@ -165,6 +220,7 @@ class GameController extends ChangeNotifier {
 
     _state.selectKitty(discardCards, newGiruda);
     notifyListeners();
+    saveGame(); // 자동 저장
   }
 
   void _processAIFriendDeclaration() async {
@@ -181,6 +237,7 @@ class GameController extends ChangeNotifier {
 
     _isProcessing = false;
     notifyListeners();
+    saveGame(); // 자동 저장
 
     _processAIPlayIfNeeded();
   }
@@ -190,6 +247,7 @@ class GameController extends ChangeNotifier {
 
     _state.declareFriend(declaration);
     notifyListeners();
+    saveGame(); // 자동 저장
 
     _processAIPlayIfNeeded();
   }
@@ -256,10 +314,17 @@ class GameController extends ChangeNotifier {
         _waitingForTrickConfirm = true;
       }
       notifyListeners();
+      saveGame(); // 자동 저장
       return; // 사용자 확인 대기 또는 카드 선택 대기
     }
 
+    // 게임 종료 시 저장 삭제
+    if (_state.phase == GamePhase.gameEnd) {
+      clearSavedGame();
+    }
+
     notifyListeners();
+    saveGame(); // 자동 저장
 
     if (_state.phase == GamePhase.playing) {
       _processAIPlayIfNeeded();
@@ -295,10 +360,17 @@ class GameController extends ChangeNotifier {
         _waitingForTrickConfirm = true;
       }
       notifyListeners();
+      saveGame(); // 자동 저장
       return; // 사용자 확인 대기 또는 카드 선택 대기
     }
 
+    // 게임 종료 시 저장 삭제
+    if (_state.phase == GamePhase.gameEnd) {
+      clearSavedGame();
+    }
+
     notifyListeners();
+    saveGame(); // 자동 저장
 
     if (_state.phase == GamePhase.playing) {
       _processAIPlayIfNeeded();

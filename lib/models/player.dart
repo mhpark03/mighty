@@ -109,4 +109,29 @@ class Player {
 
   @override
   String toString() => name;
+
+  // JSON 직렬화
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'type': type.index,
+    'hand': hand.map((c) => c.toJson()).toList(),
+    'wonCards': wonCards.map((c) => c.toJson()).toList(),
+    'team': team.index,
+    'isDeclarer': isDeclarer,
+    'isFriend': isFriend,
+  };
+
+  factory Player.fromJson(Map<String, dynamic> json) {
+    return Player(
+      id: json['id'],
+      name: json['name'],
+      type: PlayerType.values[json['type']],
+      hand: (json['hand'] as List).map((c) => PlayingCard.fromJson(c)).toList(),
+      wonCards: (json['wonCards'] as List).map((c) => PlayingCard.fromJson(c)).toList(),
+      team: Team.values[json['team']],
+      isDeclarer: json['isDeclarer'],
+      isFriend: json['isFriend'],
+    );
+  }
 }

@@ -48,6 +48,20 @@ class Bid {
     return false;
   }
 
+  Map<String, dynamic> toJson() => {
+    'playerId': playerId,
+    'suit': suit?.index,
+    'tricks': tricks,
+    'passed': passed,
+  };
+
+  factory Bid.fromJson(Map<String, dynamic> json) => Bid(
+    playerId: json['playerId'],
+    suit: json['suit'] != null ? Suit.values[json['suit']] : null,
+    tricks: json['tricks'],
+    passed: json['passed'],
+  );
+
   @override
   String toString() {
     if (passed) return 'Pass';
@@ -102,6 +116,20 @@ class FriendDeclaration {
     if (trickNumber != null) return '$trickNumber번째 트릭 획득자';
     return '';
   }
+
+  Map<String, dynamic> toJson() => {
+    'card': card?.toJson(),
+    'trickNumber': trickNumber,
+    'isFirstTrickWinner': isFirstTrickWinner,
+    'isNoFriend': isNoFriend,
+  };
+
+  factory FriendDeclaration.fromJson(Map<String, dynamic> json) => FriendDeclaration(
+    card: json['card'] != null ? PlayingCard.fromJson(json['card']) : null,
+    trickNumber: json['trickNumber'],
+    isFirstTrickWinner: json['isFirstTrickWinner'],
+    isNoFriend: json['isNoFriend'],
+  );
 }
 
 class Trick {
@@ -145,6 +173,30 @@ class Trick {
   bool get isComplete => cards.length == 5;
 
   PlayingCard? get leadCard => cards.isNotEmpty ? cards.first : null;
+
+  Map<String, dynamic> toJson() => {
+    'trickNumber': trickNumber,
+    'cards': cards.map((c) => c.toJson()).toList(),
+    'playerOrder': playerOrder,
+    'leadPlayerId': leadPlayerId,
+    'leadSuit': leadSuit?.index,
+    'winnerId': winnerId,
+    'jokerCall': jokerCall.index,
+    'jokerCallSuit': jokerCallSuit?.index,
+    'jokerLeadSuit': jokerLeadSuit?.index,
+  };
+
+  factory Trick.fromJson(Map<String, dynamic> json) => Trick(
+    trickNumber: json['trickNumber'],
+    leadPlayerId: json['leadPlayerId'],
+    cards: (json['cards'] as List).map((c) => PlayingCard.fromJson(c)).toList(),
+    playerOrder: List<int>.from(json['playerOrder']),
+    leadSuit: json['leadSuit'] != null ? Suit.values[json['leadSuit']] : null,
+    winnerId: json['winnerId'],
+    jokerCall: JokerCallType.values[json['jokerCall']],
+    jokerCallSuit: json['jokerCallSuit'] != null ? Suit.values[json['jokerCallSuit']] : null,
+    jokerLeadSuit: json['jokerLeadSuit'] != null ? Suit.values[json['jokerLeadSuit']] : null,
+  );
 }
 
 class GameState {
@@ -314,6 +366,51 @@ class GameState {
       return const PlayingCard(suit: Suit.spade, rank: Rank.three);
     }
     return const PlayingCard(suit: Suit.club, rank: Rank.three);
+  }
+
+  // JSON 직렬화
+  Map<String, dynamic> toJson() => {
+    'players': players.map((p) => p.toJson()).toList(),
+    'phase': phase.index,
+    'kitty': kitty.map((c) => c.toJson()).toList(),
+    'currentBid': currentBid?.toJson(),
+    'currentBidder': currentBidder,
+    'passedPlayers': passedPlayers,
+    'declarerId': declarerId,
+    'friendId': friendId,
+    'giruda': giruda?.index,
+    'friendDeclaration': friendDeclaration?.toJson(),
+    'friendRevealed': friendRevealed,
+    'tricks': tricks.map((t) => t.toJson()).toList(),
+    'currentTrick': currentTrick?.toJson(),
+    'currentPlayer': currentPlayer,
+    'startingPlayer': startingPlayer,
+    'mightyJokerUsed': mightyJokerUsed,
+    'declarerTeamPoints': declarerTeamPoints,
+    'defenderTeamPoints': defenderTeamPoints,
+  };
+
+  factory GameState.fromJson(Map<String, dynamic> json) {
+    return GameState(
+      players: (json['players'] as List).map((p) => Player.fromJson(p)).toList(),
+      phase: GamePhase.values[json['phase']],
+      kitty: (json['kitty'] as List).map((c) => PlayingCard.fromJson(c)).toList(),
+      currentBid: json['currentBid'] != null ? Bid.fromJson(json['currentBid']) : null,
+      currentBidder: json['currentBidder'],
+      passedPlayers: List<bool>.from(json['passedPlayers']),
+      declarerId: json['declarerId'],
+      friendId: json['friendId'],
+      giruda: json['giruda'] != null ? Suit.values[json['giruda']] : null,
+      friendDeclaration: json['friendDeclaration'] != null ? FriendDeclaration.fromJson(json['friendDeclaration']) : null,
+      friendRevealed: json['friendRevealed'],
+      tricks: (json['tricks'] as List).map((t) => Trick.fromJson(t)).toList(),
+      currentTrick: json['currentTrick'] != null ? Trick.fromJson(json['currentTrick']) : null,
+      currentPlayer: json['currentPlayer'],
+      startingPlayer: json['startingPlayer'],
+      mightyJokerUsed: json['mightyJokerUsed'],
+      declarerTeamPoints: json['declarerTeamPoints'],
+      defenderTeamPoints: json['defenderTeamPoints'],
+    );
   }
 
   void reset() {
