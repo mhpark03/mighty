@@ -204,54 +204,64 @@ class GameSelectionScreen extends StatelessWidget {
           builder: (context, constraints) {
             // 사용 가능한 공간에 맞춰 동적 크기 계산
             final availableHeight = constraints.maxHeight;
-            final padding = availableHeight * 0.08;
-            final dynamicIconSize = (availableHeight * 0.35).clamp(20.0, iconSize);
-            final iconPadding = dynamicIconSize * 0.3;
-            final dynamicTitleSize = (availableHeight * 0.12).clamp(12.0, titleSize);
-            final dynamicSubtitleSize = (availableHeight * 0.09).clamp(9.0, subtitleSize);
-            final spacing = availableHeight * 0.05;
+            final availableWidth = constraints.maxWidth;
+            final padding = availableHeight * 0.06;
+            final dynamicIconSize = (availableHeight * 0.28).clamp(18.0, iconSize);
+            final iconPadding = dynamicIconSize * 0.25;
+            final dynamicTitleSize = (availableHeight * 0.11).clamp(11.0, titleSize);
+            final dynamicSubtitleSize = (availableHeight * 0.08).clamp(8.0, subtitleSize);
+            final spacing = availableHeight * 0.04;
 
             return Container(
               padding: EdgeInsets.all(padding),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(iconPadding),
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      game.icon,
-                      color: Colors.white,
-                      size: dynamicIconSize,
-                    ),
+              width: availableWidth,
+              height: availableHeight,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: SizedBox(
+                  width: availableWidth - padding * 2,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(iconPadding),
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          game.icon,
+                          color: Colors.white,
+                          size: dynamicIconSize,
+                        ),
+                      ),
+                      SizedBox(height: spacing),
+                      Text(
+                        game.title,
+                        style: TextStyle(
+                          fontSize: dynamicTitleSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: spacing * 0.3),
+                      Text(
+                        game.subtitle,
+                        style: TextStyle(
+                          fontSize: dynamicSubtitleSize,
+                          color: Colors.white70,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  SizedBox(height: spacing),
-                  Text(
-                    game.title,
-                    style: TextStyle(
-                      fontSize: dynamicTitleSize,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: spacing * 0.3),
-                  Text(
-                    game.subtitle,
-                    style: TextStyle(
-                      fontSize: dynamicSubtitleSize,
-                      color: Colors.white70,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                ),
               ),
             );
           },
