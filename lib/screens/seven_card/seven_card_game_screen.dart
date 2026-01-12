@@ -34,27 +34,28 @@ class _ResponsiveSizes {
   late final double potFontSize;
 
   _ResponsiveSizes(this.screenHeight, this.screenWidth) {
-    final isSmall = screenHeight < 700;
-    final isMedium = screenHeight >= 700 && screenHeight < 800;
+    // 화면 크기에 비례해서 동적으로 계산
+    final baseUnit = screenHeight / 100;
+    final widthUnit = screenWidth / 100;
 
-    // AI 카드
-    aiCardWidth = isSmall ? 26 : (isMedium ? 30 : 32);
-    aiCardHeight = isSmall ? 36 : (isMedium ? 40 : 44);
-    aiFontSize = isSmall ? 9 : (isMedium ? 10 : 11);
+    // AI 카드 - 화면 높이의 비율로 계산
+    aiCardWidth = (widthUnit * 4.5).clamp(26.0, 50.0);
+    aiCardHeight = (baseUnit * 7).clamp(36.0, 70.0);
+    aiFontSize = (baseUnit * 1.8).clamp(9.0, 14.0);
 
-    // 플레이어 카드 (7장 + 족보 표시가 한 줄에 들어오도록 조정)
-    playerCardWidth = isSmall ? 32 : (isMedium ? 36 : 40);
-    playerCardHeight = isSmall ? 46 : (isMedium ? 50 : 56);
-    playerFontSize = isSmall ? 11 : (isMedium ? 13 : 14);
+    // 플레이어 카드 - 화면 너비 기준으로 7장이 들어가도록
+    playerCardWidth = (widthUnit * 5.5).clamp(32.0, 60.0);
+    playerCardHeight = (baseUnit * 9).clamp(46.0, 85.0);
+    playerFontSize = (baseUnit * 2.2).clamp(11.0, 18.0);
 
     // 폰트
-    nameFontSize = isSmall ? 10 : (isMedium ? 11 : 12);
-    infoFontSize = isSmall ? 8 : (isMedium ? 9 : 10);
-    badgeFontSize = isSmall ? 8 : (isMedium ? 9 : 10);
+    nameFontSize = (baseUnit * 2).clamp(10.0, 16.0);
+    infoFontSize = (baseUnit * 1.5).clamp(8.0, 13.0);
+    badgeFontSize = (baseUnit * 1.5).clamp(8.0, 13.0);
 
     // 팟
-    potIconSize = isSmall ? 32 : (isMedium ? 38 : 44);
-    potFontSize = isSmall ? 16 : (isMedium ? 20 : 24);
+    potIconSize = (baseUnit * 7).clamp(32.0, 60.0);
+    potFontSize = (baseUnit * 4).clamp(16.0, 32.0);
   }
 }
 
