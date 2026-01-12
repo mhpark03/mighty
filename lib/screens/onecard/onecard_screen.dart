@@ -105,6 +105,36 @@ class PlayingCard {
   int get hashCode => Object.hash(suit, rank);
 }
 
+// 반응형 사이즈 헬퍼
+class _OneCardResponsiveSizes {
+  final double screenHeight;
+  final double screenWidth;
+
+  late final double centerCardWidth;
+  late final double centerCardHeight;
+  late final double playerCardWidth;
+  late final double playerCardHeight;
+  late final double aiCardWidth;
+  late final double aiCardHeight;
+
+  _OneCardResponsiveSizes(this.screenHeight, this.screenWidth) {
+    final baseUnit = screenHeight / 100;
+    final widthUnit = screenWidth / 100;
+
+    // 중앙 덱/버린카드
+    centerCardWidth = (widthUnit * 14).clamp(45.0, 85.0);
+    centerCardHeight = (baseUnit * 13).clamp(65.0, 120.0);
+
+    // 플레이어 카드
+    playerCardWidth = (widthUnit * 10).clamp(38.0, 60.0);
+    playerCardHeight = (baseUnit * 9).clamp(52.0, 85.0);
+
+    // AI 카드 (뒷면)
+    aiCardWidth = (widthUnit * 6).clamp(22.0, 38.0);
+    aiCardHeight = (baseUnit * 5.5).clamp(30.0, 50.0);
+  }
+}
+
 class OneCardScreen extends StatefulWidget {
   final int playerCount;
   final bool resumeGame;
@@ -1032,6 +1062,11 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height - mediaQuery.padding.top - mediaQuery.padding.bottom;
+    final screenWidth = mediaQuery.size.width;
+    final sizes = _OneCardResponsiveSizes(screenHeight, screenWidth);
+
     return Scaffold(
       backgroundColor: Colors.green.shade900,
       appBar: AppBar(
@@ -1060,7 +1095,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                     children: [
                       // 상단 컴퓨터: 2인용은 컴퓨터1, 3/4인용은 컴퓨터2 (반시계방향)
                       if (computerHands.isNotEmpty)
-                        _buildTopComputerHand(playerCount == 2 ? 0 : 1),
+                        _buildTopComputerHand(playerCount == 2 ? 0 : 1, sizes),
                       // 중앙 영역 (좌우 컴퓨터 + 카드)
                       Expanded(
                         child: playerCount > 2
@@ -1068,18 +1103,18 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                                 children: [
                                   // 왼쪽 컴퓨터 (컴퓨터 3) - 반시계방향으로 세 번째
                                   if (computerHands.length >= 3)
-                                    _buildSideComputerHand(2),
+                                    _buildSideComputerHand(2, sizes),
                                   // 중앙 카드 영역
-                                  Expanded(child: _buildCenterArea()),
+                                  Expanded(child: _buildCenterArea(sizes)),
                                   // 오른쪽 컴퓨터 (컴퓨터 1) - 반시계방향으로 첫 번째
                                   if (computerHands.isNotEmpty)
-                                    _buildSideComputerHand(0),
+                                    _buildSideComputerHand(0, sizes),
                                 ],
                               )
-                            : _buildCenterArea(),
+                            : _buildCenterArea(sizes),
                       ),
                       // 하단 영역 (차례/시작버튼/메시지/원카드/손패)
-                      _buildBottomSection(),
+                      _buildBottomSection(sizes),
                     ],
                   ),
                   // 무늬 선택 UI
@@ -1096,14 +1131,14 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
   }
 
   // 좌/우측 컴퓨터 (세로 배치) - 훌라 스타일
-  Widget _buildSideComputerHand(int computerIndex) {
+  Widget _buildSideComputerHand(int computerIndex, _OneCardResponsiveSizes sizes) {
     if (computerIndex >= computerHands.length) return const SizedBox();
 
     final hand = computerHands[computerIndex];
     final isCurrentTurn = currentTurn == computerIndex + 1;
 
     return Container(
-      width: 55,
+      width: sizes.aiCardWidth * 2,
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1129,7 +1164,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
           const SizedBox(height: 8),
           // 세로 카드 스택
           Expanded(
-            child: _buildVerticalCardStack(hand.length),
+            child: _buildVerticalCardStack(hand.length, sizes),
           ),
         ],
       ),
@@ -1137,10 +1172,10 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
   }
 
   // 세로 카드 스택 - 훌라 스타일
-  Widget _buildVerticalCardStack(int cardCount) {
-    const overlap = 10.0;
-    const cardHeight = 32.0;
-    const cardWidth = 26.0;
+  Widget _buildVerticalCardStack(int cardCount, _OneCardResponsiveSizes sizes) {
+    final overlap = sizes.aiCardHeight * 0.3;
+    final cardHeight = sizes.aiCardHeight;
+    final cardWidth = sizes.aiCardWidth;
     const maxVisible = 7;
     final visibleCount = cardCount > maxVisible ? maxVisible : cardCount;
     final totalHeight = cardHeight + (visibleCount - 1) * overlap;
@@ -1172,7 +1207,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
   }
 
   // 상단 컴퓨터 (가로 배치) - 훌라 스타일
-  Widget _buildTopComputerHand(int computerIndex) {
+  Widget _buildTopComputerHand(int computerIndex, _OneCardResponsiveSizes sizes) {
     if (computerIndex >= computerHands.length) return const SizedBox();
 
     final hand = computerHands[computerIndex];
@@ -1218,8 +1253,8 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
             children: List.generate(
               hand.length > 8 ? 8 : hand.length,
               (j) => Container(
-                width: 24,
-                height: 34,
+                width: sizes.aiCardWidth,
+                height: sizes.aiCardHeight,
                 margin: const EdgeInsets.only(left: 2),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -1236,10 +1271,10 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     );
   }
 
-  Widget _buildCardBack() {
+  Widget _buildCardBack(_OneCardResponsiveSizes sizes) {
     return Container(
-      width: 50,
-      height: 70,
+      width: sizes.centerCardWidth,
+      height: sizes.centerCardHeight,
       decoration: BoxDecoration(
         color: Colors.blue.shade800,
         borderRadius: BorderRadius.circular(6),
@@ -1270,7 +1305,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
   }
 
   // 하단 영역 (훌라 스타일) - 차례/시작버튼/메시지/상태/원카드/손패
-  Widget _buildBottomSection() {
+  Widget _buildBottomSection(_OneCardResponsiveSizes sizes) {
     return Flexible(
       flex: 0,
       child: SingleChildScrollView(
@@ -1357,7 +1392,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
             _buildOneCardButton(),
 
             // 플레이어 손패
-            _buildPlayerHand(),
+            _buildPlayerHand(sizes),
           ],
         ),
       ),
@@ -1384,7 +1419,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     return Colors.black;
   }
 
-  Widget _buildCenterArea() {
+  Widget _buildCenterArea(_OneCardResponsiveSizes sizes) {
     // discardPile이 비어있으면 로딩 표시
     if (discardPile.isEmpty) {
       return const Center(child: CircularProgressIndicator());
@@ -1511,7 +1546,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                 onTap: isPlayerTurn && !gameOver ? _playerDrawCards : null,
                 child: Stack(
                   children: [
-                    _buildCardBack(),
+                    _buildCardBack(sizes),
                     Positioned(
                       bottom: 4,
                       right: 4,
@@ -1535,7 +1570,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildPlayingCard(topCard, size: 1.2),
+                  _buildPlayingCardWithSize(topCard, sizes.centerCardWidth, sizes.centerCardHeight),
                   if (showJokerInfo) jokerInfoWidget(),
                 ],
               ),
@@ -1549,13 +1584,18 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
   Widget _buildPlayingCard(PlayingCard card, {double size = 1.0, bool highlight = false}) {
     final width = 60.0 * size;
     final height = 84.0 * size;
+    return _buildPlayingCardWithSize(card, width, height, highlight: highlight);
+  }
+
+  Widget _buildPlayingCardWithSize(PlayingCard card, double width, double height, {bool highlight = false}) {
+    final sizeRatio = width / 60.0;
 
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8 * size),
+        borderRadius: BorderRadius.circular(8 * sizeRatio),
         border: Border.all(
           color: highlight ? Colors.yellow : Colors.grey.shade400,
           width: highlight ? 3 : 1,
@@ -1578,13 +1618,13 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                   Icon(
                     Icons.star,
                     color: card.isBlackJoker ? Colors.grey.shade800 : Colors.red,
-                    size: 20 * size,
+                    size: 20 * sizeRatio,
                   ),
                   Text(
                     'JOKER',
                     style: TextStyle(
                       color: card.isBlackJoker ? Colors.grey.shade800 : Colors.red,
-                      fontSize: 8 * size,
+                      fontSize: 8 * sizeRatio,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1592,7 +1632,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                     card.isBlackJoker ? '흑백 조커' : '컬러 조커',
                     style: TextStyle(
                       color: card.isBlackJoker ? Colors.grey.shade600 : Colors.red.shade400,
-                      fontSize: 6 * size,
+                      fontSize: 6 * sizeRatio,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1603,15 +1643,15 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
               children: [
                 // 좌상단
                 Positioned(
-                  left: 4 * size,
-                  top: 4 * size,
+                  left: 4 * sizeRatio,
+                  top: 4 * sizeRatio,
                   child: Column(
                     children: [
                       Text(
                         card.rankString,
                         style: TextStyle(
                           color: card.suitColor,
-                          fontSize: 14 * size,
+                          fontSize: 14 * sizeRatio,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1619,7 +1659,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                         card.suitSymbol,
                         style: TextStyle(
                           color: card.suitColor,
-                          fontSize: 12 * size,
+                          fontSize: 12 * sizeRatio,
                         ),
                       ),
                     ],
@@ -1631,14 +1671,14 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                     card.suitSymbol,
                     style: TextStyle(
                       color: card.suitColor,
-                      fontSize: 28 * size,
+                      fontSize: 28 * sizeRatio,
                     ),
                   ),
                 ),
                 // 우하단 (뒤집힌)
                 Positioned(
-                  right: 4 * size,
-                  bottom: 4 * size,
+                  right: 4 * sizeRatio,
+                  bottom: 4 * sizeRatio,
                   child: Transform.rotate(
                     angle: 3.14159,
                     child: Column(
@@ -1647,7 +1687,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                           card.rankString,
                           style: TextStyle(
                             color: card.suitColor,
-                            fontSize: 14 * size,
+                            fontSize: 14 * sizeRatio,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -1655,7 +1695,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                           card.suitSymbol,
                           style: TextStyle(
                             color: card.suitColor,
-                            fontSize: 12 * size,
+                            fontSize: 12 * sizeRatio,
                           ),
                         ),
                       ],
@@ -1730,7 +1770,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     );
   }
 
-  Widget _buildPlayerHand() {
+  Widget _buildPlayerHand(_OneCardResponsiveSizes sizes) {
     final playable = _getPlayableCards(playerHand);
 
     // 2줄로 배열
@@ -1757,7 +1797,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
               onTap: () => _onPlayerCardTap(index),
               child: Opacity(
                 opacity: canPlay ? 1.0 : 0.7,
-                child: _buildPlayingCard(card, size: 0.85, highlight: canPlay),
+                child: _buildPlayingCardWithSize(card, sizes.playerCardWidth, sizes.playerCardHeight, highlight: canPlay),
               ),
             ),
           );

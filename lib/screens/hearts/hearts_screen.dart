@@ -73,6 +73,40 @@ class PlayingCard {
 
 enum GamePhase { passing, playing, roundEnd }
 
+// 반응형 사이즈 헬퍼
+class _HeartsResponsiveSizes {
+  final double screenHeight;
+  final double screenWidth;
+
+  late final double centerCardWidth;
+  late final double centerCardHeight;
+  late final double playerCardWidth;
+  late final double playerCardHeight;
+  late final double aiCardWidth;
+  late final double aiCardHeight;
+  late final double aiCardOverlap;
+
+  _HeartsResponsiveSizes(this.screenHeight, this.screenWidth) {
+    final baseUnit = screenHeight / 100;
+    final widthUnit = screenWidth / 100;
+
+    // 중앙 트릭 영역 카드
+    centerCardWidth = (widthUnit * 12).clamp(40.0, 70.0);
+    centerCardHeight = (baseUnit * 11).clamp(58.0, 95.0);
+
+    // 플레이어 카드
+    playerCardWidth = (widthUnit * 8).clamp(32.0, 55.0);
+    playerCardHeight = (baseUnit * 9).clamp(45.0, 75.0);
+
+    // AI 카드 (상단)
+    aiCardWidth = (widthUnit * 7).clamp(24.0, 40.0);
+    aiCardHeight = (baseUnit * 6).clamp(32.0, 52.0);
+    aiCardOverlap = aiCardWidth * 0.6;
+
+    // AI 카드 (좌우)
+  }
+}
+
 class HeartsScreen extends StatefulWidget {
   final bool resumeGame;
 
@@ -1310,7 +1344,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final screenHeight = mediaQuery.size.height - mediaQuery.padding.top - mediaQuery.padding.bottom;
+    final screenWidth = mediaQuery.size.width;
     final isSmallScreen = screenHeight < 600;
+    final sizes = _HeartsResponsiveSizes(screenHeight, screenWidth);
 
     return Scaffold(
       backgroundColor: Colors.red[900],
@@ -1326,28 +1362,28 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                       _buildTopBar(isSmallScreen),
 
                       // 상대방 핸드 (위)
-                      _buildOpponentHand(2, isSmallScreen),
+                      _buildOpponentHand(2, isSmallScreen, sizes),
 
                       // 중앙 영역 (좌우 상대방 + 트릭)
                       Expanded(
                         child: Row(
                           children: [
                             // 왼쪽 상대방
-                            _buildSideOpponent(1, isSmallScreen),
+                            _buildSideOpponent(1, isSmallScreen, sizes),
 
                             // 중앙 트릭 영역
                             Expanded(
-                              child: _buildCenterArea(isSmallScreen),
+                              child: _buildCenterArea(isSmallScreen, sizes),
                             ),
 
                             // 오른쪽 상대방
-                            _buildSideOpponent(3, isSmallScreen),
+                            _buildSideOpponent(3, isSmallScreen, sizes),
                           ],
                         ),
                       ),
 
                       // 플레이어 핸드
-                      _buildPlayerHand(isSmallScreen),
+                      _buildPlayerHand(isSmallScreen, sizes),
                     ],
                   ),
 
@@ -1583,11 +1619,11 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     );
   }
 
-  Widget _buildOpponentHand(int playerIndex, bool isSmallScreen) {
+  Widget _buildOpponentHand(int playerIndex, bool isSmallScreen, _HeartsResponsiveSizes sizes) {
     final hand = hands[playerIndex];
-    final cardWidth = isSmallScreen ? 26.0 : 32.0;
-    final cardHeight = isSmallScreen ? 36.0 : 45.0;
-    final overlap = isSmallScreen ? 16.0 : 20.0;
+    final cardWidth = sizes.aiCardWidth;
+    final cardHeight = sizes.aiCardHeight;
+    final overlap = sizes.aiCardOverlap;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -1623,14 +1659,14 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     );
   }
 
-  Widget _buildSideOpponent(int playerIndex, bool isSmallScreen) {
+  Widget _buildSideOpponent(int playerIndex, bool isSmallScreen, _HeartsResponsiveSizes sizes) {
     final hand = hands[playerIndex];
-    final cardWidth = isSmallScreen ? 24.0 : 30.0;
-    final cardHeight = isSmallScreen ? 34.0 : 42.0;
-    final overlap = isSmallScreen ? 18.0 : 22.0;
+    final cardWidth = sizes.aiCardWidth;
+    final cardHeight = sizes.aiCardHeight;
+    final overlap = sizes.aiCardOverlap * 0.75; // 세로 배치시 더 촘촘하게
 
     return Container(
-      width: isSmallScreen ? 50 : 60,
+      width: sizes.aiCardWidth * 2,
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1668,9 +1704,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     );
   }
 
-  Widget _buildCenterArea(bool isSmallScreen) {
-    final cardWidth = isSmallScreen ? 45.0 : 55.0;
-    final cardHeight = isSmallScreen ? 65.0 : 80.0;
+  Widget _buildCenterArea(bool isSmallScreen, _HeartsResponsiveSizes sizes) {
+    final cardWidth = sizes.centerCardWidth;
+    final cardHeight = sizes.centerCardHeight;
 
     // 패싱 페이즈일 때는 빈 공간 반환 (테스트 패널은 오버레이로 표시)
     if (phase == GamePhase.passing) {
@@ -1715,16 +1751,17 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     );
   }
 
-  Widget _buildPlayerHand(bool isSmallScreen) {
+  Widget _buildPlayerHand(bool isSmallScreen, _HeartsResponsiveSizes sizes) {
     final hand = hands[0];
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = sizes.screenWidth;
     final horizontalPadding = isSmallScreen ? 12.0 : 16.0;
     final availableWidth = screenWidth - (horizontalPadding * 2);
 
-    // 7장이 한 줄에 들어가도록 카드 크기 계산
+    // 7장이 한 줄에 들어가도록 카드 크기 계산 - sizes 기반으로 조정
     final maxCardsPerRow = 7;
     final overlapRatio = 0.35; // 카드 겹침 비율 (35% 겹침)
-    final cardWidth = availableWidth / (maxCardsPerRow - (maxCardsPerRow - 1) * overlapRatio);
+    final baseCardWidth = availableWidth / (maxCardsPerRow - (maxCardsPerRow - 1) * overlapRatio);
+    final cardWidth = baseCardWidth.clamp(sizes.playerCardWidth * 0.8, sizes.playerCardWidth * 1.5);
     final cardHeight = cardWidth * 1.35;
     final cardStep = cardWidth * (1 - overlapRatio); // 카드 간 간격
 
