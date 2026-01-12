@@ -1334,23 +1334,8 @@ class AIPlayer {
       final remainingGiruda = _getRemainingGirudaCount(state, player);
       final cutSuits = _getCutSuits(state);
 
-      // 마이티가 있으면 마이티 사용 (5트릭 이후, 선공권 탈환용으로 아낌)
-      if (state.currentTrickNumber >= 5) {
-        final mighty = playableCards.where((c) => c.isMighty).toList();
-        if (mighty.isNotEmpty) {
-          return mighty.first;
-        }
-      }
-
-      // 조커가 있으면 조커 사용 (5트릭 이후, 마지막 트릭 제외)
-      if (state.currentTrickNumber >= 5 && state.currentTrickNumber < 10) {
-        final joker = playableCards.where((c) => c.isJoker).toList();
-        if (joker.isNotEmpty) {
-          return joker.first;
-        }
-      }
-
-      // 실효가치 14+ 최상위 카드가 있으면 사용 (컷된 무늬 제외, 상대 기루다 0이면 허용)
+      // 실효가치 14+ 최상위 카드가 있으면 우선 사용 (마이티/조커보다 먼저)
+      // 마이티/조커는 점수 카드가 많을 때 사용하는 것이 유리
       final topCards = playableCards.where((c) {
         if (c.isJoker || c.isMighty) return false;
         // 컷된 무늬는 제외 (상대 기루다 없으면 허용)
@@ -1365,6 +1350,23 @@ class AIPlayer {
         topCards.sort((a, b) =>
             _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
         return topCards.first;
+      }
+
+      // 최상위 카드가 없을 때만 마이티/조커 사용 (후반전, 점수 카드 확보용)
+      // 마이티가 있으면 마이티 사용 (7트릭 이후, 점수 카드 확보 가능성 높을 때)
+      if (state.currentTrickNumber >= 7) {
+        final mighty = playableCards.where((c) => c.isMighty).toList();
+        if (mighty.isNotEmpty) {
+          return mighty.first;
+        }
+      }
+
+      // 조커가 있으면 조커 사용 (7트릭 이후, 마지막 트릭 제외)
+      if (state.currentTrickNumber >= 7 && state.currentTrickNumber < 10) {
+        final joker = playableCards.where((c) => c.isJoker).toList();
+        if (joker.isNotEmpty) {
+          return joker.first;
+        }
       }
 
       // === 최상위 카드가 없으면 주공에게 선공 넘기기 ===
@@ -1450,6 +1452,32 @@ class AIPlayer {
 
     // === 주공팀 또는 노기루다 선공 전략 ===
 
+    // === 초반에 조커로 기루다 콜하여 상대 기루다 정리 ===
+    // 초반(트릭 2-5)에 기루다가 적게 나왔고 상대 기루다가 많으면 조커로 기루다 콜
+    if (state.giruda != null && state.currentTrickNumber >= 2 && state.currentTrickNumber <= 5) {
+      bool isAttackTeam = !_isPlayerOnDefenseTeam(player, state);
+
+      if (isAttackTeam) {
+        final joker = playableCards.where((c) => c.isJoker).toList();
+
+        if (joker.isNotEmpty) {
+          // 지금까지 나온 기루다 수 계산
+          final playedGirudaCards = _getPlayedCards(state).where((c) =>
+              !c.isJoker && c.suit == state.giruda).toList();
+          final playedGirudaCount = playedGirudaCards.length;
+
+          // 상대에게 남은 기루다 추정
+          final opponentGiruda = _getRemainingGirudaCount(state, player);
+
+          // 기루다가 적게 나왔고(3장 이하) 상대 기루다가 많이 남아있으면(4장 이상)
+          // 조커로 기루다 콜하여 상대 기루다 소진
+          if (playedGirudaCount <= 3 && opponentGiruda >= 4) {
+            return joker.first;
+          }
+        }
+      }
+    }
+
     // === 약한 기루다만 남았을 때 조커로 기루다 콜 ===
     // 기루다로 선공을 유지하다가 약한 기루다만 남으면 조커로 기루다 콜하여 상대 기루다 소진
     if (state.giruda != null && state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
@@ -1498,29 +1526,14 @@ class AIPlayer {
       }
     }
 
-    // 상대에게 남은 기루다가 없으면 최상위 카드/조커 우선 (컷 당할 위험 없음)
+    // 상대에게 남은 기루다가 없으면 최상위 카드 우선 (컷 당할 위험 없음)
+    // 마이티/조커는 점수 카드가 많을 때 사용하는 것이 유리하므로 나중에 사용
     if (state.giruda != null) {
       final opponentGiruda = _getRemainingGirudaCount(state, player);
 
       if (opponentGiruda == 0) {
-        // 상대 기루다 없음 → 조커/마이티/최상위 카드 우선
-        // 조커 사용 (첫 트릭, 마지막 트릭 제외)
-        if (state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
-          final joker = playableCards.where((c) => c.isJoker).toList();
-          if (joker.isNotEmpty) {
-            return joker.first;
-          }
-        }
-
-        // 마이티 사용 (첫 트릭 제외)
-        if (state.currentTrickNumber > 1) {
-          final mighty = playableCards.where((c) => c.isMighty).toList();
-          if (mighty.isNotEmpty) {
-            return mighty.first;
-          }
-        }
-
-        // 최상위 카드 (실효 가치 14 이상) 우선
+        // 상대 기루다 없음 → 최상위 카드 우선, 마이티/조커는 나중에
+        // 최상위 카드 (실효 가치 14 이상) 우선 사용
         final highestCards = playableCards.where((c) =>
             !c.isJoker && !c.isMighty &&
             _getEffectiveCardValue(c, state) >= 14).toList();
@@ -1532,6 +1545,23 @@ class AIPlayer {
             return nonGirudaHighest.first;
           }
           return highestCards.first;
+        }
+
+        // 최상위 카드가 없을 때만 조커/마이티 사용 (후반전)
+        // 조커 사용 (7트릭 이후, 마지막 트릭 제외)
+        if (state.currentTrickNumber >= 7 && state.currentTrickNumber < 10) {
+          final joker = playableCards.where((c) => c.isJoker).toList();
+          if (joker.isNotEmpty) {
+            return joker.first;
+          }
+        }
+
+        // 마이티 사용 (7트릭 이후)
+        if (state.currentTrickNumber >= 7) {
+          final mighty = playableCards.where((c) => c.isMighty).toList();
+          if (mighty.isNotEmpty) {
+            return mighty.first;
+          }
         }
       }
     }
