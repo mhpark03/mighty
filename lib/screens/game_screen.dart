@@ -1726,28 +1726,20 @@ class _GameScreenState extends State<GameScreen> {
               ),
           ],
         ),
-        // 획득한 점수 카드 표시 (최대 3열)
+        // 획득한 점수 카드 표시 (고정 크기)
         if (pointCards.isNotEmpty)
           Container(
-            width: maxWidth - 8,
             margin: const EdgeInsets.only(top: 4),
             padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
             decoration: BoxDecoration(
               color: Colors.black54,
               borderRadius: BorderRadius.circular(4),
             ),
-            child: Builder(
-              builder: (context) {
-                // 3열로 제한하기 위한 카드 너비 계산
-                final containerWidth = maxWidth - 8 - 4; // 패딩 제외
-                final cardWidth = (containerWidth - 4) / 3; // 3열, spacing 2*2
-                return Wrap(
-                  spacing: 2,
-                  runSpacing: 2,
-                  alignment: WrapAlignment.center,
-                  children: pointCards.map((card) => _buildTinyCardFixed(card, state, cardWidth)).toList(),
-                );
-              },
+            child: Wrap(
+              spacing: 2,
+              runSpacing: 2,
+              alignment: WrapAlignment.center,
+              children: pointCards.map((card) => _buildTinyCardFixed(card, state, 28.0)).toList(),
             ),
           ),
       ],
