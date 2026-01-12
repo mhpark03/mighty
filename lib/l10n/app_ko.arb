@@ -246,7 +246,7 @@
   "aiPlayer4": "수빈",
   "scoreCalcWin": "점수 계산 (승리)",
   "scoreCalcLose": "점수 계산 (패배)",
-  "scoreFormula": "득점 - 공약 + 1",
+  "scoreFormula": "(득점-공약+1) + (득점-최소)×2",
   "scoreFormulaLose": "-(공약 - 득점)",
   "scoreMultipliers": "주공 ×2, 프렌드 ×1, 야당 ×(-1)",
   "multiplierRun": "런 ×2",

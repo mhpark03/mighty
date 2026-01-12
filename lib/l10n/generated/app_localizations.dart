@@ -1029,7 +1029,7 @@ abstract class AppLocalizations {
   /// No description provided for @scoreFormula.
   ///
   /// In ko, this message translates to:
-  /// **'득점 - 공약 + 1'**
+  /// **'(득점-공약+1) + (득점-최소)×2'**
   String get scoreFormula;
 
   /// No description provided for @scoreFormulaLose.

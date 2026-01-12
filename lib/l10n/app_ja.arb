@@ -154,7 +154,7 @@
   "aiPlayer4": "美咲",
   "scoreCalcWin": "スコア計算 (勝利)",
   "scoreCalcLose": "スコア計算 (敗北)",
-  "scoreFormula": "得点 - 契約 + 1",
+  "scoreFormula": "(得点-契約+1) + (得点-最小)×2",
   "scoreFormulaLose": "-(契約 - 得点)",
   "scoreMultipliers": "宣言者 ×2, フレンド ×1, 守備 ×(-1)",
   "multiplierRun": "ラン ×2",

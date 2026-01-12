@@ -114,16 +114,32 @@ class CardWidget extends StatelessWidget {
 
     // 간소화 모드: 숫자와 무늬만 중앙에 표시
     if (compact) {
-      return Center(
-        child: Text(
-          '${card.rankSymbol}\n${card.suitSymbol}',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: height * 0.22,
-            fontWeight: FontWeight.bold,
-            color: color,
-            height: 1.1,
-          ),
+      return Padding(
+        padding: const EdgeInsets.all(2),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 랭크 심볼 (10 등 긴 텍스트도 한 줄에 표시)
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                card.rankSymbol,
+                style: TextStyle(
+                  fontSize: height * 0.28,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ),
+            // 무늬 심볼
+            Text(
+              card.suitSymbol,
+              style: TextStyle(
+                fontSize: height * 0.28,
+                color: color,
+              ),
+            ),
+          ],
         ),
       );
     }

@@ -120,9 +120,18 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     // 5장씩 3줄 (5+5+3)
-    final cardWidth = (screenWidth - 48) / 5;
+    // 화면 너비 기준 카드 크기
+    final cardWidthByWidth = (screenWidth - 48) / 5;
+    // 화면 높이 기준 카드 크기 (상단바, 하단 컨트롤 영역 제외)
+    final availableHeight = screenHeight - 280; // 앱바, 안내문, 하단 버튼 영역 제외
+    final cardHeightByHeight = (availableHeight - 24) / 3; // 3줄, 간격 제외
+    final cardWidthByHeight = cardHeightByHeight / 1.4;
+
+    // 더 작은 값 사용
+    final cardWidth = cardWidthByWidth < cardWidthByHeight ? cardWidthByWidth : cardWidthByHeight;
     final cardHeight = cardWidth * 1.4;
 
     return Scaffold(

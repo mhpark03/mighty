@@ -510,7 +510,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get scoreCalcLose => '分数计算 (失败)';
 
   @override
-  String get scoreFormula => '得分 - 契约 + 1';
+  String get scoreFormula => '(得分-契约+1) + (得分-最小)×2';
 
   @override
   String get scoreFormulaLose => '-(契约 - 得分)';

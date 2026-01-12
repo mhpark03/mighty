@@ -155,7 +155,7 @@
   "aiPlayer4": "Sophia",
   "scoreCalcWin": "Score Calculation (Win)",
   "scoreCalcLose": "Score Calculation (Lose)",
-  "scoreFormula": "Points - Contract + 1",
+  "scoreFormula": "(Points-Contract+1) + (Points-Min)×2",
   "scoreFormulaLose": "-(Contract - Points)",
   "scoreMultipliers": "Declarer ×2, Friend ×1, Defense ×(-1)",
   "multiplierRun": "Run ×2",

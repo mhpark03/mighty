@@ -485,26 +485,31 @@ class _GameScreenState extends State<GameScreen> {
       _suitManuallySelected = false;
     }
 
+    final screenHeight = MediaQuery.of(context).size.height;
+    final maxBiddingHeight = screenHeight * 0.45; // 화면 높이의 45%로 제한
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      constraints: BoxConstraints(maxHeight: maxBiddingHeight),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.green[800],
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.green[600]!, width: 2),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            isHumanTurn
-                ? l10n.currentBidder(l10n.you)
-                : l10n.currentBidder(_getLocalizedPlayerName(state.players[state.currentBidder], l10n)),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isHumanTurn
+                  ? l10n.currentBidder(l10n.you)
+                  : l10n.currentBidder(_getLocalizedPlayerName(state.players[state.currentBidder], l10n)),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
           // AI 추천 표시 (힌트 모드일 때만)
           if (_showHint && isHumanTurn && recommendedBid != null) ...[
             const SizedBox(height: 8),
@@ -534,31 +539,32 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ),
           ],
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           if (isHumanTurn) ...[
             // 트릭 수 선택
             Text(
               l10n.tricks,
-              style: TextStyle(color: Colors.white70, fontSize: 12),
+              style: TextStyle(color: Colors.white70, fontSize: 11),
             ),
             const SizedBox(height: 4),
             Wrap(
               spacing: 4,
+              runSpacing: 4,
               children: [
                 for (int i = 13; i <= 20; i++)
                   _buildBidChip(i, state, l10n),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             // 기루다 선택
             Text(
               l10n.giruda,
-              style: TextStyle(color: Colors.white70, fontSize: 12),
+              style: TextStyle(color: Colors.white70, fontSize: 11),
             ),
             const SizedBox(height: 4),
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: 6,
+              runSpacing: 4,
               children: [
                 _buildSuitChip(Suit.spade, '♠', l10n.spadeName),
                 _buildSuitChip(Suit.diamond, '♦', l10n.diamondName),
@@ -567,7 +573,7 @@ class _GameScreenState extends State<GameScreen> {
                 _buildSuitChip(null, '✕', l10n.noGiruda),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             // 버튼들
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -619,6 +625,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
           ],
         ],
+      ),
       ),
     );
   }
@@ -1547,8 +1554,13 @@ class _GameScreenState extends State<GameScreen> {
         ),
         Center(
           child: Container(
-            width: 300,
-            height: 200,
+            constraints: const BoxConstraints(
+              minWidth: 280,
+              maxWidth: 340,
+              minHeight: 120,
+              maxHeight: 180,
+            ),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.green[700],
               borderRadius: BorderRadius.circular(16),
@@ -1599,14 +1611,14 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildTopPlayers(GameState state) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final playerWidth = (screenWidth - 16) / 5; // 5명 (플레이어 포함), 좌우 여백 8씩
+    final playerWidth = (screenWidth - 32) / 4; // AI 4명만 표시, 좌우 여백 16씩
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 플레이어(index 0)도 포함하여 5명 모두 표시
-        for (int i = 0; i < 5; i++)
+        // AI 플레이어만 표시 (index 1-4)
+        for (int i = 1; i <= 4; i++)
           SizedBox(
             width: playerWidth,
             child: _buildPlayerIndicator(state.players[i], state, i, playerWidth),
@@ -1623,106 +1635,69 @@ class _GameScreenState extends State<GameScreen> {
     final isLeadPlayer = state.currentTrick != null &&
         state.currentTrick!.leadPlayerId == index;
 
-    // 플레이어가 획득한 점수 카드 (조커 제외)
-    final pointCards = player.wonCards
-        .where((c) => c.isPointCard && !c.isJoker)
-        .toList();
-    pointCards.sort((a, b) {
-      if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
-      return b.rankValue.compareTo(a.rankValue);
-    });
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Stack(
+      clipBehavior: Clip.none,
       children: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: isCurrentPlayer ? Colors.amber.withValues(alpha: 0.3) : Colors.black26,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: isDeclarer
-                      ? Colors.red
-                      : (isFriend ? Colors.blue : Colors.transparent),
-                  width: 2,
-                ),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    _getLocalizedPlayerName(player, l10n),
-                    style: TextStyle(
-                      color: isCurrentPlayer ? Colors.amber : Colors.white,
-                      fontWeight: isCurrentPlayer ? FontWeight.bold : FontWeight.normal,
-                      fontSize: 11,
-                    ),
-                  ),
-                  Text(
-                    l10n.cards(player.hand.length),
-                    style: const TextStyle(color: Colors.white70, fontSize: 9),
-                  ),
-                  if (isDeclarer)
-                    Text(
-                      l10n.declarer,
-                      style: const TextStyle(color: Colors.red, fontSize: 8),
-                    ),
-                  if (isFriend)
-                    Text(
-                      l10n.friend,
-                      style: const TextStyle(color: Colors.blue, fontSize: 8),
-                    ),
-                ],
-              ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          decoration: BoxDecoration(
+            color: isCurrentPlayer ? Colors.amber.withValues(alpha: 0.3) : Colors.black26,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isDeclarer
+                  ? Colors.red
+                  : (isFriend ? Colors.blue : Colors.transparent),
+              width: 2,
             ),
-            // 선공 표시
-            if (isLeadPlayer)
-              Positioned(
-                top: -6,
-                right: -6,
-                child: Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1),
-                  ),
-                  child: const Text(
-                    '1',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _getLocalizedPlayerName(player, l10n),
+                style: TextStyle(
+                  color: isCurrentPlayer ? Colors.amber : Colors.white,
+                  fontWeight: isCurrentPlayer ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 12,
                 ),
               ),
-          ],
+              Text(
+                l10n.cards(player.hand.length),
+                style: const TextStyle(color: Colors.white70, fontSize: 10),
+              ),
+              if (isDeclarer)
+                Text(
+                  l10n.declarer,
+                  style: const TextStyle(color: Colors.red, fontSize: 9),
+                ),
+              if (isFriend)
+                Text(
+                  l10n.friend,
+                  style: const TextStyle(color: Colors.blue, fontSize: 9),
+                ),
+            ],
+          ),
         ),
-        // 획득한 점수 카드 표시 (최대 3열)
-        if (pointCards.isNotEmpty)
-          Container(
-            width: maxWidth - 8,
-            margin: const EdgeInsets.only(top: 4),
-            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.black54,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Builder(
-              builder: (context) {
-                // 3열로 제한하기 위한 카드 너비 계산
-                final containerWidth = maxWidth - 8 - 4; // 패딩 제외
-                final cardWidth = (containerWidth - 4) / 3; // 3열, spacing 2*2
-                return Wrap(
-                  spacing: 2,
-                  runSpacing: 2,
-                  alignment: WrapAlignment.center,
-                  children: pointCards.map((card) => _buildTinyCardFixed(card, state, cardWidth)).toList(),
-                );
-              },
+        // 선공 표시
+        if (isLeadPlayer)
+          Positioned(
+            top: -6,
+            right: -6,
+            child: Container(
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1),
+              ),
+              child: const Text(
+                '1',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
       ],
@@ -1826,17 +1801,18 @@ class _GameScreenState extends State<GameScreen> {
 
     return Container(
       width: width,
-      padding: const EdgeInsets.symmetric(vertical: 1),
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 1),
       decoration: BoxDecoration(
         color: isMighty ? Colors.amber[700] : Colors.white,
         borderRadius: BorderRadius.circular(3),
       ),
-      child: Center(
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
         child: Text(
           '$suitSymbol$rank',
           style: TextStyle(
             color: isRed ? Colors.red[700] : Colors.black,
-            fontSize: 10,
+            fontSize: 12,
             fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -2031,7 +2007,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ),
           Wrap(
-            spacing: 8,
+            spacing: 4,
             children: [
               for (int i = 0; i < trick.cards.length; i++)
                 Column(
@@ -2039,12 +2015,12 @@ class _GameScreenState extends State<GameScreen> {
                   children: [
                     Text(
                       _getLocalizedPlayerName(state.players[trick.playerOrder[i]], l10n),
-                      style: const TextStyle(color: Colors.white70, fontSize: 10),
+                      style: const TextStyle(color: Colors.white70, fontSize: 9),
                     ),
                     CardWidget(
                       card: trick.cards[i],
-                      width: 50,
-                      height: 75,
+                      width: 42,
+                      height: 60,
                       compact: true,
                     ),
                   ],
@@ -2118,7 +2094,7 @@ class _GameScreenState extends State<GameScreen> {
               if (pointCards.isNotEmpty && (controller.state.phase == GamePhase.playing || controller.state.phase == GamePhase.gameEnd))
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.black54,
                       borderRadius: BorderRadius.circular(8),
@@ -2128,8 +2104,13 @@ class _GameScreenState extends State<GameScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: pointCards.map((card) => Padding(
-                          padding: const EdgeInsets.only(right: 3),
-                          child: _buildTinyCard(card, controller.state),
+                          padding: const EdgeInsets.only(right: 4),
+                          child: CardWidget(
+                            card: card,
+                            width: 36,
+                            height: 50,
+                            compact: true,
+                          ),
                         )).toList(),
                       ),
                     ),
@@ -2472,10 +2453,12 @@ class _GameScreenState extends State<GameScreen> {
     int specialMultiplier = 1;
 
     if (declarerWon) {
-      // 승리: 득점 - 공약 + 1
-      baseScore = state.declarerTeamPoints - targetTricks + 1;
-      formula = l10n.scoreFormula;
-      calculation = '${state.declarerTeamPoints} - $targetTricks + 1 = $baseScore';
+      // 승리: (득점 - 공약 + 1) + (득점 - 최소) * 2
+      final basicPart = state.declarerTeamPoints - targetTricks + 1;
+      final bonusPart = (state.declarerTeamPoints - minContract) * 2;
+      baseScore = basicPart + bonusPart;
+      formula = '(득점-공약+1) + (득점-최소)×2';
+      calculation = '($basicPart) + (${state.declarerTeamPoints}-$minContract)×2 = $basicPart + $bonusPart = $baseScore';
 
       if (isRun) {
         specialMultiplier *= 2;

@@ -750,8 +750,9 @@ class GameState {
 
     if (declarerWon) {
       // === 주공 승리 시 ===
-      // 득점 - 목표 + 1
-      baseScore = declarerTeamPoints - targetTricks + 1;
+      // (득점 - 공약 + 1) + (득점 - 최소) * 2
+      const int minContract = 13;
+      baseScore = (declarerTeamPoints - targetTricks + 1) + (declarerTeamPoints - minContract) * 2;
 
       // 런 (주공팀이 20점 전부 획득): x2
       if (declarerTeamPoints >= 20) {

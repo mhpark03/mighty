@@ -117,9 +117,14 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-    // 카드 크기 계산 (내 카드용 - 작게)
-    final handCardWidth = (screenWidth - 32) / 6;
+    // 반응형: 너비와 높이 모두 고려하여 카드 크기 계산
+    final handCardWidthByWidth = (screenWidth - 32) / 6;
+    final handCardWidthByHeight = (screenHeight - 400) / 8; // 높이 기준
+    final handCardWidth = handCardWidthByWidth < handCardWidthByHeight
+        ? handCardWidthByWidth
+        : handCardWidthByHeight;
     final handCardHeight = handCardWidth * 1.3;
 
     return Scaffold(
@@ -130,8 +135,14 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
-        child: Column(
-          children: [
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: screenHeight - MediaQuery.of(context).padding.top - kToolbarHeight - MediaQuery.of(context).padding.bottom,
+            ),
+            child: IntrinsicHeight(
+              child: Column(
+                children: [
             // 내 카드 표시
             Container(
               width: double.infinity,
@@ -309,6 +320,9 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
               ),
             ),
           ],
+        ),
+            ),
+          ),
         ),
       ),
     );
@@ -501,7 +515,12 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         c.rank == Rank.four || c.rank == Rank.three || c.rank == Rank.two).toList();
 
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = (screenWidth - 64) / 5.5;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // 반응형: 너비와 높이 기준 중 작은 값 사용
+    final cardWidthByWidth = (screenWidth - 64) / 5.5;
+    final cardWidthByHeight = (screenHeight - 450) / 6;
+    final cardWidth = cardWidthByWidth < cardWidthByHeight ? cardWidthByWidth : cardWidthByHeight;
     final cardHeight = cardWidth * 1.3;
 
     return Column(

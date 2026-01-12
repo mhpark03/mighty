@@ -513,7 +513,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get scoreCalcLose => 'スコア計算 (敗北)';
 
   @override
-  String get scoreFormula => '得点 - 契約 + 1';
+  String get scoreFormula => '(得点-契約+1) + (得点-最小)×2';
 
   @override
   String get scoreFormulaLose => '-(契約 - 得点)';

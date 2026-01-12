@@ -18,8 +18,39 @@ class GameSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height - mediaQuery.padding.top - mediaQuery.padding.bottom;
     final isSmallScreen = screenHeight < 600;
+
+    // 반응형: 화면 너비에 따라 열 수와 최대 너비 결정
+    final int crossAxisCount;
+    final double maxContentWidth;
+    final double iconSize;
+    final double titleSize;
+    final double subtitleSize;
+
+    if (screenWidth >= 900) {
+      // 데스크탑/대형 태블릿
+      crossAxisCount = 3;
+      maxContentWidth = 800;
+      iconSize = 48;
+      titleSize = 20;
+      subtitleSize = 14;
+    } else if (screenWidth >= 600) {
+      // 태블릿
+      crossAxisCount = 3;
+      maxContentWidth = 600;
+      iconSize = 40;
+      titleSize = 18;
+      subtitleSize = 13;
+    } else {
+      // 모바일
+      crossAxisCount = 2;
+      maxContentWidth = double.infinity;
+      iconSize = isSmallScreen ? 28 : 36;
+      titleSize = isSmallScreen ? 14.0 : 17.0;
+      subtitleSize = isSmallScreen ? 10.0 : 12.0;
+    }
 
     final games = [
       _GameInfo(
@@ -72,63 +103,68 @@ class GameSelectionScreen extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-                child: Column(
-                  children: [
-                    // 앱 타이틀
-                    Text(
-                      l10n.selectGame,
-                      style: TextStyle(
-                        fontSize: isSmallScreen ? 22 : 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: const [
-                          Shadow(
-                            blurRadius: 10,
-                            color: Colors.black54,
-                            offset: Offset(2, 2),
+              child: Center(
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: maxContentWidth),
+                  padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
+                  child: Column(
+                    children: [
+                      // 앱 타이틀
+                      Text(
+                        l10n.selectGame,
+                        style: TextStyle(
+                          fontSize: screenWidth >= 600 ? 32 : (isSmallScreen ? 22 : 28),
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: const [
+                            Shadow(
+                              blurRadius: 10,
+                              color: Colors.black54,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: isSmallScreen ? 12 : 20),
+
+                      // 게임 그리드 (반응형)
+                      Expanded(
+                        child: GridView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: isSmallScreen ? 10 : 16,
+                            mainAxisSpacing: isSmallScreen ? 10 : 16,
+                            childAspectRatio: screenWidth >= 600 ? 1.2 : 1.1,
                           ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: isSmallScreen ? 12 : 16),
-
-                    // 게임 그리드 (2x3)
-                    Expanded(
-                      child: GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: isSmallScreen ? 10 : 14,
-                          mainAxisSpacing: isSmallScreen ? 10 : 14,
-                          childAspectRatio: 1.1,
-                        ),
-                        itemCount: games.length,
-                        itemBuilder: (context, index) {
-                          final game = games[index];
-                          return _buildGameTile(
-                            context: context,
-                            game: game,
-                            isSmallScreen: isSmallScreen,
-                          );
-                        },
-                      ),
-                    ),
-
-                    // 앱 종료 버튼
-                    Padding(
-                      padding: EdgeInsets.only(top: isSmallScreen ? 8 : 12),
-                      child: TextButton.icon(
-                        onPressed: () => _showExitAppDialog(context, l10n),
-                        icon: Icon(Icons.power_settings_new, color: Colors.white54, size: isSmallScreen ? 16 : 18),
-                        label: Text(
-                          l10n.exitApp,
-                          style: TextStyle(color: Colors.white54, fontSize: isSmallScreen ? 12 : 13),
+                          itemCount: games.length,
+                          itemBuilder: (context, index) {
+                            final game = games[index];
+                            return _buildGameTile(
+                              context: context,
+                              game: game,
+                              iconSize: iconSize,
+                              titleSize: titleSize,
+                              subtitleSize: subtitleSize,
+                            );
+                          },
                         ),
                       ),
-                    ),
-                  ],
+
+                      // 앱 종료 버튼
+                      Padding(
+                        padding: EdgeInsets.only(top: isSmallScreen ? 8 : 12),
+                        child: TextButton.icon(
+                          onPressed: () => _showExitAppDialog(context, l10n),
+                          icon: Icon(Icons.power_settings_new, color: Colors.white54, size: isSmallScreen ? 16 : 20),
+                          label: Text(
+                            l10n.exitApp,
+                            style: TextStyle(color: Colors.white54, fontSize: isSmallScreen ? 12 : 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -142,11 +178,14 @@ class GameSelectionScreen extends StatelessWidget {
   Widget _buildGameTile({
     required BuildContext context,
     required _GameInfo game,
-    required bool isSmallScreen,
+    required double iconSize,
+    required double titleSize,
+    required double subtitleSize,
   }) {
     return Material(
       color: game.color,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
+      elevation: 4,
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -154,29 +193,29 @@ class GameSelectionScreen extends StatelessWidget {
             MaterialPageRoute(builder: (context) => game.screen),
           );
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: EdgeInsets.all(isSmallScreen ? 10 : 14),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: EdgeInsets.all(isSmallScreen ? 10 : 12),
+                padding: EdgeInsets.all(iconSize * 0.4),
                 decoration: BoxDecoration(
                   color: Colors.white24,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   game.icon,
                   color: Colors.white,
-                  size: isSmallScreen ? 28 : 36,
+                  size: iconSize,
                 ),
               ),
-              SizedBox(height: isSmallScreen ? 8 : 10),
+              SizedBox(height: iconSize * 0.3),
               Text(
                 game.title,
                 style: TextStyle(
-                  fontSize: isSmallScreen ? 14 : 17,
+                  fontSize: titleSize,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -184,11 +223,11 @@ class GameSelectionScreen extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              SizedBox(height: isSmallScreen ? 2 : 4),
+              const SizedBox(height: 4),
               Text(
                 game.subtitle,
                 style: TextStyle(
-                  fontSize: isSmallScreen ? 10 : 12,
+                  fontSize: subtitleSize,
                   color: Colors.white70,
                 ),
                 textAlign: TextAlign.center,
