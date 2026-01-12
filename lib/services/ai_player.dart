@@ -2130,6 +2130,16 @@ class AIPlayer {
         }
       }
 
+      // 마지막 순서이고 수비팀이 이기고 있으면 마이티로 확실히 가져오기
+      bool isLastPlayer = state.currentTrick != null &&
+          state.currentTrick!.cards.length == 4;
+      if (isLastPlayer && hasMighty) {
+        final mighty = playableCards.where((c) => c.isMighty).toList();
+        if (currentWinningCard != null && !currentWinningCard.isJoker) {
+          return mighty.first;
+        }
+      }
+
       // 마이티로 선공권 탈환 (첫 트릭 제외)
       // 단, 조커가 있으면 조커를 먼저 사용하고 마이티는 상대 조커 대응용으로 아낌
       if (state.currentTrickNumber > 1 && hasMighty) {
