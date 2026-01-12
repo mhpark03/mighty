@@ -145,6 +145,46 @@ class ThankYouOption {
   }
 }
 
+// 반응형 사이즈 헬퍼
+class _HulaResponsiveSizes {
+  final double screenHeight;
+  final double screenWidth;
+
+  late final double centerCardWidth;
+  late final double centerCardHeight;
+  late final double playerCardWidth;
+  late final double playerCardHeight;
+  late final double playerSymbolSize;
+  late final double playerRankSize;
+  late final double aiCardWidth;
+  late final double aiCardHeight;
+  late final double meldCardWidth;
+  late final double meldCardHeight;
+
+  _HulaResponsiveSizes(this.screenHeight, this.screenWidth) {
+    final baseUnit = screenHeight / 100;
+    final widthUnit = screenWidth / 100;
+
+    // 중앙 덱/버린카드 - 화면 비율로 계산
+    centerCardWidth = (widthUnit * 15).clamp(50.0, 90.0);
+    centerCardHeight = (baseUnit * 14).clamp(70.0, 130.0);
+
+    // 플레이어 카드
+    playerCardWidth = (widthUnit * 11).clamp(40.0, 65.0);
+    playerCardHeight = (baseUnit * 10).clamp(55.0, 90.0);
+    playerSymbolSize = (baseUnit * 3).clamp(14.0, 26.0);
+    playerRankSize = (baseUnit * 2.5).clamp(12.0, 22.0);
+
+    // AI 카드 (뒷면)
+    aiCardWidth = (widthUnit * 6).clamp(20.0, 36.0);
+    aiCardHeight = (baseUnit * 5).clamp(26.0, 44.0);
+
+    // 멜드 영역 카드
+    meldCardWidth = (widthUnit * 5).clamp(16.0, 28.0);
+    meldCardHeight = (baseUnit * 4).clamp(22.0, 38.0);
+  }
+}
+
 // 훌라 난이도
 enum HulaDifficulty { easy, medium, hard }
 
@@ -3047,11 +3087,16 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildGameContent() {
+    final mediaQuery = MediaQuery.of(context);
+    final screenHeight = mediaQuery.size.height - mediaQuery.padding.top - mediaQuery.padding.bottom;
+    final screenWidth = mediaQuery.size.width;
+    final sizes = _HulaResponsiveSizes(screenHeight, screenWidth);
+
     return Column(
       children: [
         // 상단 컴퓨터: 2인은 COM1, 3인은 COM2, 4인은 COM2
         if (computerHands.isNotEmpty)
-          _buildTopComputerHand(computerHands.length == 1 ? 0 : 1),
+          _buildTopComputerHand(computerHands.length == 1 ? 0 : 1, sizes),
 
         // 중앙 영역 (좌우 컴퓨터 + 덱/버린더미)
         Expanded(
@@ -3060,24 +3105,24 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                   children: [
                     // 왼쪽 컴퓨터 (COM3) - 4인 게임만
                     if (computerHands.length >= 3)
-                      _buildSideComputerHand(2),
+                      _buildSideComputerHand(2, sizes),
                     // 중앙 카드 영역
-                    Expanded(child: _buildCenterArea()),
+                    Expanded(child: _buildCenterArea(sizes)),
                     // 오른쪽 컴퓨터 (COM1) - 3인 이상
-                    _buildSideComputerHand(0),
+                    _buildSideComputerHand(0, sizes),
                   ],
                 )
-              : _buildCenterArea(),
+              : _buildCenterArea(sizes),
         ),
 
         // 하단 영역 (메시지, 멜드, 손패, 버튼)
-        _buildBottomSection(),
+        _buildBottomSection(sizes),
       ],
     );
   }
 
   // 하단 영역 (스크롤 가능)
-  Widget _buildBottomSection() {
+  Widget _buildBottomSection(_HulaResponsiveSizes sizes) {
     return Flexible(
       flex: 0,
       child: SingleChildScrollView(
@@ -3159,10 +3204,10 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
 
             // 등록된 멜드
-            if (playerMelds.isNotEmpty) _buildPlayerMelds(),
+            if (playerMelds.isNotEmpty) _buildPlayerMelds(sizes),
 
             // 플레이어 손패
-            _buildPlayerHand(),
+            _buildPlayerHand(sizes),
 
             // 액션 버튼
             _buildActionButtons(),
@@ -3173,7 +3218,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   // 상단 컴퓨터 (가로 배치)
-  Widget _buildTopComputerHand(int computerIndex) {
+  Widget _buildTopComputerHand(int computerIndex, _HulaResponsiveSizes sizes) {
     if (computerIndex >= computerHands.length) return const SizedBox();
 
     final hand = computerHands[computerIndex];
@@ -3227,8 +3272,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
             children: List.generate(
               min(hand.length, 8),
               (j) => Container(
-                width: 24,
-                height: 34,
+                width: sizes.aiCardWidth,
+                height: sizes.aiCardHeight,
                 margin: const EdgeInsets.only(left: 2),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -3246,7 +3291,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   // 좌/우측 컴퓨터 (세로 배치)
-  Widget _buildSideComputerHand(int computerIndex) {
+  Widget _buildSideComputerHand(int computerIndex, _HulaResponsiveSizes sizes) {
     if (computerIndex >= computerHands.length) return const SizedBox();
 
     final hand = computerHands[computerIndex];
@@ -3285,7 +3330,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
           const SizedBox(height: 8),
           // 세로 카드 스택
           Expanded(
-            child: _buildVerticalCardStack(hand.length),
+            child: _buildVerticalCardStack(hand.length, sizes),
           ),
         ],
       ),
@@ -3293,10 +3338,10 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   // 세로 카드 스택
-  Widget _buildVerticalCardStack(int cardCount) {
-    const overlap = 10.0;
-    const cardHeight = 32.0;
-    const cardWidth = 26.0;
+  Widget _buildVerticalCardStack(int cardCount, _HulaResponsiveSizes sizes) {
+    final overlap = sizes.aiCardHeight * 0.3;
+    final cardHeight = sizes.aiCardHeight;
+    final cardWidth = sizes.aiCardWidth;
     const maxVisible = 7;
     final visibleCount = cardCount > maxVisible ? maxVisible : cardCount;
     final totalHeight = cardHeight + (visibleCount - 1) * overlap;
@@ -3327,9 +3372,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildCenterArea() {
-    const cardWidth = 70.0;
-    const cardHeight = 100.0;
+  Widget _buildCenterArea(_HulaResponsiveSizes sizes) {
+    final cardWidth = sizes.centerCardWidth;
+    final cardHeight = sizes.centerCardHeight;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -3602,9 +3647,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildPlayerMelds() {
+  Widget _buildPlayerMelds(_HulaResponsiveSizes sizes) {
     return Container(
-      height: 50,
+      height: sizes.meldCardHeight * 1.6,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -3647,11 +3692,11 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildPlayerHand() {
-    const cardWidth = 50.0;
-    const cardHeight = 72.0;
-    const symbolSize = 20.0;
-    const rankSize = 16.0;
+  Widget _buildPlayerHand(_HulaResponsiveSizes sizes) {
+    final cardWidth = sizes.playerCardWidth;
+    final cardHeight = sizes.playerCardHeight;
+    final symbolSize = sizes.playerSymbolSize;
+    final rankSize = sizes.playerRankSize;
 
     // AI 추천 카드 인덱스
     final recommendedIndex = _showHint ? _getRecommendedDiscardCardIndex() : null;
