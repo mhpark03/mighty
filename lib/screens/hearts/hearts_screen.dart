@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../services/hearts/hearts_stats_service.dart';
 import '../../services/ad_service.dart';
+import '../../services/game_save_service.dart';
 
 enum Suit { spade, heart, diamond, club }
 
@@ -55,12 +56,37 @@ class PlayingCard {
 
   @override
   int get hashCode => suit.hashCode ^ rank.hashCode;
+
+  // JSON 직렬화
+  Map<String, dynamic> toJson() => {
+    'suit': suit.index,
+    'rank': rank,
+  };
+
+  factory PlayingCard.fromJson(Map<String, dynamic> json) {
+    return PlayingCard(
+      Suit.values[json['suit'] as int],
+      json['rank'] as int,
+    );
+  }
 }
 
 enum GamePhase { passing, playing, roundEnd }
 
 class HeartsScreen extends StatefulWidget {
-  const HeartsScreen({super.key});
+  final bool resumeGame;
+
+  const HeartsScreen({super.key, this.resumeGame = false});
+
+  // 저장된 게임이 있는지 확인
+  static Future<bool> hasSavedGame() async {
+    return await GameSaveService.hasSavedGame('hearts');
+  }
+
+  // 저장된 게임 삭제
+  static Future<void> clearSavedGame() async {
+    await GameSaveService.clearSave();
+  }
 
   @override
   State<HeartsScreen> createState() => _HeartsScreenState();
@@ -97,13 +123,86 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    _startNewGame();
+    if (widget.resumeGame) {
+      _loadGame();
+    } else {
+      _startNewGame();
+    }
   }
 
   @override
   void dispose() {
     _messageTimer?.cancel();
     super.dispose();
+  }
+
+  // 게임 상태 저장
+  Future<void> _saveGame() async {
+    final gameState = {
+      'hands': hands.map((hand) => hand.map((c) => c.toJson()).toList()).toList(),
+      'currentTrick': currentTrick.map((c) => c?.toJson()).toList(),
+      'wonCards': wonCards.map((cards) => cards.map((c) => c.toJson()).toList()).toList(),
+      'scores': scores,
+      'selectedForPassing': selectedForPassing.map((c) => c.toJson()).toList(),
+      'cardsToReceive': cardsToReceive.map((cards) => cards.map((c) => c.toJson()).toList()).toList(),
+      'phase': phase.index,
+      'currentPlayer': currentPlayer,
+      'leadPlayer': leadPlayer,
+      'trickNumber': trickNumber,
+      'heartsBroken': heartsBroken,
+      'isProcessingTrick': isProcessingTrick,
+      'playedCards': playedCards.map((c) => c.toJson()).toList(),
+    };
+    await GameSaveService.saveGame('hearts', gameState);
+  }
+
+  // 저장된 게임 불러오기
+  Future<void> _loadGame() async {
+    final gameState = await GameSaveService.loadGame('hearts');
+    if (gameState == null) {
+      _startNewGame();
+      return;
+    }
+
+    setState(() {
+      hands = (gameState['hands'] as List).map((hand) =>
+        (hand as List).map((c) => PlayingCard.fromJson(c as Map<String, dynamic>)).toList()
+      ).toList();
+
+      currentTrick = (gameState['currentTrick'] as List).map((c) =>
+        c == null ? null : PlayingCard.fromJson(c as Map<String, dynamic>)
+      ).toList();
+
+      wonCards = (gameState['wonCards'] as List).map((cards) =>
+        (cards as List).map((c) => PlayingCard.fromJson(c as Map<String, dynamic>)).toList()
+      ).toList();
+
+      scores = List<int>.from(gameState['scores'] as List);
+
+      selectedForPassing = (gameState['selectedForPassing'] as List)
+        .map((c) => PlayingCard.fromJson(c as Map<String, dynamic>)).toList();
+
+      cardsToReceive = (gameState['cardsToReceive'] as List).map((cards) =>
+        (cards as List).map((c) => PlayingCard.fromJson(c as Map<String, dynamic>)).toList()
+      ).toList();
+
+      phase = GamePhase.values[gameState['phase'] as int];
+      currentPlayer = gameState['currentPlayer'] as int;
+      leadPlayer = gameState['leadPlayer'] as int;
+      trickNumber = gameState['trickNumber'] as int;
+      heartsBroken = gameState['heartsBroken'] as bool;
+      isProcessingTrick = gameState['isProcessingTrick'] as bool;
+
+      playedCards = (gameState['playedCards'] as List)
+        .map((c) => PlayingCard.fromJson(c as Map<String, dynamic>)).toList();
+    });
+
+    // 게임 진행 중인 경우 AI 턴이면 AI가 플레이하도록
+    if (phase == GamePhase.playing && currentPlayer != 0 && !isProcessingTrick) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) _aiPlayCard();
+      });
+    }
   }
 
   void _startNewGame() {
@@ -148,6 +247,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
 
     // AI가 패싱할 카드 선택
     _aiSelectPassingCards();
+
+    // 게임 상태 저장
+    _saveGame();
   }
 
   void _sortHand(int playerIndex) {
@@ -566,6 +668,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       trickNumber = 1;
     });
 
+    // 게임 상태 저장
+    _saveGame();
+
     _showMessage('${playerNames[startPlayer]}가 클럽 2로 시작합니다');
 
     if (startPlayer != 0) {
@@ -645,6 +750,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     });
 
     HapticFeedback.lightImpact();
+    _saveGame(); // 게임 상태 저장
 
     // 다음 플레이어
     final nextPlayer = (playerIndex + 1) % 4;
@@ -1150,6 +1256,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         }
         _endRound();
       } else {
+        _saveGame(); // 게임 상태 저장
         if (winner != 0) {
           Future.delayed(const Duration(milliseconds: 500), () {
             _aiPlayCard();
@@ -1187,6 +1294,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       scores = finalScores;
       phase = GamePhase.roundEnd;
     });
+
+    // 저장된 게임 삭제 (게임 종료)
+    GameSaveService.clearSave();
 
     // 통계 저장
     final statsService = Provider.of<HeartsStatsService>(context, listen: false);
