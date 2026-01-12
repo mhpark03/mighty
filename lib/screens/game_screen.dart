@@ -1579,42 +1579,44 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
         ),
-        Positioned(
-          bottom: 10,
-          left: 0,
-          right: 0,
-          child: Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: controller.isHumanTurn ? Colors.amber : Colors.black38,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    controller.isHumanTurn
-                        ? l10n.yourTurn
-                        : l10n.playerTurn(_getLocalizedPlayerName(state.players[state.currentPlayer], l10n)),
-                    style: TextStyle(
-                      color: controller.isHumanTurn ? Colors.black : Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (controller.isHumanTurn)
+        // 게임 진행 중: 차례 표시, 게임 종료: 표시 안 함
+        if (state.phase == GamePhase.playing)
+          Positioned(
+            bottom: 10,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: controller.isHumanTurn ? Colors.amber : Colors.black38,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     Text(
-                      l10n.selectCardHint,
+                      controller.isHumanTurn
+                          ? l10n.yourTurn
+                          : l10n.playerTurn(_getLocalizedPlayerName(state.players[state.currentPlayer], l10n)),
                       style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 11,
+                        color: controller.isHumanTurn ? Colors.black : Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                ],
+                    if (controller.isHumanTurn)
+                      Text(
+                        l10n.selectCardHint,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 11,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -1923,7 +1925,7 @@ class _GameScreenState extends State<GameScreen> {
                 ),
                 // 이전 트릭 카드들
                 Wrap(
-                  spacing: 2,
+                  spacing: 4,
                   children: [
                     for (int i = 0; i < lastTrick.cards.length; i++)
                       Column(
@@ -1945,7 +1947,7 @@ class _GameScreenState extends State<GameScreen> {
                             decoration: lastTrick.playerOrder[i] == lastTrick.winnerId
                                 ? BoxDecoration(
                                     border: Border.all(color: Colors.amber, width: 1),
-                                    borderRadius: BorderRadius.circular(3),
+                                    borderRadius: BorderRadius.circular(4),
                                   )
                                 : null,
                             child: Opacity(
@@ -1954,7 +1956,6 @@ class _GameScreenState extends State<GameScreen> {
                                 card: lastTrick.cards[i],
                                 width: prevCardWidth,
                                 height: prevCardHeight,
-                                compact: true,
                               ),
                             ),
                           ),
@@ -2066,7 +2067,7 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             Wrap(
-              spacing: 2,
+              spacing: 4,
               children: [
                 for (int i = 0; i < trick.cards.length; i++)
                   Column(
@@ -2080,7 +2081,6 @@ class _GameScreenState extends State<GameScreen> {
                         card: trick.cards[i],
                         width: cardWidth,
                         height: cardHeight,
-                        compact: true,
                       ),
                     ],
                   ),
@@ -2112,13 +2112,8 @@ class _GameScreenState extends State<GameScreen> {
       return b.rankValue.compareTo(a.rankValue);
     });
 
-    // 화면 크기에 따른 획득 카드 크기
-    final screenWidth = MediaQuery.of(context).size.width;
-    final pointCardWidth = (screenWidth / 14).clamp(24.0, 36.0);
-    final pointCardHeight = pointCardWidth * 1.4;
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       color: Colors.black26,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -2148,25 +2143,20 @@ class _GameScreenState extends State<GameScreen> {
                 ],
               ),
             ),
-          // 획득한 점수 카드 (1~2줄) - 플레이 중 또는 게임 종료 시 표시
+          // 획득한 점수 카드 - AI와 같은 형식으로 표시
           if (pointCards.isNotEmpty && (controller.state.phase == GamePhase.playing || controller.state.phase == GamePhase.gameEnd))
             Container(
-              margin: const EdgeInsets.only(bottom: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+              margin: const EdgeInsets.only(bottom: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.black54,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(4),
               ),
               child: Wrap(
-                spacing: 3,
-                runSpacing: 3,
+                spacing: 2,
+                runSpacing: 2,
                 alignment: WrapAlignment.center,
-                children: pointCards.map((card) => CardWidget(
-                  card: card,
-                  width: pointCardWidth,
-                  height: pointCardHeight,
-                  compact: true,
-                )).toList(),
+                children: pointCards.map((card) => _buildTinyCardFixed(card, controller.state, 32.0)).toList(),
               ),
             ),
           // 카드 목록 - 세로 모드: 2줄, 가로 모드: 1줄 스크롤
@@ -2508,7 +2498,7 @@ class _GameScreenState extends State<GameScreen> {
       final bonusPart = (state.declarerTeamPoints - minContract) * 2;
       baseScore = basicPart + bonusPart;
       formula = '(득점-공약+1) + (득점-최소)×2';
-      calculation = '($basicPart) + (${state.declarerTeamPoints}-$minContract)×2 = $basicPart + $bonusPart = $baseScore';
+      calculation = '(${state.declarerTeamPoints}-$targetTricks+1) + (${state.declarerTeamPoints}-$minContract)×2 = $basicPart + $bonusPart = $baseScore';
 
       if (isRun) {
         specialMultiplier *= 2;
@@ -2625,25 +2615,30 @@ class _GameScreenState extends State<GameScreen> {
       });
     }
 
+    final screenHeight = MediaQuery.of(context).size.height;
+    final maxDialogHeight = screenHeight * 0.85;
+
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(24),
+        constraints: BoxConstraints(maxHeight: maxDialogHeight),
+        padding: const EdgeInsets.all(20),
         margin: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              state.declarerWon ? l10n.declarerTeamWins : l10n.defenderTeamWins,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: state.declarerWon ? Colors.green : Colors.red,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                state.declarerWon ? l10n.declarerTeamWins : l10n.defenderTeamWins,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: state.declarerWon ? Colors.green : Colors.red,
+                ),
               ),
-            ),
             const SizedBox(height: 16),
             Text(
               state.declarerTeamPoints == 20
@@ -2670,28 +2665,94 @@ class _GameScreenState extends State<GameScreen> {
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            for (final player in state.players)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${_getLocalizedPlayerName(player, l10n)} ${player.isDeclarer ? "(${l10n.declarer})" : player.isFriend ? "(${l10n.friend})" : ""}',
-                    ),
-                    Text(
-                      l10n.points(state.getPlayerScore(player.id)),
-                      style: TextStyle(
-                        color: state.getPlayerScore(player.id) >= 0
-                            ? Colors.green
-                            : Colors.red,
-                        fontWeight: FontWeight.bold,
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                children: [
+                  for (int i = 0; i < state.players.length; i++)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: i % 2 == 0 ? Colors.grey[100] : Colors.white,
+                        borderRadius: BorderRadius.vertical(
+                          top: i == 0 ? const Radius.circular(7) : Radius.zero,
+                          bottom: i == state.players.length - 1 ? const Radius.circular(7) : Radius.zero,
+                        ),
+                        border: i < state.players.length - 1
+                            ? Border(bottom: BorderSide(color: Colors.grey[300]!))
+                            : null,
+                      ),
+                      child: Row(
+                        children: [
+                          // 역할 아이콘
+                          if (state.players[i].isDeclarer)
+                            Container(
+                              margin: const EdgeInsets.only(right: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.red[100],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                l10n.declarer,
+                                style: TextStyle(fontSize: 10, color: Colors.red[700], fontWeight: FontWeight.bold),
+                              ),
+                            )
+                          else if (state.players[i].isFriend)
+                            Container(
+                              margin: const EdgeInsets.only(right: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.blue[100],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                l10n.friend,
+                                style: TextStyle(fontSize: 10, color: Colors.blue[700], fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          // 이름
+                          Expanded(
+                            child: Text(
+                              _getLocalizedPlayerName(state.players[i], l10n),
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                          // 점수
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: state.getPlayerScore(state.players[i].id) >= 0
+                                  ? Colors.green[50]
+                                  : Colors.red[50],
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: state.getPlayerScore(state.players[i].id) >= 0
+                                    ? Colors.green[300]!
+                                    : Colors.red[300]!,
+                              ),
+                            ),
+                            child: Text(
+                              l10n.points(state.getPlayerScore(state.players[i].id)),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: state.getPlayerScore(state.players[i].id) >= 0
+                                    ? Colors.green[700]
+                                    : Colors.red[700],
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                ],
               ),
-            const SizedBox(height: 24),
+            ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -2704,14 +2765,14 @@ class _GameScreenState extends State<GameScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[300],
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   ),
                   child: Text(
                     l10n.confirm,
-                    style: const TextStyle(fontSize: 18, color: Colors.black),
+                    style: const TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
@@ -2725,16 +2786,17 @@ class _GameScreenState extends State<GameScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   ),
                   child: Text(
                     l10n.newGame,
-                    style: const TextStyle(fontSize: 18, color: Colors.black),
+                    style: const TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ),
               ],
             ),
           ],
+          ),
         ),
       ),
     );
