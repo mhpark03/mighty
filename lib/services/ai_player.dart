@@ -2091,7 +2091,8 @@ class AIPlayer {
     if (isAttackTeam && defenseWinning) {
       // 공격팀인데 수비팀이 이기고 있으면 마이티/조커로 선공권 탈환 시도
       bool hasJoker = player.hand.any((c) => c.isJoker);
-      bool hasMighty = playableCards.any((c) => c.isMighty);
+      final mightyCard = state.mighty;
+      bool hasMighty = playableCards.any((c) => c.suit == mightyCard.suit && c.rank == mightyCard.rank);
 
       // 마이티 무늬 확인 (기루다가 스페이드면 다이아, 아니면 스페이드)
       Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
@@ -2134,8 +2135,8 @@ class AIPlayer {
       bool isLastPlayer = state.currentTrick != null &&
           state.currentTrick!.cards.length == 4;
       if (isLastPlayer && hasMighty) {
-        final mighty = playableCards.where((c) => c.isMighty).toList();
-        if (currentWinningCard != null && !currentWinningCard.isJoker) {
+        final mighty = playableCards.where((c) => c.suit == mightyCard.suit && c.rank == mightyCard.rank).toList();
+        if (mighty.isNotEmpty && currentWinningCard != null && !currentWinningCard.isJoker) {
           return mighty.first;
         }
       }
@@ -2143,9 +2144,9 @@ class AIPlayer {
       // 마이티로 선공권 탈환 (첫 트릭 제외)
       // 단, 조커가 있으면 조커를 먼저 사용하고 마이티는 상대 조커 대응용으로 아낌
       if (state.currentTrickNumber > 1 && hasMighty) {
-        final mighty = playableCards.where((c) => c.isMighty).toList();
+        final mighty = playableCards.where((c) => c.suit == mightyCard.suit && c.rank == mightyCard.rank).toList();
         // 현재 이기고 있는 카드가 조커가 아니면 마이티 사용
-        if (currentWinningCard != null && !currentWinningCard.isJoker) {
+        if (mighty.isNotEmpty && currentWinningCard != null && !currentWinningCard.isJoker) {
           // 조커가 없거나, 점수 카드가 3장 이상일 때만 마이티 사용
           int pointCardsInTrick = state.currentTrick!.cards
               .where((c) => c.isPointCard || c.isJoker).length;
