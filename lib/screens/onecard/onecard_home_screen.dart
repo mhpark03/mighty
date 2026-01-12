@@ -5,8 +5,30 @@ import '../../services/onecard/onecard_stats_service.dart';
 import '../../services/ad_service.dart';
 import 'onecard_screen.dart';
 
-class OneCardHomeScreen extends StatelessWidget {
+class OneCardHomeScreen extends StatefulWidget {
   const OneCardHomeScreen({super.key});
+
+  @override
+  State<OneCardHomeScreen> createState() => _OneCardHomeScreenState();
+}
+
+class _OneCardHomeScreenState extends State<OneCardHomeScreen> {
+  bool _hasSavedGame = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedGame();
+  }
+
+  Future<void> _checkSavedGame() async {
+    final hasSaved = await OneCardScreen.hasSavedGame();
+    if (mounted) {
+      setState(() {
+        _hasSavedGame = hasSaved;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +104,7 @@ class OneCardHomeScreen extends StatelessWidget {
                         ),
                         SizedBox(height: sectionGap),
 
-                        // 게임 시작 버튼
+                        // 게임 시작하기/이어하기 버튼
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
@@ -90,11 +112,12 @@ class OneCardHomeScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const OneCardScreen(
+                                  builder: (context) => OneCardScreen(
                                     playerCount: 4,
+                                    resumeGame: _hasSavedGame,
                                   ),
                                 ),
-                              );
+                              ).then((_) => _checkSavedGame());
                             },
                             icon: Icon(
                               Icons.play_arrow,
@@ -102,7 +125,7 @@ class OneCardHomeScreen extends StatelessWidget {
                               size: buttonIconSize,
                             ),
                             label: Text(
-                              l10n.startGame,
+                              _hasSavedGame ? l10n.continueGame : l10n.startGame,
                               style: TextStyle(
                                 fontSize: buttonFontSize,
                                 fontWeight: FontWeight.bold,

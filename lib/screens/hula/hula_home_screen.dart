@@ -5,8 +5,30 @@ import '../../services/hula/hula_stats_service.dart';
 import '../../services/ad_service.dart';
 import 'hula_screen.dart';
 
-class HulaHomeScreen extends StatelessWidget {
+class HulaHomeScreen extends StatefulWidget {
   const HulaHomeScreen({super.key});
+
+  @override
+  State<HulaHomeScreen> createState() => _HulaHomeScreenState();
+}
+
+class _HulaHomeScreenState extends State<HulaHomeScreen> {
+  bool _hasSavedGame = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedGame();
+  }
+
+  Future<void> _checkSavedGame() async {
+    final hasSaved = await HulaScreen.hasSavedGame();
+    if (mounted) {
+      setState(() {
+        _hasSavedGame = hasSaved;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +105,7 @@ class HulaHomeScreen extends StatelessWidget {
                         ),
                         SizedBox(height: sectionGap),
 
-                        // 게임 시작 버튼
+                        // 게임 시작하기/이어하기 버튼
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
@@ -91,13 +113,13 @@ class HulaHomeScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const HulaScreen(
+                                  builder: (context) => HulaScreen(
                                     playerCount: 4,
                                     difficulty: HulaDifficulty.hard,
-                                    resumeGame: false,
+                                    resumeGame: _hasSavedGame,
                                   ),
                                 ),
-                              );
+                              ).then((_) => _checkSavedGame());
                             },
                             icon: Icon(
                               Icons.play_arrow,
@@ -105,7 +127,7 @@ class HulaHomeScreen extends StatelessWidget {
                               size: buttonIconSize,
                             ),
                             label: Text(
-                              l10n.startGame,
+                              _hasSavedGame ? l10n.continueGame : l10n.startGame,
                               style: TextStyle(
                                 fontSize: buttonFontSize,
                                 fontWeight: FontWeight.bold,
