@@ -360,6 +360,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     _messageTimer?.cancel();
     _computerActionTimer?.cancel();
 
+    // 이전 게임 승자 저장 (새 게임 시작 플레이어로 사용)
+    final previousWinner = winnerIndex;
+
     deck = createDeck();
     deck.shuffle(Random());
 
@@ -394,8 +397,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       _sortHand(hand);
     }
 
-    // 시작 플레이어 랜덤 선택 (0 = 플레이어, 1~N = 컴퓨터)
-    currentTurn = random.nextInt(playerCount);
+    // 시작 플레이어 선택 (이전 게임 승자가 먼저, 첫 게임은 랜덤)
+    currentTurn = previousWinner ?? random.nextInt(playerCount);
     gameOver = false;
     winner = null;
     winnerIndex = null;
@@ -2745,10 +2748,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   void _calculateScoresAndEnd({required int stopperIndex}) {
-    // 모든 플레이어 점수 계산
-    scores[0] = _calculateHandScore(playerHand);
+    // 모든 플레이어 점수 계산 (등록하지 못한 플레이어는 2배 패널티)
+    final playerRegistered = playerMelds.isNotEmpty;
+    scores[0] = _calculateHandScore(playerHand) * (playerRegistered ? 1 : 2);
     for (int i = 0; i < computerHands.length; i++) {
-      scores[i + 1] = _calculateHandScore(computerHands[i]);
+      final computerRegistered = computerMelds[i].isNotEmpty;
+      scores[i + 1] = _calculateHandScore(computerHands[i]) * (computerRegistered ? 1 : 2);
     }
 
     // 최저 점수 찾기
@@ -2792,10 +2797,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // stopperIndex: 스톱 실패한 플레이어 인덱스 (null이면 일반 종료)
   void _endGame(int winnerIdx, {int? stopperIndex}) {
-    // 손패 점수 계산
-    scores[0] = _calculateHandScore(playerHand);
+    // 손패 점수 계산 (등록하지 못한 플레이어는 2배 패널티)
+    final playerRegistered = playerMelds.isNotEmpty;
+    scores[0] = _calculateHandScore(playerHand) * (playerRegistered ? 1 : 2);
     for (int i = 0; i < computerHands.length; i++) {
-      scores[i + 1] = _calculateHandScore(computerHands[i]);
+      final computerRegistered = computerMelds[i].isNotEmpty;
+      scores[i + 1] = _calculateHandScore(computerHands[i]) * (computerRegistered ? 1 : 2);
     }
 
     // 라운드 점수 계산

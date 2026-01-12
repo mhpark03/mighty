@@ -158,6 +158,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
 
   bool gameOver = false;
   String? winner;
+  int? winnerIndex; // 승자 인덱스 (0 = 플레이어, 1+ = 컴퓨터)
 
   // 공격 스택
   int attackStack = 0;
@@ -339,6 +340,9 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
   }
 
   void _initGame() {
+    // 이전 게임 승자 저장 (새 게임 시작 플레이어로 사용)
+    final previousWinner = winnerIndex;
+
     deck = _createDeck();
     deck.shuffle(Random());
 
@@ -369,7 +373,8 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     discardPile.add(firstCard);
     lastNormalCard = firstCard;
 
-    currentTurn = 0;
+    // 시작 플레이어 선택 (이전 게임 승자가 먼저, 첫 게임은 플레이어)
+    currentTurn = previousWinner ?? 0;
     turnDirection = 1;
     waitingForNextTurn = false;
     lastPlayedCard = null;
@@ -377,6 +382,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     lastPlayerName = null;
     gameOver = false;
     winner = null;
+    winnerIndex = null;
     attackStack = 0;
     declaredSuit = null;
     skipNextTurn = false;
@@ -490,6 +496,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     lastPlayerName = null;
     gameOver = false;
     winner = null;
+    winnerIndex = null;
     skipNextTurn = false;
     reverseDirection = false;
     selectedCardIndex = null;
@@ -672,12 +679,14 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
       if (playerHand.isEmpty) {
         gameOver = true;
         winner = '플레이어';
+        winnerIndex = 0;
         return;
       }
       for (int i = 0; i < computerHands.length; i++) {
         if (computerHands[i].isEmpty) {
           gameOver = true;
           winner = aiNames[i];
+          winnerIndex = i + 1;
           return;
         }
       }
@@ -843,16 +852,18 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
   String _getBankruptcyWinner() {
     // 파산하지 않은 플레이어 중 카드가 가장 적은 사람
     int minCards = playerHand.length;
-    int winnerIndex = 0; // 0 = 플레이어
+    int localWinnerIndex = 0; // 0 = 플레이어
 
     for (int i = 0; i < computerHands.length; i++) {
       if (computerHands[i].length < minCards) {
         minCards = computerHands[i].length;
-        winnerIndex = i + 1; // AI 인덱스는 1부터 시작
+        localWinnerIndex = i + 1; // AI 인덱스는 1부터 시작
       }
     }
 
-    return winnerIndex == 0 ? '플레이어' : aiNames[winnerIndex - 1];
+    // 클래스 변수에 승자 인덱스 저장
+    winnerIndex = localWinnerIndex;
+    return localWinnerIndex == 0 ? '플레이어' : aiNames[localWinnerIndex - 1];
   }
 
   void _computerTurn(int computerIndex) {
@@ -884,6 +895,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         if (computerHand.length >= bankruptcyLimit) {
           gameOver = true;
           winner = '플레이어';
+          winnerIndex = 0;
           pendingMessage = '$computerName 파산! (${computerHand.length}장 보유)';
           return;
         }
