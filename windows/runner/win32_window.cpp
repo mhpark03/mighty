@@ -216,6 +216,14 @@ Win32Window::MessageHandler(HWND hwnd,
     case WM_DWMCOLORIZATIONCOLORCHANGED:
       UpdateTheme(hwnd);
       return 0;
+
+    case WM_GETMINMAXINFO: {
+      MINMAXINFO* min_max_info = reinterpret_cast<MINMAXINFO*>(lparam);
+      // 최소 창 크기 설정 (400 x 700 픽셀)
+      min_max_info->ptMinTrackSize.x = 400;
+      min_max_info->ptMinTrackSize.y = 700;
+      return 0;
+    }
   }
 
   return DefWindowProc(window_handle_, message, wparam, lparam);

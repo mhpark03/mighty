@@ -417,7 +417,12 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: leftOpponents.map((opponent) =>
-                        _buildOpponentArea(opponent, state, l10n, controller, sizes)
+                        Flexible(
+                          child: SingleChildScrollView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            child: _buildOpponentArea(opponent, state, l10n, controller, sizes),
+                          ),
+                        )
                       ).toList(),
                     ),
                   ),
@@ -429,7 +434,12 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: rightOpponents.map((opponent) =>
-                        _buildOpponentArea(opponent, state, l10n, controller, sizes)
+                        Flexible(
+                          child: SingleChildScrollView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            child: _buildOpponentArea(opponent, state, l10n, controller, sizes),
+                          ),
+                        )
                       ).toList(),
                     ),
                   ),
