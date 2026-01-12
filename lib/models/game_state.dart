@@ -540,11 +540,11 @@ class GameState {
       }
     }
 
-    // 첫 트릭에서 조커/마이티 제한 (후속 플레이어)
+    // 첫 트릭에서 조커 제한 (후속 플레이어) - 마이티는 사용 가능
     if (currentTrickNumber == 1 && !mightyJokerUsed) {
-      if (card.isJoker || card.isMighty) {
+      if (card.isJoker) {
         final otherCards = player.hand
-            .where((c) => !c.isJoker && !c.isMighty)
+            .where((c) => !c.isJoker)
             .toList();
         if (otherCards.isNotEmpty) {
           return false;
