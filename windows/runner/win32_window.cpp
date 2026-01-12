@@ -219,7 +219,7 @@ Win32Window::MessageHandler(HWND hwnd,
 
     case WM_GETMINMAXINFO: {
       MINMAXINFO* min_max_info = reinterpret_cast<MINMAXINFO*>(lparam);
-      // 최소 창 크기 설정 (400 x 700 픽셀)
+      // Set minimum window size (400 x 700 pixels)
       min_max_info->ptMinTrackSize.x = 400;
       min_max_info->ptMinTrackSize.y = 700;
       return 0;
