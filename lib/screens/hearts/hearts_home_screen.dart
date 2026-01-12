@@ -105,23 +105,17 @@ class _HeartsHomeScreenState extends State<HeartsHomeScreen> {
                         ),
                         SizedBox(height: sectionGap),
 
-                        // 게임 시작 버튼
+                        // 게임 시작하기/이어하기 버튼
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
-                            onPressed: () async {
-                              // 저장된 게임이 있으면 삭제
-                              if (_hasSavedGame) {
-                                await HeartsScreen.clearSavedGame();
-                              }
-                              if (context.mounted) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const HeartsScreen(),
-                                  ),
-                                ).then((_) => _checkSavedGame());
-                              }
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HeartsScreen(resumeGame: _hasSavedGame),
+                                ),
+                              ).then((_) => _checkSavedGame());
                             },
                             icon: Icon(
                               Icons.play_arrow,
@@ -129,7 +123,7 @@ class _HeartsHomeScreenState extends State<HeartsHomeScreen> {
                               size: buttonIconSize,
                             ),
                             label: Text(
-                              l10n.startGame,
+                              _hasSavedGame ? l10n.continueGame : l10n.startGame,
                               style: TextStyle(
                                 fontSize: buttonFontSize,
                                 fontWeight: FontWeight.bold,
@@ -145,43 +139,6 @@ class _HeartsHomeScreenState extends State<HeartsHomeScreen> {
                             ),
                           ),
                         ),
-                        // 이어하기 버튼
-                        if (_hasSavedGame) ...[
-                          SizedBox(height: isSmallScreen ? 8 : 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton.icon(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const HeartsScreen(resumeGame: true),
-                                  ),
-                                ).then((_) => _checkSavedGame());
-                              },
-                              icon: Icon(
-                                Icons.refresh,
-                                color: Colors.white,
-                                size: buttonIconSize,
-                              ),
-                              label: Text(
-                                l10n.continueGame,
-                                style: TextStyle(
-                                  fontSize: buttonFontSize,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.white70, width: 2),
-                                padding: EdgeInsets.symmetric(vertical: buttonPadding),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
                         SizedBox(height: sectionGap),
 
                         // 통계 테이블
