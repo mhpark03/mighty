@@ -2740,17 +2740,50 @@ class AIPlayer {
 
         if (iAmFriend) {
           // 내가 프렌드인데, 이기고 있는 사람이 나도 아니고 주공도 아니면 수비팀이 이기는 것
-          if (winner.id != player.id) {
+          if (winner.id != player.id && !winner.isDeclarer) {
             return true;
           }
-          return false; // 내가 이기고 있으므로 공격팀이 이기는 것
+          return false; // 내가 또는 주공이 이기고 있으므로 공격팀이 이기는 것
         }
       }
 
       // 내가 프렌드가 아니면 보수적으로 판단
-      // 주공인 경우: 이기고 있는 사람이 프렌드일 수 있으므로 false
-      if (player.isDeclarer) {
-        return false;
+      // 주공인 경우: 현재 트릭에서 프렌드 카드가 나왔는지 확인
+      if (player.isDeclarer && state.friendDeclaration?.card != null) {
+        final friendCard = state.friendDeclaration!.card!;
+        // 현재 트릭에서 프렌드 카드를 낸 플레이어 찾기
+        int? friendPlayerId;
+        if (state.currentTrick != null) {
+          for (int i = 0; i < state.currentTrick!.cards.length; i++) {
+            final card = state.currentTrick!.cards[i];
+            bool isFriendCard;
+            if (friendCard.isJoker) {
+              isFriendCard = card.isJoker;
+            } else {
+              isFriendCard = card.suit == friendCard.suit && card.rank == friendCard.rank;
+            }
+            if (isFriendCard) {
+              // 트릭의 i번째 카드를 낸 플레이어 ID 계산
+              final leaderId = state.currentTrick!.leadPlayerId;
+              friendPlayerId = (leaderId + i) % state.players.length;
+              break;
+            }
+          }
+        }
+
+        if (friendPlayerId != null) {
+          // 프렌드가 이 트릭에 참여함 - 프렌드가 이기고 있으면 공격팀이 이기는 것
+          if (winner.id == friendPlayerId) {
+            return false; // 프렌드가 이기고 있으므로 공격팀이 이기는 것
+          }
+          return true; // 프렌드가 참여했지만 이기지 않음 - 수비팀이 이기는 것
+        }
+
+        // 프렌드 카드가 아직 안 나옴 - 수비팀이 이기고 있다고 판단
+        return true;
+      } else if (player.isDeclarer) {
+        // 노프렌드인 경우
+        return true; // 주공 자신이 아니면 수비팀이 이기는 것
       }
 
       // 수비팀인 경우: 이기고 있는 사람이 주공이 아니고 자신도 아니면
