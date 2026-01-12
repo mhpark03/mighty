@@ -135,7 +135,7 @@ class GameSelectionScreen extends StatelessWidget {
                             crossAxisCount: crossAxisCount,
                             crossAxisSpacing: isSmallScreen ? 10 : 16,
                             mainAxisSpacing: isSmallScreen ? 10 : 16,
-                            childAspectRatio: screenWidth >= 600 ? 1.2 : 1.1,
+                            childAspectRatio: screenWidth >= 600 ? 1.2 : (isSmallScreen ? 0.95 : 1.0),
                           ),
                           itemCount: games.length,
                           itemBuilder: (context, index) {
@@ -182,6 +182,7 @@ class GameSelectionScreen extends StatelessWidget {
     required double titleSize,
     required double subtitleSize,
   }) {
+    final isSmall = iconSize < 32;
     return Material(
       color: game.color,
       borderRadius: BorderRadius.circular(16),
@@ -195,7 +196,7 @@ class GameSelectionScreen extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(isSmall ? 10 : 16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
