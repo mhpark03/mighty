@@ -1599,13 +1599,14 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildTopPlayers(GameState state) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final playerWidth = (screenWidth - 16) / 4; // 4명의 AI, 좌우 여백 8씩
+    final playerWidth = (screenWidth - 16) / 5; // 5명 (플레이어 포함), 좌우 여백 8씩
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (int i = 1; i < 5; i++)
+        // 플레이어(index 0)도 포함하여 5명 모두 표시
+        for (int i = 0; i < 5; i++)
           SizedBox(
             width: playerWidth,
             child: _buildPlayerIndicator(state.players[i], state, i, playerWidth),
@@ -2471,12 +2472,10 @@ class _GameScreenState extends State<GameScreen> {
     int specialMultiplier = 1;
 
     if (declarerWon) {
-      // 승리: (득점 - 공약) + (득점 - 최소공약) × 2
-      final part1 = state.declarerTeamPoints - targetTricks;
-      final part2 = (state.declarerTeamPoints - minContract) * 2;
-      baseScore = part1 + part2;
+      // 승리: 득점 - 공약 + 1
+      baseScore = state.declarerTeamPoints - targetTricks + 1;
       formula = l10n.scoreFormula;
-      calculation = '(${state.declarerTeamPoints}-$targetTricks) + (${state.declarerTeamPoints}-$minContract)×2 = $part1 + $part2 = $baseScore';
+      calculation = '${state.declarerTeamPoints} - $targetTricks + 1 = $baseScore';
 
       if (isRun) {
         specialMultiplier *= 2;

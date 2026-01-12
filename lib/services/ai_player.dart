@@ -1334,12 +1334,22 @@ class AIPlayer {
       final remainingGiruda = _getRemainingGirudaCount(state, player);
       final cutSuits = _getCutSuits(state);
 
+      // 조커 프렌드인 경우, 주공이 마이티를 가지고 있을 확률이 높음
+      // 마이티 무늬로 선공하면 주공이 마이티를 낭비해야 할 수 있으므로 피함
+      final bool isJokerFriend = state.friendDeclaration?.card?.isJoker ?? false;
+      final Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
+
       // 실효가치 14+ 최상위 카드가 있으면 우선 사용 (마이티/조커보다 먼저)
       // 마이티/조커는 점수 카드가 많을 때 사용하는 것이 유리
+      // 조커 프렌드일 때는 마이티 무늬 제외
       final topCards = playableCards.where((c) {
         if (c.isJoker || c.isMighty) return false;
         // 컷된 무늬는 제외 (상대 기루다 없으면 허용)
         if (remainingGiruda > 0 && c.suit != null && cutSuits.contains(c.suit)) {
+          return false;
+        }
+        // 조커 프렌드일 때 마이티 무늬 제외
+        if (isJokerFriend && c.suit == mightySuit) {
           return false;
         }
         return _getEffectiveCardValue(c, state) >= 14;
@@ -1372,9 +1382,12 @@ class AIPlayer {
       // === 최상위 카드가 없으면 주공에게 선공 넘기기 ===
 
       // 전략 1: 주공이 없는 무늬로 선공 (주공이 기루다로 컷 가능)
+      // 조커 프렌드일 때는 마이티 무늬 제외
       Set<Suit> declarerVoidSuits = _getDeclarerVoidSuits(state);
       if (declarerVoidSuits.isNotEmpty) {
         for (Suit voidSuit in declarerVoidSuits) {
+          // 조커 프렌드일 때 마이티 무늬 스킵
+          if (isJokerFriend && voidSuit == mightySuit) continue;
           final voidSuitCards = playableCards.where((c) =>
               !c.isJoker && !c.isMighty && c.suit == voidSuit).toList();
           if (voidSuitCards.isNotEmpty) {
@@ -1399,16 +1412,26 @@ class AIPlayer {
       }
 
       // 전략 3: 비기루다 중 낮은 카드로 선공 (수비팀이 이길 가능성, 주공이 다음 기회에)
+      // 조커 프렌드일 때는 마이티 무늬를 마지막에 사용
       final nonGirudaCards = playableCards.where((c) =>
           !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
       if (nonGirudaCards.isNotEmpty) {
         nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-        // 컷되지 않은 무늬 우선
+        // 컷되지 않은 무늬 우선, 조커 프렌드일 때 마이티 무늬 제외
         final cutSuits = _getCutSuits(state);
         final nonCutCards = nonGirudaCards.where((c) =>
-            c.suit != null && !cutSuits.contains(c.suit)).toList();
+            c.suit != null && !cutSuits.contains(c.suit) &&
+            !(isJokerFriend && c.suit == mightySuit)).toList();
         if (nonCutCards.isNotEmpty) {
           return nonCutCards.first;
+        }
+        // 마이티 무늬가 아닌 카드가 있으면 우선
+        if (isJokerFriend) {
+          final nonMightySuitCards = nonGirudaCards.where((c) =>
+              c.suit != mightySuit).toList();
+          if (nonMightySuitCards.isNotEmpty) {
+            return nonMightySuitCards.first;
+          }
         }
         return nonGirudaCards.first;
       }

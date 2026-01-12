@@ -513,7 +513,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get scoreCalcLose => '점수 계산 (패배)';
 
   @override
-  String get scoreFormula => '(득점-공약) + (득점-최소)×2';
+  String get scoreFormula => '득점 - 공약 + 1';
 
   @override
   String get scoreFormulaLose => '-(공약 - 득점)';

@@ -515,7 +515,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scoreCalcLose => 'Score Calculation (Lose)';
 
   @override
-  String get scoreFormula => '(Points-Contract) + (Points-Min)×2';
+  String get scoreFormula => 'Points - Contract + 1';
 
   @override
   String get scoreFormulaLose => '-(Contract - Points)';
