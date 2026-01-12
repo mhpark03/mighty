@@ -1369,7 +1369,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                       ),
                     ] else
                       Text(
-                        '${l10n.pot}: ${state.pot}',
+                        '${l10n.pot}: ${state.pot}${winner != null ? ' (+${state.pot - winner.totalBetInGame})' : ''}',
                         style: const TextStyle(fontSize: 16),
                       ),
                 const SizedBox(height: 16),
