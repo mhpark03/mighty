@@ -85,6 +85,32 @@ class AIPlayer {
     return _getCutSuits(state).contains(suit);
   }
 
+  // 기루다가 오픈되었는지 확인 (기루다로 컷한 적이 있는지)
+  // 기루다가 아직 오픈되지 않았으면 다른 플레이어가 기루다로 컷할 가능성이 낮음
+  bool _hasGirudaBeenOpened(GameState state) {
+    if (state.giruda == null) return false;
+
+    // 과거 트릭에서 기루다가 사용되었는지 확인
+    for (final trick in state.tricks) {
+      for (final card in trick.cards) {
+        if (!card.isJoker && card.suit == state.giruda) {
+          return true;
+        }
+      }
+    }
+
+    // 현재 트릭에서 기루다가 사용되었는지 확인
+    if (state.currentTrick != null) {
+      for (final card in state.currentTrick!.cards) {
+        if (!card.isJoker && card.suit == state.giruda) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   // 주공이 특정 무늬가 없는지 확인 (컷한 이력으로 판단)
   Set<Suit> _getDeclarerVoidSuits(GameState state) {
     Set<Suit> voidSuits = {};
@@ -1882,8 +1908,13 @@ class AIPlayer {
 
             // 남은 리드 무늬가 남은 플레이어 수보다 적으면 기루다 컷 가능성 있음
             // (누군가는 리드 무늬가 없어서 기루다로 컷할 수 있음)
+            // 단, 기루다가 아직 오픈되지 않았고 선공 무늬가 기루다가 아니면 컷 가능성 낮음
+            bool girudaNotOpenedAndNotLeadSuit = !_hasGirudaBeenOpened(state) &&
+                leadSuit != state.giruda;
+
             bool girudaCutPossible = remainingPlayers > 0 &&
-                remainingLeadSuitCount < remainingPlayers;
+                remainingLeadSuitCount < remainingPlayers &&
+                !girudaNotOpenedAndNotLeadSuit;
 
             // 팀원이 확실히 이기는지 확인
             // 1. 기루다 컷 가능성이 없고
