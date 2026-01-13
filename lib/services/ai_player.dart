@@ -1084,6 +1084,16 @@ class AIPlayer {
           return state.giruda!;
         }
 
+        // 조건 1-1: 마이티가 프렌드 카드이고 기루다 A가 없으면 초반에 기루다 호출
+        // → 상대의 높은 기루다를 제거하여 기루다 정리
+        bool mightyIsFriendCard = state.friendDeclaration?.card?.isMighty ?? false;
+        bool hasGirudaAce = player.hand.any((c) =>
+            !c.isJoker && c.suit == state.giruda && c.rank == Rank.ace);
+
+        if (mightyIsFriendCard && !hasGirudaAce && _isEarlyGirudaPhase(state, player)) {
+          return state.giruda!;
+        }
+
         // 조건 2: 후반(상대 기루다 7장 이하)이면 주공이 컷으로 기루다 사용할 확률 높음
         // → 기루다 호출하지 않고, 차상위 카드를 가진 무늬 호출
         if (_isLateGirudaPhase(state, player)) {
