@@ -649,7 +649,8 @@ class GameState {
       }
     }
 
-    if (card.isJoker || card.isMighty) {
+    // 마이티는 기루다에 따라 달라지므로 실제 마이티와 비교
+    if (card.isJoker || (card.suit == mighty.suit && card.rank == mighty.rank)) {
       return true;
     }
 
