@@ -1963,12 +1963,13 @@ class AIPlayer {
                 girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
                 return girudaCards.first;
               }
-            } else {
+            } else if (highestRemainingLeadSuit != null) {
               // 팀원이 역전될 수 있으면 리드 무늬 내에서 보조
               // 상대 최강보다 높은 리드 무늬 카드 찾기
+              final highestRemaining = highestRemainingLeadSuit;
               final strongerLeadSuitCards = playableCards.where((c) =>
                   !c.isJoker && !c.isMighty && c.suit == leadSuit &&
-                  c.rankValue > highestRemainingLeadSuit!.rankValue).toList();
+                  c.rankValue > highestRemaining.rankValue).toList();
 
               if (strongerLeadSuitCards.isNotEmpty) {
                 // 이길 수 있는 카드 중 가장 낮은 것 선택
