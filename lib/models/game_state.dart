@@ -566,14 +566,17 @@ class GameState {
   }
 
   bool canPlayCard(PlayingCard card, Player player) {
+    // 마이티는 기루다에 따라 달라지므로 헬퍼 함수 사용
+    bool isMightyCard(PlayingCard c) => c.suit == mighty.suit && c.rank == mighty.rank;
+
     if (currentTrick == null || currentTrick!.cards.isEmpty) {
       // 초구(첫 트릭) 주공 선공 시 기루다 제한 (초간 방지)
       // 주공이 첫 트릭 선공일 때 기루다를 낼 수 없음
       if (currentTrickNumber == 1 && player.isDeclarer && giruda != null) {
-        if (!card.isJoker && !card.isMighty && card.suit == giruda) {
+        if (!card.isJoker && !isMightyCard(card) && card.suit == giruda) {
           // 기루다가 아닌 다른 카드가 있는지 확인
           final nonGirudaCards = player.hand
-              .where((c) => !c.isJoker && !c.isMighty && c.suit != giruda)
+              .where((c) => !c.isJoker && !isMightyCard(c) && c.suit != giruda)
               .toList();
           if (nonGirudaCards.isNotEmpty) {
             return false;
@@ -581,12 +584,12 @@ class GameState {
         }
       }
 
-      // 첫 트릭 선공에서 조커/마이티 제한
+      // 첫 트릭 선공에서 조커 제한 (마이티는 언제든지 낼 수 있음)
       if (currentTrickNumber == 1 && !mightyJokerUsed) {
-        if (card.isJoker || card.isMighty) {
+        if (card.isJoker) {
           if (player.hand.length > 1) {
             final otherCards = player.hand
-                .where((c) => !c.isJoker && !c.isMighty)
+                .where((c) => !c.isJoker)
                 .toList();
             if (otherCards.isNotEmpty) {
               return false;
