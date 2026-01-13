@@ -1639,12 +1639,11 @@ class AIPlayer {
       return _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state));
     });
 
-    if (state.currentTrickNumber > 1) {
-      final nonJokerMighty =
-          playableCards.where((c) => !c.isJoker && !c.isMighty).toList();
-      if (nonJokerMighty.isNotEmpty) {
-        return nonJokerMighty.first;
-      }
+    // 첫 트릭에서도 마이티 대신 다른 최상위 카드 우선 (마이티는 아껴둠)
+    final nonJokerMighty =
+        playableCards.where((c) => !c.isJoker && !c.isMighty).toList();
+    if (nonJokerMighty.isNotEmpty) {
+      return nonJokerMighty.first;
     }
 
     return playableCards.first;
