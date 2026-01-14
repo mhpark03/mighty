@@ -462,19 +462,22 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     _saveGame();
 
     // 컴퓨터가 먼저 시작하면 대기 상태로 전환
-    final l10n = AppLocalizations.of(context)!;
-    if (currentTurn != 0) {
-      final startingComputer = currentTurn;
-      final aiNames = _getAiNames(context);
-      _showMessage('${aiNames[startingComputer - 1]} ${l10n.start}');
-      setState(() {
-        waitingForNextTurn = true;
-      });
-      _startNextTurnTimer();
-    } else {
-      // 플레이어가 먼저 시작
-      _showMessage(l10n.drawCardMessage);
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      if (currentTurn != 0) {
+        final startingComputer = currentTurn;
+        final aiNames = _getAiNames(context);
+        _showMessage('${aiNames[startingComputer - 1]} ${l10n.start}');
+        setState(() {
+          waitingForNextTurn = true;
+        });
+        _startNextTurnTimer();
+      } else {
+        // 플레이어가 먼저 시작
+        _showMessage(l10n.drawCardMessage);
+      }
+    });
   }
 
   // 다음 턴 자동 진행 타이머 시작
@@ -711,30 +714,33 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     _cancelNextTurnTimer();
 
     // 내 차례면 메시지만 표시
-    final l10n = AppLocalizations.of(context)!;
-    if (currentTurn == 0) {
-      _showMessage(hasDrawn ? l10n.discardOrMeldMessage : l10n.drawCardMessage);
-    }
-    // 컴퓨터 턴이고 대기 상태면 타이머 시작
-    else if (waitingForNextTurn) {
-      _startNextTurnTimer();
-    }
-    // 컴퓨터 턴이고 드로우 전이면 대기 상태로 만들고 타이머 시작
-    else if (!hasDrawn) {
-      setState(() {
-        waitingForNextTurn = true;
-      });
-      _startNextTurnTimer();
-    }
-    // 컴퓨터 턴이고 드로우 후면 버리기 단계로 진행
-    else {
-      final computerIndex = currentTurn - 1;
-      _computerActionTimer = Timer(const Duration(milliseconds: 500), () {
-        if (mounted && !gameOver) {
-          _computerTurnDiscard(computerIndex);
-        }
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      if (currentTurn == 0) {
+        _showMessage(hasDrawn ? l10n.discardOrMeldMessage : l10n.drawCardMessage);
+      }
+      // 컴퓨터 턴이고 대기 상태면 타이머 시작
+      else if (waitingForNextTurn) {
+        _startNextTurnTimer();
+      }
+      // 컴퓨터 턴이고 드로우 전이면 대기 상태로 만들고 타이머 시작
+      else if (!hasDrawn) {
+        setState(() {
+          waitingForNextTurn = true;
+        });
+        _startNextTurnTimer();
+      }
+      // 컴퓨터 턴이고 드로우 후면 버리기 단계로 진행
+      else {
+        final computerIndex = currentTurn - 1;
+        _computerActionTimer = Timer(const Duration(milliseconds: 500), () {
+          if (mounted && !gameOver) {
+            _computerTurnDiscard(computerIndex);
+          }
+        });
+      }
+    });
   }
 
   void _showMessage(String message, {int seconds = 2, bool keepDuringWait = false}) {
