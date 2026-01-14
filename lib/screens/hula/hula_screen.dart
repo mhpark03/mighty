@@ -1117,6 +1117,68 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     return count;
   }
 
+  // 등록된 런에 붙일 가능성 계산 (중간 카드가 남아있으면 보너스)
+  // 예: 7-8-9 런이 있고, 내가 J를 가지고 있으면 10이 남아있을수록 J 가치 높음
+  double _calculateRunAttachPotential(PlayingCard card) {
+    double bonus = 0;
+
+    // 모든 멜드에서 런 확인
+    final allMelds = [...playerMelds];
+    for (final melds in computerMelds) {
+      allMelds.addAll(melds);
+    }
+
+    for (final meld in allMelds) {
+      if (!meld.isRun || meld.cards.isEmpty) continue;
+      if (meld.cards.first.suit != card.suit) continue;
+
+      // 런의 최소/최대 랭크 찾기
+      final ranks = meld.cards.map((c) => c.rank).toList()..sort();
+      final minRank = ranks.first;
+      final maxRank = ranks.last;
+
+      // 카드가 런에서 1칸 떨어져 있으면 (바로 붙일 수 있음)
+      if (card.rank == minRank - 1 || card.rank == maxRank + 1) {
+        bonus += 30; // 바로 붙일 수 있음
+      }
+      // 카드가 런에서 2칸 떨어져 있으면 (중간 카드 필요)
+      else if (card.rank == minRank - 2 || card.rank == maxRank + 2) {
+        // 중간 카드가 얼마나 남았는지 확인
+        final bridgeRank = card.rank < minRank ? minRank - 1 : maxRank + 1;
+        final bridgeUsed = discardPile.where((c) => c.rank == bridgeRank && c.suit == card.suit).length +
+            _countMeldedCardsWithSuit(bridgeRank, card.suit);
+
+        if (bridgeUsed == 0) {
+          // 중간 카드가 아직 많이 남음 (4장 중 4장)
+          bonus += 25;
+        } else if (bridgeUsed == 1) {
+          // 3장 남음
+          bonus += 15;
+        } else if (bridgeUsed == 2) {
+          // 2장 남음
+          bonus += 8;
+        }
+        // 3장 이상 사용되면 보너스 없음
+      }
+    }
+
+    return bonus;
+  }
+
+  // 특정 숫자와 무늬의 카드가 멜드에 있는지 확인
+  int _countMeldedCardsWithSuit(int rank, Suit suit) {
+    int count = 0;
+    for (final meld in playerMelds) {
+      count += meld.cards.where((c) => c.rank == rank && c.suit == suit).length;
+    }
+    for (final melds in computerMelds) {
+      for (final meld in melds) {
+        count += meld.cards.where((c) => c.rank == rank && c.suit == suit).length;
+      }
+    }
+    return count;
+  }
+
   // 땡큐 가능 여부 확인 (버린 카드를 가져와서 바로 등록 가능한지)
   // 주의: 새로운 멜드 등록이 가능할 때만 가져올 수 있음 (붙이기만 가능하면 안됨)
   bool _canThankYou() {
@@ -1458,7 +1520,11 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         }
       }
 
-      // 4. 버린 더미에서 같은 카드 확인 (확률 계산)
+      // 4. 등록된 런에 붙일 가능성 확인 (중간 카드가 남아있으면 가치 높음)
+      final runAttachBonus = _calculateRunAttachPotential(card);
+      keepScore += runAttachBonus;
+
+      // 5. 버린 더미에서 같은 카드 확인 (확률 계산)
       // 같은 숫자가 이미 많이 버려졌으면 Group 확률 낮음
       final discardedSameRank =
           discardPile.where((c) => c.rank == card.rank).length;
