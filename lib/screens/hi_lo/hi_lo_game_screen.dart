@@ -1191,7 +1191,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                   const SizedBox(width: 8),
                   Flexible(
                     child: Text(
-                      controller.roundTransitionMessage,
+                      getRoundTransitionMessage(context, controller.transitionRound),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -1207,7 +1207,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${controller.transitionCountdown}초',
+                      getL10n(context).secondsCount(controller.transitionCountdown),
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 12,

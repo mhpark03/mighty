@@ -11,7 +11,7 @@ class SevenCardController extends ChangeNotifier {
   late SevenCardState _state;
   bool _isProcessing = false;
   bool _isRoundTransitioning = false;
-  String _roundTransitionMessage = '';
+  int _transitionRound = 0; // 완료된 라운드 번호 (1, 2, 3)
   int _transitionCountdown = 0;
   Timer? _transitionTimer;
   SevenCardPhase? _previousPhase;
@@ -71,7 +71,7 @@ class SevenCardController extends ChangeNotifier {
   bool get isProcessing => _isProcessing;
   bool get isHumanTurn => _state.currentPlayerIndex == 0 && !_isProcessing && !_isRoundTransitioning;
   bool get isRoundTransitioning => _isRoundTransitioning;
-  String get roundTransitionMessage => _roundTransitionMessage;
+  int get transitionRound => _transitionRound; // 완료된 라운드 번호 (UI에서 로컬라이즈)
   int get transitionCountdown => _transitionCountdown;
   bool get hasActiveGame => _state.phase != SevenCardPhase.waiting && _state.phase != SevenCardPhase.gameEnd;
   int get cardCountBeforeTransition => _cardCountBeforeTransition;
@@ -163,9 +163,9 @@ class SevenCardController extends ChangeNotifier {
   }
 
   /// 라운드 전환 시작 (5초 카운트다운)
-  void _startRoundTransition(String message) {
+  void _startRoundTransition(int round) {
     _isRoundTransitioning = true;
-    _roundTransitionMessage = message;
+    _transitionRound = round;
     _transitionCountdown = 5;
     notifyListeners();
 
@@ -196,7 +196,7 @@ class SevenCardController extends ChangeNotifier {
     _processAITurnIfNeeded();
   }
 
-  /// 페이즈 변경 감지 및 전환 메시지 생성
+  /// 페이즈 변경 감지 및 전환 라운드 저장
   void _checkPhaseTransition() {
     if (_previousPhase == null) {
       _previousPhase = _state.phase;
@@ -208,24 +208,24 @@ class SevenCardController extends ChangeNotifier {
     final currPhase = _state.phase;
     _previousPhase = currPhase;
 
-    String? message;
+    int? round;
 
     if (prevPhase == SevenCardPhase.betting1 && currPhase == SevenCardPhase.betting2) {
-      message = '라운드 1 완료!\n5번째 카드가 배분됩니다.\n\nGOOD LUCK!';
+      round = 1;
       _cardCountBeforeTransition = 4; // 전환 전 카드 수 (새 카드 숨기기용)
     } else if (prevPhase == SevenCardPhase.betting2 && currPhase == SevenCardPhase.betting3) {
-      message = '라운드 2 완료!\n6번째 카드가 배분됩니다.\n\nGOOD LUCK!';
+      round = 2;
       _cardCountBeforeTransition = 5;
     } else if (prevPhase == SevenCardPhase.betting3 && currPhase == SevenCardPhase.betting4) {
-      message = '라운드 3 완료!\n마지막 7번째 카드가 배분됩니다.\n\nGOOD LUCK!';
+      round = 3;
       _cardCountBeforeTransition = 6;
     } else if (currPhase == SevenCardPhase.gameEnd && prevPhase != SevenCardPhase.gameEnd) {
       // 게임 종료는 별도 화면으로 처리
       return;
     }
 
-    if (message != null) {
-      _startRoundTransition(message);
+    if (round != null) {
+      _startRoundTransition(round);
     }
   }
 

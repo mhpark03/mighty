@@ -12,7 +12,7 @@ class HiLoController extends ChangeNotifier {
   late HiLoState _state;
   bool _isProcessing = false;
   bool _isRoundTransitioning = false;
-  String _roundTransitionMessage = '';
+  int _transitionRound = 0; // 완료된 라운드 번호 (1, 2, 3)
   int _transitionCountdown = 0;
   Timer? _transitionTimer;
   HiLoPhase? _previousPhase;
@@ -81,7 +81,7 @@ class HiLoController extends ChangeNotifier {
   bool get isProcessing => _isProcessing;
   bool get isHumanTurn => _state.currentPlayerIndex == 0 && !_isProcessing && !_isRoundTransitioning;
   bool get isRoundTransitioning => _isRoundTransitioning;
-  String get roundTransitionMessage => _roundTransitionMessage;
+  int get transitionRound => _transitionRound; // 완료된 라운드 번호 (UI에서 로컬라이즈)
   int get transitionCountdown => _transitionCountdown;
   bool get hasActiveGame => _state.phase != HiLoPhase.waiting && _state.phase != HiLoPhase.gameEnd;
   int get cardCountBeforeTransition => _cardCountBeforeTransition;
@@ -169,9 +169,9 @@ class HiLoController extends ChangeNotifier {
     _transitionCountdown = 0;
   }
 
-  void _startRoundTransition(String message) {
+  void _startRoundTransition(int round) {
     _isRoundTransitioning = true;
-    _roundTransitionMessage = message;
+    _transitionRound = round;
     _transitionCountdown = 5;
     notifyListeners();
 
@@ -210,23 +210,23 @@ class HiLoController extends ChangeNotifier {
     final currPhase = _state.phase;
     _previousPhase = currPhase;
 
-    String? message;
+    int? round;
 
     if (prevPhase == HiLoPhase.betting1 && currPhase == HiLoPhase.betting2) {
-      message = '라운드 1 완료!\n5번째 카드가 배분됩니다.\n\nGOOD LUCK!';
+      round = 1;
       _cardCountBeforeTransition = 4;
     } else if (prevPhase == HiLoPhase.betting2 && currPhase == HiLoPhase.betting3) {
-      message = '라운드 2 완료!\n6번째 카드가 배분됩니다.\n\nGOOD LUCK!';
+      round = 2;
       _cardCountBeforeTransition = 5;
     } else if (prevPhase == HiLoPhase.betting3 && currPhase == HiLoPhase.betting4) {
-      message = '라운드 3 완료!\n마지막 7번째 카드가 배분됩니다.\n\nGOOD LUCK!';
+      round = 3;
       _cardCountBeforeTransition = 6;
     } else if (currPhase == HiLoPhase.gameEnd && prevPhase != HiLoPhase.gameEnd) {
       return;
     }
 
-    if (message != null) {
-      _startRoundTransition(message);
+    if (round != null) {
+      _startRoundTransition(round);
     }
   }
 

@@ -485,7 +485,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                   const SizedBox(width: 8),
                   Flexible(
                     child: Text(
-                      controller.roundTransitionMessage,
+                      getRoundTransitionMessage(context, controller.transitionRound),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
