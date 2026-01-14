@@ -574,11 +574,31 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       return 50 + card.rank;
     }
 
+    // ★ 완전 보이드 패스: 정확히 3장인 무늬를 최우선 패스
+    // 3장을 모두 버리면 그 무늬가 리드될 때 하트나 ♠Q를 넘길 수 있음
+    // 특히 스페이드가 많으면(5장+) Q 방어가 가능하므로 다른 무늬 보이드가 유리
+    final canDefendSpadeQ = spadeCount >= 5 && lowSpadeCount >= 3;
+
+    // 정확히 3장인 무늬 찾기 (클럽/다이아만 대상)
+    Suit? exactThreeSuit;
+    if (diamondCount == 3) {
+      exactThreeSuit = Suit.diamond;
+    } else if (clubCount == 3) {
+      exactThreeSuit = Suit.club;
+    }
+
+    // 정확히 3장인 무늬가 있으면 해당 무늬 전체를 최우선 패스
+    if (exactThreeSuit != null && card.suit == exactThreeSuit) {
+      // 스페이드 방어 가능하면 더 높은 우선순위
+      final bonus = canDefendSpadeQ ? 100 : 0;
+      return 900 + bonus + card.rank; // 최우선 패스
+    }
+
     // ★ 보이드 집중 패스: 클럽/다이아 중 3장 이하인 무늬 찾기
     // 같은 무늬에서 집중 패스하면 보이드 생성 확률 증가
-    final voidTargetSuit = (clubCount <= 3 && clubCount > 0 && (diamondCount == 0 || clubCount <= diamondCount))
+    final voidTargetSuit = (clubCount <= 3 && clubCount > 0 && clubCount < 3 && (diamondCount == 0 || clubCount <= diamondCount))
         ? Suit.club
-        : (diamondCount <= 3 && diamondCount > 0)
+        : (diamondCount <= 3 && diamondCount > 0 && diamondCount < 3)
             ? Suit.diamond
             : null;
 
@@ -1038,26 +1058,27 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         }
       }
 
-      // ★ 일반 (슛더문 아님): 스페이드Q는 가장 나중에
-      // 마지막 순서 + 어떤 카드를 내도 이김 + 점수 없음 → 높은 카드 버리기 (Q 제외)
+      // ★ 마지막 순서 + 결과 확정 (모든 카드로 이김 또는 모든 카드로 짐) + 슛더문 아님
       final allCardsWin = sameSuitCards.every((c) => c.rank > highestRank);
-      if (isLastPlayer && allCardsWin && !hasPointsInTrick) {
-        final safeHighCards = sameSuitCards.where((c) => !c.isQueenOfSpades).toList();
-        if (safeHighCards.isNotEmpty) {
-          safeHighCards.sort((a, b) => b.rank.compareTo(a.rank));
-          return safeHighCards.first;
+      final allCardsLose = canWin.isEmpty;
+      if (isLastPlayer && !isShootingMoon && (allCardsWin || allCardsLose)) {
+        if (allCardsLose) {
+          // 지는 상황: 스페이드 Q 우선 버리기 (상대에게 13점 벌점)
+          final queenOfSpades = sameSuitCards.where((c) => c.isQueenOfSpades).toList();
+          if (queenOfSpades.isNotEmpty) return queenOfSpades.first;
+          // Q 없으면 가장 높은 카드
+          sameSuitCards.sort((a, b) => b.rank.compareTo(a.rank));
+          return sameSuitCards.first;
+        } else {
+          // 이기는 상황: Q 제외하고 가장 높은 카드 (Q 내면 내가 먹으므로)
+          final safeHighCards = sameSuitCards.where((c) => !c.isQueenOfSpades).toList();
+          if (safeHighCards.isNotEmpty) {
+            safeHighCards.sort((a, b) => b.rank.compareTo(a.rank));
+            return safeHighCards.first;
+          }
+          sameSuitCards.sort((a, b) => b.rank.compareTo(a.rank));
+          return sameSuitCards.first;
         }
-      }
-
-      // 이길 수 없으면 가장 높은 카드 (Q 제외)
-      if (canWin.isEmpty) {
-        final withoutQueen = sameSuitCards.where((c) => !c.isQueenOfSpades).toList();
-        if (withoutQueen.isNotEmpty) {
-          withoutQueen.sort((a, b) => b.rank.compareTo(a.rank));
-          return withoutQueen.first;
-        }
-        sameSuitCards.sort((a, b) => b.rank.compareTo(a.rank));
-        return sameSuitCards.first;
       }
 
       // 점수 트릭이면 피하기 (Q 제외)
