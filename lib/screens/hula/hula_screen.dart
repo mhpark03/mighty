@@ -1405,21 +1405,36 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       // 2. 같은 숫자 카드 개수 (Group 가능성)
       final sameRankCount = hand.where((c) => c.rank == card.rank).length;
       if (sameRankCount >= 2) {
-        keepScore += sameRankCount * 30; // 2장: 60, 3장: 90
-        // 2-1. K/Q/J 페어는 추가 보너스 (다른 플레이어가 버릴 확률 높음)
-        if (card.rank >= 11) { // J=11, Q=12, K=13
-          keepScore += 40;
-        }
-        // 2-2. 버린 더미나 멜드에 같은 숫자가 있으면 그룹 완성 확률 낮아짐
+        // 먼저 그룹 완성 가능 여부 확인
         final discardedSameRank = discardPile.where((c) => c.rank == card.rank).length;
         final meldedSameRank = _countMeldedCards(card.rank);
         final usedSameRank = discardedSameRank + meldedSameRank;
+
         if (usedSameRank >= 2) {
-          // 2장 이상 나왔으면 그룹 완성 불가능 (4장 중 2장 손패 + 2장 사용됨)
-          keepScore -= 50;
-        } else if (usedSameRank == 1) {
-          // 1장 나왔으면 확률 낮아짐 (남은 1장만 가능)
-          keepScore -= 20;
+          // 그룹 완성 불가능 - 단독 카드와 동일하게 처리 (숫자 역순으로 버리기)
+          // 5/6/7/8/9는 제외 (별도 런 보너스)
+          if (!(card.rank >= 5 && card.rank <= 9)) {
+            if (card.rank == 1) {
+              keepScore += 50;
+            } else if (card.rank == 2) {
+              keepScore += 45;
+            } else if (card.rank == 3) {
+              keepScore += 40;
+            } else {
+              keepScore += (14 - card.rank) * 4; // K→4, Q→8, J→12, 4→40
+            }
+          }
+        } else {
+          // 그룹 완성 가능 - 페어 보너스 적용
+          keepScore += sameRankCount * 30; // 2장: 60, 3장: 90
+          // K/Q/J 페어는 추가 보너스 (다른 플레이어가 버릴 확률 높음)
+          if (card.rank >= 11) {
+            keepScore += 40;
+          }
+          // 1장 사용됨 - 확률 낮아짐
+          if (usedSameRank == 1) {
+            keepScore -= 20;
+          }
         }
       }
 
