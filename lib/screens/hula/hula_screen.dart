@@ -1143,22 +1143,16 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       }
       // 카드가 런에서 2칸 떨어져 있으면 (중간 카드 필요)
       else if (card.rank == minRank - 2 || card.rank == maxRank + 2) {
-        // 중간 카드가 얼마나 남았는지 확인
+        // 중간 카드가 남아있는지 확인 (각 무늬당 1장뿐)
         final bridgeRank = card.rank < minRank ? minRank - 1 : maxRank + 1;
         final bridgeUsed = discardPile.where((c) => c.rank == bridgeRank && c.suit == card.suit).length +
             _countMeldedCardsWithSuit(bridgeRank, card.suit);
 
         if (bridgeUsed == 0) {
-          // 중간 카드가 아직 많이 남음 (4장 중 4장)
+          // 중간 카드가 남아있음 - 붙일 가능성 있음
           bonus += 25;
-        } else if (bridgeUsed == 1) {
-          // 3장 남음
-          bonus += 15;
-        } else if (bridgeUsed == 2) {
-          // 2장 남음
-          bonus += 8;
         }
-        // 3장 이상 사용되면 보너스 없음
+        // bridgeUsed >= 1: 중간 카드가 사라짐 - 보너스 없음 (일반 단독 카드로 처리)
       }
     }
 
