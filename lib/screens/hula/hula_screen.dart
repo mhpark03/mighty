@@ -1101,6 +1101,22 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     return false;
   }
 
+  // 특정 숫자의 카드가 멜드에 몇 장 있는지 확인
+  int _countMeldedCards(int rank) {
+    int count = 0;
+    // 플레이어 멜드에서 확인
+    for (final meld in playerMelds) {
+      count += meld.cards.where((c) => c.rank == rank).length;
+    }
+    // 컴퓨터 멜드에서 확인
+    for (final melds in computerMelds) {
+      for (final meld in melds) {
+        count += meld.cards.where((c) => c.rank == rank).length;
+      }
+    }
+    return count;
+  }
+
   // 땡큐 가능 여부 확인 (버린 카드를 가져와서 바로 등록 가능한지)
   // 주의: 새로운 멜드 등록이 가능할 때만 가져올 수 있음 (붙이기만 가능하면 안됨)
   bool _canThankYou() {
@@ -1393,6 +1409,17 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         // 2-1. K/Q/J 페어는 추가 보너스 (다른 플레이어가 버릴 확률 높음)
         if (card.rank >= 11) { // J=11, Q=12, K=13
           keepScore += 40;
+        }
+        // 2-2. 버린 더미나 멜드에 같은 숫자가 있으면 그룹 완성 확률 낮아짐
+        final discardedSameRank = discardPile.where((c) => c.rank == card.rank).length;
+        final meldedSameRank = _countMeldedCards(card.rank);
+        final usedSameRank = discardedSameRank + meldedSameRank;
+        if (usedSameRank >= 2) {
+          // 2장 이상 나왔으면 그룹 완성 불가능 (4장 중 2장 손패 + 2장 사용됨)
+          keepScore -= 50;
+        } else if (usedSameRank == 1) {
+          // 1장 나왔으면 확률 낮아짐 (남은 1장만 가능)
+          keepScore -= 20;
         }
       }
 
