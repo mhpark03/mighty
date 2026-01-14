@@ -1360,6 +1360,15 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         }
       }
 
+      // 1-2. 5나 9 카드는 6/8 다음 우선순위 (5-6-7 또는 7-8-9 런 가능)
+      if (card.rank == 5 || card.rank == 9) {
+        final sevenOfSameSuit = _isSevenRegistered(card.suit);
+        if (!sevenOfSameSuit) {
+          // 7이 아직 등록되지 않았으면 5/9 유지 가치 높임 (6/8보다 낮은 우선순위)
+          keepScore += 60;
+        }
+      }
+
       // 2. 같은 숫자 카드 개수 (Group 가능성)
       final sameRankCount = hand.where((c) => c.rank == card.rank).length;
       if (sameRankCount >= 2) {
