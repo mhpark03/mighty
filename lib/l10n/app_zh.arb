@@ -232,5 +232,399 @@
   "hulaTitle": "胡拉",
   "hulaSubtitle": "4人拉米纸牌游戏",
   "heartsTitle": "红心大战",
-  "heartsSubtitle": "4人吃墩游戏"
+  "heartsSubtitle": "4人吃墩游戏",
+  "handRoyalStraightFlush": "皇家同花顺",
+  "handBackStraightFlush": "反向同花顺",
+  "handStraightFlush": "同花顺",
+  "handFourOfAKind": "四条",
+  "handFullHouse": "葫芦",
+  "handFlush": "同花",
+  "handMountain": "山",
+  "handBackStraight": "反向顺子",
+  "handStraight": "顺子",
+  "handTriple": "三条",
+  "handTwoPair": "两对",
+  "handOnePair": "一对",
+  "handHighCard": "高牌",
+  "highCardTop": "{rank}高",
+  "@highCardTop": {
+    "placeholders": {
+      "rank": {"type": "String"}
+    }
+  },
+  "noLow": "无低牌",
+  "betPing": "平",
+  "betCheck": "过牌",
+  "betCall": "跟注",
+  "betDdadang": "加倍",
+  "betQuarter": "四分之一",
+  "betHalf": "一半",
+  "betFull": "全部",
+  "betDie": "弃牌",
+  "selectOpenCard": "选择要公开的牌",
+  "selectOpenCardDesc": "选中的牌将向对手公开",
+  "aiSelectingCard": "AI正在选择牌...",
+  "nthCard": "第{n}张牌",
+  "@nthCard": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "secondsCount": "{n}秒",
+  "@secondsCount": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "totalBetAmount": "总计: {amount}",
+  "@totalBetAmount": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "bettingAmount": "下注: {amount}",
+  "@bettingAmount": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "bonusHand": "奖励牌型！",
+  "bonus": "奖励",
+  "total": "总计",
+  "otherPlayersLose": "其他玩家: 各 -{amount}",
+  "@otherPlayersLose": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "thisGame": "本局",
+  "cumulative": "累计",
+  "foldedSection": "弃牌",
+  "hiLoHi": "高",
+  "hiLoLo": "低",
+  "hiLoSwing": "双向",
+  "roundComplete": "第 {n} 轮完成！",
+  "@roundComplete": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "cardDistribution5": "正在发第5张牌。",
+  "cardDistribution6": "正在发第6张牌。",
+  "cardDistribution7": "正在发最后第7张牌。",
+  "goodLuck": "祝好运！",
+  "suitSpade": "黑桃",
+  "suitDiamond": "方块",
+  "suitHeart": "红心",
+  "suitClub": "梅花",
+  "noGiruda": "无王牌",
+  "noFriend": "无朋友",
+  "firstTrickFriend": "首轮朋友",
+  "cardOwner": "{card}持有者",
+  "@cardOwner": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "trickWinner": "第{n}轮获胜者",
+  "@trickWinner": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "hint": "提示",
+  "hintOff": "提示 关闭",
+  "hintDialogContent": "观看广告即可启用提示。\n继续吗？",
+  "newGameDialogContent": "观看广告即可开始新游戏。\n继续吗？",
+  "watchAd": "观看广告",
+  "jokerLead": "小丑先攻: {suit}",
+  "@jokerLead": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "gameSelection": "游戏选择",
+  "onecardTitle": "单牌",
+  "onecardSubtitle": "4人对战",
+  "gameRules": "游戏规则",
+  "confirm": "确认",
+  "heartsGuideGoal": "目标",
+  "heartsGuideGoalText": "目标是避开红心牌和黑桃皇后，获得最低分数。",
+  "heartsGuideHow": "玩法",
+  "heartsGuideHowText": "• 4人游戏，每人13张牌\n• 游戏开始时向左传3张牌\n• 持有梅花2的玩家先出\n• 进行13轮，避开得分牌",
+  "heartsGuideScoring": "计分",
+  "heartsGuideScoringText": "• 红心牌: 每张1分 (共13分)\n• 黑桃皇后 (♠Q): 13分\n• 总分: 26分\n• 低分获胜！",
+  "heartsGuideBreaking": "红心破冰",
+  "heartsGuideBreakingText": "第一轮不能出红心。\n红心被出过后才能用红心领出。",
+  "heartsGuideShootMoon": "射月",
+  "heartsGuideShootMoonText": "如果一位玩家获得所有红心和黑桃皇后:\n• 该玩家: 0分\n• 其他玩家: 各26分",
+  "heartsGuideTips": "策略提示",
+  "heartsGuideTipsText": "• 尽早打出大牌\n• 小心黑桃皇后\n• 把得分牌给对手",
+  "allScoreCardsUsed": "所有得分牌用完！游戏结束",
+  "passLeftCount": "向左传 ({count}/3)",
+  "@passLeftCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "cardPass": "传牌",
+  "trickProgress": "轮次 {current}/13",
+  "@trickProgress": {
+    "placeholders": {
+      "current": {"type": "int"}
+    }
+  },
+  "heartBroken": "红心破冰",
+  "passRecommend": "推荐传牌",
+  "recommend": "推荐",
+  "selectCardsToPassLeft": "选择3张牌向左传",
+  "playerNameWins": "{name} 获胜",
+  "@playerNameWins": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "playerStartsWithClub2": "{name}以梅花2开始",
+  "@playerStartsWithClub2": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "playerWonTrick": "{name}赢得本轮！(+{points}分)",
+  "@playerWonTrick": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "points": {"type": "int"}
+    }
+  },
+  "playerShootMoonSuccess": "{name}全收成功！",
+  "@playerShootMoonSuccess": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "hintActivated": "提示已激活！",
+  "myTurn": "我的回合",
+  "start": "开始",
+  "counterClockwise": "逆时针",
+  "clockwise": "顺时针",
+  "blackJoker": "黑白小丑",
+  "colorJoker": "彩色小丑",
+  "oneCardCall": "单张！",
+  "oneCardCallTimer": "单张 ({seconds}秒)",
+  "@oneCardCallTimer": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "selectSuit": "选择花色",
+  "discardedCards": "弃牌堆",
+  "meld": "组合",
+  "discard": "弃牌",
+  "stop": "停止",
+  "handCards": "手牌",
+  "score": "分数",
+  "close": "关闭",
+  "cannotPlayCard": "不能出这张牌",
+  "drawCard": "请抽牌",
+  "discardOrMeld": "请弃牌或组合",
+  "noCards": "没有牌",
+  "thankYouSelectMethod": "选择谢谢方式",
+  "thankYouMeldSolo": "谢谢！ {suit}7 单独组合",
+  "@thankYouMeldSolo": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "thankYouMeldMyMeld": "谢谢！ 将 {card} 加入我的组合",
+  "@thankYouMeldMyMeld": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "thankYouMeldAiMeld": "谢谢！ 将 {card} 加入 {aiName} 的组合",
+  "@thankYouMeldAiMeld": {
+    "placeholders": {
+      "card": {"type": "String"},
+      "aiName": {"type": "String"}
+    }
+  },
+  "addedToMeld": "已加入组合",
+  "noMeldToAttach": "没有可加入的组合",
+  "invalidCombination": "无效组合",
+  "drawCardFirst": "请先抽牌",
+  "selectCardToDiscard": "选择要弃的牌",
+  "hulaWin": "Hula胜利！ (x2)",
+  "continue_": "继续",
+  "attackReceived": "受到攻击，抽了{count}张牌",
+  "@attackReceived": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "cardDrawn": "抽了牌",
+  "bankrupt": "破产！ ({count}张牌)",
+  "@bankrupt": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "restart": "重新开始",
+  "goal": "目标",
+  "howToPlay": "玩法",
+  "attackCards": "攻击牌",
+  "defense": "防御",
+  "specialCards": "特殊牌",
+  "tips": "提示",
+  "winRate": "胜率",
+  "onecardGuideGoal": "目标",
+  "onecardGuideGoalText": "最先出完手中所有牌即为胜利。",
+  "onecardGuidePlay": "出牌",
+  "onecardGuidePlayText": "可以出与前一张牌相同花色或相同数字的牌。",
+  "onecardGuideAttack": "攻击牌",
+  "onecardGuideAttackText": "• 2: +2张攻击\n• A: +3张攻击 (♠A为+5张)\n• 小丑: +5张(黑白) / +7张(彩色)",
+  "onecardGuideSpecial": "特殊牌",
+  "onecardGuideSpecialText": "• J: 跳过下一位\n• Q: 反转方向\n• K: 跳过2回合\n• 7: 更换花色",
+  "onecardGuideJokerDefense": "小丑防御",
+  "onecardGuideJokerDefenseText": "被小丑攻击时，只能用小丑防御。",
+  "onecardGuideOnecard": "单牌!",
+  "onecardGuideOnecardText": "剩1张牌时必须按\"单牌!\"按钮。\n不按的话将受到2张罚牌。",
+  "onecardGuideBankrupt": "破产",
+  "onecardGuideBankruptText": "手牌达到20张以上就破产！牌最少的玩家获胜。",
+  "hulaGuideGoal": "目标",
+  "hulaGuideGoalText": "最先通过组合或弃牌清空手牌即为胜利。",
+  "hulaGuideHow": "玩法",
+  "hulaGuideHowText": "每回合从牌堆或弃牌堆抽一张牌，然后组合或弃牌。",
+  "hulaGuideMelds": "组合类型",
+  "hulaGuideMeldsText": "• 顺子: 同花色连续3张以上 (例: ♠3-4-5)\n• 刻子: 相同数字不同花色3张以上 (例: ♠7-♥7-♦7)",
+  "hulaGuideSeven": "7的特殊规则",
+  "hulaGuideSevenText": "7可以单独组合。",
+  "hulaGuideThankYou": "谢谢",
+  "hulaGuideThankYouText": "从弃牌堆抽到7时可以喊\"谢谢\"并进行特殊组合。",
+  "hulaGuideStop": "停止",
+  "hulaGuideStopText": "可以随时喊停止结束游戏。\n剩余牌点数最低的玩家获胜。",
+  "hulaGuideCardPoints": "牌点数",
+  "hulaGuideCardPointsText": "A=1分, 2~9=面值, J=10分, Q=11分, K=12分",
+  "hulaGuideScoring": "计分",
+  "hulaGuideScoringText": "• 赢家: 获得与其他玩家手牌差值总和\n• 输家: 扣除与赢家的手牌差值\n• 胡拉(无组合获胜): 双倍得分",
+  "hulaGuideStopPenalty": "停止失败惩罚",
+  "hulaGuideStopPenaltyText": "喊停止但不是最低分时:\n• 喊停止的人承担赢家应得的全部分数\n• 其他玩家不扣分",
+
+  "attackTotalCards": "+{power}! (共{total}张攻击)",
+  "skipNextTurnMessage": "J! 跳过下一回合",
+  "reverseDirectionMessage": "Q! 反转方向",
+  "skipTwoTurnsMessage": "K! 跳过2回合",
+  "changeSuitMessage": "7! 更换花色: {suit}",
+  "playerPlayedCard": "{name}出了一张牌",
+  "continueGame": "继续",
+  "onecardWithPlayers": "单卡 ({count}P)",
+  "restart": "重新开始",
+  "selectSuit": "请选择花色",
+  "blackWhiteJoker": "黑白小丑",
+  "colorJoker": "彩色小丑",
+  "clockwiseDirection": "顺时针",
+  "counterClockwiseDirection": "逆时针",
+  "aiTurnCountdown": "{name} ({seconds})",
+  "aiTurn": "{name}的回合",
+  "cannotPlayThisCard": "这张牌无法出",
+  "bankruptWithCards": "破产! ({count}张)",
+  "gameRulesTitle": "游戏规则",
+  "goal": "目标",
+  "goalText": "最先出完所有手牌的玩家获胜。\n出最后一张牌前必须喊\"单卡\"。",
+  "howToPlay": "玩法",
+  "howToPlayText": "可以出相同花色或相同数字的牌。\n没有可出的牌时从牌堆抽牌。",
+  "defense": "防御",
+  "defenseText": "被攻击时可以用相同的攻击牌防御。\n防御后攻击会累积给下一位玩家。",
+  "specialCards": "特殊牌",
+  "gameTips": "游戏提示",
+  "close": "关闭",
+
+  "drawCardMessage": "请抽一张牌",
+  "discardOrMeldMessage": "请弃牌或组合",
+  "noCardsMessage": "没有牌",
+  "thankYouSelectMethod": "选择谢谢方式",
+  "thankYouSolo": "谢谢! {suit}7 单独组合",
+  "thankYouAddToMine": "谢谢! {card} 添加到我的组合",
+  "thankYouAddToAi": "谢谢! {card} 添加到{aiName}的组合",
+  "thankYouDesc": "谢谢! {desc}",
+  "addedToMeld": "已添加到组合",
+  "noMeldToAttach": "没有可添加的组合",
+  "invalidCombination": "无效的组合",
+  "drawFirstMessage": "请先抽牌",
+  "selectCardToDiscard": "请选择要弃的牌",
+  "hulaWinBonus": "胡拉获胜! (x2)",
+  "handColumn": "手牌",
+  "scoreColumn": "得分",
+  "cumulativeColumn": "累计",
+  "hulaWithPlayers": "胡拉 ({count}人)",
+  "hintOnOff": "提示 {status}",
+  "discardedCards": "弃牌",
+  "meldButton": "组合",
+  "discardButton": "弃牌",
+  "stopButton": "停止",
+  "thankYouMeld": "谢谢组合",
+  "meldTypes": "组合类型",
+  "ok": "确定",
+  "stop": "停止",
+  "aiThankYouDraw": "{aiName} 谢谢! {card}",
+  "@aiThankYouDraw": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiDrawsCard": "{aiName}抽牌",
+  "@aiDrawsCard": {
+    "placeholders": {
+      "aiName": {"type": "String"}
+    }
+  },
+  "aiRegistersSeven": "{aiName}: 7 {type}登记",
+  "@aiRegistersSeven": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "type": {"type": "String"}
+    }
+  },
+  "aiRegistersMeld": "{aiName}: {meldType}登记 {cards}",
+  "@aiRegistersMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "meldType": {"type": "String"},
+      "cards": {"type": "String"}
+    }
+  },
+  "aiAttachesToMeld": "{aiName}: {card}加入组合",
+  "@aiAttachesToMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiAttachesToPlayerMeld": "{aiName}: {card}加入玩家组合",
+  "@aiAttachesToPlayerMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiAttachesToOtherAiMeld": "{aiName}: {card}加入{targetAi}组合",
+  "@aiAttachesToOtherAiMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"},
+      "targetAi": {"type": "String"}
+    }
+  },
+  "aiDiscards": "{aiName}: 弃{card}",
+  "@aiDiscards": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "group": "组",
+  "solo": "单独",
+  "victory": "胜利!",
+  "defeat": "失败"
 }

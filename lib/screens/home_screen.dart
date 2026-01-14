@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: Icon(Icons.arrow_back, color: Colors.white, size: isSmallScreen ? 22 : 26),
-                      tooltip: '게임 선택',
+                      tooltip: l10n.gameSelection,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),

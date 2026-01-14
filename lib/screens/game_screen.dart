@@ -104,15 +104,16 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _showHintDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('힌트'),
-        content: const Text('광고를 시청하면 힌트가 활성화됩니다.\n계속하시겠습니까?'),
+        title: Text(l10n.hint),
+        content: Text(l10n.hintDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -132,7 +133,7 @@ class _GameScreenState extends State<GameScreen> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-            child: const Text('광고 보기', style: TextStyle(color: Colors.black)),
+            child: Text(l10n.watchAd, style: const TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -144,7 +145,7 @@ class _GameScreenState extends State<GameScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n.newGame),
-        content: const Text('광고를 시청하면 새 게임을 시작합니다.\n계속하시겠습니까?'),
+        content: Text(l10n.newGameDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -199,7 +200,7 @@ class _GameScreenState extends State<GameScreen> {
             actions: [
               IconButton(
                 icon: Icon(Icons.lightbulb, color: _showHint ? Colors.yellow : Colors.white),
-                tooltip: _showHint ? '힌트 OFF' : '힌트',
+                tooltip: _showHint ? l10n.hintOff : l10n.hint,
                 onPressed: _onHintButtonPressed,
               ),
               IconButton(
@@ -2050,7 +2051,7 @@ class _GameScreenState extends State<GameScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  '조커 선공: ${_getSuitSymbol(trick.jokerLeadSuit!)}',
+                  AppLocalizations.of(context)!.jokerLead(_getSuitSymbol(trick.jokerLeadSuit!)),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,

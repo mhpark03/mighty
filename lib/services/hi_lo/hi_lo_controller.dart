@@ -88,14 +88,22 @@ class HiLoController extends ChangeNotifier {
 
   void _initializePlayers() {
     final players = [
-      HiLoPlayer(id: 0, name: '플레이어', type: PlayerType.human),
-      HiLoPlayer(id: 1, name: '민준', type: PlayerType.ai),
-      HiLoPlayer(id: 2, name: '서연', type: PlayerType.ai),
-      HiLoPlayer(id: 3, name: '지호', type: PlayerType.ai),
-      HiLoPlayer(id: 4, name: '수빈', type: PlayerType.ai),
+      HiLoPlayer(id: 0, name: 'Player', type: PlayerType.human),
+      HiLoPlayer(id: 1, name: 'AI 1', type: PlayerType.ai),
+      HiLoPlayer(id: 2, name: 'AI 2', type: PlayerType.ai),
+      HiLoPlayer(id: 3, name: 'AI 3', type: PlayerType.ai),
+      HiLoPlayer(id: 4, name: 'AI 4', type: PlayerType.ai),
     ];
 
     _state = HiLoState(players: players);
+  }
+
+  /// 지역화된 플레이어 이름으로 업데이트
+  void updateLocalizedNames(List<String> names) {
+    for (int i = 0; i < _state.players.length && i < names.length; i++) {
+      _state.players[i].name = names[i];
+    }
+    notifyListeners();
   }
 
   void startNewGame() {

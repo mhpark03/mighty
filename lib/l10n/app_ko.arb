@@ -324,5 +324,467 @@
   "hulaTitle": "훌라",
   "hulaSubtitle": "4인용 러미 카드 게임",
   "heartsTitle": "하트",
-  "heartsSubtitle": "4인 트릭 테이킹 게임"
+  "heartsSubtitle": "4인 트릭 테이킹 게임",
+  "handRoyalStraightFlush": "로열 스트레이트 플러시",
+  "handBackStraightFlush": "백스트레이트 플러시",
+  "handStraightFlush": "스트레이트 플러시",
+  "handFourOfAKind": "포카드",
+  "handFullHouse": "풀하우스",
+  "handFlush": "플러시",
+  "handMountain": "마운틴",
+  "handBackStraight": "백스트레이트",
+  "handStraight": "스트레이트",
+  "handTriple": "트리플",
+  "handTwoPair": "투페어",
+  "handOnePair": "원페어",
+  "handHighCard": "하이카드",
+  "highCardTop": "{rank}탑",
+  "@highCardTop": {
+    "placeholders": {
+      "rank": {"type": "String"}
+    }
+  },
+  "noLow": "No Low",
+  "betPing": "삥",
+  "betCheck": "체크",
+  "betCall": "콜",
+  "betDdadang": "따당",
+  "betQuarter": "쿼터",
+  "betHalf": "하프",
+  "betFull": "풀",
+  "betDie": "다이",
+  "selectOpenCard": "공개할 카드를 선택하세요",
+  "selectOpenCardDesc": "선택한 카드가 상대에게 공개됩니다",
+  "aiSelectingCard": "AI가 카드를 선택하고 있습니다...",
+  "nthCard": "{n}번째 카드",
+  "@nthCard": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "secondsCount": "{n}초",
+  "@secondsCount": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "totalBetAmount": "총: {amount}",
+  "@totalBetAmount": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "bettingAmount": "베팅: {amount}",
+  "@bettingAmount": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "bonusHand": "보너스 핸드!",
+  "bonus": "보너스",
+  "total": "총",
+  "otherPlayersLose": "다른 플레이어: 각 -{amount}",
+  "@otherPlayersLose": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "thisGame": "이번 게임",
+  "cumulative": "누적",
+  "foldedSection": "다이",
+  "hiLoHi": "하이",
+  "hiLoLo": "로우",
+  "hiLoSwing": "스윙",
+  "roundComplete": "라운드 {n} 완료!",
+  "@roundComplete": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "cardDistribution5": "5번째 카드가 배분됩니다.",
+  "cardDistribution6": "6번째 카드가 배분됩니다.",
+  "cardDistribution7": "마지막 7번째 카드가 배분됩니다.",
+  "goodLuck": "GOOD LUCK!",
+  "suitSpade": "스페이드",
+  "suitDiamond": "다이아몬드",
+  "suitHeart": "하트",
+  "suitClub": "클럽",
+  "noGiruda": "노기루다",
+  "noFriend": "노프렌드",
+  "firstTrickFriend": "초구 프렌드",
+  "cardOwner": "{card} 소유자",
+  "@cardOwner": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "trickWinner": "{n}번째 트릭 획득자",
+  "@trickWinner": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "hint": "힌트",
+  "hintOff": "힌트 OFF",
+  "hintDialogContent": "광고를 시청하면 힌트가 활성화됩니다.\n계속하시겠습니까?",
+  "newGameDialogContent": "광고를 시청하면 새 게임을 시작합니다.\n계속하시겠습니까?",
+  "watchAd": "광고 보기",
+  "jokerLead": "조커 선공: {suit}",
+  "@jokerLead": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "gameSelection": "게임 선택",
+  "onecardTitle": "원카드",
+  "onecardSubtitle": "4인 대전",
+  "gameRules": "게임 규칙",
+  "confirm": "확인",
+  "heartsGuideGoal": "목표",
+  "heartsGuideGoalText": "하트 카드와 스페이드 퀸을 피해 가장 낮은 점수를 얻는 것이 목표입니다.",
+  "heartsGuideHow": "진행 방법",
+  "heartsGuideHowText": "• 4명이 플레이하며 각자 13장씩 받습니다\n• 게임 시작 시 3장을 왼쪽 플레이어에게 전달\n• 클럽 2를 가진 플레이어가 먼저 시작\n• 13트릭을 진행하며 점수 카드를 피합니다",
+  "heartsGuideScoring": "점수 계산",
+  "heartsGuideScoringText": "• 하트 카드: 각 1점 (총 13점)\n• 스페이드 퀸 (♠Q): 13점\n• 총점: 26점\n• 낮은 점수가 승리!",
+  "heartsGuideBreaking": "하트 브레이킹",
+  "heartsGuideBreakingText": "첫 트릭에서는 하트를 낼 수 없습니다.\n하트가 한 번 나온 후에야 하트로 시작할 수 있습니다.",
+  "heartsGuideShootMoon": "슈팅 더 문",
+  "heartsGuideShootMoonText": "한 플레이어가 모든 하트와 스페이드 퀸을 획득하면:\n• 그 플레이어: 0점\n• 다른 플레이어: 각 26점",
+  "heartsGuideTips": "전략 팁",
+  "heartsGuideTipsText": "• 높은 카드는 일찍 버리세요\n• 스페이드 퀸을 조심하세요\n• 상대방에게 점수 카드를 먹이세요",
+  "allScoreCardsUsed": "모든 점수 카드 소진! 게임 종료",
+  "passLeftCount": "왼쪽으로 패스 ({count}/3)",
+  "@passLeftCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "cardPass": "카드 패스",
+  "trickProgress": "트릭 {current}/13",
+  "@trickProgress": {
+    "placeholders": {
+      "current": {"type": "int"}
+    }
+  },
+  "heartBroken": "하트 브레이킹",
+  "passRecommend": "패스 추천",
+  "recommend": "추천",
+  "selectCardsToPassLeft": "왼쪽으로 보낼 카드 3장을 선택하세요",
+  "playerNameWins": "{name} 승리",
+  "@playerNameWins": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "playerStartsWithClub2": "{name}가 클럽 2로 시작합니다",
+  "@playerStartsWithClub2": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "playerWonTrick": "{name} 트릭 획득! (+{points}점)",
+  "@playerWonTrick": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "points": {"type": "int"}
+    }
+  },
+  "playerShootMoonSuccess": "{name} 슈팅 더 문 성공!",
+  "@playerShootMoonSuccess": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "hintActivated": "힌트가 활성화되었습니다!",
+  "myTurn": "내 차례",
+  "start": "시작",
+  "counterClockwise": "반시계",
+  "clockwise": "시계",
+  "blackJoker": "흑백 조커",
+  "colorJoker": "컬러 조커",
+  "oneCardCall": "원카드!",
+  "oneCardCallTimer": "원카드 ({seconds}초)",
+  "@oneCardCallTimer": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "selectSuit": "무늬를 선택하세요",
+  "discardedCards": "버린 카드",
+  "meld": "등록",
+  "discard": "버리기",
+  "stop": "스톱",
+  "handCards": "손패",
+  "score": "점수",
+  "close": "닫기",
+  "cannotPlayCard": "이 카드는 낼 수 없습니다",
+  "drawCard": "카드를 뽑으세요",
+  "discardOrMeld": "카드를 버리거나 등록하세요",
+  "noCards": "카드가 없습니다",
+  "thankYouSelectMethod": "땡큐 방법을 선택하세요",
+  "thankYouMeldSolo": "땡큐! {suit}7 단독 등록",
+  "@thankYouMeldSolo": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "thankYouMeldMyMeld": "땡큐! {card} 내 멜드에 붙이기",
+  "@thankYouMeldMyMeld": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "thankYouMeldAiMeld": "땡큐! {card} {aiName} 멜드에 붙이기",
+  "@thankYouMeldAiMeld": {
+    "placeholders": {
+      "card": {"type": "String"},
+      "aiName": {"type": "String"}
+    }
+  },
+  "addedToMeld": "멜드에 추가됨",
+  "noMeldToAttach": "붙일 멜드가 없습니다",
+  "invalidCombination": "유효하지 않은 조합입니다",
+  "drawCardFirst": "먼저 카드를 뽑으세요",
+  "selectCardToDiscard": "버릴 카드를 선택하세요",
+  "hulaWin": "훌라로 승리! (x2)",
+  "continue_": "이어하기",
+  "attackReceived": "공격으로 {count}장을 받았습니다",
+  "@attackReceived": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "cardDrawn": "카드를 뽑았습니다",
+  "bankrupt": "파산! ({count}장 보유)",
+  "@bankrupt": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "restart": "다시 시작",
+  "goal": "목표",
+  "howToPlay": "진행 방법",
+  "attackCards": "공격 카드",
+  "defense": "방어",
+  "specialCards": "특수 카드",
+  "tips": "게임 팁",
+  "winRate": "승률",
+  "onecardGuideGoal": "목표",
+  "onecardGuideGoalText": "손에 든 카드를 가장 먼저 모두 내려놓는 것이 목표입니다.",
+  "onecardGuidePlay": "카드 내기",
+  "onecardGuidePlayText": "이전에 낸 카드와 같은 무늬 또는 같은 숫자의 카드를 낼 수 있습니다.",
+  "onecardGuideAttack": "공격 카드",
+  "onecardGuideAttackText": "• 2: +2장 공격\n• A: +3장 공격 (♠A는 +5장)\n• 조커: +5장(흑백) / +7장(컬러)",
+  "onecardGuideSpecial": "특수 카드",
+  "onecardGuideSpecialText": "• J: 다음 순서 건너뛰기\n• Q: 방향 반대\n• K: 2턴 건너뛰기\n• 7: 무늬 변경",
+  "onecardGuideJokerDefense": "조커 방어",
+  "onecardGuideJokerDefenseText": "조커로 공격받으면 조커로만 방어할 수 있습니다.",
+  "onecardGuideOnecard": "원카드!",
+  "onecardGuideOnecardText": "손패가 1장 남으면 \"원카드!\" 버튼을 눌러야 합니다.\n누르지 않으면 패널티로 2장을 받습니다.",
+  "onecardGuideBankrupt": "파산",
+  "onecardGuideBankruptText": "손패가 20장 이상이 되면 파산! 가장 적은 카드를 가진 플레이어가 승리합니다.",
+  "hulaGuideGoal": "목표",
+  "hulaGuideGoalText": "손패의 카드를 모두 등록하거나 버려서 가장 먼저 없애는 것이 목표입니다.",
+  "hulaGuideHow": "진행 방법",
+  "hulaGuideHowText": "매 턴마다 덱 또는 버린 더미에서 카드 1장을 뽑고, 등록 또는 버리기를 합니다.",
+  "hulaGuideMelds": "멜드 종류",
+  "hulaGuideMeldsText": "• Run: 같은 무늬의 연속된 숫자 3장 이상 (예: ♠3-4-5)\n• Group: 같은 숫자 다른 무늬 3장 이상 (예: ♠7-♥7-♦7)",
+  "hulaGuideSeven": "7의 특수 규칙",
+  "hulaGuideSevenText": "7은 단독으로 등록할 수 있습니다.",
+  "hulaGuideThankYou": "땡큐",
+  "hulaGuideThankYouText": "버린 더미에서 7을 뽑으면 \"땡큐\"를 외치고 특별한 등록을 할 수 있습니다.",
+  "hulaGuideStop": "스톱",
+  "hulaGuideStopText": "언제든 스톱을 외쳐 게임을 끝낼 수 있습니다.\n남은 카드 점수가 가장 적은 사람이 승리합니다.",
+  "hulaGuideCardPoints": "카드 점수",
+  "hulaGuideCardPointsText": "A=1점, 2~9=숫자점, J=10점, Q=11점, K=12점",
+  "hulaGuideScoring": "점수 계산",
+  "hulaGuideScoringText": "• 승자: 다른 플레이어 손패와의 차이 합계를 획득\n• 패자: 승자와의 손패 차이만큼 감점\n• 훌라(등록 없이 승리): 점수 2배",
+  "hulaGuideStopPenalty": "스톱 실패 페널티",
+  "hulaGuideStopPenaltyText": "스톱을 외쳤지만 최저 점수가 아닌 경우:\n• 승자가 받을 점수 전부를 스톱한 사람이 부담\n• 다른 플레이어는 감점 없음",
+
+  "attackTotalCards": "+{power}! (총 {total}장 공격)",
+  "@attackTotalCards": {
+    "placeholders": {
+      "power": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "skipNextTurnMessage": "J! 다음 턴 건너뛰기",
+  "reverseDirectionMessage": "Q! 방향 반대",
+  "skipTwoTurnsMessage": "K! 2턴 건너뛰기",
+  "changeSuitMessage": "7! 무늬 변경: {suit}",
+  "@changeSuitMessage": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "playerPlayedCard": "{name}이(가) 카드를 냈습니다",
+  "@playerPlayedCard": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "continueGame": "이어하기",
+  "onecardWithPlayers": "원카드 ({count}P)",
+  "@onecardWithPlayers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "restart": "다시 시작",
+  "selectSuit": "무늬를 선택하세요",
+  "blackWhiteJoker": "흑백 조커",
+  "colorJoker": "컬러 조커",
+  "clockwiseDirection": "시계",
+  "counterClockwiseDirection": "반시계",
+  "aiTurnCountdown": "{name} ({seconds})",
+  "@aiTurnCountdown": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "seconds": {"type": "int"}
+    }
+  },
+  "aiTurn": "{name} 차례",
+  "@aiTurn": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "cannotPlayThisCard": "이 카드는 낼 수 없습니다",
+  "bankruptWithCards": "파산! ({count}장 보유)",
+  "@bankruptWithCards": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "gameRulesTitle": "게임 규칙",
+  "goal": "목표",
+  "goalText": "손에 든 카드를 가장 먼저 모두 내려놓는 사람이 승리합니다.\n마지막 카드를 내기 전 \"원카드\"를 외쳐야 합니다.",
+  "howToPlay": "진행 방법",
+  "howToPlayText": "같은 무늬 또는 같은 숫자의 카드를 낼 수 있습니다.\n낼 수 있는 카드가 없으면 덱에서 카드를 뽑습니다.",
+  "defense": "방어",
+  "defenseText": "공격을 받으면 같은 공격 카드로 막을 수 있습니다.\n막으면 공격이 누적되어 다음 사람에게 넘어갑니다.",
+  "specialCards": "특수 카드",
+  "gameTips": "게임 팁",
+  "close": "닫기",
+
+  "drawCardMessage": "카드를 뽑으세요",
+  "discardOrMeldMessage": "카드를 버리거나 등록하세요",
+  "noCardsMessage": "카드가 없습니다",
+  "thankYouSelectMethod": "땡큐 방법을 선택하세요",
+  "thankYouSolo": "땡큐! {suit}7 단독 등록",
+  "@thankYouSolo": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "thankYouAddToMine": "땡큐! {card} 내 멜드에 붙이기",
+  "@thankYouAddToMine": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "thankYouAddToAi": "땡큐! {card} {aiName} 멜드에 붙이기",
+  "@thankYouAddToAi": {
+    "placeholders": {
+      "card": {"type": "String"},
+      "aiName": {"type": "String"}
+    }
+  },
+  "thankYouDesc": "땡큐! {desc}",
+  "@thankYouDesc": {
+    "placeholders": {
+      "desc": {"type": "String"}
+    }
+  },
+  "addedToMeld": "멜드에 추가됨",
+  "noMeldToAttach": "붙일 멜드가 없습니다",
+  "invalidCombination": "유효하지 않은 조합입니다",
+  "drawFirstMessage": "먼저 카드를 뽑으세요",
+  "selectCardToDiscard": "버릴 카드를 선택하세요",
+  "hulaWinBonus": "훌라로 승리! (x2)",
+  "handColumn": "손패",
+  "scoreColumn": "점수",
+  "cumulativeColumn": "누적",
+  "hulaWithPlayers": "훌라 ({count}인)",
+  "@hulaWithPlayers": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "hintOnOff": "힌트 {status}",
+  "@hintOnOff": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "discardedCards": "버린 카드",
+  "meldButton": "등록",
+  "discardButton": "버리기",
+  "stopButton": "스톱",
+  "thankYouMeld": "땡큐 멜드",
+  "meldTypes": "멜드 종류",
+  "ok": "확인",
+  "stop": "스톱",
+  "aiThankYouDraw": "{aiName} 땡큐! {card}",
+  "@aiThankYouDraw": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiDrawsCard": "{aiName}이 카드를 뽑음",
+  "@aiDrawsCard": {
+    "placeholders": {
+      "aiName": {"type": "String"}
+    }
+  },
+  "aiRegistersSeven": "{aiName}: 7 {type} 등록",
+  "@aiRegistersSeven": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "type": {"type": "String"}
+    }
+  },
+  "aiRegistersMeld": "{aiName}: {meldType} 등록 {cards}",
+  "@aiRegistersMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "meldType": {"type": "String"},
+      "cards": {"type": "String"}
+    }
+  },
+  "aiAttachesToMeld": "{aiName}: {card} 멜드에 붙임",
+  "@aiAttachesToMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiAttachesToPlayerMeld": "{aiName}: {card} 플레이어 멜드에 붙임",
+  "@aiAttachesToPlayerMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiAttachesToOtherAiMeld": "{aiName}: {card} {targetAi} 멜드에 붙임",
+  "@aiAttachesToOtherAiMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"},
+      "targetAi": {"type": "String"}
+    }
+  },
+  "aiDiscards": "{aiName}: {card} 버림",
+  "@aiDiscards": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "group": "그룹",
+  "solo": "단독",
+  "victory": "승리!",
+  "defeat": "패배"
 }

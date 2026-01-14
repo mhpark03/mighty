@@ -295,7 +295,7 @@ class _HulaHomeScreenState extends State<HulaHomeScreen> {
   ) {
     final isHuman = playerIndex == 0;
     final scoreColor = playerStats.totalScore >= 0 ? Colors.lightGreenAccent : Colors.redAccent;
-    final playerNames = ['플레이어', '민준', '서연', '지호'];
+    final playerNames = [l10n.player, l10n.aiPlayer1, l10n.aiPlayer2, l10n.aiPlayer3];
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -436,10 +436,10 @@ class _HulaHomeScreenState extends State<HulaHomeScreen> {
                   children: [
                     const Icon(Icons.menu_book, color: Colors.amber, size: 24),
                     const SizedBox(width: 8),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        '게임 규칙',
-                        style: TextStyle(
+                        AppLocalizations.of(dialogContext)!.gameRules,
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -462,23 +462,23 @@ class _HulaHomeScreenState extends State<HulaHomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildGuideSection('목표', '손패의 카드를 모두 등록하거나 버려서 가장 먼저 없애는 것이 목표입니다.', Icons.info_outline, titleSize, textSize),
+                      _buildGuideSection(AppLocalizations.of(dialogContext)!.hulaGuideGoal, AppLocalizations.of(dialogContext)!.hulaGuideGoalText, Icons.info_outline, titleSize, textSize),
                       const SizedBox(height: 16),
-                      _buildGuideSection('진행 방법', '매 턴마다 덱 또는 버린 더미에서 카드 1장을 뽑고, 등록 또는 버리기를 합니다.', Icons.play_arrow, titleSize, textSize),
+                      _buildGuideSection(AppLocalizations.of(dialogContext)!.hulaGuideHow, AppLocalizations.of(dialogContext)!.hulaGuideHowText, Icons.play_arrow, titleSize, textSize),
                       const SizedBox(height: 16),
-                      _buildGuideSection('멜드 종류', '• Run: 같은 무늬의 연속된 숫자 3장 이상 (예: ♠3-4-5)\n• Group: 같은 숫자 다른 무늬 3장 이상 (예: ♠7-♥7-♦7)', Icons.style, titleSize, textSize),
+                      _buildGuideSection(AppLocalizations.of(dialogContext)!.hulaGuideMelds, AppLocalizations.of(dialogContext)!.hulaGuideMeldsText, Icons.style, titleSize, textSize),
                       const SizedBox(height: 16),
-                      _buildGuideSection('7의 특수 규칙', '7은 단독으로 등록할 수 있습니다.', Icons.star, titleSize, textSize, Colors.amber),
+                      _buildGuideSection(AppLocalizations.of(dialogContext)!.hulaGuideSeven, AppLocalizations.of(dialogContext)!.hulaGuideSevenText, Icons.star, titleSize, textSize, Colors.amber),
                       const SizedBox(height: 16),
-                      _buildGuideSection('땡큐', '버린 더미에서 7을 뽑으면 "땡큐"를 외치고 특별한 등록을 할 수 있습니다.', Icons.celebration, titleSize, textSize, Colors.cyan),
+                      _buildGuideSection(AppLocalizations.of(dialogContext)!.hulaGuideThankYou, AppLocalizations.of(dialogContext)!.hulaGuideThankYouText, Icons.celebration, titleSize, textSize, Colors.cyan),
                       const SizedBox(height: 16),
-                      _buildGuideSection('스톱', '언제든 스톱을 외쳐 게임을 끝낼 수 있습니다.\n남은 카드 점수가 가장 적은 사람이 승리합니다.', Icons.stop_circle, titleSize, textSize, Colors.red),
+                      _buildGuideSection(AppLocalizations.of(dialogContext)!.hulaGuideStop, AppLocalizations.of(dialogContext)!.hulaGuideStopText, Icons.stop_circle, titleSize, textSize, Colors.red),
                       const SizedBox(height: 16),
-                      _buildGuideSection('카드 점수', 'A=1점, 2~9=숫자점, J=10점, Q=11점, K=12점', Icons.style, titleSize, textSize),
+                      _buildGuideSection(AppLocalizations.of(dialogContext)!.hulaGuideCardPoints, AppLocalizations.of(dialogContext)!.hulaGuideCardPointsText, Icons.style, titleSize, textSize),
                       const SizedBox(height: 16),
-                      _buildGuideSection('점수 계산', '• 승자: 다른 플레이어 손패와의 차이 합계를 획득\n• 패자: 승자와의 손패 차이만큼 감점\n• 훌라(등록 없이 승리): 점수 2배', Icons.calculate, titleSize, textSize, Colors.lightGreenAccent),
+                      _buildGuideSection(AppLocalizations.of(dialogContext)!.hulaGuideScoring, AppLocalizations.of(dialogContext)!.hulaGuideScoringText, Icons.calculate, titleSize, textSize, Colors.lightGreenAccent),
                       const SizedBox(height: 16),
-                      _buildGuideSection('스톱 실패 페널티', '스톱을 외쳤지만 최저 점수가 아닌 경우:\n• 승자가 받을 점수 전부를 스톱한 사람이 부담\n• 다른 플레이어는 감점 없음', Icons.warning, titleSize, textSize, Colors.orange),
+                      _buildGuideSection(AppLocalizations.of(dialogContext)!.hulaGuideStopPenalty, AppLocalizations.of(dialogContext)!.hulaGuideStopPenaltyText, Icons.warning, titleSize, textSize, Colors.orange),
                     ],
                   ),
                 ),
@@ -497,9 +497,9 @@ class _HulaHomeScreenState extends State<HulaHomeScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
-                      '확인',
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(dialogContext)!.confirm,
+                      style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),

@@ -108,7 +108,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get byCard => '按牌指定';
 
   @override
-  String get firstTrickFriend => '首墩朋友';
+  String get firstTrickFriend => '首轮朋友';
 
   @override
   String get firstTrickFriendDesc => '赢得第一墩的人';
@@ -757,4 +757,725 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get heartsSubtitle => '4人吃墩游戏';
+
+  @override
+  String get handRoyalStraightFlush => '皇家同花顺';
+
+  @override
+  String get handBackStraightFlush => '反向同花顺';
+
+  @override
+  String get handStraightFlush => '同花顺';
+
+  @override
+  String get handFourOfAKind => '四条';
+
+  @override
+  String get handFullHouse => '葫芦';
+
+  @override
+  String get handFlush => '同花';
+
+  @override
+  String get handMountain => '山';
+
+  @override
+  String get handBackStraight => '反向顺子';
+
+  @override
+  String get handStraight => '顺子';
+
+  @override
+  String get handTriple => '三条';
+
+  @override
+  String get handTwoPair => '两对';
+
+  @override
+  String get handOnePair => '一对';
+
+  @override
+  String get handHighCard => '高牌';
+
+  @override
+  String highCardTop(String rank) {
+    return '$rank高';
+  }
+
+  @override
+  String get noLow => '无低牌';
+
+  @override
+  String get betPing => '平';
+
+  @override
+  String get betCheck => '过牌';
+
+  @override
+  String get betCall => '跟注';
+
+  @override
+  String get betDdadang => '加倍';
+
+  @override
+  String get betQuarter => '四分之一';
+
+  @override
+  String get betHalf => '一半';
+
+  @override
+  String get betFull => '全部';
+
+  @override
+  String get betDie => '弃牌';
+
+  @override
+  String get selectOpenCard => '选择要公开的牌';
+
+  @override
+  String get selectOpenCardDesc => '选中的牌将向对手公开';
+
+  @override
+  String get aiSelectingCard => 'AI正在选择牌...';
+
+  @override
+  String nthCard(int n) {
+    return '第$n张牌';
+  }
+
+  @override
+  String secondsCount(int n) {
+    return '$n秒';
+  }
+
+  @override
+  String totalBetAmount(int amount) {
+    return '总计: $amount';
+  }
+
+  @override
+  String bettingAmount(int amount) {
+    return '下注: $amount';
+  }
+
+  @override
+  String get bonusHand => '奖励牌型！';
+
+  @override
+  String get bonus => '奖励';
+
+  @override
+  String get total => '总计';
+
+  @override
+  String otherPlayersLose(int amount) {
+    return '其他玩家: 各 -$amount';
+  }
+
+  @override
+  String get thisGame => '本局';
+
+  @override
+  String get cumulative => '累计';
+
+  @override
+  String get foldedSection => '弃牌';
+
+  @override
+  String get hiLoHi => '高';
+
+  @override
+  String get hiLoLo => '低';
+
+  @override
+  String get hiLoSwing => '双向';
+
+  @override
+  String roundComplete(int n) {
+    return '第 $n 轮完成！';
+  }
+
+  @override
+  String get cardDistribution5 => '正在发第5张牌。';
+
+  @override
+  String get cardDistribution6 => '正在发第6张牌。';
+
+  @override
+  String get cardDistribution7 => '正在发最后第7张牌。';
+
+  @override
+  String get goodLuck => '祝好运！';
+
+  @override
+  String get suitSpade => '黑桃';
+
+  @override
+  String get suitDiamond => '方块';
+
+  @override
+  String get suitHeart => '红心';
+
+  @override
+  String get suitClub => '梅花';
+
+  @override
+  String cardOwner(String card) {
+    return '$card持有者';
+  }
+
+  @override
+  String trickWinner(int n) {
+    return '第$n轮获胜者';
+  }
+
+  @override
+  String get hint => '提示';
+
+  @override
+  String get hintOff => '提示 关闭';
+
+  @override
+  String get hintDialogContent => '观看广告即可启用提示。\n继续吗？';
+
+  @override
+  String get newGameDialogContent => '观看广告即可开始新游戏。\n继续吗？';
+
+  @override
+  String get watchAd => '观看广告';
+
+  @override
+  String jokerLead(String suit) {
+    return '小丑先攻: $suit';
+  }
+
+  @override
+  String get gameSelection => '游戏选择';
+
+  @override
+  String get onecardTitle => '单牌';
+
+  @override
+  String get onecardSubtitle => '4人对战';
+
+  @override
+  String get gameRules => '游戏规则';
+
+  @override
+  String get heartsGuideGoal => '目标';
+
+  @override
+  String get heartsGuideGoalText => '目标是避开红心牌和黑桃皇后，获得最低分数。';
+
+  @override
+  String get heartsGuideHow => '玩法';
+
+  @override
+  String get heartsGuideHowText =>
+      '• 4人游戏，每人13张牌\n• 游戏开始时向左传3张牌\n• 持有梅花2的玩家先出\n• 进行13轮，避开得分牌';
+
+  @override
+  String get heartsGuideScoring => '计分';
+
+  @override
+  String get heartsGuideScoringText =>
+      '• 红心牌: 每张1分 (共13分)\n• 黑桃皇后 (♠Q): 13分\n• 总分: 26分\n• 低分获胜！';
+
+  @override
+  String get heartsGuideBreaking => '红心破冰';
+
+  @override
+  String get heartsGuideBreakingText => '第一轮不能出红心。\n红心被出过后才能用红心领出。';
+
+  @override
+  String get heartsGuideShootMoon => '射月';
+
+  @override
+  String get heartsGuideShootMoonText =>
+      '如果一位玩家获得所有红心和黑桃皇后:\n• 该玩家: 0分\n• 其他玩家: 各26分';
+
+  @override
+  String get heartsGuideTips => '策略提示';
+
+  @override
+  String get heartsGuideTipsText => '• 尽早打出大牌\n• 小心黑桃皇后\n• 把得分牌给对手';
+
+  @override
+  String get allScoreCardsUsed => '所有得分牌用完！游戏结束';
+
+  @override
+  String passLeftCount(int count) {
+    return '向左传 ($count/3)';
+  }
+
+  @override
+  String get cardPass => '传牌';
+
+  @override
+  String trickProgress(int current) {
+    return '轮次 $current/13';
+  }
+
+  @override
+  String get heartBroken => '红心破冰';
+
+  @override
+  String get passRecommend => '推荐传牌';
+
+  @override
+  String get recommend => '推荐';
+
+  @override
+  String get selectCardsToPassLeft => '选择3张牌向左传';
+
+  @override
+  String playerNameWins(String name) {
+    return '$name 获胜';
+  }
+
+  @override
+  String playerStartsWithClub2(String name) {
+    return '$name以梅花2开始';
+  }
+
+  @override
+  String playerWonTrick(String name, int points) {
+    return '$name赢得本轮！(+$points分)';
+  }
+
+  @override
+  String playerShootMoonSuccess(String name) {
+    return '$name全收成功！';
+  }
+
+  @override
+  String get hintActivated => '提示已激活！';
+
+  @override
+  String get myTurn => '我的回合';
+
+  @override
+  String get start => '开始';
+
+  @override
+  String get counterClockwise => '逆时针';
+
+  @override
+  String get clockwise => '顺时针';
+
+  @override
+  String get blackJoker => '黑白小丑';
+
+  @override
+  String get colorJoker => '彩色小丑';
+
+  @override
+  String get oneCardCall => '单张！';
+
+  @override
+  String oneCardCallTimer(int seconds) {
+    return '单张 ($seconds秒)';
+  }
+
+  @override
+  String get selectSuit => '请选择花色';
+
+  @override
+  String get discardedCards => '弃牌';
+
+  @override
+  String get meld => '组合';
+
+  @override
+  String get discard => '弃牌';
+
+  @override
+  String get stop => '停止';
+
+  @override
+  String get handCards => '手牌';
+
+  @override
+  String get cannotPlayCard => '不能出这张牌';
+
+  @override
+  String get drawCard => '请抽牌';
+
+  @override
+  String get discardOrMeld => '请弃牌或组合';
+
+  @override
+  String get noCards => '没有牌';
+
+  @override
+  String get thankYouSelectMethod => '选择谢谢方式';
+
+  @override
+  String thankYouMeldSolo(String suit) {
+    return '谢谢！ ${suit}7 单独组合';
+  }
+
+  @override
+  String thankYouMeldMyMeld(String card) {
+    return '谢谢！ 将 $card 加入我的组合';
+  }
+
+  @override
+  String thankYouMeldAiMeld(String card, String aiName) {
+    return '谢谢！ 将 $card 加入 $aiName 的组合';
+  }
+
+  @override
+  String get addedToMeld => '已添加到组合';
+
+  @override
+  String get noMeldToAttach => '没有可添加的组合';
+
+  @override
+  String get invalidCombination => '无效的组合';
+
+  @override
+  String get drawCardFirst => '请先抽牌';
+
+  @override
+  String get selectCardToDiscard => '请选择要弃的牌';
+
+  @override
+  String get hulaWin => 'Hula胜利！ (x2)';
+
+  @override
+  String get continue_ => '继续';
+
+  @override
+  String attackReceived(int count) {
+    return '受到攻击，抽了$count张牌';
+  }
+
+  @override
+  String get cardDrawn => '抽了牌';
+
+  @override
+  String bankrupt(int count) {
+    return '破产！ ($count张牌)';
+  }
+
+  @override
+  String get restart => '重新开始';
+
+  @override
+  String get goal => '目标';
+
+  @override
+  String get howToPlay => '玩法';
+
+  @override
+  String get attackCards => '攻击牌';
+
+  @override
+  String get defense => '防御';
+
+  @override
+  String get specialCards => '特殊牌';
+
+  @override
+  String get tips => '提示';
+
+  @override
+  String get winRate => '胜率';
+
+  @override
+  String get onecardGuideGoal => '目标';
+
+  @override
+  String get onecardGuideGoalText => '最先出完手中所有牌即为胜利。';
+
+  @override
+  String get onecardGuidePlay => '出牌';
+
+  @override
+  String get onecardGuidePlayText => '可以出与前一张牌相同花色或相同数字的牌。';
+
+  @override
+  String get onecardGuideAttack => '攻击牌';
+
+  @override
+  String get onecardGuideAttackText =>
+      '• 2: +2张攻击\n• A: +3张攻击 (♠A为+5张)\n• 小丑: +5张(黑白) / +7张(彩色)';
+
+  @override
+  String get onecardGuideSpecial => '特殊牌';
+
+  @override
+  String get onecardGuideSpecialText =>
+      '• J: 跳过下一位\n• Q: 反转方向\n• K: 跳过2回合\n• 7: 更换花色';
+
+  @override
+  String get onecardGuideJokerDefense => '小丑防御';
+
+  @override
+  String get onecardGuideJokerDefenseText => '被小丑攻击时，只能用小丑防御。';
+
+  @override
+  String get onecardGuideOnecard => '单牌!';
+
+  @override
+  String get onecardGuideOnecardText => '剩1张牌时必须按\"单牌!\"按钮。\n不按的话将受到2张罚牌。';
+
+  @override
+  String get onecardGuideBankrupt => '破产';
+
+  @override
+  String get onecardGuideBankruptText => '手牌达到20张以上就破产！牌最少的玩家获胜。';
+
+  @override
+  String get hulaGuideGoal => '目标';
+
+  @override
+  String get hulaGuideGoalText => '最先通过组合或弃牌清空手牌即为胜利。';
+
+  @override
+  String get hulaGuideHow => '玩法';
+
+  @override
+  String get hulaGuideHowText => '每回合从牌堆或弃牌堆抽一张牌，然后组合或弃牌。';
+
+  @override
+  String get hulaGuideMelds => '组合类型';
+
+  @override
+  String get hulaGuideMeldsText =>
+      '• 顺子: 同花色连续3张以上 (例: ♠3-4-5)\n• 刻子: 相同数字不同花色3张以上 (例: ♠7-♥7-♦7)';
+
+  @override
+  String get hulaGuideSeven => '7的特殊规则';
+
+  @override
+  String get hulaGuideSevenText => '7可以单独组合。';
+
+  @override
+  String get hulaGuideThankYou => '谢谢';
+
+  @override
+  String get hulaGuideThankYouText => '从弃牌堆抽到7时可以喊\"谢谢\"并进行特殊组合。';
+
+  @override
+  String get hulaGuideStop => '停止';
+
+  @override
+  String get hulaGuideStopText => '可以随时喊停止结束游戏。\n剩余牌点数最低的玩家获胜。';
+
+  @override
+  String get hulaGuideCardPoints => '牌点数';
+
+  @override
+  String get hulaGuideCardPointsText => 'A=1分, 2~9=面值, J=10分, Q=11分, K=12分';
+
+  @override
+  String get hulaGuideScoring => '计分';
+
+  @override
+  String get hulaGuideScoringText =>
+      '• 赢家: 获得与其他玩家手牌差值总和\n• 输家: 扣除与赢家的手牌差值\n• 胡拉(无组合获胜): 双倍得分';
+
+  @override
+  String get hulaGuideStopPenalty => '停止失败惩罚';
+
+  @override
+  String get hulaGuideStopPenaltyText =>
+      '喊停止但不是最低分时:\n• 喊停止的人承担赢家应得的全部分数\n• 其他玩家不扣分';
+
+  @override
+  String attackTotalCards(int power, int total) {
+    return '+$power! (共$total张攻击)';
+  }
+
+  @override
+  String get skipNextTurnMessage => 'J! 跳过下一回合';
+
+  @override
+  String get reverseDirectionMessage => 'Q! 反转方向';
+
+  @override
+  String get skipTwoTurnsMessage => 'K! 跳过2回合';
+
+  @override
+  String changeSuitMessage(String suit) {
+    return '7! 更换花色: $suit';
+  }
+
+  @override
+  String playerPlayedCard(String name) {
+    return '$name出了一张牌';
+  }
+
+  @override
+  String onecardWithPlayers(int count) {
+    return '单卡 (${count}P)';
+  }
+
+  @override
+  String get blackWhiteJoker => '黑白小丑';
+
+  @override
+  String get clockwiseDirection => '顺时针';
+
+  @override
+  String get counterClockwiseDirection => '逆时针';
+
+  @override
+  String aiTurnCountdown(String name, int seconds) {
+    return '$name ($seconds)';
+  }
+
+  @override
+  String aiTurn(String name) {
+    return '$name的回合';
+  }
+
+  @override
+  String get cannotPlayThisCard => '这张牌无法出';
+
+  @override
+  String bankruptWithCards(int count) {
+    return '破产! ($count张)';
+  }
+
+  @override
+  String get gameRulesTitle => '游戏规则';
+
+  @override
+  String get goalText => '最先出完所有手牌的玩家获胜。\n出最后一张牌前必须喊\"单卡\"。';
+
+  @override
+  String get howToPlayText => '可以出相同花色或相同数字的牌。\n没有可出的牌时从牌堆抽牌。';
+
+  @override
+  String get defenseText => '被攻击时可以用相同的攻击牌防御。\n防御后攻击会累积给下一位玩家。';
+
+  @override
+  String get gameTips => '游戏提示';
+
+  @override
+  String get drawCardMessage => '请抽一张牌';
+
+  @override
+  String get discardOrMeldMessage => '请弃牌或组合';
+
+  @override
+  String get noCardsMessage => '没有牌';
+
+  @override
+  String thankYouSolo(String suit) {
+    return '谢谢! ${suit}7 单独组合';
+  }
+
+  @override
+  String thankYouAddToMine(String card) {
+    return '谢谢! $card 添加到我的组合';
+  }
+
+  @override
+  String thankYouAddToAi(String card, String aiName) {
+    return '谢谢! $card 添加到$aiName的组合';
+  }
+
+  @override
+  String thankYouDesc(String desc) {
+    return '谢谢! $desc';
+  }
+
+  @override
+  String get drawFirstMessage => '请先抽牌';
+
+  @override
+  String get hulaWinBonus => '胡拉获胜! (x2)';
+
+  @override
+  String get handColumn => '手牌';
+
+  @override
+  String get scoreColumn => '得分';
+
+  @override
+  String get cumulativeColumn => '累计';
+
+  @override
+  String hulaWithPlayers(int count) {
+    return '胡拉 ($count人)';
+  }
+
+  @override
+  String hintOnOff(String status) {
+    return '提示 $status';
+  }
+
+  @override
+  String get meldButton => '组合';
+
+  @override
+  String get discardButton => '弃牌';
+
+  @override
+  String get stopButton => '停止';
+
+  @override
+  String get thankYouMeld => '谢谢组合';
+
+  @override
+  String get meldTypes => '组合类型';
+
+  @override
+  String get ok => '确定';
+
+  @override
+  String aiThankYouDraw(String aiName, String card) {
+    return '$aiName 谢谢! $card';
+  }
+
+  @override
+  String aiDrawsCard(String aiName) {
+    return '$aiName抽牌';
+  }
+
+  @override
+  String aiRegistersSeven(String aiName, String type) {
+    return '$aiName: 7 $type登记';
+  }
+
+  @override
+  String aiRegistersMeld(String aiName, String meldType, String cards) {
+    return '$aiName: $meldType登记 $cards';
+  }
+
+  @override
+  String aiAttachesToMeld(String aiName, String card) {
+    return '$aiName: $card加入组合';
+  }
+
+  @override
+  String aiAttachesToPlayerMeld(String aiName, String card) {
+    return '$aiName: $card加入玩家组合';
+  }
+
+  @override
+  String aiAttachesToOtherAiMeld(String aiName, String card, String targetAi) {
+    return '$aiName: $card加入$targetAi组合';
+  }
+
+  @override
+  String aiDiscards(String aiName, String card) {
+    return '$aiName: 弃$card';
+  }
+
+  @override
+  String get group => '组';
+
+  @override
+  String get solo => '单独';
+
+  @override
+  String get victory => '胜利!';
+
+  @override
+  String get defeat => '失败';
 }

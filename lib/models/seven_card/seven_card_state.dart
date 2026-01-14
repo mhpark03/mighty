@@ -69,7 +69,7 @@ enum BettingAction {
 /// 세븐카드 플레이어
 class SevenCardPlayer {
   final int id;
-  final String name;
+  String name;
   final PlayerType type;
   List<PlayingCard> hand; // 전체 카드 (최대 7장)
   int chips;              // 보유 칩

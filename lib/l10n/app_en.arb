@@ -233,5 +233,399 @@
   "hulaTitle": "Hula",
   "hulaSubtitle": "4-Player Rummy Card Game",
   "heartsTitle": "Hearts",
-  "heartsSubtitle": "4-Player Trick-Taking Game"
+  "heartsSubtitle": "4-Player Trick-Taking Game",
+  "handRoyalStraightFlush": "Royal Straight Flush",
+  "handBackStraightFlush": "Back Straight Flush",
+  "handStraightFlush": "Straight Flush",
+  "handFourOfAKind": "Four of a Kind",
+  "handFullHouse": "Full House",
+  "handFlush": "Flush",
+  "handMountain": "Mountain",
+  "handBackStraight": "Back Straight",
+  "handStraight": "Straight",
+  "handTriple": "Three of a Kind",
+  "handTwoPair": "Two Pair",
+  "handOnePair": "One Pair",
+  "handHighCard": "High Card",
+  "highCardTop": "{rank} High",
+  "@highCardTop": {
+    "placeholders": {
+      "rank": {"type": "String"}
+    }
+  },
+  "noLow": "No Low",
+  "betPing": "Ping",
+  "betCheck": "Check",
+  "betCall": "Call",
+  "betDdadang": "Double",
+  "betQuarter": "Quarter",
+  "betHalf": "Half",
+  "betFull": "Full",
+  "betDie": "Fold",
+  "selectOpenCard": "Select a card to reveal",
+  "selectOpenCardDesc": "The selected card will be shown to opponents",
+  "aiSelectingCard": "AI is selecting a card...",
+  "nthCard": "Card #{n}",
+  "@nthCard": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "secondsCount": "{n}s",
+  "@secondsCount": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "totalBetAmount": "Total: {amount}",
+  "@totalBetAmount": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "bettingAmount": "Bet: {amount}",
+  "@bettingAmount": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "bonusHand": "Bonus Hand!",
+  "bonus": "Bonus",
+  "total": "Total",
+  "otherPlayersLose": "Other players: -{amount} each",
+  "@otherPlayersLose": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "thisGame": "This Game",
+  "cumulative": "Total",
+  "foldedSection": "Folded",
+  "hiLoHi": "Hi",
+  "hiLoLo": "Lo",
+  "hiLoSwing": "Swing",
+  "roundComplete": "Round {n} Complete!",
+  "@roundComplete": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "cardDistribution5": "The 5th card is being dealt.",
+  "cardDistribution6": "The 6th card is being dealt.",
+  "cardDistribution7": "The final 7th card is being dealt.",
+  "goodLuck": "GOOD LUCK!",
+  "suitSpade": "Spade",
+  "suitDiamond": "Diamond",
+  "suitHeart": "Heart",
+  "suitClub": "Club",
+  "noGiruda": "No Giruda",
+  "noFriend": "No Friend",
+  "firstTrickFriend": "First Trick Friend",
+  "cardOwner": "{card} Owner",
+  "@cardOwner": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "trickWinner": "Trick {n} Winner",
+  "@trickWinner": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "hint": "Hint",
+  "hintOff": "Hint OFF",
+  "hintDialogContent": "Watch an ad to enable hints.\nContinue?",
+  "newGameDialogContent": "Watch an ad to start a new game.\nContinue?",
+  "watchAd": "Watch Ad",
+  "jokerLead": "Joker lead: {suit}",
+  "@jokerLead": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "gameSelection": "Game Selection",
+  "onecardTitle": "One Card",
+  "onecardSubtitle": "4-Player Game",
+  "gameRules": "Game Rules",
+  "confirm": "OK",
+  "heartsGuideGoal": "Goal",
+  "heartsGuideGoalText": "The goal is to get the lowest score by avoiding heart cards and the Queen of Spades.",
+  "heartsGuideHow": "How to Play",
+  "heartsGuideHowText": "• 4 players, each receives 13 cards\n• Pass 3 cards to the left at game start\n• Player with Club 2 starts first\n• Play 13 tricks while avoiding point cards",
+  "heartsGuideScoring": "Scoring",
+  "heartsGuideScoringText": "• Heart cards: 1 point each (13 total)\n• Queen of Spades (♠Q): 13 points\n• Total: 26 points\n• Lowest score wins!",
+  "heartsGuideBreaking": "Heart Breaking",
+  "heartsGuideBreakingText": "Hearts cannot be played on the first trick.\nHearts can only lead after hearts have been broken.",
+  "heartsGuideShootMoon": "Shooting the Moon",
+  "heartsGuideShootMoonText": "If one player takes all hearts and the Queen of Spades:\n• That player: 0 points\n• Other players: 26 points each",
+  "heartsGuideTips": "Strategy Tips",
+  "heartsGuideTipsText": "• Get rid of high cards early\n• Watch out for the Queen of Spades\n• Try to give point cards to opponents",
+  "allScoreCardsUsed": "All point cards used! Game over",
+  "passLeftCount": "Pass left ({count}/3)",
+  "@passLeftCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "cardPass": "Card Pass",
+  "trickProgress": "Trick {current}/13",
+  "@trickProgress": {
+    "placeholders": {
+      "current": {"type": "int"}
+    }
+  },
+  "heartBroken": "Heart Breaking",
+  "passRecommend": "Pass Recommend",
+  "recommend": "Recommend",
+  "selectCardsToPassLeft": "Select 3 cards to pass left",
+  "playerNameWins": "{name} wins",
+  "@playerNameWins": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "playerStartsWithClub2": "{name} starts with Club 2",
+  "@playerStartsWithClub2": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "playerWonTrick": "{name} won the trick! (+{points} points)",
+  "@playerWonTrick": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "points": {"type": "int"}
+    }
+  },
+  "playerShootMoonSuccess": "{name} shot the moon!",
+  "@playerShootMoonSuccess": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "hintActivated": "Hint activated!",
+  "myTurn": "My Turn",
+  "start": "Start",
+  "counterClockwise": "CCW",
+  "clockwise": "CW",
+  "blackJoker": "B&W Joker",
+  "colorJoker": "Color Joker",
+  "oneCardCall": "One Card!",
+  "oneCardCallTimer": "One Card ({seconds}s)",
+  "@oneCardCallTimer": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "selectSuit": "Select a suit",
+  "discardedCards": "Discarded",
+  "meld": "Meld",
+  "discard": "Discard",
+  "stop": "Stop",
+  "handCards": "Hand",
+  "score": "Score",
+  "close": "Close",
+  "cannotPlayCard": "Cannot play this card",
+  "drawCard": "Draw a card",
+  "discardOrMeld": "Discard or meld a card",
+  "noCards": "No cards",
+  "thankYouSelectMethod": "Select Thank You method",
+  "thankYouMeldSolo": "Thank You! Meld {suit}7 solo",
+  "@thankYouMeldSolo": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "thankYouMeldMyMeld": "Thank You! Add {card} to my meld",
+  "@thankYouMeldMyMeld": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "thankYouMeldAiMeld": "Thank You! Add {card} to {aiName}'s meld",
+  "@thankYouMeldAiMeld": {
+    "placeholders": {
+      "card": {"type": "String"},
+      "aiName": {"type": "String"}
+    }
+  },
+  "addedToMeld": "Added to meld",
+  "noMeldToAttach": "No meld to attach",
+  "invalidCombination": "Invalid combination",
+  "drawCardFirst": "Draw a card first",
+  "selectCardToDiscard": "Select a card to discard",
+  "hulaWin": "Hula win! (x2)",
+  "continue_": "Continue",
+  "attackReceived": "Received {count} cards from attack",
+  "@attackReceived": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "cardDrawn": "Card drawn",
+  "bankrupt": "Bankrupt! ({count} cards)",
+  "@bankrupt": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "restart": "Restart",
+  "goal": "Goal",
+  "howToPlay": "How to Play",
+  "attackCards": "Attack Cards",
+  "defense": "Defense",
+  "specialCards": "Special Cards",
+  "tips": "Tips",
+  "winRate": "Win Rate",
+  "onecardGuideGoal": "Goal",
+  "onecardGuideGoalText": "Be the first to play all your cards.",
+  "onecardGuidePlay": "Playing Cards",
+  "onecardGuidePlayText": "You can play a card with the same suit or number as the previous card.",
+  "onecardGuideAttack": "Attack Cards",
+  "onecardGuideAttackText": "• 2: +2 cards attack\n• A: +3 cards attack (♠A is +5)\n• Joker: +5(B&W) / +7(Color)",
+  "onecardGuideSpecial": "Special Cards",
+  "onecardGuideSpecialText": "• J: Skip next player\n• Q: Reverse direction\n• K: Skip 2 turns\n• 7: Change suit",
+  "onecardGuideJokerDefense": "Joker Defense",
+  "onecardGuideJokerDefenseText": "When attacked by a Joker, you can only defend with a Joker.",
+  "onecardGuideOnecard": "One Card!",
+  "onecardGuideOnecardText": "When you have 1 card left, you must press the \"One Card!\" button.\nIf you don't, you receive 2 penalty cards.",
+  "onecardGuideBankrupt": "Bankruptcy",
+  "onecardGuideBankruptText": "If you have 20+ cards, you're bankrupt! The player with fewest cards wins.",
+  "hulaGuideGoal": "Goal",
+  "hulaGuideGoalText": "Be the first to get rid of all cards in your hand by melding or discarding.",
+  "hulaGuideHow": "How to Play",
+  "hulaGuideHowText": "Each turn, draw a card from the deck or discard pile, then meld or discard.",
+  "hulaGuideMelds": "Meld Types",
+  "hulaGuideMeldsText": "• Run: 3+ consecutive cards of same suit (e.g., ♠3-4-5)\n• Group: 3+ same number different suits (e.g., ♠7-♥7-♦7)",
+  "hulaGuideSeven": "Special Rule for 7",
+  "hulaGuideSevenText": "A 7 can be melded on its own.",
+  "hulaGuideThankYou": "Thank You",
+  "hulaGuideThankYouText": "If you draw a 7 from the discard pile, you can call \"Thank You\" and make a special meld.",
+  "hulaGuideStop": "Stop",
+  "hulaGuideStopText": "You can call Stop anytime to end the game.\nThe player with the lowest card points wins.",
+  "hulaGuideCardPoints": "Card Points",
+  "hulaGuideCardPointsText": "A=1pt, 2~9=face value, J=10pts, Q=11pts, K=12pts",
+  "hulaGuideScoring": "Scoring",
+  "hulaGuideScoringText": "• Winner: Gets sum of point differences from other players\n• Loser: Loses points based on difference with winner\n• Hula (win without melding): Double points",
+  "hulaGuideStopPenalty": "Stop Failure Penalty",
+  "hulaGuideStopPenaltyText": "If you call Stop but don't have the lowest score:\n• The stopper pays all points the winner would receive\n• Other players lose no points",
+
+  "attackTotalCards": "+{power}! ({total} cards attack)",
+  "skipNextTurnMessage": "J! Skip next turn",
+  "reverseDirectionMessage": "Q! Reverse direction",
+  "skipTwoTurnsMessage": "K! Skip 2 turns",
+  "changeSuitMessage": "7! Change suit: {suit}",
+  "playerPlayedCard": "{name} played a card",
+  "continueGame": "Continue",
+  "onecardWithPlayers": "One Card ({count}P)",
+  "restart": "Restart",
+  "selectSuit": "Select a suit",
+  "blackWhiteJoker": "B&W Joker",
+  "colorJoker": "Color Joker",
+  "clockwiseDirection": "Clockwise",
+  "counterClockwiseDirection": "Counter-clockwise",
+  "aiTurnCountdown": "{name} ({seconds})",
+  "aiTurn": "{name}'s turn",
+  "cannotPlayThisCard": "This card cannot be played",
+  "bankruptWithCards": "Bankrupt! ({count} cards)",
+  "gameRulesTitle": "Game Rules",
+  "goal": "Goal",
+  "goalText": "Be the first to play all your cards.\nYou must call \"One Card\" before playing your last card.",
+  "howToPlay": "How to Play",
+  "howToPlayText": "Play a card with the same suit or number.\nIf you can't play, draw from the deck.",
+  "defense": "Defense",
+  "defenseText": "When attacked, defend with the same attack card.\nDefending stacks the attack to the next player.",
+  "specialCards": "Special Cards",
+  "gameTips": "Game Tips",
+  "close": "Close",
+
+  "drawCardMessage": "Draw a card",
+  "discardOrMeldMessage": "Discard or meld a card",
+  "noCardsMessage": "No cards",
+  "thankYouSelectMethod": "Select Thank You method",
+  "thankYouSolo": "Thank You! {suit}7 solo meld",
+  "thankYouAddToMine": "Thank You! Add {card} to my meld",
+  "thankYouAddToAi": "Thank You! Add {card} to {aiName}'s meld",
+  "thankYouDesc": "Thank You! {desc}",
+  "addedToMeld": "Added to meld",
+  "noMeldToAttach": "No meld to attach",
+  "invalidCombination": "Invalid combination",
+  "drawFirstMessage": "Draw a card first",
+  "selectCardToDiscard": "Select a card to discard",
+  "hulaWinBonus": "Hula win! (x2)",
+  "handColumn": "Hand",
+  "scoreColumn": "Score",
+  "cumulativeColumn": "Total",
+  "hulaWithPlayers": "Hula ({count}P)",
+  "hintOnOff": "Hint {status}",
+  "discardedCards": "Discarded cards",
+  "meldButton": "Meld",
+  "discardButton": "Discard",
+  "stopButton": "Stop",
+  "thankYouMeld": "Thank You Meld",
+  "meldTypes": "Meld Types",
+  "ok": "OK",
+  "stop": "Stop",
+  "aiThankYouDraw": "{aiName} Thank You! {card}",
+  "@aiThankYouDraw": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiDrawsCard": "{aiName} draws a card",
+  "@aiDrawsCard": {
+    "placeholders": {
+      "aiName": {"type": "String"}
+    }
+  },
+  "aiRegistersSeven": "{aiName}: Registers 7 {type}",
+  "@aiRegistersSeven": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "type": {"type": "String"}
+    }
+  },
+  "aiRegistersMeld": "{aiName}: Registers {meldType} {cards}",
+  "@aiRegistersMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "meldType": {"type": "String"},
+      "cards": {"type": "String"}
+    }
+  },
+  "aiAttachesToMeld": "{aiName}: Attaches {card} to meld",
+  "@aiAttachesToMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiAttachesToPlayerMeld": "{aiName}: Attaches {card} to player meld",
+  "@aiAttachesToPlayerMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiAttachesToOtherAiMeld": "{aiName}: Attaches {card} to {targetAi} meld",
+  "@aiAttachesToOtherAiMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"},
+      "targetAi": {"type": "String"}
+    }
+  },
+  "aiDiscards": "{aiName}: Discards {card}",
+  "@aiDiscards": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "group": "Group",
+  "solo": "Solo",
+  "victory": "Victory!",
+  "defeat": "Defeat"
 }

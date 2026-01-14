@@ -75,7 +75,7 @@ class OneCardStatsService extends ChangeNotifier {
   }
 
   void _updatePlayerNames() {
-    final defaultNames = ['플레이어', '민준', '서연', '지호'];
+    final defaultNames = ['Player', 'AI 1', 'AI 2', 'AI 3'];
     // 기존 통계가 4명이 아닌 경우 초기화
     if (_playerStats.length != 4) {
       _initDefaultStats();
@@ -88,11 +88,19 @@ class OneCardStatsService extends ChangeNotifier {
 
   void _initDefaultStats() {
     _playerStats = [
-      OneCardPlayerStats(name: '플레이어'),
-      OneCardPlayerStats(name: '민준'),
-      OneCardPlayerStats(name: '서연'),
-      OneCardPlayerStats(name: '지호'),
+      OneCardPlayerStats(name: 'Player'),
+      OneCardPlayerStats(name: 'AI 1'),
+      OneCardPlayerStats(name: 'AI 2'),
+      OneCardPlayerStats(name: 'AI 3'),
     ];
+  }
+
+  /// 지역화된 플레이어 이름으로 업데이트
+  void updateLocalizedNames(List<String> names) {
+    for (int i = 0; i < _playerStats.length && i < names.length; i++) {
+      _playerStats[i].name = names[i];
+    }
+    notifyListeners();
   }
 
   Future<void> _saveStats() async {

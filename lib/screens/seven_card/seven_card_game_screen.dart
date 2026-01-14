@@ -8,6 +8,7 @@ import '../../models/seven_card/seven_card_state.dart';
 import '../../services/ad_service.dart';
 import '../../services/seven_card/seven_card_controller.dart';
 import '../../services/seven_card/seven_card_stats_service.dart';
+import '../../l10n/l10n_helper.dart';
 
 /// 반응형 사이즈 헬퍼
 class _ResponsiveSizes {
@@ -111,7 +112,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n.newGame),
-        content: const Text('광고를 시청하면 새 게임을 시작합니다.\n계속하시겠습니까?'),
+        content: Text(l10n.newGameDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -152,15 +153,16 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
   }
 
   void _showHintDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('힌트'),
-        content: const Text('광고를 시청하면 힌트가 활성화됩니다.\n계속하시겠습니까?'),
+        title: Text(l10n.hint),
+        content: Text(l10n.hintDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -180,7 +182,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-            child: const Text('광고 보기', style: TextStyle(color: Colors.black)),
+            child: Text(l10n.watchAd, style: const TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -207,7 +209,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
             actions: [
               IconButton(
                 icon: Icon(Icons.lightbulb, color: _showHint ? Colors.yellow : Colors.white),
-                tooltip: _showHint ? '힌트 OFF' : '힌트',
+                tooltip: _showHint ? l10n.hintOff : l10n.hint,
                 onPressed: _onHintButtonPressed,
               ),
               IconButton(
@@ -253,7 +255,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               const Icon(Icons.visibility, color: Colors.amber, size: 40),
               const SizedBox(height: 8),
               Text(
-                '공개할 카드를 선택하세요',
+                l10n.selectOpenCard,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -262,7 +264,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               ),
               const SizedBox(height: 4),
               Text(
-                '선택한 카드가 상대에게 공개됩니다',
+                l10n.selectOpenCardDesc,
                 style: const TextStyle(color: Colors.white70, fontSize: 14),
               ),
               // AI 추천 표시
@@ -281,7 +283,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                       const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
                       const SizedBox(width: 6),
                       Text(
-                        'AI 추천: ${recommendedIndex + 1}번째 카드',
+                        '${l10n.aiRecommendation}: ${l10n.nthCard(recommendedIndex + 1)}',
                         style: const TextStyle(
                           color: Colors.lightBlueAccent,
                           fontSize: 13,
@@ -318,7 +320,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                 const CircularProgressIndicator(color: Colors.amber),
                 const SizedBox(height: 16),
                 Text(
-                  'AI가 카드를 선택하고 있습니다...',
+                  l10n.aiSelectingCard,
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
@@ -499,7 +501,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${controller.transitionCountdown}초',
+                      AppLocalizations.of(context)!.secondsCount(controller.transitionCountdown),
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 12,
@@ -716,7 +718,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
             ],
           ),
           Text(
-            '총: ${opponent.totalBetInGame}',
+            l10n.totalBetAmount(opponent.totalBetInGame),
             style: TextStyle(
               color: isFolded ? Colors.grey : Colors.amber,
               fontSize: sizes.infoFontSize,
@@ -725,7 +727,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
           // 베팅 정보 (액션 + 금액)
           if (opponent.lastAction != BettingAction.none)
             Text(
-              _getBettingActionText(opponent.lastAction, opponent.currentBet),
+              getBettingActionText(context, opponent.lastAction, opponent.currentBet),
               style: TextStyle(
                 color: _getBettingActionColor(opponent.lastAction),
                 fontSize: sizes.infoFontSize,
@@ -734,7 +736,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
             )
           else if (opponent.currentBet > 0)
             Text(
-              '${l10n.bet}: ${opponent.currentBet}',
+              l10n.bettingAmount(opponent.currentBet),
               style: TextStyle(
                 color: Colors.green,
                 fontSize: sizes.infoFontSize,
@@ -933,7 +935,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                 ],
               ),
               Text(
-                '총: ${player.totalBetInGame}',
+                l10n.totalBetAmount(player.totalBetInGame),
                 style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: sizes.nameFontSize),
               ),
             ],
@@ -1129,7 +1131,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                   const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
                   const SizedBox(width: 6),
                   Text(
-                    'AI 추천: ${controller.getRecommendedActionName(recommendedAction)}${recommendedAction.amount > 0 ? ' (${recommendedAction.amount})' : ''}',
+                    '${l10n.aiRecommendation}: ${getBettingActionName(context, recommendedAction.action)}${recommendedAction.amount > 0 ? ' (${recommendedAction.amount})' : ''}',
                     style: const TextStyle(
                       color: Colors.lightBlueAccent,
                       fontSize: 13,
@@ -1146,7 +1148,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
             children: [
               // 삥 (기본 판돈 - 보스만)
               _buildBetButton(
-                label: '삥',
+                label: l10n.betPing,
                 amount: state.getBingAmount(),
                 color: Colors.green,
                 onPressed: getAction('bing', () => controller.humanBing()),
@@ -1154,7 +1156,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               ),
               // 콜
               _buildBetButton(
-                label: '콜',
+                label: l10n.betCall,
                 amount: state.getCallAmount(),
                 color: Colors.cyan,
                 onPressed: getAction('call', () => controller.humanCall()),
@@ -1162,7 +1164,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               ),
               // 따당 (2배)
               _buildBetButton(
-                label: '따당',
+                label: l10n.betDdadang,
                 amount: state.getDdadangAmount(),
                 color: Colors.orange,
                 onPressed: getAction('ddadang', () => controller.humanDdadang()),
@@ -1170,7 +1172,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               ),
               // 다이 (폴드)
               _buildBetButton(
-                label: '다이',
+                label: l10n.betDie,
                 amount: null,
                 color: Colors.red,
                 onPressed: getAction('die', () => controller.humanDie()),
@@ -1185,7 +1187,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
             children: [
               // 체크 (보스만)
               _buildBetButton(
-                label: '체크',
+                label: l10n.betCheck,
                 amount: null,
                 color: Colors.blue,
                 onPressed: getAction('check', () => controller.humanCheck()),
@@ -1193,7 +1195,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               ),
               // 쿼터 (25%)
               _buildBetButton(
-                label: '쿼터',
+                label: l10n.betQuarter,
                 amount: state.getQuarterAmount(),
                 color: Colors.teal,
                 onPressed: getAction('quarter', () => controller.humanQuarter()),
@@ -1201,7 +1203,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               ),
               // 하프 (50%)
               _buildBetButton(
-                label: '하프',
+                label: l10n.betHalf,
                 amount: state.getHalfAmount(),
                 color: Colors.indigo,
                 onPressed: getAction('half', () => controller.humanHalf()),
@@ -1209,7 +1211,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               ),
               // 풀 (100%)
               _buildBetButton(
-                label: '풀',
+                label: l10n.betFull,
                 amount: state.getFullAmount(),
                 color: Colors.purple,
                 onPressed: getAction('full', () => controller.humanFull()),
@@ -1327,12 +1329,12 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                         ),
                         child: Column(
                           children: [
-                            const Text(
-                              '🎉 보너스 핸드!',
-                              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
+                            Text(
+                              '🎉 ${l10n.bonusHand}',
+                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                             Text(
-                              controller.getHandRankName(bonusInfo.handRank),
+                              getHandRankName(context, bonusInfo.handRank),
                               style: TextStyle(color: Colors.red[900], fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                           ],
@@ -1349,7 +1351,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                     if (winner?.pokerHand != null && bonusInfo == null) ...[
                       const SizedBox(height: 4),
                       Text(
-                        controller.getHandRankName(winner!.pokerHand!.rank),
+                        getHandRankName(context, winner!.pokerHand!.rank),
                         style: const TextStyle(fontSize: 16, color: Colors.green),
                       ),
                     ],
@@ -1359,11 +1361,11 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _buildBonusChip('팟', '+${state.pot}', Colors.green),
+                          _buildBonusChip(l10n.pot, '+${state.pot}', Colors.green),
                           const SizedBox(width: 8),
-                          _buildBonusChip('보너스', '+${bonusInfo.bonusAmount * 4}', Colors.amber),
+                          _buildBonusChip(l10n.bonus, '+${bonusInfo.bonusAmount * 4}', Colors.amber),
                           const SizedBox(width: 8),
-                          _buildBonusChip('총', '+${bonusInfo.totalWinnings}', Colors.blue),
+                          _buildBonusChip(l10n.total, '+${bonusInfo.totalWinnings}', Colors.blue),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -1374,7 +1376,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          '다른 플레이어: 각 -${bonusInfo.bonusAmount}',
+                          l10n.otherPlayersLose(bonusInfo.bonusAmount),
                           style: const TextStyle(color: Colors.red, fontSize: 12),
                         ),
                       ),
@@ -1396,10 +1398,10 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                       // 테이블 헤더
                       Row(
                         children: [
-                          const Expanded(flex: 3, child: Text('플레이어', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                          const Expanded(flex: 2, child: Text('이번 게임', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                          const Expanded(flex: 2, child: Text('승/패', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                          const Expanded(flex: 2, child: Text('누적', textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          Expanded(flex: 3, child: Text(l10n.player, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          Expanded(flex: 2, child: Text(l10n.thisGame, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          Expanded(flex: 2, child: Text(l10n.winLoss, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          Expanded(flex: 2, child: Text(l10n.cumulative, textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                         ],
                       ),
                       const Divider(height: 8),
@@ -1493,7 +1495,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                     ElevatedButton.icon(
                       onPressed: () => _showDetailedResults(context, controller, state),
                       icon: const Icon(Icons.visibility, size: 18),
-                      label: const Text('결과 확인'),
+                      label: Text(l10n.viewResults),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
@@ -1558,13 +1560,14 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
   }
 
   void _showDetailedResults(BuildContext context, SevenCardController controller, SevenCardState state) {
+    final l10n = AppLocalizations.of(context)!;
     // 활성 플레이어와 다이한 플레이어 분리
     final activePlayers = state.players.where((p) => !p.isFolded).toList();
     final foldedPlayers = state.players.where((p) => p.isFolded).toList();
 
     showDialog(
       context: context,
-      builder: (context) => Dialog(
+      builder: (dialogContext) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         child: Container(
@@ -1587,16 +1590,16 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      '최종 결과',
-                      style: TextStyle(
+                    Text(
+                      l10n.finalResults,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     IconButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(dialogContext),
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -1624,9 +1627,9 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        '다이',
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      Text(
+                        l10n.foldedSection,
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
                       ),
                       const SizedBox(height: 8),
                       Column(
@@ -1682,13 +1685,13 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    controller.getHandRankDisplayName(player.pokerHand),
+                    getHandRankDisplayName(context, player.pokerHand),
                     style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 ),
               const SizedBox(width: 8),
               Text(
-                '베팅: ${player.totalBetInGame}',
+                AppLocalizations.of(context)!.bettingAmount(player.totalBetInGame),
                 style: const TextStyle(color: Colors.amber, fontSize: 11),
               ),
             ],
@@ -1721,32 +1724,34 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
   }
 
   Widget _buildFoldedPlayerResult(SevenCardPlayer player, SevenCardController controller) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.black38,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Text(
-            player.name,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+    return Builder(
+      builder: (context) => Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.black38,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Text(
+              player.name,
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-          // 카드 뒷면 표시
-          ...List.generate(player.hand.length, (index) => _buildSmallCardBack()),
-          const Spacer(),
-          Text(
-            '베팅: ${player.totalBetInGame}',
-            style: const TextStyle(color: Colors.grey, fontSize: 10),
-          ),
-        ],
+            const SizedBox(width: 8),
+            // 카드 뒷면 표시
+            ...List.generate(player.hand.length, (index) => _buildSmallCardBack()),
+            const Spacer(),
+            Text(
+              AppLocalizations.of(context)!.bettingAmount(player.totalBetInGame),
+              style: const TextStyle(color: Colors.grey, fontSize: 10),
+            ),
+          ],
+        ),
       ),
     );
   }

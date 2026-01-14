@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../l10n/l10n_helper.dart';
 import '../../models/card.dart';
 import '../../models/hi_lo/hi_lo_state.dart';
 import '../../services/ad_service.dart';
@@ -103,7 +104,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(l10n.newGame),
-        content: const Text('광고를 시청하면 새 게임을 시작합니다.\n계속하시겠습니까?'),
+        content: Text(l10n.newGameDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -144,15 +145,16 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
   }
 
   void _showHintDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('힌트'),
-        content: const Text('광고를 시청하면 힌트가 활성화됩니다.\n계속하시겠습니까?'),
+        title: Text(l10n.hint),
+        content: Text(l10n.hintDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -172,7 +174,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-            child: const Text('광고 보기', style: TextStyle(color: Colors.black)),
+            child: Text(l10n.watchAd, style: const TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -199,7 +201,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
             actions: [
               IconButton(
                 icon: Icon(Icons.lightbulb, color: _showHint ? Colors.yellow : Colors.white),
-                tooltip: _showHint ? '힌트 OFF' : '힌트',
+                tooltip: _showHint ? l10n.hintOff : l10n.hint,
                 onPressed: _onHintButtonPressed,
               ),
               IconButton(
@@ -247,18 +249,18 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
             children: [
               const Icon(Icons.visibility, color: Colors.amber, size: 40),
               const SizedBox(height: 8),
-              const Text(
-                '공개할 카드를 선택하세요',
-                style: TextStyle(
+              Text(
+                l10n.selectOpenCard,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                '선택한 카드가 상대에게 공개됩니다',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
+              Text(
+                l10n.selectOpenCardDesc,
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
               ),
               // AI 추천 표시
               if (_showHint && isMyTurn && recommendedIndex != null) ...[
@@ -674,9 +676,9 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildBonusInfoChip('팟', '+${state.pot}', Colors.green),
-                      _buildBonusInfoChip('보너스', '+${bonusInfo.bonusAmount * 4}', Colors.amber),
-                      _buildBonusInfoChip('총', '+${bonusInfo.totalWinnings}', Colors.purple),
+                      _buildBonusInfoChip(l10n.pot, '+${state.pot}', Colors.green),
+                      _buildBonusInfoChip(l10n.bonus, '+${bonusInfo.bonusAmount * 4}', Colors.amber),
+                      _buildBonusInfoChip(l10n.total, '+${bonusInfo.totalWinnings}', Colors.purple),
                     ],
                   ),
                 ],
@@ -697,7 +699,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                   const Icon(Icons.remove_circle, color: Colors.red, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    '다른 플레이어들: 각 -${bonusInfo.bonusAmount}',
+                    l10n.otherPlayersLose(bonusInfo.bonusAmount),
                     style: const TextStyle(color: Colors.red, fontSize: 14),
                   ),
                 ],
@@ -1419,7 +1421,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
             ],
           ),
           Text(
-            '총: ${opponent.totalBetInGame}',
+            l10n.totalBetAmount(opponent.totalBetInGame),
             style: TextStyle(
               color: isFolded ? Colors.grey : Colors.amber,
               fontSize: sizes.infoFontSize,
@@ -1427,7 +1429,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
           ),
           if (opponent.lastAction != HiLoBettingAction.none)
             Text(
-              _getBettingActionText(opponent.lastAction, opponent.currentBet),
+              getHiLoBettingActionText(context, opponent.lastAction, opponent.currentBet),
               style: TextStyle(
                 color: _getBettingActionColor(opponent.lastAction),
                 fontSize: sizes.infoFontSize,
@@ -1436,7 +1438,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
             )
           else if (opponent.currentBet > 0)
             Text(
-              '${l10n.bet}: ${opponent.currentBet}',
+              l10n.bettingAmount(opponent.currentBet),
               style: TextStyle(
                 color: Colors.green,
                 fontSize: sizes.infoFontSize,
@@ -1612,7 +1614,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                 ],
               ),
               Text(
-                '총: ${player.totalBetInGame}',
+                l10n.totalBetAmount(player.totalBetInGame),
                 style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: sizes.nameFontSize),
               ),
             ],
@@ -1886,28 +1888,28 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildBetButton(
-                label: '삥',
+                label: l10n.betPing,
                 amount: state.getBingAmount(),
                 color: Colors.green,
                 onPressed: getAction('bing', () => controller.humanBing()),
                 sizes: sizes,
               ),
               _buildBetButton(
-                label: '콜',
+                label: l10n.betCall,
                 amount: state.getCallAmount(),
                 color: Colors.cyan,
                 onPressed: getAction('call', () => controller.humanCall()),
                 sizes: sizes,
               ),
               _buildBetButton(
-                label: '따당',
+                label: l10n.betDdadang,
                 amount: state.getDdadangAmount(),
                 color: Colors.orange,
                 onPressed: getAction('ddadang', () => controller.humanDdadang()),
                 sizes: sizes,
               ),
               _buildBetButton(
-                label: '다이',
+                label: l10n.betDie,
                 amount: null,
                 color: Colors.red,
                 onPressed: getAction('die', () => controller.humanDie()),
@@ -1920,28 +1922,28 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildBetButton(
-                label: '체크',
+                label: l10n.betCheck,
                 amount: null,
                 color: Colors.blue,
                 onPressed: getAction('check', () => controller.humanCheck()),
                 sizes: sizes,
               ),
               _buildBetButton(
-                label: '쿼터',
+                label: l10n.betQuarter,
                 amount: state.getQuarterAmount(),
                 color: Colors.teal,
                 onPressed: getAction('quarter', () => controller.humanQuarter()),
                 sizes: sizes,
               ),
               _buildBetButton(
-                label: '하프',
+                label: l10n.betHalf,
                 amount: state.getHalfAmount(),
                 color: Colors.indigo,
                 onPressed: getAction('half', () => controller.humanHalf()),
                 sizes: sizes,
               ),
               _buildBetButton(
-                label: '풀',
+                label: l10n.betFull,
                 amount: state.getFullAmount(),
                 color: Colors.purple,
                 onPressed: getAction('full', () => controller.humanFull()),
@@ -2130,10 +2132,10 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                     children: [
                       Row(
                         children: [
-                          const Expanded(flex: 3, child: Text('플레이어', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                          const Expanded(flex: 2, child: Text('이번 게임', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                          const Expanded(flex: 2, child: Text('승/패', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-                          const Expanded(flex: 2, child: Text('누적', textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          Expanded(flex: 3, child: Text(l10n.player, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          Expanded(flex: 2, child: Text(l10n.thisGame, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          Expanded(flex: 2, child: Text(l10n.winLoss, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          Expanded(flex: 2, child: Text(l10n.cumulative, textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
                         ],
                       ),
                       const Divider(height: 8),

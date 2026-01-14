@@ -115,7 +115,7 @@ class PokerHandEvaluator {
   /// 7장의 카드에서 최고의 5장 조합을 찾아 평가
   static PokerHand evaluate(List<PlayingCard> cards) {
     if (cards.length < 5) {
-      throw ArgumentError('최소 5장의 카드가 필요합니다');
+      throw ArgumentError('At least 5 cards are required');
     }
 
     // 조커 제외한 카드만 사용

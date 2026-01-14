@@ -52,7 +52,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get giruda => 'Trump';
 
   @override
-  String get noGiruda => 'No Trump';
+  String get noGiruda => 'No Giruda';
 
   @override
   String get spade => 'Spade';
@@ -96,7 +96,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changeGiruda => 'Change Trump (Optional):';
 
   @override
-  String get confirm => 'Confirm';
+  String get confirm => 'OK';
 
   @override
   String get declareFriend => 'Declare Friend';
@@ -764,4 +764,742 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get heartsSubtitle => '4-Player Trick-Taking Game';
+
+  @override
+  String get handRoyalStraightFlush => 'Royal Straight Flush';
+
+  @override
+  String get handBackStraightFlush => 'Back Straight Flush';
+
+  @override
+  String get handStraightFlush => 'Straight Flush';
+
+  @override
+  String get handFourOfAKind => 'Four of a Kind';
+
+  @override
+  String get handFullHouse => 'Full House';
+
+  @override
+  String get handFlush => 'Flush';
+
+  @override
+  String get handMountain => 'Mountain';
+
+  @override
+  String get handBackStraight => 'Back Straight';
+
+  @override
+  String get handStraight => 'Straight';
+
+  @override
+  String get handTriple => 'Three of a Kind';
+
+  @override
+  String get handTwoPair => 'Two Pair';
+
+  @override
+  String get handOnePair => 'One Pair';
+
+  @override
+  String get handHighCard => 'High Card';
+
+  @override
+  String highCardTop(String rank) {
+    return '$rank High';
+  }
+
+  @override
+  String get noLow => 'No Low';
+
+  @override
+  String get betPing => 'Ping';
+
+  @override
+  String get betCheck => 'Check';
+
+  @override
+  String get betCall => 'Call';
+
+  @override
+  String get betDdadang => 'Double';
+
+  @override
+  String get betQuarter => 'Quarter';
+
+  @override
+  String get betHalf => 'Half';
+
+  @override
+  String get betFull => 'Full';
+
+  @override
+  String get betDie => 'Fold';
+
+  @override
+  String get selectOpenCard => 'Select a card to reveal';
+
+  @override
+  String get selectOpenCardDesc =>
+      'The selected card will be shown to opponents';
+
+  @override
+  String get aiSelectingCard => 'AI is selecting a card...';
+
+  @override
+  String nthCard(int n) {
+    return 'Card #$n';
+  }
+
+  @override
+  String secondsCount(int n) {
+    return '${n}s';
+  }
+
+  @override
+  String totalBetAmount(int amount) {
+    return 'Total: $amount';
+  }
+
+  @override
+  String bettingAmount(int amount) {
+    return 'Bet: $amount';
+  }
+
+  @override
+  String get bonusHand => 'Bonus Hand!';
+
+  @override
+  String get bonus => 'Bonus';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String otherPlayersLose(int amount) {
+    return 'Other players: -$amount each';
+  }
+
+  @override
+  String get thisGame => 'This Game';
+
+  @override
+  String get cumulative => 'Total';
+
+  @override
+  String get foldedSection => 'Folded';
+
+  @override
+  String get hiLoHi => 'Hi';
+
+  @override
+  String get hiLoLo => 'Lo';
+
+  @override
+  String get hiLoSwing => 'Swing';
+
+  @override
+  String roundComplete(int n) {
+    return 'Round $n Complete!';
+  }
+
+  @override
+  String get cardDistribution5 => 'The 5th card is being dealt.';
+
+  @override
+  String get cardDistribution6 => 'The 6th card is being dealt.';
+
+  @override
+  String get cardDistribution7 => 'The final 7th card is being dealt.';
+
+  @override
+  String get goodLuck => 'GOOD LUCK!';
+
+  @override
+  String get suitSpade => 'Spade';
+
+  @override
+  String get suitDiamond => 'Diamond';
+
+  @override
+  String get suitHeart => 'Heart';
+
+  @override
+  String get suitClub => 'Club';
+
+  @override
+  String cardOwner(String card) {
+    return '$card Owner';
+  }
+
+  @override
+  String trickWinner(int n) {
+    return 'Trick $n Winner';
+  }
+
+  @override
+  String get hint => 'Hint';
+
+  @override
+  String get hintOff => 'Hint OFF';
+
+  @override
+  String get hintDialogContent => 'Watch an ad to enable hints.\nContinue?';
+
+  @override
+  String get newGameDialogContent =>
+      'Watch an ad to start a new game.\nContinue?';
+
+  @override
+  String get watchAd => 'Watch Ad';
+
+  @override
+  String jokerLead(String suit) {
+    return 'Joker lead: $suit';
+  }
+
+  @override
+  String get gameSelection => 'Game Selection';
+
+  @override
+  String get onecardTitle => 'One Card';
+
+  @override
+  String get onecardSubtitle => '4-Player Game';
+
+  @override
+  String get gameRules => 'Game Rules';
+
+  @override
+  String get heartsGuideGoal => 'Goal';
+
+  @override
+  String get heartsGuideGoalText =>
+      'The goal is to get the lowest score by avoiding heart cards and the Queen of Spades.';
+
+  @override
+  String get heartsGuideHow => 'How to Play';
+
+  @override
+  String get heartsGuideHowText =>
+      '• 4 players, each receives 13 cards\n• Pass 3 cards to the left at game start\n• Player with Club 2 starts first\n• Play 13 tricks while avoiding point cards';
+
+  @override
+  String get heartsGuideScoring => 'Scoring';
+
+  @override
+  String get heartsGuideScoringText =>
+      '• Heart cards: 1 point each (13 total)\n• Queen of Spades (♠Q): 13 points\n• Total: 26 points\n• Lowest score wins!';
+
+  @override
+  String get heartsGuideBreaking => 'Heart Breaking';
+
+  @override
+  String get heartsGuideBreakingText =>
+      'Hearts cannot be played on the first trick.\nHearts can only lead after hearts have been broken.';
+
+  @override
+  String get heartsGuideShootMoon => 'Shooting the Moon';
+
+  @override
+  String get heartsGuideShootMoonText =>
+      'If one player takes all hearts and the Queen of Spades:\n• That player: 0 points\n• Other players: 26 points each';
+
+  @override
+  String get heartsGuideTips => 'Strategy Tips';
+
+  @override
+  String get heartsGuideTipsText =>
+      '• Get rid of high cards early\n• Watch out for the Queen of Spades\n• Try to give point cards to opponents';
+
+  @override
+  String get allScoreCardsUsed => 'All point cards used! Game over';
+
+  @override
+  String passLeftCount(int count) {
+    return 'Pass left ($count/3)';
+  }
+
+  @override
+  String get cardPass => 'Card Pass';
+
+  @override
+  String trickProgress(int current) {
+    return 'Trick $current/13';
+  }
+
+  @override
+  String get heartBroken => 'Heart Breaking';
+
+  @override
+  String get passRecommend => 'Pass Recommend';
+
+  @override
+  String get recommend => 'Recommend';
+
+  @override
+  String get selectCardsToPassLeft => 'Select 3 cards to pass left';
+
+  @override
+  String playerNameWins(String name) {
+    return '$name wins';
+  }
+
+  @override
+  String playerStartsWithClub2(String name) {
+    return '$name starts with Club 2';
+  }
+
+  @override
+  String playerWonTrick(String name, int points) {
+    return '$name won the trick! (+$points points)';
+  }
+
+  @override
+  String playerShootMoonSuccess(String name) {
+    return '$name shot the moon!';
+  }
+
+  @override
+  String get hintActivated => 'Hint activated!';
+
+  @override
+  String get myTurn => 'My Turn';
+
+  @override
+  String get start => 'Start';
+
+  @override
+  String get counterClockwise => 'CCW';
+
+  @override
+  String get clockwise => 'CW';
+
+  @override
+  String get blackJoker => 'B&W Joker';
+
+  @override
+  String get colorJoker => 'Color Joker';
+
+  @override
+  String get oneCardCall => 'One Card!';
+
+  @override
+  String oneCardCallTimer(int seconds) {
+    return 'One Card (${seconds}s)';
+  }
+
+  @override
+  String get selectSuit => 'Select a suit';
+
+  @override
+  String get discardedCards => 'Discarded cards';
+
+  @override
+  String get meld => 'Meld';
+
+  @override
+  String get discard => 'Discard';
+
+  @override
+  String get stop => 'Stop';
+
+  @override
+  String get handCards => 'Hand';
+
+  @override
+  String get cannotPlayCard => 'Cannot play this card';
+
+  @override
+  String get drawCard => 'Draw a card';
+
+  @override
+  String get discardOrMeld => 'Discard or meld a card';
+
+  @override
+  String get noCards => 'No cards';
+
+  @override
+  String get thankYouSelectMethod => 'Select Thank You method';
+
+  @override
+  String thankYouMeldSolo(String suit) {
+    return 'Thank You! Meld ${suit}7 solo';
+  }
+
+  @override
+  String thankYouMeldMyMeld(String card) {
+    return 'Thank You! Add $card to my meld';
+  }
+
+  @override
+  String thankYouMeldAiMeld(String card, String aiName) {
+    return 'Thank You! Add $card to $aiName\'s meld';
+  }
+
+  @override
+  String get addedToMeld => 'Added to meld';
+
+  @override
+  String get noMeldToAttach => 'No meld to attach';
+
+  @override
+  String get invalidCombination => 'Invalid combination';
+
+  @override
+  String get drawCardFirst => 'Draw a card first';
+
+  @override
+  String get selectCardToDiscard => 'Select a card to discard';
+
+  @override
+  String get hulaWin => 'Hula win! (x2)';
+
+  @override
+  String get continue_ => 'Continue';
+
+  @override
+  String attackReceived(int count) {
+    return 'Received $count cards from attack';
+  }
+
+  @override
+  String get cardDrawn => 'Card drawn';
+
+  @override
+  String bankrupt(int count) {
+    return 'Bankrupt! ($count cards)';
+  }
+
+  @override
+  String get restart => 'Restart';
+
+  @override
+  String get goal => 'Goal';
+
+  @override
+  String get howToPlay => 'How to Play';
+
+  @override
+  String get attackCards => 'Attack Cards';
+
+  @override
+  String get defense => 'Defense';
+
+  @override
+  String get specialCards => 'Special Cards';
+
+  @override
+  String get tips => 'Tips';
+
+  @override
+  String get winRate => 'Win Rate';
+
+  @override
+  String get onecardGuideGoal => 'Goal';
+
+  @override
+  String get onecardGuideGoalText => 'Be the first to play all your cards.';
+
+  @override
+  String get onecardGuidePlay => 'Playing Cards';
+
+  @override
+  String get onecardGuidePlayText =>
+      'You can play a card with the same suit or number as the previous card.';
+
+  @override
+  String get onecardGuideAttack => 'Attack Cards';
+
+  @override
+  String get onecardGuideAttackText =>
+      '• 2: +2 cards attack\n• A: +3 cards attack (♠A is +5)\n• Joker: +5(B&W) / +7(Color)';
+
+  @override
+  String get onecardGuideSpecial => 'Special Cards';
+
+  @override
+  String get onecardGuideSpecialText =>
+      '• J: Skip next player\n• Q: Reverse direction\n• K: Skip 2 turns\n• 7: Change suit';
+
+  @override
+  String get onecardGuideJokerDefense => 'Joker Defense';
+
+  @override
+  String get onecardGuideJokerDefenseText =>
+      'When attacked by a Joker, you can only defend with a Joker.';
+
+  @override
+  String get onecardGuideOnecard => 'One Card!';
+
+  @override
+  String get onecardGuideOnecardText =>
+      'When you have 1 card left, you must press the \"One Card!\" button.\nIf you don\'t, you receive 2 penalty cards.';
+
+  @override
+  String get onecardGuideBankrupt => 'Bankruptcy';
+
+  @override
+  String get onecardGuideBankruptText =>
+      'If you have 20+ cards, you\'re bankrupt! The player with fewest cards wins.';
+
+  @override
+  String get hulaGuideGoal => 'Goal';
+
+  @override
+  String get hulaGuideGoalText =>
+      'Be the first to get rid of all cards in your hand by melding or discarding.';
+
+  @override
+  String get hulaGuideHow => 'How to Play';
+
+  @override
+  String get hulaGuideHowText =>
+      'Each turn, draw a card from the deck or discard pile, then meld or discard.';
+
+  @override
+  String get hulaGuideMelds => 'Meld Types';
+
+  @override
+  String get hulaGuideMeldsText =>
+      '• Run: 3+ consecutive cards of same suit (e.g., ♠3-4-5)\n• Group: 3+ same number different suits (e.g., ♠7-♥7-♦7)';
+
+  @override
+  String get hulaGuideSeven => 'Special Rule for 7';
+
+  @override
+  String get hulaGuideSevenText => 'A 7 can be melded on its own.';
+
+  @override
+  String get hulaGuideThankYou => 'Thank You';
+
+  @override
+  String get hulaGuideThankYouText =>
+      'If you draw a 7 from the discard pile, you can call \"Thank You\" and make a special meld.';
+
+  @override
+  String get hulaGuideStop => 'Stop';
+
+  @override
+  String get hulaGuideStopText =>
+      'You can call Stop anytime to end the game.\nThe player with the lowest card points wins.';
+
+  @override
+  String get hulaGuideCardPoints => 'Card Points';
+
+  @override
+  String get hulaGuideCardPointsText =>
+      'A=1pt, 2~9=face value, J=10pts, Q=11pts, K=12pts';
+
+  @override
+  String get hulaGuideScoring => 'Scoring';
+
+  @override
+  String get hulaGuideScoringText =>
+      '• Winner: Gets sum of point differences from other players\n• Loser: Loses points based on difference with winner\n• Hula (win without melding): Double points';
+
+  @override
+  String get hulaGuideStopPenalty => 'Stop Failure Penalty';
+
+  @override
+  String get hulaGuideStopPenaltyText =>
+      'If you call Stop but don\'t have the lowest score:\n• The stopper pays all points the winner would receive\n• Other players lose no points';
+
+  @override
+  String attackTotalCards(int power, int total) {
+    return '+$power! ($total cards attack)';
+  }
+
+  @override
+  String get skipNextTurnMessage => 'J! Skip next turn';
+
+  @override
+  String get reverseDirectionMessage => 'Q! Reverse direction';
+
+  @override
+  String get skipTwoTurnsMessage => 'K! Skip 2 turns';
+
+  @override
+  String changeSuitMessage(String suit) {
+    return '7! Change suit: $suit';
+  }
+
+  @override
+  String playerPlayedCard(String name) {
+    return '$name played a card';
+  }
+
+  @override
+  String onecardWithPlayers(int count) {
+    return 'One Card (${count}P)';
+  }
+
+  @override
+  String get blackWhiteJoker => 'B&W Joker';
+
+  @override
+  String get clockwiseDirection => 'Clockwise';
+
+  @override
+  String get counterClockwiseDirection => 'Counter-clockwise';
+
+  @override
+  String aiTurnCountdown(String name, int seconds) {
+    return '$name ($seconds)';
+  }
+
+  @override
+  String aiTurn(String name) {
+    return '$name\'s turn';
+  }
+
+  @override
+  String get cannotPlayThisCard => 'This card cannot be played';
+
+  @override
+  String bankruptWithCards(int count) {
+    return 'Bankrupt! ($count cards)';
+  }
+
+  @override
+  String get gameRulesTitle => 'Game Rules';
+
+  @override
+  String get goalText =>
+      'Be the first to play all your cards.\nYou must call \"One Card\" before playing your last card.';
+
+  @override
+  String get howToPlayText =>
+      'Play a card with the same suit or number.\nIf you can\'t play, draw from the deck.';
+
+  @override
+  String get defenseText =>
+      'When attacked, defend with the same attack card.\nDefending stacks the attack to the next player.';
+
+  @override
+  String get gameTips => 'Game Tips';
+
+  @override
+  String get drawCardMessage => 'Draw a card';
+
+  @override
+  String get discardOrMeldMessage => 'Discard or meld a card';
+
+  @override
+  String get noCardsMessage => 'No cards';
+
+  @override
+  String thankYouSolo(String suit) {
+    return 'Thank You! ${suit}7 solo meld';
+  }
+
+  @override
+  String thankYouAddToMine(String card) {
+    return 'Thank You! Add $card to my meld';
+  }
+
+  @override
+  String thankYouAddToAi(String card, String aiName) {
+    return 'Thank You! Add $card to $aiName\'s meld';
+  }
+
+  @override
+  String thankYouDesc(String desc) {
+    return 'Thank You! $desc';
+  }
+
+  @override
+  String get drawFirstMessage => 'Draw a card first';
+
+  @override
+  String get hulaWinBonus => 'Hula win! (x2)';
+
+  @override
+  String get handColumn => 'Hand';
+
+  @override
+  String get scoreColumn => 'Score';
+
+  @override
+  String get cumulativeColumn => 'Total';
+
+  @override
+  String hulaWithPlayers(int count) {
+    return 'Hula (${count}P)';
+  }
+
+  @override
+  String hintOnOff(String status) {
+    return 'Hint $status';
+  }
+
+  @override
+  String get meldButton => 'Meld';
+
+  @override
+  String get discardButton => 'Discard';
+
+  @override
+  String get stopButton => 'Stop';
+
+  @override
+  String get thankYouMeld => 'Thank You Meld';
+
+  @override
+  String get meldTypes => 'Meld Types';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String aiThankYouDraw(String aiName, String card) {
+    return '$aiName Thank You! $card';
+  }
+
+  @override
+  String aiDrawsCard(String aiName) {
+    return '$aiName draws a card';
+  }
+
+  @override
+  String aiRegistersSeven(String aiName, String type) {
+    return '$aiName: Registers 7 $type';
+  }
+
+  @override
+  String aiRegistersMeld(String aiName, String meldType, String cards) {
+    return '$aiName: Registers $meldType $cards';
+  }
+
+  @override
+  String aiAttachesToMeld(String aiName, String card) {
+    return '$aiName: Attaches $card to meld';
+  }
+
+  @override
+  String aiAttachesToPlayerMeld(String aiName, String card) {
+    return '$aiName: Attaches $card to player meld';
+  }
+
+  @override
+  String aiAttachesToOtherAiMeld(String aiName, String card, String targetAi) {
+    return '$aiName: Attaches $card to $targetAi meld';
+  }
+
+  @override
+  String aiDiscards(String aiName, String card) {
+    return '$aiName: Discards $card';
+  }
+
+  @override
+  String get group => 'Group';
+
+  @override
+  String get solo => 'Solo';
+
+  @override
+  String get victory => 'Victory!';
+
+  @override
+  String get defeat => 'Defeat';
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../services/game_save_service.dart';
 import '../../services/ad_service.dart';
 import '../../services/hula/hula_stats_service.dart';
@@ -114,6 +115,7 @@ class ThankYouOption {
   final List<PlayingCard> handCards; // 손패에서 사용할 카드들
   final int? meldIndex; // 붙일 멜드 인덱스
   final int? computerIndex; // 컴퓨터 인덱스 (컴퓨터 멜드에 붙일 때)
+  final String? computerName; // 컴퓨터 이름 (컴퓨터 멜드에 붙일 때)
   final bool isRun; // 새 멜드가 Run인지
 
   ThankYouOption({
@@ -122,18 +124,19 @@ class ThankYouOption {
     this.handCards = const [],
     this.meldIndex,
     this.computerIndex,
+    this.computerName,
     this.isRun = false,
   });
 
   // 옵션 설명 문자열
-  String get description {
+  String getDescription(AppLocalizations l10n) {
     switch (type) {
       case ThankYouType.seven:
-        return '${discardCard.suitSymbol}7 단독 등록';
+        return l10n.thankYouSolo(discardCard.suitSymbol);
       case ThankYouType.attachPlayer:
-        return '${discardCard.suitSymbol}${discardCard.rankString} 내 멜드에 붙이기';
+        return l10n.thankYouAddToMine('${discardCard.suitSymbol}${discardCard.rankString}');
       case ThankYouType.attachComputer:
-        return '${discardCard.suitSymbol}${discardCard.rankString} ${_HulaScreenState.aiNames[computerIndex!]} 멜드에 붙이기';
+        return l10n.thankYouAddToAi('${discardCard.suitSymbol}${discardCard.rankString}', computerName ?? '');
       case ThankYouType.newMeld:
         final allCards = [...handCards, discardCard];
         if (isRun) {
@@ -238,8 +241,11 @@ class HulaScreen extends StatefulWidget {
 }
 
 class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
-  // AI 이름 (마이티와 동일)
-  static const List<String> aiNames = ['민준', '서연', '지호'];
+  // AI 이름 (동적으로 가져옴)
+  List<String> _getAiNames(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [l10n.aiPlayer1, l10n.aiPlayer2, l10n.aiPlayer3];
+  }
 
   // 카드 덱
   List<PlayingCard> deck = [];
@@ -316,15 +322,16 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   void _showNewGameDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('새 게임'),
-        content: const Text('광고를 시청하면 새 게임을 시작합니다.\n계속하시겠습니까?'),
+        title: Text(l10n.newGame),
+        content: Text(l10n.newGameDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -341,7 +348,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-            child: const Text('새 게임', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.newGame, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -359,15 +366,16 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   void _showHintDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('힌트'),
-        content: const Text('광고를 시청하면 힌트가 활성화됩니다.\n계속하시겠습니까?'),
+        title: Text(l10n.hint),
+        content: Text(l10n.hintDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -387,7 +395,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-            child: const Text('광고 보기', style: TextStyle(color: Colors.black)),
+            child: Text(l10n.watchAd, style: const TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -454,16 +462,18 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     _saveGame();
 
     // 컴퓨터가 먼저 시작하면 대기 상태로 전환
+    final l10n = AppLocalizations.of(context)!;
     if (currentTurn != 0) {
       final startingComputer = currentTurn;
-      _showMessage('${aiNames[startingComputer - 1]}이 먼저 시작합니다');
+      final aiNames = _getAiNames(context);
+      _showMessage('${aiNames[startingComputer - 1]} ${l10n.start}');
       setState(() {
         waitingForNextTurn = true;
       });
       _startNextTurnTimer();
     } else {
       // 플레이어가 먼저 시작
-      _showMessage('카드를 뽑으세요');
+      _showMessage(l10n.drawCardMessage);
     }
   }
 
@@ -701,8 +711,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     _cancelNextTurnTimer();
 
     // 내 차례면 메시지만 표시
+    final l10n = AppLocalizations.of(context)!;
     if (currentTurn == 0) {
-      _showMessage(hasDrawn ? '카드를 버리거나 등록하세요' : '카드를 뽑으세요');
+      _showMessage(hasDrawn ? l10n.discardOrMeldMessage : l10n.drawCardMessage);
     }
     // 컴퓨터 턴이고 대기 상태면 타이머 시작
     else if (waitingForNextTurn) {
@@ -746,7 +757,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     if (deck.isEmpty) {
       // 덱이 비면 버린 더미 섞기
       if (discardPile.length <= 1) {
-        _showMessage('카드가 없습니다');
+        final l10n = AppLocalizations.of(context)!;
+        _showMessage(l10n.noCardsMessage);
         return;
       }
       final topCard = discardPile.removeLast();
@@ -794,10 +806,11 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 땡큐 옵션 선택 다이얼로그 표시
   void _showThankYouOptionsDialog(List<ThankYouOption> options) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Row(
           children: [
             Text(
@@ -809,7 +822,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
             ),
             const SizedBox(width: 8),
-            Text('${'땡큐'} ${'방법을 선택하세요'}'),
+            Text(l10n.thankYouSelectMethod),
           ],
         ),
         content: SizedBox(
@@ -824,11 +837,11 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                 child: ListTile(
                   leading: _buildOptionIcon(option),
                   title: Text(
-                    option.description,
+                    option.getDescription(l10n),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.pop(dialogContext);
                     _executeThankYouOption(option);
                   },
                 ),
@@ -838,8 +851,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('취소'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.cancel),
           ),
         ],
       ),
@@ -869,6 +882,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 땡큐 옵션 실행
   void _executeThankYouOption(ThankYouOption option) {
+    final l10n = AppLocalizations.of(context)!;
     // 땡큐 상황: 대기 중에 가져가기
     if (waitingForNextTurn) {
       _cancelNextTurnTimer();
@@ -884,15 +898,16 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     switch (option.type) {
       case ThankYouType.seven:
         playerMelds.add(Meld(cards: [card], isRun: false));
-        meldMessage = '땡큐! ${card.suitSymbol}7 단독 등록';
+        meldMessage = l10n.thankYouSolo(card.suitSymbol);
 
       case ThankYouType.attachPlayer:
         _attachToMeld(option.meldIndex!, card);
-        meldMessage = '땡큐! ${card.suitSymbol}${card.rankString} 내 멜드에 붙이기';
+        meldMessage = l10n.thankYouAddToMine('${card.suitSymbol}${card.rankString}');
 
       case ThankYouType.attachComputer:
         _attachToMeldList(option.meldIndex!, card, computerMelds[option.computerIndex!]);
-        meldMessage = '땡큐! ${card.suitSymbol}${card.rankString} ${aiNames[option.computerIndex!]} 멜드에 붙이기';
+        final aiNames = _getAiNames(context);
+        meldMessage = l10n.thankYouAddToAi('${card.suitSymbol}${card.rankString}', aiNames[option.computerIndex!]);
 
       case ThankYouType.newMeld:
         final newMeldCards = [...option.handCards, card];
@@ -904,7 +919,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
           newMeldCards.sort((a, b) => a.rank.compareTo(b.rank));
         }
         playerMelds.add(Meld(cards: newMeldCards, isRun: option.isRun));
-        meldMessage = '땡큐! ${option.description}';
+        meldMessage = l10n.thankYouDesc(option.getDescription(l10n));
     }
 
     setState(() {
@@ -1143,6 +1158,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     if (discardPile.isEmpty) return [];
     final card = discardPile.last;
     final options = <ThankYouOption>[];
+    final aiNames = _getAiNames(context);
 
     // 1. 7이면 단독 등록 가능
     if (_isSeven(card)) {
@@ -1172,6 +1188,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
             discardCard: card,
             meldIndex: i,
             computerIndex: c,
+            computerName: aiNames[c],
           ));
         }
       }
@@ -1737,7 +1754,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 컴퓨터가 스톱 선언
   void _computerCallStop(int computerIndex) {
-    _showMessage('${aiNames[computerIndex]}이 스톱!');
+    final l10n = AppLocalizations.of(context)!;
+    final aiNames = _getAiNames(context);
+    _showMessage('${aiNames[computerIndex]} ${l10n.stop}!');
     _calculateScoresAndEnd(stopperIndex: computerIndex + 1); // 컴퓨터 인덱스 + 1
   }
 
@@ -1883,6 +1902,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 멜드 등록
   void _registerMeld() {
+    final l10n = AppLocalizations.of(context)!;
     final selectedCards =
         selectedCardIndices.map((i) => playerHand[i]).toList();
 
@@ -1895,7 +1915,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       setState(() {
         selectedCardIndices = [];
       });
-      _showMessage('7 단독 등록');
+      _showMessage(l10n.thankYouSolo(card.suitSymbol));
       _saveGame();
 
       if (playerHand.isEmpty) {
@@ -1934,7 +1954,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         setState(() {
           selectedCardIndices = [];
         });
-        _showMessage('멜드에 추가됨');
+        _showMessage(l10n.addedToMeld);
         _saveGame();
 
         if (playerHand.isEmpty) {
@@ -1943,13 +1963,13 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         return;
       }
 
-      _showMessage('붙일 멜드가 없습니다');
+      _showMessage(l10n.noMeldToAttach);
       return;
     }
 
     // 3장 이상: 새 멜드 등록
     if (!_isValidMeld(selectedCards)) {
-      _showMessage('유효하지 않은 조합입니다');
+      _showMessage(l10n.invalidCombination);
       return;
     }
 
@@ -1966,7 +1986,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       selectedCardIndices = [];
     });
 
-    _showMessage(isRun ? 'Run 등록됨' : 'Group 등록됨');
+    _showMessage(isRun ? 'Run' : 'Group');
     _saveGame();
 
     // 손패가 비었으면 승리
@@ -1977,12 +1997,13 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 카드 버리기
   void _discardCard() {
+    final l10n = AppLocalizations.of(context)!;
     if (!hasDrawn) {
-      _showMessage('먼저 카드를 뽑으세요');
+      _showMessage(l10n.drawFirstMessage);
       return;
     }
     if (selectedCardIndices.length != 1) {
-      _showMessage('버릴 카드를 선택하세요');
+      _showMessage(l10n.selectCardToDiscard);
       return;
     }
 
@@ -2080,6 +2101,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     final computerIndex = currentTurn - 1;
     final hand = computerHands[computerIndex];
     final melds = computerMelds[computerIndex];
+    final aiNames = _getAiNames(context);
+    final l10n = AppLocalizations.of(context)!;
 
     // 난이도에 따른 땡큐(드로우) 확률 (쉬움: 50%, 보통: 80%, 어려움: 100%)
     final difficulty = computerDifficulties.length > computerIndex
@@ -2107,7 +2130,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
     if (takeDiscard && discardPile.isNotEmpty) {
       drawnCard = discardPile.removeLast();
-      _showMessage('${aiNames[computerIndex]} 땡큐! ${drawnCard.suitSymbol}${drawnCard.rankString}');
+      _showMessage(l10n.aiThankYouDraw(aiNames[computerIndex], '${drawnCard.suitSymbol}${drawnCard.rankString}'));
     } else {
       if (deck.isEmpty && discardPile.length > 1) {
         final topCard = discardPile.removeLast();
@@ -2120,7 +2143,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         return;
       }
       drawnCard = deck.removeLast();
-      _showMessage('${aiNames[computerIndex]}이 카드를 뽑음');
+      _showMessage(l10n.aiDrawsCard(aiNames[computerIndex]));
     }
 
     hand.add(drawnCard);
@@ -2194,6 +2217,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       return;
     }
 
+    final aiNames = _getAiNames(context);
+    final l10n = AppLocalizations.of(context)!;
     final hand = computerHands[computerIndex];
     final melds = computerMelds[computerIndex];
     final meldData = meldsToRegister[index];
@@ -2217,12 +2242,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
     // 메시지 표시
     if (type == '7group') {
-      _showMessage('${aiNames[computerIndex]}: 7 그룹 등록');
+      _showMessage(l10n.aiRegistersSeven(aiNames[computerIndex], l10n.group));
     } else if (type == '7') {
-      _showMessage('${aiNames[computerIndex]}: 7 단독 등록');
+      _showMessage(l10n.aiRegistersSeven(aiNames[computerIndex], l10n.solo));
     } else {
       final cardStr = cards.map((c) => '${c.suitSymbol}${c.rankString}').join(' ');
-      _showMessage('${aiNames[computerIndex]}: ${isRun ? 'Run' : 'Group'} 등록 $cardStr');
+      _showMessage(l10n.aiRegistersMeld(aiNames[computerIndex], isRun ? 'Run' : 'Group', cardStr));
     }
 
     setState(() {});
@@ -2241,6 +2266,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   void _computerTurnAttach(int computerIndex) {
     if (gameOver) return;
 
+    final aiNames = _getAiNames(context);
+    final l10n = AppLocalizations.of(context)!;
     final hand = computerHands[computerIndex];
     final melds = computerMelds[computerIndex];
 
@@ -2265,7 +2292,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       if (ownMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
         _attachToMeldList(ownMeldIndex, card, melds);
         hand.removeAt(i);
-        _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} 멜드에 붙임');
+        _showMessage(l10n.aiAttachesToMeld(aiNames[computerIndex], '${card.suitSymbol}${card.rankString}'));
         setState(() {});
         _saveGame();
 
@@ -2284,7 +2311,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       if (playerMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
         _attachToMeldList(playerMeldIndex, card, playerMelds);
         hand.removeAt(i);
-        _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} 플레이어 멜드에 붙임');
+        _showMessage(l10n.aiAttachesToPlayerMeld(aiNames[computerIndex], '${card.suitSymbol}${card.rankString}'));
         setState(() {});
         _saveGame();
 
@@ -2305,7 +2332,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         if (otherMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
           _attachToMeldList(otherMeldIndex, card, computerMelds[c]);
           hand.removeAt(i);
-          _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} ${aiNames[c]} 멜드에 붙임');
+          _showMessage(l10n.aiAttachesToOtherAiMeld(aiNames[computerIndex], '${card.suitSymbol}${card.rankString}', aiNames[c]));
           setState(() {});
           _saveGame();
 
@@ -2329,6 +2356,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   void _computerTurnDiscard(int computerIndex) {
     if (gameOver) return;
 
+    final aiNames = _getAiNames(context);
+    final l10n = AppLocalizations.of(context)!;
     final hand = computerHands[computerIndex];
     final melds = computerMelds[computerIndex];
 
@@ -2338,7 +2367,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       final seven = sevens.first;
       hand.remove(seven);
       melds.add(Meld(cards: [seven], isRun: false));
-      _showMessage('${aiNames[computerIndex]}: 7 단독 등록');
+      _showMessage(l10n.aiRegistersSeven(aiNames[computerIndex], l10n.solo));
       setState(() {});
       _saveGame();
 
@@ -2362,7 +2391,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     discardPile.add(discardCard);
     _sortHand(hand);
 
-    _showMessage('${aiNames[computerIndex]}: ${discardCard.suitSymbol}${discardCard.rankString} 버림');
+    _showMessage(l10n.aiDiscards(aiNames[computerIndex], '${discardCard.suitSymbol}${discardCard.rankString}'));
     setState(() {});
     _saveGame();
 
@@ -2462,6 +2491,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     if (discardPile.isEmpty) return;
     _computerActionTimer?.cancel();
 
+    final aiNames = _getAiNames(context);
+    final l10n = AppLocalizations.of(context)!;
+
     // 땡큐한 컴퓨터의 턴으로 설정
     currentTurn = computerIndex + 1;
 
@@ -2470,7 +2502,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
     hand.add(card);
     _sortHand(hand);
-    _showMessage('${aiNames[computerIndex]} 땡큐! ${card.suitSymbol}${card.rankString}');
+    _showMessage(l10n.aiThankYouDraw(aiNames[computerIndex], '${card.suitSymbol}${card.rankString}'));
     setState(() {});
     _saveGame();
 
@@ -2544,6 +2576,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       return;
     }
 
+    final aiNames = _getAiNames(context);
+    final l10n = AppLocalizations.of(context)!;
     final hand = computerHands[computerIndex];
     final melds = computerMelds[computerIndex];
     final meldData = meldsToRegister[index];
@@ -2567,12 +2601,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
     // 메시지 표시
     if (type == '7group') {
-      _showMessage('${aiNames[computerIndex]}: 7 그룹 등록');
+      _showMessage(l10n.aiRegistersSeven(aiNames[computerIndex], l10n.group));
     } else if (type == '7') {
-      _showMessage('${aiNames[computerIndex]}: 7 단독 등록');
+      _showMessage(l10n.aiRegistersSeven(aiNames[computerIndex], l10n.solo));
     } else {
       final cardStr = cards.map((c) => '${c.suitSymbol}${c.rankString}').join(' ');
-      _showMessage('${aiNames[computerIndex]}: ${isRun ? 'Run' : 'Group'} 등록 $cardStr');
+      _showMessage(l10n.aiRegistersMeld(aiNames[computerIndex], isRun ? 'Run' : 'Group', cardStr));
     }
 
     setState(() {});
@@ -2591,6 +2625,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   void _executeComputerThankYouAttach(int computerIndex) {
     if (gameOver) return;
 
+    final aiNames = _getAiNames(context);
+    final l10n = AppLocalizations.of(context)!;
     final hand = computerHands[computerIndex];
     final melds = computerMelds[computerIndex];
 
@@ -2615,7 +2651,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       if (ownMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
         _attachToMeldList(ownMeldIndex, card, melds);
         hand.removeAt(i);
-        _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} 멜드에 붙임');
+        _showMessage(l10n.aiAttachesToMeld(aiNames[computerIndex], '${card.suitSymbol}${card.rankString}'));
         setState(() {});
         _saveGame();
 
@@ -2634,7 +2670,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       if (playerMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
         _attachToMeldList(playerMeldIndex, card, playerMelds);
         hand.removeAt(i);
-        _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} 플레이어 멜드에 붙임');
+        _showMessage(l10n.aiAttachesToPlayerMeld(aiNames[computerIndex], '${card.suitSymbol}${card.rankString}'));
         setState(() {});
         _saveGame();
 
@@ -2655,7 +2691,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         if (otherMeldIndex >= 0 && Random().nextInt(100) < attachChance) {
           _attachToMeldList(otherMeldIndex, card, computerMelds[c]);
           hand.removeAt(i);
-          _showMessage('${aiNames[computerIndex]}: ${card.suitSymbol}${card.rankString} ${aiNames[c]} 멜드에 붙임');
+          _showMessage(l10n.aiAttachesToOtherAiMeld(aiNames[computerIndex], '${card.suitSymbol}${card.rankString}', aiNames[c]));
           setState(() {});
           _saveGame();
 
@@ -2677,6 +2713,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 땡큐 후 컴퓨터가 카드 버리기
   void _computerDiscardAfterThankYou(int computerIndex) {
+    final aiNames = _getAiNames(context);
+    final l10n = AppLocalizations.of(context)!;
     final hand = computerHands[computerIndex];
     final melds = computerMelds[computerIndex];
 
@@ -2686,7 +2724,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       final seven = sevens.first;
       hand.remove(seven);
       melds.add(Meld(cards: [seven], isRun: false));
-      _showMessage('${aiNames[computerIndex]}: 7 단독 등록');
+      _showMessage(l10n.aiRegistersSeven(aiNames[computerIndex], l10n.solo));
       setState(() {});
       _saveGame();
 
@@ -2710,7 +2748,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     discardPile.add(discardCard);
     _sortHand(hand);
 
-    _showMessage('${aiNames[computerIndex]}: ${discardCard.suitSymbol}${discardCard.rankString} 버림');
+    _showMessage(l10n.aiDiscards(aiNames[computerIndex], '${discardCard.suitSymbol}${discardCard.rankString}'));
     setState(() {});
     _saveGame();
 
@@ -2875,12 +2913,14 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       roundScores[winnerIdx] = winnerGain;
     }
 
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       gameOver = true;
       winnerIndex = winnerIdx;
       if (winnerIdx == 0) {
-        winner = '플레이어';
+        winner = l10n.player;
       } else {
+        final aiNames = _getAiNames(context);
         winner = aiNames[winnerIdx - 1];
       }
     });
@@ -2899,13 +2939,15 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   void _showGameOverDialog() {
+    final l10n = AppLocalizations.of(context)!;
     final statsService = Provider.of<HulaStatsService>(context, listen: false);
-    final playerNames = ['플레이어', ...aiNames];
+    final aiNames = _getAiNames(context);
+    final playerNames = [l10n.player, ...aiNames];
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: Colors.grey.shade900,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -2917,7 +2959,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         title: Column(
           children: [
             Text(
-              winnerIndex == 0 ? '승리!' : '패배',
+              winnerIndex == 0 ? l10n.victory : l10n.defeat,
               style: TextStyle(
                 color: winnerIndex == 0 ? Colors.amber : Colors.red,
                 fontWeight: FontWeight.bold,
@@ -2927,7 +2969,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
             ),
             if (isHula && winnerIndex == 0)
               Text(
-                '훌라로 승리! (x2)',
+                l10n.hulaWinBonus,
                 style: const TextStyle(
                   color: Colors.orange,
                   fontWeight: FontWeight.bold,
@@ -2940,7 +2982,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '${winner ?? ''} 승리!',
+              l10n.playerNameWins(winner ?? ''),
               style: const TextStyle(color: Colors.white, fontSize: 18),
             ),
             const SizedBox(height: 16),
@@ -2954,9 +2996,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               child: Row(
                 children: [
                   const Expanded(flex: 2, child: Text('', style: TextStyle(color: Colors.white70, fontSize: 12))),
-                  const Expanded(child: Text('손패', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 12))),
-                  const Expanded(child: Text('점수', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 12))),
-                  const Expanded(child: Text('누적', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 12))),
+                  Expanded(child: Text(l10n.handColumn, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 12))),
+                  Expanded(child: Text(l10n.scoreColumn, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 12))),
+                  Expanded(child: Text(l10n.cumulativeColumn, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 12))),
                 ],
               ),
             ),
@@ -3038,17 +3080,17 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               _initGame();
             },
-            child: const Text('새 게임'),
+            child: Text(l10n.newGame),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               Navigator.pop(context);
             },
-            child: const Text('닫기'),
+            child: Text(l10n.close),
           ),
         ],
       ),
@@ -3057,12 +3099,13 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFF0D5C2E),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('훌라 (${playerCount}인)',
+        title: Text(l10n.hulaWithPlayers(playerCount),
             style: const TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -3071,7 +3114,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         actions: [
           IconButton(
             icon: Icon(Icons.lightbulb, color: _showHint ? Colors.yellow : Colors.white),
-            tooltip: _showHint ? '힌트 OFF' : '힌트',
+            tooltip: _showHint ? l10n.hintOnOff('OFF') : l10n.hint,
             onPressed: _onHintButtonPressed,
           ),
           IconButton(
@@ -3123,6 +3166,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 하단 영역 (스크롤 가능)
   Widget _buildBottomSection(_HulaResponsiveSizes sizes) {
+    final l10n = AppLocalizations.of(context)!;
+    final aiNames = _getAiNames(context);
     return Flexible(
       flex: 0,
       child: SingleChildScrollView(
@@ -3148,8 +3193,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                           ),
                           child: Text(
                             currentTurn == 0
-                                ? '내 차례'
-                                : (waitingForNextTurn ? '${aiNames[currentTurn - 1]} ($_autoPlayCountdown)' : '${aiNames[currentTurn - 1]} 차례'),
+                                ? l10n.myTurn
+                                : (waitingForNextTurn ? l10n.aiTurnCountdown(aiNames[currentTurn - 1], _autoPlayCountdown) : l10n.aiTurn(aiNames[currentTurn - 1])),
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -3170,9 +3215,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text(
-                              '시작',
-                              style: TextStyle(
+                            child: Text(
+                              l10n.start,
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -3221,6 +3266,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   Widget _buildTopComputerHand(int computerIndex, _HulaResponsiveSizes sizes) {
     if (computerIndex >= computerHands.length) return const SizedBox();
 
+    final aiNames = _getAiNames(context);
     final hand = computerHands[computerIndex];
     final melds = computerMelds[computerIndex];
     final isCurrentTurn = currentTurn == computerIndex + 1;
@@ -3294,6 +3340,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   Widget _buildSideComputerHand(int computerIndex, _HulaResponsiveSizes sizes) {
     if (computerIndex >= computerHands.length) return const SizedBox();
 
+    final aiNames = _getAiNames(context);
     final hand = computerHands[computerIndex];
     final melds = computerMelds[computerIndex];
     final isCurrentTurn = currentTurn == computerIndex + 1;
@@ -3373,6 +3420,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildCenterArea(_HulaResponsiveSizes sizes) {
+    final l10n = AppLocalizations.of(context)!;
     final cardWidth = sizes.centerCardWidth;
     final cardHeight = sizes.centerCardHeight;
     return Center(
@@ -3461,7 +3509,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                       child: discardPile.isEmpty
                           ? Center(
                               child: Text(
-                                '버린 카드',
+                                l10n.discardedCards,
                                 style: const TextStyle(color: Colors.grey),
                               ),
                             )
@@ -3799,6 +3847,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildActionButtons() {
+    final l10n = AppLocalizations.of(context)!;
     // 7 단독: 특별 규칙, 1~2장: 붙이기 가능 여부, 3장+: 새 멜드 가능 여부
     bool canMeld = false;
     if (selectedCardIndices.length >= 3) {
@@ -3836,19 +3885,19 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         children: [
           // 멜드 등록 (드로우 후에만 가능)
           _buildActionButton(
-            label: '등록',
+            label: l10n.meldButton,
             color: Colors.green,
             onPressed: currentTurn == 0 && hasDrawn && canMeld ? _registerMeld : null,
           ),
           // 버리기
           _buildActionButton(
-            label: '버리기',
+            label: l10n.discardButton,
             color: Colors.orange,
             onPressed: currentTurn == 0 && canDiscard ? _discardCard : null,
           ),
           // 스톱
           _buildActionButton(
-            label: '스톱',
+            label: l10n.stopButton,
             color: Colors.red,
             onPressed: currentTurn == 0 && !gameOver ? _callStop : null,
           ),
@@ -3886,15 +3935,16 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   }
 
   void _showRulesDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: Colors.grey.shade900,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
         title: Text(
-          '게임 규칙',
+          l10n.gameRulesTitle,
           style: const TextStyle(color: Colors.amber),
         ),
         content: SingleChildScrollView(
@@ -3903,7 +3953,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '목표',
+                l10n.hulaGuideGoal,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -3911,12 +3961,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 4),
               Text(
-                '손패의 카드를 모두 등록하거나 버려서 가장 먼저 없애는 것이 목표입니다.',
+                l10n.hulaGuideGoalText,
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Text(
-                '진행 방법',
+                l10n.hulaGuideHow,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -3924,12 +3974,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 4),
               Text(
-                '매 턴마다 덱 또는 버린 더미에서 카드 1장을 뽑고, 등록 또는 버리기를 합니다.',
+                l10n.hulaGuideHowText,
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Text(
-                '멜드 종류',
+                l10n.hulaGuideMelds,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -3937,12 +3987,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 4),
               Text(
-                '• Run: 같은 무늬의 연속된 숫자 3장 이상 (예: ♠3-4-5)\n• Group: 같은 숫자 다른 무늬 3장 이상 (예: ♠7-♥7-♦7)',
+                l10n.hulaGuideMeldsText,
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Text(
-                '7의 특수 규칙',
+                l10n.hulaGuideSeven,
                 style: const TextStyle(
                   color: Colors.amber,
                   fontWeight: FontWeight.bold,
@@ -3950,12 +4000,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 4),
               Text(
-                '7은 단독으로 등록할 수 있습니다.',
+                l10n.hulaGuideSevenText,
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Text(
-                '땡큐 멜드',
+                l10n.thankYouMeld,
                 style: const TextStyle(
                   color: Colors.cyan,
                   fontWeight: FontWeight.bold,
@@ -3963,12 +4013,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 4),
               Text(
-                '버린 더미에서 7을 뽑으면 "땡큐"를 외치고 특별한 등록을 할 수 있습니다.',
+                l10n.hulaGuideThankYouText,
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Text(
-                '스톱',
+                l10n.hulaGuideStop,
                 style: const TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.bold,
@@ -3976,12 +4026,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 4),
               Text(
-                '언제든 스톱을 외쳐 게임을 끝낼 수 있습니다. 남은 카드 점수가 가장 적은 사람이 승리합니다.',
+                l10n.hulaGuideStopText,
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 12),
               Text(
-                '점수 계산',
+                l10n.hulaGuideCardPoints,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -3989,7 +4039,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(height: 4),
               Text(
-                'A=1점, 2~9=숫자점, J=10점, Q=11점, K=12점',
+                l10n.hulaGuideCardPointsText,
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
             ],
@@ -3997,8 +4047,8 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('확인'),
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.ok),
           ),
         ],
       ),

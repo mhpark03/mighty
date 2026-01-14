@@ -78,8 +78,8 @@ class GameSelectionScreen extends StatelessWidget {
         screen: const HulaHomeScreen(),
       ),
       _GameInfo(
-        title: '원카드',
-        subtitle: '4인 대전',
+        title: l10n.onecardTitle,
+        subtitle: l10n.onecardSubtitle,
         icon: Icons.filter_1,
         color: Colors.orange[700]!,
         screen: const OneCardHomeScreen(),

@@ -65,20 +65,20 @@ class Bid {
   @override
   String toString() {
     if (passed) return 'Pass';
-    final suitStr = suit != null ? _suitToString(suit!) : '노기루다';
+    final suitStr = suit != null ? _suitToString(suit!) : 'No Giruda';
     return '$tricks $suitStr';
   }
 
   String _suitToString(Suit suit) {
     switch (suit) {
       case Suit.spade:
-        return '스페이드';
+        return 'Spade';
       case Suit.diamond:
-        return '다이아몬드';
+        return 'Diamond';
       case Suit.heart:
-        return '하트';
+        return 'Heart';
       case Suit.club:
-        return '클럽';
+        return 'Club';
     }
   }
 }
@@ -110,10 +110,10 @@ class FriendDeclaration {
 
   @override
   String toString() {
-    if (isNoFriend) return '노프렌드';
-    if (isFirstTrickWinner) return '초구 프렌드';
-    if (card != null) return '${card!} 소유자';
-    if (trickNumber != null) return '$trickNumber번째 트릭 획득자';
+    if (isNoFriend) return 'No Friend';
+    if (isFirstTrickWinner) return 'First Trick Winner';
+    if (card != null) return '${card!} Owner';
+    if (trickNumber != null) return 'Trick $trickNumber Winner';
     return '';
   }
 

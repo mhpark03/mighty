@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../../services/hearts/hearts_stats_service.dart';
 import '../../services/ad_service.dart';
 import '../../services/game_save_service.dart';
@@ -152,7 +153,10 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   Timer? _messageTimer;
   bool _showHint = false; // 힌트 표시 여부
 
-  final playerNames = ['플레이어', '민준', '서연', '지호'];
+  List<String> _getPlayerNames(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [l10n.player, l10n.aiPlayer1, l10n.aiPlayer2, l10n.aiPlayer3];
+  }
 
   @override
   void initState() {
@@ -705,7 +709,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     // 게임 상태 저장
     _saveGame();
 
-    _showMessage('${playerNames[startPlayer]}가 클럽 2로 시작합니다');
+    final l10n = AppLocalizations.of(context)!;
+    final playerNames = _getPlayerNames(context);
+    _showMessage(l10n.playerStartsWithClub2(playerNames[startPlayer]));
 
     if (startPlayer != 0) {
       Future.delayed(const Duration(milliseconds: 1000), () {
@@ -1257,7 +1263,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     // 슛더문 상태 업데이트
     _updateShootMoonStatus();
 
-    _showMessage('${playerNames[winnerIndex]} 트릭 획득! (+$trickPoints점)');
+    final l10n = AppLocalizations.of(context)!;
+    final playerNames = _getPlayerNames(context);
+    _showMessage(l10n.playerWonTrick(playerNames[winnerIndex], trickPoints));
 
     // winnerIndex를 final로 캡처하여 클로저 문제 방지
     final winner = winnerIndex;
@@ -1286,7 +1294,8 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
 
       if (gameEnded) {
         if (earlyEnd) {
-          _showMessage('모든 점수 카드 소진! 게임 종료');
+          final l10n = AppLocalizations.of(context)!;
+          _showMessage(l10n.allScoreCardsUsed);
         }
         _endRound();
       } else {
@@ -1315,7 +1324,9 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       // 슈팅 더 문 성공
       finalScores = [26, 26, 26, 26];
       finalScores[shooterIndex] = 0;
-      _showMessage('${playerNames[shooterIndex]} 슈팅 더 문 성공!');
+      final l10n = AppLocalizations.of(context)!;
+      final playerNames = _getPlayerNames(context);
+      _showMessage(l10n.playerShootMoonSuccess(playerNames[shooterIndex]));
     } else {
       finalScores = List<int>.from(scores);
     }
@@ -1428,7 +1439,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                             ),
                           ),
                           child: Text(
-                            '왼쪽으로 패스 (${selectedForPassing.length}/3)',
+                            AppLocalizations.of(context)!.passLeftCount(selectedForPassing.length),
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: isSmallScreen ? 14 : 16,
@@ -1467,75 +1478,92 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
             constraints: const BoxConstraints(),
           ),
           const SizedBox(width: 12),
-          Text(
-            phase == GamePhase.passing
-                ? '카드 패스'
-                : '트릭 $trickNumber/13',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: isSmallScreen ? 14 : 16,
-              fontWeight: FontWeight.bold,
-            ),
+          Builder(
+            builder: (context) {
+              final l10n = AppLocalizations.of(context)!;
+              return Text(
+                phase == GamePhase.passing
+                    ? l10n.cardPass
+                    : l10n.trickProgress(trickNumber),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isSmallScreen ? 14 : 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
           ),
           const Spacer(),
           if (heartsBroken)
-            Row(
-              children: [
-                Icon(Icons.favorite, color: Colors.red, size: isSmallScreen ? 16 : 20),
-                const SizedBox(width: 4),
-                Text(
-                  '하트 브레이킹',
-                  style: TextStyle(
-                    color: Colors.red[300],
-                    fontSize: isSmallScreen ? 11 : 13,
+            Builder(
+              builder: (context) => Row(
+                children: [
+                  Icon(Icons.favorite, color: Colors.red, size: isSmallScreen ? 16 : 20),
+                  const SizedBox(width: 4),
+                  Text(
+                    AppLocalizations.of(context)!.heartBroken,
+                    style: TextStyle(
+                      color: Colors.red[300],
+                      fontSize: isSmallScreen ? 11 : 13,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           const SizedBox(width: 8),
           // 힌트 버튼
           if (phase != GamePhase.roundEnd)
-            TextButton.icon(
-              onPressed: _onHintButtonPressed,
-              icon: Icon(
-                Icons.lightbulb,
-                color: _showHint ? Colors.yellow : Colors.green,
-                size: isSmallScreen ? 16 : 18,
-              ),
-              label: Text(
-                _showHint ? '힌트 OFF' : '힌트',
-                style: TextStyle(
-                  color: _showHint ? Colors.yellow : Colors.green,
-                  fontSize: isSmallScreen ? 11 : 13,
-                ),
-              ),
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 6 : 8),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
+            Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return TextButton.icon(
+                  onPressed: _onHintButtonPressed,
+                  icon: Icon(
+                    Icons.lightbulb,
+                    color: _showHint ? Colors.yellow : Colors.green,
+                    size: isSmallScreen ? 16 : 18,
+                  ),
+                  label: Text(
+                    _showHint ? l10n.hintOff : l10n.hint,
+                    style: TextStyle(
+                      color: _showHint ? Colors.yellow : Colors.green,
+                      fontSize: isSmallScreen ? 11 : 13,
+                    ),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 6 : 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                );
+              },
             ),
           const SizedBox(width: 4),
           // 새 게임 버튼
-          TextButton.icon(
-            onPressed: () => _showNewGameDialog(),
-            icon: Icon(
-              Icons.refresh,
-              color: Colors.amber,
-              size: isSmallScreen ? 16 : 18,
-            ),
-            label: Text(
-              '새 게임',
-              style: TextStyle(
-                color: Colors.amber,
-                fontSize: isSmallScreen ? 11 : 13,
-              ),
-            ),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 6 : 8),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+          Builder(
+            builder: (context) {
+              final l10n = AppLocalizations.of(context)!;
+              return TextButton.icon(
+                onPressed: () => _showNewGameDialog(),
+                icon: Icon(
+                  Icons.refresh,
+                  color: Colors.amber,
+                  size: isSmallScreen ? 16 : 18,
+                ),
+                label: Text(
+                  l10n.newGame,
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontSize: isSmallScreen ? 11 : 13,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 6 : 8),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -1543,15 +1571,16 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   }
 
   void _showNewGameDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('새 게임'),
-        content: const Text('현재 게임을 종료하고 새 게임을 시작하시겠습니까?'),
+        title: Text(l10n.newGame),
+        content: Text(l10n.newGameDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1562,7 +1591,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-            child: const Text('새 게임', style: TextStyle(color: Colors.black)),
+            child: Text(l10n.newGame, style: const TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -1582,15 +1611,17 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
   }
 
   void _showHintDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final hintActivatedMsg = l10n.hintActivated;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('힌트'),
-        content: const Text('광고를 시청하면 힌트가 활성화됩니다.\n계속하시겠습니까?'),
+        title: Text(l10n.hint),
+        content: Text(l10n.hintDialogContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1600,19 +1631,19 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                   setState(() {
                     _showHint = true;
                   });
-                  _showMessage('힌트가 활성화되었습니다!');
+                  _showMessage(hintActivatedMsg);
                 },
                 onAdNotAvailable: () {
                   // 광고 로드 실패 시에도 힌트 활성화
                   setState(() {
                     _showHint = true;
                   });
-                  _showMessage('힌트가 활성화되었습니다!');
+                  _showMessage(hintActivatedMsg);
                 },
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-            child: const Text('광고 보기', style: TextStyle(color: Colors.black)),
+            child: Text(l10n.watchAd, style: const TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -1624,6 +1655,8 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     final cardWidth = sizes.aiCardWidth;
     final cardHeight = sizes.aiCardHeight;
     final overlap = sizes.aiCardOverlap;
+    final l10n = AppLocalizations.of(context)!;
+    final playerNames = _getPlayerNames(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -1631,7 +1664,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '${playerNames[playerIndex]} (${scores[playerIndex]}점)',
+            '${playerNames[playerIndex]} (${scores[playerIndex]}${l10n.score})',
             style: TextStyle(
               color: currentPlayer == playerIndex ? Colors.amber : Colors.white70,
               fontSize: isSmallScreen ? 11 : 13,
@@ -1664,6 +1697,8 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     final cardWidth = sizes.aiCardWidth;
     final cardHeight = sizes.aiCardHeight;
     final overlap = sizes.aiCardOverlap * 0.75; // 세로 배치시 더 촘촘하게
+    final l10n = AppLocalizations.of(context)!;
+    final playerNames = _getPlayerNames(context);
 
     return Container(
       width: sizes.aiCardWidth * 2,
@@ -1674,7 +1709,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
           RotatedBox(
             quarterTurns: playerIndex == 1 ? 1 : 3,
             child: Text(
-              '${playerNames[playerIndex]} (${scores[playerIndex]}점)',
+              '${playerNames[playerIndex]} (${scores[playerIndex]}${l10n.score})',
               style: TextStyle(
                 color: currentPlayer == playerIndex ? Colors.amber : Colors.white70,
                 fontSize: isSmallScreen ? 10 : 12,
@@ -1828,53 +1863,61 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '${playerNames[0]} (${scores[0]}점)',
-                style: TextStyle(
-                  color: currentPlayer == 0 ? Colors.amber : Colors.white,
-                  fontSize: isSmallScreen ? 12 : 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              // ★ 추천 카드 힌트 표시
-              if (recommendedCard != null || recommendedForPassing.isNotEmpty) ...[
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(8),
+          Builder(
+            builder: (context) {
+              final l10n = AppLocalizations.of(context)!;
+              final playerNames = _getPlayerNames(context);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${playerNames[0]} (${scores[0]}${l10n.score})',
+                    style: TextStyle(
+                      color: currentPlayer == 0 ? Colors.amber : Colors.white,
+                      fontSize: isSmallScreen ? 12 : 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.star, color: Colors.yellow, size: isSmallScreen ? 12 : 14),
-                      const SizedBox(width: 2),
-                      Text(
-                        recommendedForPassing.isNotEmpty ? '패스 추천' : '추천',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: isSmallScreen ? 10 : 11,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  // ★ 추천 카드 힌트 표시
+                  if (recommendedCard != null || recommendedForPassing.isNotEmpty) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star, color: Colors.yellow, size: isSmallScreen ? 12 : 14),
+                          const SizedBox(width: 2),
+                          Text(
+                            recommendedForPassing.isNotEmpty ? l10n.passRecommend : l10n.recommend,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isSmallScreen ? 10 : 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
           if (phase == GamePhase.passing)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text(
-                '왼쪽으로 보낼 카드 3장을 선택하세요',
-                style: TextStyle(
-                  color: Colors.amber,
-                  fontSize: isSmallScreen ? 10 : 12,
+            Builder(
+              builder: (context) => Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  AppLocalizations.of(context)!.selectCardsToPassLeft,
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontSize: isSmallScreen ? 10 : 12,
+                  ),
                 ),
               ),
             ),
@@ -1980,81 +2023,85 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     int winnerId = scores.indexOf(minScore);
     bool isPlayerWinner = winnerId == 0;
 
-    return Container(
-      color: Colors.black87,
-      child: Center(
-        child: Container(
-          margin: const EdgeInsets.all(24),
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.red[900],
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.amber, width: 2),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                isPlayerWinner ? Icons.emoji_events : Icons.sentiment_dissatisfied,
-                color: isPlayerWinner ? Colors.amber : Colors.white70,
-                size: isSmallScreen ? 48 : 64,
+    return Builder(
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        final playerNames = _getPlayerNames(context);
+        return Container(
+          color: Colors.black87,
+          child: Center(
+            child: Container(
+              margin: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.red[900],
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.amber, width: 2),
               ),
-              const SizedBox(height: 16),
-              Text(
-                isPlayerWinner ? '승리!' : '${playerNames[winnerId]} 승리',
-                style: TextStyle(
-                  color: isPlayerWinner ? Colors.amber : Colors.white,
-                  fontSize: isSmallScreen ? 24 : 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 24),
-              // 점수 표시
-              ...List.generate(4, (i) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        playerNames[i],
-                        style: TextStyle(
-                          color: i == winnerId ? Colors.amber : Colors.white,
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: i == winnerId ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                      Text(
-                        '${scores[i]}점',
-                        style: TextStyle(
-                          color: i == winnerId ? Colors.amber : Colors.white,
-                          fontSize: isSmallScreen ? 14 : 16,
-                          fontWeight: i == winnerId ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  ElevatedButton(
-                    onPressed: _startNewGame,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isSmallScreen ? 20 : 28,
-                        vertical: isSmallScreen ? 10 : 14,
-                      ),
+                  Icon(
+                    isPlayerWinner ? Icons.emoji_events : Icons.sentiment_dissatisfied,
+                    color: isPlayerWinner ? Colors.amber : Colors.white70,
+                    size: isSmallScreen ? 48 : 64,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    isPlayerWinner ? l10n.wins : l10n.playerNameWins(playerNames[winnerId]),
+                    style: TextStyle(
+                      color: isPlayerWinner ? Colors.amber : Colors.white,
+                      fontSize: isSmallScreen ? 24 : 32,
+                      fontWeight: FontWeight.bold,
                     ),
-                    child: Text(
-                      '새 게임',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: isSmallScreen ? 14 : 16,
-                        fontWeight: FontWeight.bold,
+                  ),
+                  const SizedBox(height: 24),
+                  // 점수 표시
+                  ...List.generate(4, (i) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            playerNames[i],
+                            style: TextStyle(
+                              color: i == winnerId ? Colors.amber : Colors.white,
+                              fontSize: isSmallScreen ? 14 : 16,
+                              fontWeight: i == winnerId ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                          Text(
+                            '${scores[i]}${l10n.score}',
+                            style: TextStyle(
+                              color: i == winnerId ? Colors.amber : Colors.white,
+                              fontSize: isSmallScreen ? 14 : 16,
+                              fontWeight: i == winnerId ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: _startNewGame,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.amber,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isSmallScreen ? 20 : 28,
+                            vertical: isSmallScreen ? 10 : 14,
+                          ),
+                        ),
+                        child: Text(
+                          l10n.newGame,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: isSmallScreen ? 14 : 16,
+                            fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -2068,7 +2115,7 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                       ),
                     ),
                     child: Text(
-                      '나가기',
+                      l10n.exit,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: isSmallScreen ? 14 : 16,
@@ -2081,6 +2128,8 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
           ),
         ),
       ),
+    );
+      },
     );
   }
 

@@ -79,7 +79,7 @@ class HeartsStatsService extends ChangeNotifier {
   }
 
   void _updatePlayerNames() {
-    final defaultNames = ['플레이어', '민준', '서연', '지호'];
+    final defaultNames = ['Player', 'AI 1', 'AI 2', 'AI 3'];
     if (_playerStats.length != 4) {
       _initDefaultStats();
       return;
@@ -91,11 +91,19 @@ class HeartsStatsService extends ChangeNotifier {
 
   void _initDefaultStats() {
     _playerStats = [
-      HeartsPlayerStats(name: '플레이어'),
-      HeartsPlayerStats(name: '민준'),
-      HeartsPlayerStats(name: '서연'),
-      HeartsPlayerStats(name: '지호'),
+      HeartsPlayerStats(name: 'Player'),
+      HeartsPlayerStats(name: 'AI 1'),
+      HeartsPlayerStats(name: 'AI 2'),
+      HeartsPlayerStats(name: 'AI 3'),
     ];
+  }
+
+  /// 지역화된 플레이어 이름으로 업데이트
+  void updateLocalizedNames(List<String> names) {
+    for (int i = 0; i < _playerStats.length && i < names.length; i++) {
+      _playerStats[i].name = names[i];
+    }
+    notifyListeners();
   }
 
   Future<void> _saveStats() async {

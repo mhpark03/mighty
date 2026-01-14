@@ -232,5 +232,399 @@
   "hulaTitle": "フラ",
   "hulaSubtitle": "4人用ラミーカードゲーム",
   "heartsTitle": "ハーツ",
-  "heartsSubtitle": "4人トリックテイキングゲーム"
+  "heartsSubtitle": "4人トリックテイキングゲーム",
+  "handRoyalStraightFlush": "ロイヤルストレートフラッシュ",
+  "handBackStraightFlush": "バックストレートフラッシュ",
+  "handStraightFlush": "ストレートフラッシュ",
+  "handFourOfAKind": "フォーカード",
+  "handFullHouse": "フルハウス",
+  "handFlush": "フラッシュ",
+  "handMountain": "マウンテン",
+  "handBackStraight": "バックストレート",
+  "handStraight": "ストレート",
+  "handTriple": "スリーカード",
+  "handTwoPair": "ツーペア",
+  "handOnePair": "ワンペア",
+  "handHighCard": "ハイカード",
+  "highCardTop": "{rank}トップ",
+  "@highCardTop": {
+    "placeholders": {
+      "rank": {"type": "String"}
+    }
+  },
+  "noLow": "ローなし",
+  "betPing": "ピン",
+  "betCheck": "チェック",
+  "betCall": "コール",
+  "betDdadang": "ダブル",
+  "betQuarter": "クォーター",
+  "betHalf": "ハーフ",
+  "betFull": "フル",
+  "betDie": "ダイ",
+  "selectOpenCard": "公開するカードを選んでください",
+  "selectOpenCardDesc": "選んだカードが相手に公開されます",
+  "aiSelectingCard": "AIがカードを選んでいます...",
+  "nthCard": "{n}枚目のカード",
+  "@nthCard": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "secondsCount": "{n}秒",
+  "@secondsCount": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "totalBetAmount": "合計: {amount}",
+  "@totalBetAmount": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "bettingAmount": "ベット: {amount}",
+  "@bettingAmount": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "bonusHand": "ボーナスハンド！",
+  "bonus": "ボーナス",
+  "total": "合計",
+  "otherPlayersLose": "他のプレイヤー: 各 -{amount}",
+  "@otherPlayersLose": {
+    "placeholders": {
+      "amount": {"type": "int"}
+    }
+  },
+  "thisGame": "今回のゲーム",
+  "cumulative": "累計",
+  "foldedSection": "ダイ",
+  "hiLoHi": "ハイ",
+  "hiLoLo": "ロー",
+  "hiLoSwing": "スイング",
+  "roundComplete": "ラウンド {n} 完了！",
+  "@roundComplete": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "cardDistribution5": "5枚目のカードが配られます。",
+  "cardDistribution6": "6枚目のカードが配られます。",
+  "cardDistribution7": "最後の7枚目のカードが配られます。",
+  "goodLuck": "グッドラック！",
+  "suitSpade": "スペード",
+  "suitDiamond": "ダイヤ",
+  "suitHeart": "ハート",
+  "suitClub": "クラブ",
+  "noGiruda": "ノーギルダ",
+  "noFriend": "ノーフレンド",
+  "firstTrickFriend": "初回トリックフレンド",
+  "cardOwner": "{card}所有者",
+  "@cardOwner": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "trickWinner": "{n}番目のトリック獲得者",
+  "@trickWinner": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "hint": "ヒント",
+  "hintOff": "ヒント OFF",
+  "hintDialogContent": "広告を見るとヒントが有効になります。\n続けますか？",
+  "newGameDialogContent": "広告を見ると新しいゲームを開始します。\n続けますか？",
+  "watchAd": "広告を見る",
+  "jokerLead": "ジョーカー先攻: {suit}",
+  "@jokerLead": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "gameSelection": "ゲーム選択",
+  "onecardTitle": "ワンカード",
+  "onecardSubtitle": "4人対戦",
+  "gameRules": "ゲームルール",
+  "confirm": "確認",
+  "heartsGuideGoal": "目標",
+  "heartsGuideGoalText": "ハートカードとスペードのクイーンを避けて最低得点を目指します。",
+  "heartsGuideHow": "遊び方",
+  "heartsGuideHowText": "• 4人でプレイし、各自13枚を受け取ります\n• ゲーム開始時に3枚を左のプレイヤーに渡します\n• クラブの2を持つプレイヤーが最初に開始\n• 13トリックを行い、得点カードを避けます",
+  "heartsGuideScoring": "得点計算",
+  "heartsGuideScoringText": "• ハートカード: 各1点 (計13点)\n• スペードのクイーン (♠Q): 13点\n• 合計: 26点\n• 低い得点が勝利！",
+  "heartsGuideBreaking": "ハートブレイク",
+  "heartsGuideBreakingText": "最初のトリックではハートを出せません。\nハートが一度出た後にハートでリードできます。",
+  "heartsGuideShootMoon": "シューティング・ザ・ムーン",
+  "heartsGuideShootMoonText": "一人のプレイヤーが全てのハートとスペードのクイーンを獲得すると:\n• そのプレイヤー: 0点\n• 他のプレイヤー: 各26点",
+  "heartsGuideTips": "戦略のコツ",
+  "heartsGuideTipsText": "• 高いカードは早く捨てましょう\n• スペードのクイーンに注意\n• 相手に得点カードを取らせましょう",
+  "allScoreCardsUsed": "全得点カード消化！ゲーム終了",
+  "passLeftCount": "左へパス ({count}/3)",
+  "@passLeftCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "cardPass": "カードパス",
+  "trickProgress": "トリック {current}/13",
+  "@trickProgress": {
+    "placeholders": {
+      "current": {"type": "int"}
+    }
+  },
+  "heartBroken": "ハートブレイク",
+  "passRecommend": "パス推奨",
+  "recommend": "推奨",
+  "selectCardsToPassLeft": "左に渡す3枚を選択",
+  "playerNameWins": "{name} 勝利",
+  "@playerNameWins": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "playerStartsWithClub2": "{name}がクラブ2で開始",
+  "@playerStartsWithClub2": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "playerWonTrick": "{name}がトリック獲得！(+{points}点)",
+  "@playerWonTrick": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "points": {"type": "int"}
+    }
+  },
+  "playerShootMoonSuccess": "{name}がシュートザムーン成功！",
+  "@playerShootMoonSuccess": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "hintActivated": "ヒントが有効になりました！",
+  "myTurn": "自分の番",
+  "start": "開始",
+  "counterClockwise": "反時計",
+  "clockwise": "時計",
+  "blackJoker": "白黒ジョーカー",
+  "colorJoker": "カラージョーカー",
+  "oneCardCall": "ワンカード！",
+  "oneCardCallTimer": "ワンカード ({seconds}秒)",
+  "@oneCardCallTimer": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "selectSuit": "スートを選択",
+  "discardedCards": "捨て札",
+  "meld": "メルド",
+  "discard": "捨てる",
+  "stop": "ストップ",
+  "handCards": "手札",
+  "score": "得点",
+  "close": "閉じる",
+  "cannotPlayCard": "このカードは出せません",
+  "drawCard": "カードを引いてください",
+  "discardOrMeld": "カードを捨てるかメルドしてください",
+  "noCards": "カードがありません",
+  "thankYouSelectMethod": "サンキュー方法を選択",
+  "thankYouMeldSolo": "サンキュー！ {suit}7 単独メルド",
+  "@thankYouMeldSolo": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "thankYouMeldMyMeld": "サンキュー！ {card} を自分のメルドに追加",
+  "@thankYouMeldMyMeld": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "thankYouMeldAiMeld": "サンキュー！ {card} を {aiName} のメルドに追加",
+  "@thankYouMeldAiMeld": {
+    "placeholders": {
+      "card": {"type": "String"},
+      "aiName": {"type": "String"}
+    }
+  },
+  "addedToMeld": "メルドに追加",
+  "noMeldToAttach": "追加できるメルドがありません",
+  "invalidCombination": "無効な組み合わせ",
+  "drawCardFirst": "先にカードを引いてください",
+  "selectCardToDiscard": "捨てるカードを選択",
+  "hulaWin": "フラ勝利！ (x2)",
+  "continue_": "続ける",
+  "attackReceived": "攻撃で{count}枚受け取りました",
+  "@attackReceived": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "cardDrawn": "カードを引きました",
+  "bankrupt": "破産！ ({count}枚所持)",
+  "@bankrupt": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "restart": "再スタート",
+  "goal": "目標",
+  "howToPlay": "遊び方",
+  "attackCards": "攻撃カード",
+  "defense": "防御",
+  "specialCards": "特殊カード",
+  "tips": "コツ",
+  "winRate": "勝率",
+  "onecardGuideGoal": "目標",
+  "onecardGuideGoalText": "手札を最初に全て出し切ることが目標です。",
+  "onecardGuidePlay": "カードの出し方",
+  "onecardGuidePlayText": "前に出されたカードと同じスートまたは同じ数字のカードを出せます。",
+  "onecardGuideAttack": "攻撃カード",
+  "onecardGuideAttackText": "• 2: +2枚攻撃\n• A: +3枚攻撃 (♠Aは+5枚)\n• ジョーカー: +5枚(白黒) / +7枚(カラー)",
+  "onecardGuideSpecial": "特殊カード",
+  "onecardGuideSpecialText": "• J: 次の順番をスキップ\n• Q: 方向逆転\n• K: 2ターンスキップ\n• 7: スート変更",
+  "onecardGuideJokerDefense": "ジョーカー防御",
+  "onecardGuideJokerDefenseText": "ジョーカーで攻撃されたらジョーカーでのみ防御できます。",
+  "onecardGuideOnecard": "ワンカード!",
+  "onecardGuideOnecardText": "手札が1枚残ったら「ワンカード!」ボタンを押す必要があります。\n押さないとペナルティで2枚を受け取ります。",
+  "onecardGuideBankrupt": "破産",
+  "onecardGuideBankruptText": "手札が20枚以上になると破産！最少カードのプレイヤーが勝利します。",
+  "hulaGuideGoal": "目標",
+  "hulaGuideGoalText": "手札のカードを全て登録または捨てて最初になくすことが目標です。",
+  "hulaGuideHow": "遊び方",
+  "hulaGuideHowText": "毎ターン、デッキまたは捨て札からカードを1枚引き、登録または捨てます。",
+  "hulaGuideMelds": "メルドの種類",
+  "hulaGuideMeldsText": "• ラン: 同じスートの連続した数字3枚以上 (例: ♠3-4-5)\n• グループ: 同じ数字で異なるスート3枚以上 (例: ♠7-♥7-♦7)",
+  "hulaGuideSeven": "7の特別ルール",
+  "hulaGuideSevenText": "7は単独で登録できます。",
+  "hulaGuideThankYou": "サンキュー",
+  "hulaGuideThankYouText": "捨て札から7を引くと「サンキュー」を宣言し、特別な登録ができます。",
+  "hulaGuideStop": "ストップ",
+  "hulaGuideStopText": "いつでもストップを宣言してゲームを終了できます。\n残りカードの点数が最も低い人が勝利します。",
+  "hulaGuideCardPoints": "カード点数",
+  "hulaGuideCardPointsText": "A=1点, 2~9=数字点, J=10点, Q=11点, K=12点",
+  "hulaGuideScoring": "得点計算",
+  "hulaGuideScoringText": "• 勝者: 他プレイヤーとの手札差の合計を獲得\n• 敗者: 勝者との手札差だけ減点\n• フラ(登録なしで勝利): 点数2倍",
+  "hulaGuideStopPenalty": "ストップ失敗ペナルティ",
+  "hulaGuideStopPenaltyText": "ストップを宣言したが最低点でない場合:\n• 勝者が受ける点数を全てストップした人が負担\n• 他のプレイヤーは減点なし",
+
+  "attackTotalCards": "+{power}! (計{total}枚攻撃)",
+  "skipNextTurnMessage": "J! 次のターンをスキップ",
+  "reverseDirectionMessage": "Q! 方向反転",
+  "skipTwoTurnsMessage": "K! 2ターンスキップ",
+  "changeSuitMessage": "7! スート変更: {suit}",
+  "playerPlayedCard": "{name}がカードを出しました",
+  "continueGame": "続ける",
+  "onecardWithPlayers": "ワンカード ({count}P)",
+  "restart": "再スタート",
+  "selectSuit": "スートを選択してください",
+  "blackWhiteJoker": "白黒ジョーカー",
+  "colorJoker": "カラージョーカー",
+  "clockwiseDirection": "時計回り",
+  "counterClockwiseDirection": "反時計回り",
+  "aiTurnCountdown": "{name} ({seconds})",
+  "aiTurn": "{name}の番",
+  "cannotPlayThisCard": "このカードは出せません",
+  "bankruptWithCards": "破産! ({count}枚所持)",
+  "gameRulesTitle": "ゲームルール",
+  "goal": "目標",
+  "goalText": "手札を全て出した人が勝利です。\n最後のカードを出す前に「ワンカード」を宣言する必要があります。",
+  "howToPlay": "遊び方",
+  "howToPlayText": "同じスートまたは同じ数字のカードを出せます。\n出せるカードがない場合はデッキから引きます。",
+  "defense": "防御",
+  "defenseText": "攻撃されたら同じ攻撃カードで防御できます。\n防御すると攻撃が次の人に累積されます。",
+  "specialCards": "特殊カード",
+  "gameTips": "ゲームのヒント",
+  "close": "閉じる",
+
+  "drawCardMessage": "カードを引いてください",
+  "discardOrMeldMessage": "カードを捨てるか登録してください",
+  "noCardsMessage": "カードがありません",
+  "thankYouSelectMethod": "サンキュー方法を選択",
+  "thankYouSolo": "サンキュー! {suit}7 単独登録",
+  "thankYouAddToMine": "サンキュー! {card} 自分のメルドに追加",
+  "thankYouAddToAi": "サンキュー! {card} {aiName}のメルドに追加",
+  "thankYouDesc": "サンキュー! {desc}",
+  "addedToMeld": "メルドに追加しました",
+  "noMeldToAttach": "追加できるメルドがありません",
+  "invalidCombination": "無効な組み合わせです",
+  "drawFirstMessage": "先にカードを引いてください",
+  "selectCardToDiscard": "捨てるカードを選択してください",
+  "hulaWinBonus": "フラ勝利! (x2)",
+  "handColumn": "手札",
+  "scoreColumn": "得点",
+  "cumulativeColumn": "累計",
+  "hulaWithPlayers": "フラ ({count}人)",
+  "hintOnOff": "ヒント {status}",
+  "discardedCards": "捨て札",
+  "meldButton": "登録",
+  "discardButton": "捨てる",
+  "stopButton": "ストップ",
+  "thankYouMeld": "サンキューメルド",
+  "meldTypes": "メルドの種類",
+  "ok": "確認",
+  "stop": "ストップ",
+  "aiThankYouDraw": "{aiName} サンキュー! {card}",
+  "@aiThankYouDraw": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiDrawsCard": "{aiName}がカードを引く",
+  "@aiDrawsCard": {
+    "placeholders": {
+      "aiName": {"type": "String"}
+    }
+  },
+  "aiRegistersSeven": "{aiName}: 7 {type}登録",
+  "@aiRegistersSeven": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "type": {"type": "String"}
+    }
+  },
+  "aiRegistersMeld": "{aiName}: {meldType}登録 {cards}",
+  "@aiRegistersMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "meldType": {"type": "String"},
+      "cards": {"type": "String"}
+    }
+  },
+  "aiAttachesToMeld": "{aiName}: {card}をメルドに追加",
+  "@aiAttachesToMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiAttachesToPlayerMeld": "{aiName}: {card}をプレイヤーメルドに追加",
+  "@aiAttachesToPlayerMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "aiAttachesToOtherAiMeld": "{aiName}: {card}を{targetAi}メルドに追加",
+  "@aiAttachesToOtherAiMeld": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"},
+      "targetAi": {"type": "String"}
+    }
+  },
+  "aiDiscards": "{aiName}: {card}を捨てる",
+  "@aiDiscards": {
+    "placeholders": {
+      "aiName": {"type": "String"},
+      "card": {"type": "String"}
+    }
+  },
+  "group": "グループ",
+  "solo": "単独",
+  "victory": "勝利!",
+  "defeat": "敗北"
 }

@@ -13,7 +13,7 @@ enum Team {
 
 class Player {
   final int id;
-  final String name;
+  String name;
   final PlayerType type;
   final List<PlayingCard> hand;
   final List<PlayingCard> wonCards;

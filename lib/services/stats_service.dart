@@ -36,7 +36,7 @@ class StatsService extends ChangeNotifier {
 
   /// 플레이어 이름 업데이트 (기존 데이터 마이그레이션)
   void _updatePlayerNames() {
-    final defaultNames = ['플레이어', '민준', '서연', '지호', '수빈'];
+    final defaultNames = ['Player', 'AI 1', 'AI 2', 'AI 3', 'AI 4'];
     for (int i = 0; i < _playerStats.length && i < defaultNames.length; i++) {
       _playerStats[i].name = defaultNames[i];
     }
@@ -45,12 +45,20 @@ class StatsService extends ChangeNotifier {
   /// 기본 플레이어 통계 초기화
   void _initDefaultStats() {
     _playerStats = [
-      PlayerStats(name: '플레이어'),
-      PlayerStats(name: '민준'),
-      PlayerStats(name: '서연'),
-      PlayerStats(name: '지호'),
-      PlayerStats(name: '수빈'),
+      PlayerStats(name: 'Player'),
+      PlayerStats(name: 'AI 1'),
+      PlayerStats(name: 'AI 2'),
+      PlayerStats(name: 'AI 3'),
+      PlayerStats(name: 'AI 4'),
     ];
+  }
+
+  /// 지역화된 플레이어 이름으로 업데이트
+  void updateLocalizedNames(List<String> names) {
+    for (int i = 0; i < _playerStats.length && i < names.length; i++) {
+      _playerStats[i].name = names[i];
+    }
+    notifyListeners();
   }
 
   /// 플레이어 통계 저장

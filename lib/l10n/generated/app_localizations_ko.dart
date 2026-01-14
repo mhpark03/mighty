@@ -762,4 +762,735 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get heartsSubtitle => '4인 트릭 테이킹 게임';
+
+  @override
+  String get handRoyalStraightFlush => '로열 스트레이트 플러시';
+
+  @override
+  String get handBackStraightFlush => '백스트레이트 플러시';
+
+  @override
+  String get handStraightFlush => '스트레이트 플러시';
+
+  @override
+  String get handFourOfAKind => '포카드';
+
+  @override
+  String get handFullHouse => '풀하우스';
+
+  @override
+  String get handFlush => '플러시';
+
+  @override
+  String get handMountain => '마운틴';
+
+  @override
+  String get handBackStraight => '백스트레이트';
+
+  @override
+  String get handStraight => '스트레이트';
+
+  @override
+  String get handTriple => '트리플';
+
+  @override
+  String get handTwoPair => '투페어';
+
+  @override
+  String get handOnePair => '원페어';
+
+  @override
+  String get handHighCard => '하이카드';
+
+  @override
+  String highCardTop(String rank) {
+    return '$rank탑';
+  }
+
+  @override
+  String get noLow => 'No Low';
+
+  @override
+  String get betPing => '삥';
+
+  @override
+  String get betCheck => '체크';
+
+  @override
+  String get betCall => '콜';
+
+  @override
+  String get betDdadang => '따당';
+
+  @override
+  String get betQuarter => '쿼터';
+
+  @override
+  String get betHalf => '하프';
+
+  @override
+  String get betFull => '풀';
+
+  @override
+  String get betDie => '다이';
+
+  @override
+  String get selectOpenCard => '공개할 카드를 선택하세요';
+
+  @override
+  String get selectOpenCardDesc => '선택한 카드가 상대에게 공개됩니다';
+
+  @override
+  String get aiSelectingCard => 'AI가 카드를 선택하고 있습니다...';
+
+  @override
+  String nthCard(int n) {
+    return '$n번째 카드';
+  }
+
+  @override
+  String secondsCount(int n) {
+    return '$n초';
+  }
+
+  @override
+  String totalBetAmount(int amount) {
+    return '총: $amount';
+  }
+
+  @override
+  String bettingAmount(int amount) {
+    return '베팅: $amount';
+  }
+
+  @override
+  String get bonusHand => '보너스 핸드!';
+
+  @override
+  String get bonus => '보너스';
+
+  @override
+  String get total => '총';
+
+  @override
+  String otherPlayersLose(int amount) {
+    return '다른 플레이어: 각 -$amount';
+  }
+
+  @override
+  String get thisGame => '이번 게임';
+
+  @override
+  String get cumulative => '누적';
+
+  @override
+  String get foldedSection => '다이';
+
+  @override
+  String get hiLoHi => '하이';
+
+  @override
+  String get hiLoLo => '로우';
+
+  @override
+  String get hiLoSwing => '스윙';
+
+  @override
+  String roundComplete(int n) {
+    return '라운드 $n 완료!';
+  }
+
+  @override
+  String get cardDistribution5 => '5번째 카드가 배분됩니다.';
+
+  @override
+  String get cardDistribution6 => '6번째 카드가 배분됩니다.';
+
+  @override
+  String get cardDistribution7 => '마지막 7번째 카드가 배분됩니다.';
+
+  @override
+  String get goodLuck => 'GOOD LUCK!';
+
+  @override
+  String get suitSpade => '스페이드';
+
+  @override
+  String get suitDiamond => '다이아몬드';
+
+  @override
+  String get suitHeart => '하트';
+
+  @override
+  String get suitClub => '클럽';
+
+  @override
+  String cardOwner(String card) {
+    return '$card 소유자';
+  }
+
+  @override
+  String trickWinner(int n) {
+    return '$n번째 트릭 획득자';
+  }
+
+  @override
+  String get hint => '힌트';
+
+  @override
+  String get hintOff => '힌트 OFF';
+
+  @override
+  String get hintDialogContent => '광고를 시청하면 힌트가 활성화됩니다.\n계속하시겠습니까?';
+
+  @override
+  String get newGameDialogContent => '광고를 시청하면 새 게임을 시작합니다.\n계속하시겠습니까?';
+
+  @override
+  String get watchAd => '광고 보기';
+
+  @override
+  String jokerLead(String suit) {
+    return '조커 선공: $suit';
+  }
+
+  @override
+  String get gameSelection => '게임 선택';
+
+  @override
+  String get onecardTitle => '원카드';
+
+  @override
+  String get onecardSubtitle => '4인 대전';
+
+  @override
+  String get gameRules => '게임 규칙';
+
+  @override
+  String get heartsGuideGoal => '목표';
+
+  @override
+  String get heartsGuideGoalText => '하트 카드와 스페이드 퀸을 피해 가장 낮은 점수를 얻는 것이 목표입니다.';
+
+  @override
+  String get heartsGuideHow => '진행 방법';
+
+  @override
+  String get heartsGuideHowText =>
+      '• 4명이 플레이하며 각자 13장씩 받습니다\n• 게임 시작 시 3장을 왼쪽 플레이어에게 전달\n• 클럽 2를 가진 플레이어가 먼저 시작\n• 13트릭을 진행하며 점수 카드를 피합니다';
+
+  @override
+  String get heartsGuideScoring => '점수 계산';
+
+  @override
+  String get heartsGuideScoringText =>
+      '• 하트 카드: 각 1점 (총 13점)\n• 스페이드 퀸 (♠Q): 13점\n• 총점: 26점\n• 낮은 점수가 승리!';
+
+  @override
+  String get heartsGuideBreaking => '하트 브레이킹';
+
+  @override
+  String get heartsGuideBreakingText =>
+      '첫 트릭에서는 하트를 낼 수 없습니다.\n하트가 한 번 나온 후에야 하트로 시작할 수 있습니다.';
+
+  @override
+  String get heartsGuideShootMoon => '슈팅 더 문';
+
+  @override
+  String get heartsGuideShootMoonText =>
+      '한 플레이어가 모든 하트와 스페이드 퀸을 획득하면:\n• 그 플레이어: 0점\n• 다른 플레이어: 각 26점';
+
+  @override
+  String get heartsGuideTips => '전략 팁';
+
+  @override
+  String get heartsGuideTipsText =>
+      '• 높은 카드는 일찍 버리세요\n• 스페이드 퀸을 조심하세요\n• 상대방에게 점수 카드를 먹이세요';
+
+  @override
+  String get allScoreCardsUsed => '모든 점수 카드 소진! 게임 종료';
+
+  @override
+  String passLeftCount(int count) {
+    return '왼쪽으로 패스 ($count/3)';
+  }
+
+  @override
+  String get cardPass => '카드 패스';
+
+  @override
+  String trickProgress(int current) {
+    return '트릭 $current/13';
+  }
+
+  @override
+  String get heartBroken => '하트 브레이킹';
+
+  @override
+  String get passRecommend => '패스 추천';
+
+  @override
+  String get recommend => '추천';
+
+  @override
+  String get selectCardsToPassLeft => '왼쪽으로 보낼 카드 3장을 선택하세요';
+
+  @override
+  String playerNameWins(String name) {
+    return '$name 승리';
+  }
+
+  @override
+  String playerStartsWithClub2(String name) {
+    return '$name가 클럽 2로 시작합니다';
+  }
+
+  @override
+  String playerWonTrick(String name, int points) {
+    return '$name 트릭 획득! (+$points점)';
+  }
+
+  @override
+  String playerShootMoonSuccess(String name) {
+    return '$name 슈팅 더 문 성공!';
+  }
+
+  @override
+  String get hintActivated => '힌트가 활성화되었습니다!';
+
+  @override
+  String get myTurn => '내 차례';
+
+  @override
+  String get start => '시작';
+
+  @override
+  String get counterClockwise => '반시계';
+
+  @override
+  String get clockwise => '시계';
+
+  @override
+  String get blackJoker => '흑백 조커';
+
+  @override
+  String get colorJoker => '컬러 조커';
+
+  @override
+  String get oneCardCall => '원카드!';
+
+  @override
+  String oneCardCallTimer(int seconds) {
+    return '원카드 ($seconds초)';
+  }
+
+  @override
+  String get selectSuit => '무늬를 선택하세요';
+
+  @override
+  String get discardedCards => '버린 카드';
+
+  @override
+  String get meld => '등록';
+
+  @override
+  String get discard => '버리기';
+
+  @override
+  String get stop => '스톱';
+
+  @override
+  String get handCards => '손패';
+
+  @override
+  String get cannotPlayCard => '이 카드는 낼 수 없습니다';
+
+  @override
+  String get drawCard => '카드를 뽑으세요';
+
+  @override
+  String get discardOrMeld => '카드를 버리거나 등록하세요';
+
+  @override
+  String get noCards => '카드가 없습니다';
+
+  @override
+  String get thankYouSelectMethod => '땡큐 방법을 선택하세요';
+
+  @override
+  String thankYouMeldSolo(String suit) {
+    return '땡큐! ${suit}7 단독 등록';
+  }
+
+  @override
+  String thankYouMeldMyMeld(String card) {
+    return '땡큐! $card 내 멜드에 붙이기';
+  }
+
+  @override
+  String thankYouMeldAiMeld(String card, String aiName) {
+    return '땡큐! $card $aiName 멜드에 붙이기';
+  }
+
+  @override
+  String get addedToMeld => '멜드에 추가됨';
+
+  @override
+  String get noMeldToAttach => '붙일 멜드가 없습니다';
+
+  @override
+  String get invalidCombination => '유효하지 않은 조합입니다';
+
+  @override
+  String get drawCardFirst => '먼저 카드를 뽑으세요';
+
+  @override
+  String get selectCardToDiscard => '버릴 카드를 선택하세요';
+
+  @override
+  String get hulaWin => '훌라로 승리! (x2)';
+
+  @override
+  String get continue_ => '이어하기';
+
+  @override
+  String attackReceived(int count) {
+    return '공격으로 $count장을 받았습니다';
+  }
+
+  @override
+  String get cardDrawn => '카드를 뽑았습니다';
+
+  @override
+  String bankrupt(int count) {
+    return '파산! ($count장 보유)';
+  }
+
+  @override
+  String get restart => '다시 시작';
+
+  @override
+  String get goal => '목표';
+
+  @override
+  String get howToPlay => '진행 방법';
+
+  @override
+  String get attackCards => '공격 카드';
+
+  @override
+  String get defense => '방어';
+
+  @override
+  String get specialCards => '특수 카드';
+
+  @override
+  String get tips => '게임 팁';
+
+  @override
+  String get winRate => '승률';
+
+  @override
+  String get onecardGuideGoal => '목표';
+
+  @override
+  String get onecardGuideGoalText => '손에 든 카드를 가장 먼저 모두 내려놓는 것이 목표입니다.';
+
+  @override
+  String get onecardGuidePlay => '카드 내기';
+
+  @override
+  String get onecardGuidePlayText => '이전에 낸 카드와 같은 무늬 또는 같은 숫자의 카드를 낼 수 있습니다.';
+
+  @override
+  String get onecardGuideAttack => '공격 카드';
+
+  @override
+  String get onecardGuideAttackText =>
+      '• 2: +2장 공격\n• A: +3장 공격 (♠A는 +5장)\n• 조커: +5장(흑백) / +7장(컬러)';
+
+  @override
+  String get onecardGuideSpecial => '특수 카드';
+
+  @override
+  String get onecardGuideSpecialText =>
+      '• J: 다음 순서 건너뛰기\n• Q: 방향 반대\n• K: 2턴 건너뛰기\n• 7: 무늬 변경';
+
+  @override
+  String get onecardGuideJokerDefense => '조커 방어';
+
+  @override
+  String get onecardGuideJokerDefenseText => '조커로 공격받으면 조커로만 방어할 수 있습니다.';
+
+  @override
+  String get onecardGuideOnecard => '원카드!';
+
+  @override
+  String get onecardGuideOnecardText =>
+      '손패가 1장 남으면 \"원카드!\" 버튼을 눌러야 합니다.\n누르지 않으면 패널티로 2장을 받습니다.';
+
+  @override
+  String get onecardGuideBankrupt => '파산';
+
+  @override
+  String get onecardGuideBankruptText =>
+      '손패가 20장 이상이 되면 파산! 가장 적은 카드를 가진 플레이어가 승리합니다.';
+
+  @override
+  String get hulaGuideGoal => '목표';
+
+  @override
+  String get hulaGuideGoalText => '손패의 카드를 모두 등록하거나 버려서 가장 먼저 없애는 것이 목표입니다.';
+
+  @override
+  String get hulaGuideHow => '진행 방법';
+
+  @override
+  String get hulaGuideHowText =>
+      '매 턴마다 덱 또는 버린 더미에서 카드 1장을 뽑고, 등록 또는 버리기를 합니다.';
+
+  @override
+  String get hulaGuideMelds => '멜드 종류';
+
+  @override
+  String get hulaGuideMeldsText =>
+      '• Run: 같은 무늬의 연속된 숫자 3장 이상 (예: ♠3-4-5)\n• Group: 같은 숫자 다른 무늬 3장 이상 (예: ♠7-♥7-♦7)';
+
+  @override
+  String get hulaGuideSeven => '7의 특수 규칙';
+
+  @override
+  String get hulaGuideSevenText => '7은 단독으로 등록할 수 있습니다.';
+
+  @override
+  String get hulaGuideThankYou => '땡큐';
+
+  @override
+  String get hulaGuideThankYouText =>
+      '버린 더미에서 7을 뽑으면 \"땡큐\"를 외치고 특별한 등록을 할 수 있습니다.';
+
+  @override
+  String get hulaGuideStop => '스톱';
+
+  @override
+  String get hulaGuideStopText =>
+      '언제든 스톱을 외쳐 게임을 끝낼 수 있습니다.\n남은 카드 점수가 가장 적은 사람이 승리합니다.';
+
+  @override
+  String get hulaGuideCardPoints => '카드 점수';
+
+  @override
+  String get hulaGuideCardPointsText => 'A=1점, 2~9=숫자점, J=10점, Q=11점, K=12점';
+
+  @override
+  String get hulaGuideScoring => '점수 계산';
+
+  @override
+  String get hulaGuideScoringText =>
+      '• 승자: 다른 플레이어 손패와의 차이 합계를 획득\n• 패자: 승자와의 손패 차이만큼 감점\n• 훌라(등록 없이 승리): 점수 2배';
+
+  @override
+  String get hulaGuideStopPenalty => '스톱 실패 페널티';
+
+  @override
+  String get hulaGuideStopPenaltyText =>
+      '스톱을 외쳤지만 최저 점수가 아닌 경우:\n• 승자가 받을 점수 전부를 스톱한 사람이 부담\n• 다른 플레이어는 감점 없음';
+
+  @override
+  String attackTotalCards(int power, int total) {
+    return '+$power! (총 $total장 공격)';
+  }
+
+  @override
+  String get skipNextTurnMessage => 'J! 다음 턴 건너뛰기';
+
+  @override
+  String get reverseDirectionMessage => 'Q! 방향 반대';
+
+  @override
+  String get skipTwoTurnsMessage => 'K! 2턴 건너뛰기';
+
+  @override
+  String changeSuitMessage(String suit) {
+    return '7! 무늬 변경: $suit';
+  }
+
+  @override
+  String playerPlayedCard(String name) {
+    return '$name이(가) 카드를 냈습니다';
+  }
+
+  @override
+  String onecardWithPlayers(int count) {
+    return '원카드 (${count}P)';
+  }
+
+  @override
+  String get blackWhiteJoker => '흑백 조커';
+
+  @override
+  String get clockwiseDirection => '시계';
+
+  @override
+  String get counterClockwiseDirection => '반시계';
+
+  @override
+  String aiTurnCountdown(String name, int seconds) {
+    return '$name ($seconds)';
+  }
+
+  @override
+  String aiTurn(String name) {
+    return '$name 차례';
+  }
+
+  @override
+  String get cannotPlayThisCard => '이 카드는 낼 수 없습니다';
+
+  @override
+  String bankruptWithCards(int count) {
+    return '파산! ($count장 보유)';
+  }
+
+  @override
+  String get gameRulesTitle => '게임 규칙';
+
+  @override
+  String get goalText =>
+      '손에 든 카드를 가장 먼저 모두 내려놓는 사람이 승리합니다.\n마지막 카드를 내기 전 \"원카드\"를 외쳐야 합니다.';
+
+  @override
+  String get howToPlayText =>
+      '같은 무늬 또는 같은 숫자의 카드를 낼 수 있습니다.\n낼 수 있는 카드가 없으면 덱에서 카드를 뽑습니다.';
+
+  @override
+  String get defenseText =>
+      '공격을 받으면 같은 공격 카드로 막을 수 있습니다.\n막으면 공격이 누적되어 다음 사람에게 넘어갑니다.';
+
+  @override
+  String get gameTips => '게임 팁';
+
+  @override
+  String get drawCardMessage => '카드를 뽑으세요';
+
+  @override
+  String get discardOrMeldMessage => '카드를 버리거나 등록하세요';
+
+  @override
+  String get noCardsMessage => '카드가 없습니다';
+
+  @override
+  String thankYouSolo(String suit) {
+    return '땡큐! ${suit}7 단독 등록';
+  }
+
+  @override
+  String thankYouAddToMine(String card) {
+    return '땡큐! $card 내 멜드에 붙이기';
+  }
+
+  @override
+  String thankYouAddToAi(String card, String aiName) {
+    return '땡큐! $card $aiName 멜드에 붙이기';
+  }
+
+  @override
+  String thankYouDesc(String desc) {
+    return '땡큐! $desc';
+  }
+
+  @override
+  String get drawFirstMessage => '먼저 카드를 뽑으세요';
+
+  @override
+  String get hulaWinBonus => '훌라로 승리! (x2)';
+
+  @override
+  String get handColumn => '손패';
+
+  @override
+  String get scoreColumn => '점수';
+
+  @override
+  String get cumulativeColumn => '누적';
+
+  @override
+  String hulaWithPlayers(int count) {
+    return '훌라 ($count인)';
+  }
+
+  @override
+  String hintOnOff(String status) {
+    return '힌트 $status';
+  }
+
+  @override
+  String get meldButton => '등록';
+
+  @override
+  String get discardButton => '버리기';
+
+  @override
+  String get stopButton => '스톱';
+
+  @override
+  String get thankYouMeld => '땡큐 멜드';
+
+  @override
+  String get meldTypes => '멜드 종류';
+
+  @override
+  String get ok => '확인';
+
+  @override
+  String aiThankYouDraw(String aiName, String card) {
+    return '$aiName 땡큐! $card';
+  }
+
+  @override
+  String aiDrawsCard(String aiName) {
+    return '$aiName이 카드를 뽑음';
+  }
+
+  @override
+  String aiRegistersSeven(String aiName, String type) {
+    return '$aiName: 7 $type 등록';
+  }
+
+  @override
+  String aiRegistersMeld(String aiName, String meldType, String cards) {
+    return '$aiName: $meldType 등록 $cards';
+  }
+
+  @override
+  String aiAttachesToMeld(String aiName, String card) {
+    return '$aiName: $card 멜드에 붙임';
+  }
+
+  @override
+  String aiAttachesToPlayerMeld(String aiName, String card) {
+    return '$aiName: $card 플레이어 멜드에 붙임';
+  }
+
+  @override
+  String aiAttachesToOtherAiMeld(String aiName, String card, String targetAi) {
+    return '$aiName: $card $targetAi 멜드에 붙임';
+  }
+
+  @override
+  String aiDiscards(String aiName, String card) {
+    return '$aiName: $card 버림';
+  }
+
+  @override
+  String get group => '그룹';
+
+  @override
+  String get solo => '단독';
+
+  @override
+  String get victory => '승리!';
+
+  @override
+  String get defeat => '패배';
 }
