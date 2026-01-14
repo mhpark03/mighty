@@ -1373,6 +1373,10 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       final sameRankCount = hand.where((c) => c.rank == card.rank).length;
       if (sameRankCount >= 2) {
         keepScore += sameRankCount * 30; // 2장: 60, 3장: 90
+        // 2-1. K/Q/J 페어는 추가 보너스 (다른 플레이어가 버릴 확률 높음)
+        if (card.rank >= 11) { // J=11, Q=12, K=13
+          keepScore += 40;
+        }
       }
 
       // 3. 같은 무늬 연속 카드 (Run 가능성)
