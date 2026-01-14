@@ -1993,12 +1993,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {
-                  AdService().showRewardedAd(
-                    onRewarded: _restartGame,
-                    onAdNotAvailable: _restartGame,
-                  );
-                },
+                onPressed: _restartGame,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green.shade700,
                   foregroundColor: Colors.white,
