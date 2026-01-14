@@ -1370,9 +1370,20 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       }
 
       // 1-3. A/2/3 단독 카드는 스톱 시 점수가 낮아서 유리 (나중에 버리기)
+      // 5/6/7/8/9는 별도 런 보너스가 있으므로 제외
       final sameRankCountForLow = hand.where((c) => c.rank == card.rank).length;
-      if (sameRankCountForLow == 1 && (card.rank == 1 || card.rank == 2 || card.rank == 3)) {
-        keepScore += 45; // 5/9보다 낮고 일반 카드보다 높음
+      if (sameRankCountForLow == 1 && !(card.rank >= 5 && card.rank <= 9)) {
+        if (card.rank == 1) {
+          keepScore += 50; // A: 가장 낮은 점수
+        } else if (card.rank == 2) {
+          keepScore += 45;
+        } else if (card.rank == 3) {
+          keepScore += 40;
+        } else {
+          // 1-4. 기타 단독 카드 (4, 10, J, Q, K)는 숫자 역순으로 버리기
+          // rank가 높을수록 keepScore가 낮아짐
+          keepScore += (14 - card.rank) * 4; // 4→40, 10→16, K→4
+        }
       }
 
       // 2. 같은 숫자 카드 개수 (Group 가능성)
