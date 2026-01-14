@@ -1498,4 +1498,25 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get defeat => '패배';
+
+  @override
+  String drewCardWithCard(String card) {
+    return '$card을 뽑았습니다';
+  }
+
+  @override
+  String playerDiscards(String card) {
+    return '$card 버림';
+  }
+
+  @override
+  String get inPossession => '(보유중)';
+
+  @override
+  String get fourPlayerGame => '4인 대전';
+
+  @override
+  String meldCount(int count) {
+    return '$count개 멜드';
+  }
 }

@@ -425,9 +425,9 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
               ),
             ),
             if (isDisabled)
-              const Text(
-                '(보유중)',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.inPossession,
+                style: const TextStyle(
                   color: Colors.grey,
                   fontSize: 9,
                 ),

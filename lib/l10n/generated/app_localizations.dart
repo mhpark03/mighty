@@ -2759,6 +2759,36 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'패배'**
   String get defeat;
+
+  /// No description provided for @drewCardWithCard.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card}을 뽑았습니다'**
+  String drewCardWithCard(String card);
+
+  /// No description provided for @playerDiscards.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card} 버림'**
+  String playerDiscards(String card);
+
+  /// No description provided for @inPossession.
+  ///
+  /// In ko, this message translates to:
+  /// **'(보유중)'**
+  String get inPossession;
+
+  /// No description provided for @fourPlayerGame.
+  ///
+  /// In ko, this message translates to:
+  /// **'4인 대전'**
+  String get fourPlayerGame;
+
+  /// No description provided for @meldCount.
+  ///
+  /// In ko, this message translates to:
+  /// **'{count}개 멜드'**
+  String meldCount(int count);
 }
 
 class _AppLocalizationsDelegate

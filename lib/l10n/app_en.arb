@@ -633,5 +633,25 @@
   "group": "Group",
   "solo": "Solo",
   "victory": "Victory!",
-  "defeat": "Defeat"
+  "defeat": "Defeat",
+  "drewCardWithCard": "Drew {card}",
+  "@drewCardWithCard": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "playerDiscards": "{card} discarded",
+  "@playerDiscards": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "inPossession": "(Owned)",
+  "fourPlayerGame": "4 Players",
+  "meldCount": "{count} melds",
+  "@meldCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  }
 }

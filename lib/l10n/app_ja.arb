@@ -632,5 +632,25 @@
   "group": "グループ",
   "solo": "単独",
   "victory": "勝利!",
-  "defeat": "敗北"
+  "defeat": "敗北",
+  "drewCardWithCard": "{card}を引きました",
+  "@drewCardWithCard": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "playerDiscards": "{card}を捨てる",
+  "@playerDiscards": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "inPossession": "（所持中）",
+  "fourPlayerGame": "4人対戦",
+  "meldCount": "{count}メルド",
+  "@meldCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  }
 }

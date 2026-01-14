@@ -792,5 +792,25 @@
   "group": "그룹",
   "solo": "단독",
   "victory": "승리!",
-  "defeat": "패배"
+  "defeat": "패배",
+  "drewCardWithCard": "{card}을 뽑았습니다",
+  "@drewCardWithCard": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "playerDiscards": "{card} 버림",
+  "@playerDiscards": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "inPossession": "(보유중)",
+  "fourPlayerGame": "4인 대전",
+  "meldCount": "{count}개 멜드",
+  "@meldCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  }
 }

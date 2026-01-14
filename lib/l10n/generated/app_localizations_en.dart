@@ -1507,4 +1507,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get defeat => 'Defeat';
+
+  @override
+  String drewCardWithCard(String card) {
+    return 'Drew $card';
+  }
+
+  @override
+  String playerDiscards(String card) {
+    return '$card discarded';
+  }
+
+  @override
+  String get inPossession => '(Owned)';
+
+  @override
+  String get fourPlayerGame => '4 Players';
+
+  @override
+  String meldCount(int count) {
+    return '$count melds';
+  }
 }

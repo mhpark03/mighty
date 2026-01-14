@@ -782,7 +782,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       selectedCardIndices = [];
       waitingForNextTurn = false;
     });
-    _showMessage('${card.suitSymbol}${card.rankString}을 뽑았습니다');
+    _showMessage(AppLocalizations.of(context)!.drewCardWithCard('${card.suitSymbol}${card.rankString}'));
     _saveGame();
   }
 
@@ -2022,7 +2022,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       hasDrawn = false;
     });
 
-    _showMessage('${card.suitSymbol}${card.rankString} 버림');
+    _showMessage(AppLocalizations.of(context)!.playerDiscards('${card.suitSymbol}${card.rankString}'));
     _saveGame();
 
     // 손패가 비었으면 승리
@@ -3302,13 +3302,13 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '${hand.length}장',
+                      AppLocalizations.of(context)!.cardCount(hand.length),
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     if (melds.isNotEmpty) ...[
                       const SizedBox(width: 8),
                       Text(
-                        '(${melds.length}개 멜드)',
+                        '(${AppLocalizations.of(context)!.meldCount(melds.length)})',
                         style: const TextStyle(color: Colors.green, fontSize: 11),
                       ),
                     ],
@@ -3372,12 +3372,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
           const SizedBox(height: 4),
           // 카드 수
           Text(
-            '${hand.length}장',
+            AppLocalizations.of(context)!.cardCount(hand.length),
             style: const TextStyle(color: Colors.white, fontSize: 11),
           ),
           if (melds.isNotEmpty)
             Text(
-              '${melds.length}개 멜드',
+              AppLocalizations.of(context)!.meldCount(melds.length),
               style: const TextStyle(color: Colors.green, fontSize: 9),
             ),
           const SizedBox(height: 8),

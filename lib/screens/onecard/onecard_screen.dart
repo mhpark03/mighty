@@ -358,7 +358,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         playerCalledOneCard = true; // 더 이상 벌칙 없음
         _waitingForOneCard = false;
       });
-      _showMessage('${_getPlayerName(randomComputer)}: 원카드!');
+      _showMessage('${_getPlayerName(randomComputer)}: ${AppLocalizations.of(context)!.oneCardCall}');
       HapticFeedback.heavyImpact();
       _saveGame();
 

@@ -632,5 +632,25 @@
   "group": "组",
   "solo": "单独",
   "victory": "胜利!",
-  "defeat": "失败"
+  "defeat": "失败",
+  "drewCardWithCard": "抽到{card}",
+  "@drewCardWithCard": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "playerDiscards": "弃{card}",
+  "@playerDiscards": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "inPossession": "（已拥有）",
+  "fourPlayerGame": "4人对战",
+  "meldCount": "{count}组",
+  "@meldCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  }
 }

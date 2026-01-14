@@ -1483,4 +1483,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get defeat => '失败';
+
+  @override
+  String drewCardWithCard(String card) {
+    return '抽到$card';
+  }
+
+  @override
+  String playerDiscards(String card) {
+    return '弃$card';
+  }
+
+  @override
+  String get inPossession => '（已拥有）';
+
+  @override
+  String get fourPlayerGame => '4人对战';
+
+  @override
+  String meldCount(int count) {
+    return '$count组';
+  }
 }

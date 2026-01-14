@@ -1492,4 +1492,25 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get defeat => '敗北';
+
+  @override
+  String drewCardWithCard(String card) {
+    return '$cardを引きました';
+  }
+
+  @override
+  String playerDiscards(String card) {
+    return '$cardを捨てる';
+  }
+
+  @override
+  String get inPossession => '（所持中）';
+
+  @override
+  String get fourPlayerGame => '4人対戦';
+
+  @override
+  String meldCount(int count) {
+    return '$countメルド';
+  }
 }
