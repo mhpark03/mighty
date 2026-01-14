@@ -1495,19 +1495,25 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
           ),
           const Spacer(),
           if (heartsBroken)
-            Builder(
-              builder: (context) => Row(
-                children: [
-                  Icon(Icons.favorite, color: Colors.red, size: isSmallScreen ? 16 : 20),
-                  const SizedBox(width: 4),
-                  Text(
-                    AppLocalizations.of(context)!.heartBroken,
-                    style: TextStyle(
-                      color: Colors.red[300],
-                      fontSize: isSmallScreen ? 11 : 13,
+            Flexible(
+              child: Builder(
+                builder: (context) => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.favorite, color: Colors.red, size: isSmallScreen ? 16 : 20),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        AppLocalizations.of(context)!.heartBroken,
+                        style: TextStyle(
+                          color: Colors.red[300],
+                          fontSize: isSmallScreen ? 11 : 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           const SizedBox(width: 8),
