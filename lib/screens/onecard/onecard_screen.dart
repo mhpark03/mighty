@@ -1097,7 +1097,12 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _restartGame,
+            onPressed: () {
+              AdService().showRewardedAd(
+                onRewarded: _restartGame,
+                onAdNotAvailable: _restartGame,
+              );
+            },
             tooltip: l10n.restart,
           ),
         ],
