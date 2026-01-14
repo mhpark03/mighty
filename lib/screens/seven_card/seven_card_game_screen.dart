@@ -1949,28 +1949,9 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
     }
   }
 
-  /// 베팅 액션을 한글 텍스트로 변환
-  String _getBettingActionText(BettingAction action, int amount) {
-    switch (action) {
-      case BettingAction.bing:
-        return '삥 ($amount)';
-      case BettingAction.check:
-        return '체크';
-      case BettingAction.call:
-        return '콜 ($amount)';
-      case BettingAction.ddadang:
-        return '따당 ($amount)';
-      case BettingAction.quarter:
-        return '쿼터 ($amount)';
-      case BettingAction.half:
-        return '하프 ($amount)';
-      case BettingAction.full:
-        return '풀 ($amount)';
-      case BettingAction.die:
-        return '다이';
-      case BettingAction.none:
-        return '';
-    }
+  /// 베팅 액션을 로컬라이즈된 텍스트로 변환
+  String _getBettingActionText(BuildContext context, BettingAction action, int amount) {
+    return getBettingActionText(context, action, amount);
   }
 
   /// 베팅 액션별 색상

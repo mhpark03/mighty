@@ -2619,27 +2619,8 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
     }
   }
 
-  String _getBettingActionText(HiLoBettingAction action, int amount) {
-    switch (action) {
-      case HiLoBettingAction.bing:
-        return '삥 ($amount)';
-      case HiLoBettingAction.check:
-        return '체크';
-      case HiLoBettingAction.call:
-        return '콜 ($amount)';
-      case HiLoBettingAction.ddadang:
-        return '따당 ($amount)';
-      case HiLoBettingAction.quarter:
-        return '쿼터 ($amount)';
-      case HiLoBettingAction.half:
-        return '하프 ($amount)';
-      case HiLoBettingAction.full:
-        return '풀 ($amount)';
-      case HiLoBettingAction.die:
-        return '다이';
-      case HiLoBettingAction.none:
-        return '';
-    }
+  String _getBettingActionText(BuildContext context, HiLoBettingAction action, int amount) {
+    return getHiLoBettingActionText(context, action, amount);
   }
 
   Color _getBettingActionColor(HiLoBettingAction action) {
