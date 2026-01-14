@@ -1369,6 +1369,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         }
       }
 
+      // 1-3. A/2/3 단독 카드는 스톱 시 점수가 낮아서 유리 (나중에 버리기)
+      final sameRankCountForLow = hand.where((c) => c.rank == card.rank).length;
+      if (sameRankCountForLow == 1 && (card.rank == 1 || card.rank == 2 || card.rank == 3)) {
+        keepScore += 45; // 5/9보다 낮고 일반 카드보다 높음
+      }
+
       // 2. 같은 숫자 카드 개수 (Group 가능성)
       final sameRankCount = hand.where((c) => c.rank == card.rank).length;
       if (sameRankCount >= 2) {
