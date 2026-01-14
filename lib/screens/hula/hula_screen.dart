@@ -1082,6 +1082,25 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   // 7 카드인지 확인
   bool _isSeven(PlayingCard card) => card.rank == 7;
 
+  // 특정 무늬의 7이 멜드로 등록되었는지 확인
+  bool _isSevenRegistered(Suit suit) {
+    // 플레이어 멜드에서 확인
+    for (final meld in playerMelds) {
+      if (meld.cards.any((c) => c.rank == 7 && c.suit == suit)) {
+        return true;
+      }
+    }
+    // 컴퓨터 멜드에서 확인
+    for (final melds in computerMelds) {
+      for (final meld in melds) {
+        if (meld.cards.any((c) => c.rank == 7 && c.suit == suit)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   // 땡큐 가능 여부 확인 (버린 카드를 가져와서 바로 등록 가능한지)
   // 주의: 새로운 멜드 등록이 가능할 때만 가져올 수 있음 (붙이기만 가능하면 안됨)
   bool _canThankYou() {
@@ -1330,6 +1349,15 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       // 1. 7 카드는 절대 버리면 안 됨 (단독 등록 가능)
       if (_isSeven(card)) {
         keepScore += 1000;
+      }
+
+      // 1-1. 6이나 8 카드는 같은 무늬 7이 등록되지 않았으면 유지 (7 등록 후 붙이기 가능)
+      if (card.rank == 6 || card.rank == 8) {
+        final sevenOfSameSuit = _isSevenRegistered(card.suit);
+        if (!sevenOfSameSuit) {
+          // 7이 아직 등록되지 않았으면 6/8 유지 가치 높임
+          keepScore += 80;
+        }
       }
 
       // 2. 같은 숫자 카드 개수 (Group 가능성)
