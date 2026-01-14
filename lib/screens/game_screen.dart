@@ -2490,7 +2490,7 @@ class _GameScreenState extends State<GameScreen> {
       final basicPart = state.declarerTeamPoints - targetTricks + 1;
       final bonusPart = (state.declarerTeamPoints - minContract) * 2;
       baseScore = basicPart + bonusPart;
-      formula = '(득점-공약+1) + (득점-최소)×2';
+      formula = l10n.scoreFormula;
       calculation = '(${state.declarerTeamPoints}-$targetTricks+1) + (${state.declarerTeamPoints}-$minContract)×2 = $basicPart + $bonusPart = $baseScore';
 
       if (isRun) {
