@@ -775,22 +775,6 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                   // 오픈 카드
                   ...opponent.openCards.map((card) => _buildSmallCard(card, sizes)),
                 ],
-                // 조정 강도 표시 (테스트용)
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  child: Text(
-                    '${(controller.getAdjustedStrength(opponent) * 100).toStringAsFixed(0)}%',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: sizes.badgeFontSize,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
               ],
             ),
           ],
