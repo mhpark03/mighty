@@ -991,7 +991,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: Text(
-                      controller.getHandRankDisplayName(player.allCardsPokerHand),
+                      getHandRankDisplayName(context, player.allCardsPokerHand),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

@@ -585,7 +585,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
     });
 
     final winner = bonusInfo.winner;
-    final handRankName = controller.getHandRankName(bonusInfo.handRank);
+    final handRankName = getHandRankName(context,bonusInfo.handRank);
     final isHumanWinner = winner.id == 0;
 
     return Stack(
@@ -858,7 +858,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                     children: [
                       const Text('Hi', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 11)),
                       Text(
-                        hiHand != null ? controller.getHandRankDisplayName(hiHand) : '-',
+                        hiHand != null ? getHandRankDisplayName(context,hiHand) : '-',
                         style: const TextStyle(color: Colors.white, fontSize: 10),
                       ),
                     ],
@@ -953,7 +953,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                   children: [
                     const Text('Hi', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
                     Text(
-                      hiHand != null ? controller.getHandRankDisplayName(hiHand) : '-',
+                      hiHand != null ? getHandRankDisplayName(context,hiHand) : '-',
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
@@ -1693,7 +1693,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                                       child: Icon(Icons.star, color: Colors.amber, size: sizes.nameFontSize),
                                     ),
                                   Text(
-                                    'Hi ${controller.getHandRankDisplayName(player.allCardsPokerHand)}',
+                                    'Hi ${getHandRankDisplayName(context,player.allCardsPokerHand)}',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -2074,7 +2074,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                         Text(
-                          controller.getHandRankName(bonusInfo.handRank),
+                          getHandRankName(context,bonusInfo.handRank),
                           style: TextStyle(color: Colors.red[900], fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                       ],
@@ -2426,7 +2426,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    'Hi: ${player.pokerHand != null ? controller.getHandRankDisplayName(player.pokerHand) : "-"}',
+                    'Hi: ${player.pokerHand != null ? getHandRankDisplayName(context,player.pokerHand) : "-"}',
                     style: const TextStyle(color: Colors.white, fontSize: 10),
                   ),
                 ),
@@ -2559,7 +2559,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
         const SizedBox(width: 8),
         if (label == 'Hi' && winner.pokerHand != null)
           Text(
-            controller.getHandRankDisplayName(winner.pokerHand),
+            getHandRankDisplayName(context,winner.pokerHand),
             style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
         if (label == 'Lo' && winner.lowHand != null)
