@@ -938,8 +938,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         // 파산 체크
         if (computerHand.length >= bankruptcyLimit) {
           gameOver = true;
-          winner = l10n.player;
-          winnerIndex = 0;
+          winner = _getBankruptcyWinner();
           pendingMessage = '$computerName ${l10n.bankruptWithCards(computerHand.length)}';
           return;
         }
