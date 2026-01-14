@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -103,7 +104,7 @@ class GameSelectionScreen extends StatelessWidget {
       tileWidth = 160;
       tileHeight = 130;
     } else {
-      tileWidth = (screenWidth - 48) / 2; // 2열, 패딩 고려
+      tileWidth = math.max(80, (screenWidth - 48) / 2); // 2열, 패딩 고려, 최소 80
       tileHeight = isSmallScreen ? 100 : 120;
     }
 
@@ -219,7 +220,7 @@ class GameSelectionScreen extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: SizedBox(
-                  width: availableWidth - padding * 2,
+                  width: math.max(40, availableWidth - padding * 2),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
