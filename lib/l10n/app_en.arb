@@ -314,6 +314,12 @@
   "cardDistribution6": "The 6th card is being dealt.",
   "cardDistribution7": "The final 7th card is being dealt.",
   "goodLuck": "GOOD LUCK!",
+  "cardCount": "{count} cards",
+  "@cardCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "suitSpade": "Spade",
   "suitDiamond": "Diamond",
   "suitHeart": "Heart",

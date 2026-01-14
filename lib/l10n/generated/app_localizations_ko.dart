@@ -913,6 +913,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get goodLuck => 'GOOD LUCK!';
 
   @override
+  String cardCount(int count) {
+    return '$count장';
+  }
+
+  @override
   String get suitSpade => '스페이드';
 
   @override

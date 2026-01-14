@@ -313,6 +313,12 @@
   "cardDistribution6": "正在发第6张牌。",
   "cardDistribution7": "正在发最后第7张牌。",
   "goodLuck": "祝好运！",
+  "cardCount": "{count}张",
+  "@cardCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "suitSpade": "黑桃",
   "suitDiamond": "方块",
   "suitHeart": "红心",

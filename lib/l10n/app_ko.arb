@@ -405,6 +405,12 @@
   "cardDistribution6": "6번째 카드가 배분됩니다.",
   "cardDistribution7": "마지막 7번째 카드가 배분됩니다.",
   "goodLuck": "GOOD LUCK!",
+  "cardCount": "{count}장",
+  "@cardCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "suitSpade": "스페이드",
   "suitDiamond": "다이아몬드",
   "suitHeart": "하트",

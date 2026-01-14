@@ -908,6 +908,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get goodLuck => '祝好运！';
 
   @override
+  String cardCount(int count) {
+    return '$count张';
+  }
+
+  @override
   String get suitSpade => '黑桃';
 
   @override

@@ -916,6 +916,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goodLuck => 'GOOD LUCK!';
 
   @override
+  String cardCount(int count) {
+    return '$count cards';
+  }
+
+  @override
   String get suitSpade => 'Spade';
 
   @override

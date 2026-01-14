@@ -313,6 +313,12 @@
   "cardDistribution6": "6枚目のカードが配られます。",
   "cardDistribution7": "最後の7枚目のカードが配られます。",
   "goodLuck": "グッドラック！",
+  "cardCount": "{count}枚",
+  "@cardCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "suitSpade": "スペード",
   "suitDiamond": "ダイヤ",
   "suitHeart": "ハート",

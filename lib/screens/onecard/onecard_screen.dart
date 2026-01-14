@@ -1176,7 +1176,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
           const SizedBox(height: 4),
           // 카드 수
           Text(
-            '${hand.length}장',
+            AppLocalizations.of(context)!.cardCount(hand.length),
             style: const TextStyle(color: Colors.white, fontSize: 11),
           ),
           const SizedBox(height: 8),
@@ -1257,7 +1257,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '${hand.length}장',
+                      AppLocalizations.of(context)!.cardCount(hand.length),
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -1846,7 +1846,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
                 const Icon(Icons.person, color: Colors.white, size: 16),
                 const SizedBox(width: 4),
                 Text(
-                  '${playerHand.length}장',
+                  AppLocalizations.of(context)!.cardCount(playerHand.length),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 13,

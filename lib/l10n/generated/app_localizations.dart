@@ -1770,6 +1770,12 @@ abstract class AppLocalizations {
   /// **'GOOD LUCK!'**
   String get goodLuck;
 
+  /// No description provided for @cardCount.
+  ///
+  /// In ko, this message translates to:
+  /// **'{count}장'**
+  String cardCount(int count);
+
   /// No description provided for @suitSpade.
   ///
   /// In ko, this message translates to:
