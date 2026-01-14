@@ -255,3 +255,28 @@ String getHiLoBettingActionText(BuildContext context, HiLoBettingAction action, 
       return '';
   }
 }
+
+/// 베팅 액션 이름 반환 (문자열 기반) - AI 추천용
+String getBettingActionNameFromString(BuildContext context, String action) {
+  final l10n = getL10n(context);
+  switch (action) {
+    case 'bing':
+      return l10n.betPing;
+    case 'check':
+      return l10n.betCheck;
+    case 'call':
+      return l10n.betCall;
+    case 'ddadang':
+      return l10n.betDdadang;
+    case 'quarter':
+      return l10n.betQuarter;
+    case 'half':
+      return l10n.betHalf;
+    case 'full':
+      return l10n.betFull;
+    case 'die':
+      return l10n.betDie;
+    default:
+      return action;
+  }
+}

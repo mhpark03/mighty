@@ -278,7 +278,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                       const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
                       const SizedBox(width: 6),
                       Text(
-                        'AI 추천: ${recommendedIndex + 1}번째 카드',
+                        '${l10n.aiRecommendation}: ${l10n.nthCard(recommendedIndex! + 1)}',
                         style: const TextStyle(
                           color: Colors.lightBlueAccent,
                           fontSize: 13,
@@ -307,15 +307,15 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
             ),
           )
         else
-          const Padding(
-            padding: EdgeInsets.all(24),
+          Padding(
+            padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                CircularProgressIndicator(color: Colors.amber),
-                SizedBox(height: 16),
+                const CircularProgressIndicator(color: Colors.amber),
+                const SizedBox(height: 16),
                 Text(
-                  'AI가 카드를 선택하고 있습니다...',
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                  l10n.aiSelectingCard,
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
             ),
@@ -432,7 +432,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                       const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
                       const SizedBox(width: 6),
                       Text(
-                        'AI 추천: ${controller.getRecommendedHiLoChoiceName(recommendedChoice)}',
+                        '${l10n.aiRecommendation}: ${getHiLoChoiceName(context, recommendedChoice!)}',
                         style: const TextStyle(
                           color: Colors.lightBlueAccent,
                           fontSize: 13,
@@ -481,15 +481,15 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
             ),
           )
         else
-          const Padding(
-            padding: EdgeInsets.all(24),
+          Padding(
+            padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                CircularProgressIndicator(color: Colors.amber),
-                SizedBox(height: 16),
+                const CircularProgressIndicator(color: Colors.amber),
+                const SizedBox(height: 16),
                 Text(
-                  'AI가 선택하고 있습니다...',
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                  l10n.aiSelectingCard,
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
             ),
@@ -1873,7 +1873,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                   const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
                   const SizedBox(width: 6),
                   Text(
-                    'AI 추천: ${controller.getRecommendedActionName(recommendedAction)}${recommendedAction.amount > 0 ? ' (${recommendedAction.amount})' : ''}',
+                    '${l10n.aiRecommendation}: ${getBettingActionNameFromString(context, recommendedAction!.action)}${recommendedAction!.amount > 0 ? ' (${recommendedAction!.amount})' : ''}',
                     style: const TextStyle(
                       color: Colors.lightBlueAccent,
                       fontSize: 13,
