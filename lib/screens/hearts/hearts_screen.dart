@@ -1544,32 +1544,17 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                 );
               },
             ),
-          const SizedBox(width: 4),
-          // 새 게임 버튼
-          Builder(
-            builder: (context) {
-              final l10n = AppLocalizations.of(context)!;
-              return TextButton.icon(
-                onPressed: () => _showNewGameDialog(),
-                icon: Icon(
-                  Icons.refresh,
-                  color: Colors.amber,
-                  size: isSmallScreen ? 16 : 18,
-                ),
-                label: Text(
-                  l10n.newGame,
-                  style: TextStyle(
-                    color: Colors.amber,
-                    fontSize: isSmallScreen ? 11 : 13,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 6 : 8),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              );
-            },
+          // 새 게임 버튼 (아이콘만)
+          IconButton(
+            onPressed: () => _showNewGameDialog(),
+            icon: Icon(
+              Icons.refresh,
+              color: Colors.amber,
+              size: isSmallScreen ? 18 : 20,
+            ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            tooltip: AppLocalizations.of(context)!.newGame,
           ),
         ],
       ),
