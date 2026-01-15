@@ -1692,6 +1692,90 @@ class AIPlayer {
     bool defenseWinning = _isDefenseTeamWinning(state, currentWinnerId, player);
     bool isAttackTeam = !isDefenseTeam;
 
+    // === 주공이 프렌드의 낮은 기루다 선공을 받아야 할 때 ===
+    // 프렌드가 낮은 기루다로 선공하면, 주공은 높은 기루다로 받아서 선을 가져가야 함
+    if (player.isDeclarer &&
+        state.friendRevealed &&
+        state.currentTrick!.cards.length == 1 && // 두 번째로 카드를 냄
+        state.giruda != null &&
+        leadSuit == state.giruda) { // 프렌드가 기루다로 선공
+
+      // 선공한 사람이 프렌드인지 확인
+      final leaderId = state.currentTrick!.playerOrder.first;
+      final leader = state.players.firstWhere((p) => p.id == leaderId);
+
+      if (leader.isFriend && !leader.isDeclarer) {
+        // 프렌드가 낮은 기루다로 선공한 경우 (7 이하면 낮은 카드로 간주)
+        if (currentWinningCard != null &&
+            currentWinningCard.rankValue <= 10 && // 10 이하면 주공에게 넘기려는 신호
+            !currentWinningCard.isJoker &&
+            !currentWinningCard.isMighty) {
+
+          // 기루다 카드 중 이길 수 있는 카드 찾기
+          final girudaCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+
+          if (girudaCards.isNotEmpty) {
+            // 프렌드 카드보다 높고, 남은 기루다 중 상대가 이길 수 없는 카드 찾기
+            final playedCards = _getPlayedCards(state);
+
+            // 상대가 낼 수 있는 기루다 중 가장 높은 것 찾기
+            PlayingCard? highestOpponentGiruda;
+            for (int rankVal = 14; rankVal >= 2; rankVal--) {
+              final rank = Rank.values[rankVal - 2];
+              bool inMyHand = player.hand.any((c) =>
+                  c.suit == state.giruda && c.rank == rank);
+              bool alreadyPlayed = playedCards.any((c) =>
+                  c.suit == state.giruda && c.rank == rank);
+              bool inCurrentTrick = state.currentTrick!.cards.any((c) =>
+                  c.suit == state.giruda && c.rank == rank);
+              // 프렌드도 제외 (프렌드가 낸 카드는 이미 알고 있음)
+              if (!inMyHand && !alreadyPlayed && !inCurrentTrick) {
+                highestOpponentGiruda = PlayingCard(suit: state.giruda, rank: rank);
+                break;
+              }
+            }
+
+            // 상대 최고 기루다보다 높은 내 기루다 찾기
+            if (highestOpponentGiruda != null) {
+              final winningGirudas = girudaCards.where((c) =>
+                  c.rankValue > highestOpponentGiruda!.rankValue).toList();
+
+              if (winningGirudas.isNotEmpty) {
+                // 이길 수 있는 기루다 중 가장 낮은 것 선택 (효율적)
+                winningGirudas.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return winningGirudas.first;
+              }
+            }
+
+            // 확실히 이길 수 없어도 프렌드 카드보다 높은 기루다로 시도
+            final higherThanFriend = girudaCards.where((c) =>
+                c.rankValue > currentWinningCard!.rankValue).toList();
+
+            if (higherThanFriend.isNotEmpty) {
+              // 가장 높은 기루다로 최선을 다해 이기려 시도
+              higherThanFriend.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+              return higherThanFriend.first;
+            }
+          }
+
+          // 기루다가 없거나 더 높은 기루다가 없으면 마이티/조커 사용
+          final mighty = playableCards.where((c) => c.isMighty).toList();
+          if (mighty.isNotEmpty) {
+            return mighty.first;
+          }
+
+          bool jokerCalled = state.currentTrick?.jokerCall == JokerCallType.jokerCall;
+          if (!jokerCalled) {
+            final joker = playableCards.where((c) => c.isJoker).toList();
+            if (joker.isNotEmpty) {
+              return joker.first;
+            }
+          }
+        }
+      }
+    }
+
     // === 같은 팀이 이기고 있을 때 낮은 카드 버리기 ===
     // 팀원이 이기고 있으면 높은 카드를 낭비하지 않고 낮은 카드를 버린다
     // ※ 조커/마이티 전략보다 먼저 체크해야 함
