@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../l10n/l10n_helper.dart';
 import '../../services/ad_service.dart';
 import '../../services/seven_card/seven_card_controller.dart';
 import '../../services/seven_card/seven_card_stats_service.dart';
@@ -330,7 +331,7 @@ class _SevenCardHomeScreenState extends State<SevenCardHomeScreen> {
                 if (isHuman) const SizedBox(width: 4),
                 Flexible(
                   child: Text(
-                    playerStats.name,
+                    getPlayerName(context, playerIndex),
                     style: TextStyle(
                       color: isHuman ? Colors.amber : Colors.white,
                       fontSize: nameSize,

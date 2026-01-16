@@ -653,7 +653,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                       const Icon(Icons.emoji_events, color: Colors.amber, size: 32),
                       const SizedBox(width: 8),
                       Text(
-                        winner.name,
+                        getPlayerName(context, winner.id),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 22,
@@ -792,7 +792,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                 const Icon(Icons.person, color: Colors.amber, size: 18),
               if (isHuman) const SizedBox(width: 4),
               Text(
-                player.name,
+                getPlayerName(context, player.id),
                 style: TextStyle(
                   color: isHuman ? Colors.amber : Colors.white,
                   fontSize: 14,
@@ -1070,7 +1070,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
           return Column(
             children: [
               Text(
-                player.name,
+                getPlayerName(context, player.id),
                 style: const TextStyle(color: Colors.white70, fontSize: 10),
               ),
               const SizedBox(height: 2),
@@ -1401,7 +1401,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                opponent.name,
+                getPlayerName(context, opponent.id),
                 style: TextStyle(
                   color: isFolded ? Colors.grey : Colors.white,
                   fontWeight: FontWeight.bold,
@@ -2087,7 +2087,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                       const Icon(Icons.emoji_events, color: Colors.amber, size: 20),
                       const SizedBox(width: 4),
                       Text(
-                        '${bonusInfo.winner.name} +${bonusInfo.totalWinnings}',
+                        '${getPlayerName(context, bonusInfo.winner.id)} +${bonusInfo.totalWinnings}',
                         style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -2110,7 +2110,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${result!.swingPlayer!.name} ${l10n.swingSuccess}!',
+                        '${getPlayerName(context, result!.swingPlayer!.id)} ${l10n.swingSuccess}!',
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -2177,7 +2177,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                                     const SizedBox(width: 2),
                                     Flexible(
                                       child: Text(
-                                        player.name,
+                                        getPlayerName(context, player.id),
                                         style: TextStyle(
                                           fontWeight: (isBonusWinner || isHiWinner || isLoWinner) ? FontWeight.bold : FontWeight.normal,
                                           color: player.isFolded ? Colors.grey : Colors.black,
@@ -2386,7 +2386,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
               if (isWinner)
                 const SizedBox(width: 4),
               Text(
-                player.name,
+                getPlayerName(context, player.id),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -2468,7 +2468,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
       child: Row(
         children: [
           Text(
-            player.name,
+            getPlayerName(context, player.id),
             style: const TextStyle(
               color: Colors.grey,
               fontSize: 13,
@@ -2553,7 +2553,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
         ),
         const SizedBox(width: 8),
         Text(
-          '${winner.name} +$pot',
+          '${getPlayerName(context, winner.id)} +$pot',
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
         const SizedBox(width: 8),

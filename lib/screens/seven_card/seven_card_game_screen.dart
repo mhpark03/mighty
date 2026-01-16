@@ -698,7 +698,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                opponent.name,
+                getPlayerName(context, opponent.id),
                 style: TextStyle(
                   color: isFolded ? Colors.grey : Colors.white,
                   fontWeight: FontWeight.bold,
@@ -1329,7 +1329,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                       const Icon(Icons.emoji_events, color: Colors.amber, size: 48),
                     if (bonusInfo == null) const SizedBox(height: 12),
                     Text(
-                      winner != null ? '${winner.name} ${l10n.wins}!' : l10n.gameEnd,
+                      winner != null ? '${getPlayerName(context, winner.id)} ${l10n.wins}!' : l10n.gameEnd,
                       style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     if (winner?.pokerHand != null && bonusInfo == null) ...[
@@ -1419,7 +1419,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
                                     if (isWinner) const SizedBox(width: 2),
                                     Flexible(
                                       child: Text(
-                                        player.name,
+                                        getPlayerName(context, player.id),
                                         style: TextStyle(
                                           fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
                                           color: player.isFolded ? Colors.grey : Colors.black,
@@ -1653,7 +1653,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
               if (isWinner)
                 const SizedBox(width: 4),
               Text(
-                player.name,
+                getPlayerName(context, player.id),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -1719,7 +1719,7 @@ class _SevenCardGameScreenState extends State<SevenCardGameScreen> with TickerPr
         child: Row(
           children: [
             Text(
-              player.name,
+              getPlayerName(context, player.id),
               style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 13,
