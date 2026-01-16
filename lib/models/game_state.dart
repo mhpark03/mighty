@@ -782,6 +782,8 @@ class GameState {
 
   void endGame() {
     phase = GamePhase.gameEnd;
+    // 마지막 트릭이 tricks에 추가된 후이므로 중복 방지
+    currentTrick = null;
     // 프렌드가 밝혀지지 않은 경우 프렌드 카드를 가진 플레이어 찾기
     _revealFriendIfNeeded();
     calculateScores();

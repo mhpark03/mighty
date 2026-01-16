@@ -657,10 +657,22 @@ class AIPlayer {
     // 최상위 카드가 있는 무늬 (버리기 우선순위 낮춤)
     final topSuits = _getSuitsWithTopCards(hand, state);
 
+    // 마이티 카드 확인 (기루다에 따라 다름)
+    final mightyCard = state.mighty;
+    bool isMightyCard(PlayingCard c) {
+      return c.suit == mightyCard.suit && c.rank == mightyCard.rank;
+    }
+
     hand.sort((a, b) {
       // 1. 조커/마이티는 절대 버리지 않음
-      if (a.isJoker || a.isMighty) return 1;
-      if (b.isJoker || b.isMighty) return -1;
+      if (a.isJoker || isMightyCard(a)) return 1;
+      if (b.isJoker || isMightyCard(b)) return -1;
+
+      // 2. A, K 등 최상위 카드는 버리기 우선순위 낮춤
+      bool aIsTop = a.rank == Rank.ace || a.rank == Rank.king;
+      bool bIsTop = b.rank == Rank.ace || b.rank == Rank.king;
+      if (aIsTop && !bIsTop) return 1;
+      if (!aIsTop && bIsTop) return -1;
 
       // 2. 조커가 있으면 조커콜 카드 우선 버림
       if (hasJoker) {
