@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../widgets/banner_ad_widget.dart';
 import 'home_screen.dart';
@@ -12,8 +13,22 @@ import 'hula/hula_home_screen.dart';
 import 'onecard/onecard_home_screen.dart';
 import 'hearts/hearts_home_screen.dart';
 
-class GameSelectionScreen extends StatelessWidget {
+class GameSelectionScreen extends StatefulWidget {
   const GameSelectionScreen({super.key});
+
+  @override
+  State<GameSelectionScreen> createState() => _GameSelectionScreenState();
+}
+
+class _GameSelectionScreenState extends State<GameSelectionScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // 스플래시 화면 제거 (1초 후)
+    Future.delayed(const Duration(seconds: 1), () {
+      FlutterNativeSplash.remove();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

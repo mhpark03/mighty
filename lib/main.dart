@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'l10n/generated/app_localizations.dart';
@@ -17,7 +18,8 @@ import 'services/ad_service.dart';
 import 'screens/game_selection_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // 전체 화면 모드 설정 (상태바 숨기기)
   SystemChrome.setEnabledSystemUIMode(
@@ -25,11 +27,10 @@ void main() {
     overlays: [],
   );
 
-  // AdMob 초기화
-  MobileAds.instance.initialize();
-
-  // 보상형 광고 미리 로드
-  AdService().loadRewardedAd();
+  // AdMob 초기화 (비동기로 진행하여 스플래시 화면 먼저 표시)
+  MobileAds.instance.initialize().then((_) {
+    AdService().loadRewardedAd();
+  });
 
   runApp(const MightyApp());
 }
