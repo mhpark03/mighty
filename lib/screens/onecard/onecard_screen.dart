@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../services/game_save_service.dart';
 import '../../services/ad_service.dart';
+import '../../services/onecard/onecard_stats_service.dart';
 
 // 카드 무늬
 enum Suit { spade, heart, diamond, club }
@@ -193,6 +195,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
   bool gameOver = false;
   String? winner;
   int? winnerIndex; // 승자 인덱스 (0 = 플레이어, 1+ = 컴퓨터)
+  bool _statsRecorded = false; // 통계 기록 여부
 
   // 공격 스택
   int attackStack = 0;
@@ -417,6 +420,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     gameOver = false;
     winner = null;
     winnerIndex = null;
+    _statsRecorded = false;
     attackStack = 0;
     declaredSuit = null;
     skipNextTurn = false;
@@ -431,6 +435,18 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     gameMessage = null;
     _messageTimeLeft = 0;
     selectedCardIndex = null;
+  }
+
+  // 게임 결과 통계 기록
+  void _recordGameStats() {
+    if (_statsRecorded || winnerIndex == null) return;
+    _statsRecorded = true;
+
+    final statsService = Provider.of<OneCardStatsService>(context, listen: false);
+    statsService.recordGameResult(
+      winnerId: winnerIndex!,
+      playerCount: playerCount,
+    );
   }
 
   // 게임 상태 저장
@@ -718,6 +734,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         gameOver = true;
         winner = l10n.player;
         winnerIndex = 0;
+        _recordGameStats();
         return;
       }
       final aiNames = _getAiNames(context);
@@ -726,6 +743,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
           gameOver = true;
           winner = aiNames[i];
           winnerIndex = i + 1;
+          _recordGameStats();
           return;
         }
       }
@@ -862,6 +880,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
       if (playerHand.length >= bankruptcyLimit) {
         gameOver = true;
         winner = _getBankruptcyWinner();
+        _recordGameStats();
         pendingMessage = l10n.bankruptWithCards(playerHand.length);
         return;
       }
@@ -939,6 +958,7 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         if (computerHand.length >= bankruptcyLimit) {
           gameOver = true;
           winner = _getBankruptcyWinner();
+          _recordGameStats();
           pendingMessage = '$computerName ${l10n.bankruptWithCards(computerHand.length)}';
           return;
         }
