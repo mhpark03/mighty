@@ -904,29 +904,30 @@ class AIPlayer {
         // 기루다 A + K 필수
         if (!hasGirudaAce || !hasGirudaKing) return false;
 
-        // 마이티 무늬 카드가 있는지 확인 (프렌드에게 선을 넘기기 위해 필요)
+        // 마이티 무늬 카드가 있는지 확인
+        // 주공이 마이티 무늬로 선공하면 프렌드가 마이티만 있을 때 강제로 마이티를 내야 함
+        // 이미 이기는 카드(차상위)에 마이티를 낭비하는 상황 발생
+        // 따라서 마이티 무늬 카드가 없어야 풀이 안전함
         final mightySuit = state.mighty.suit;
         bool hasMightySuitCard = hand.any((c) =>
             !c.isJoker && !c.isMighty && c.suit == mightySuit);
 
         if (hasMightySuitCard) {
-          // 마이티 무늬 카드가 있으면 프렌드에게 선을 넘길 수 있음
-          int leadKeepingCards = 3; // 조커 + 기루다 A + K (마이티는 프렌드가 보유)
-          if (hasGirudaQueen) leadKeepingCards++;
-          if (hasGirudaJack) leadKeepingCards++;
-          if (hasGirudaTen) leadKeepingCards++;
-          leadKeepingCards += nonGirudaAceCount;
-
-          // 마이티 프렌드 풀: 선공 유지 7장 이상 + 기루다 6장 이상 (1트릭은 프렌드)
-          if (leadKeepingCards >= 7 && girudaCount >= 6) return true;
-          // 또는: 선공 유지 6장 이상 + 기루다 5장 이상 + 비기루다 A 2장 이상
-          if (leadKeepingCards >= 6 && girudaCount >= 5 && nonGirudaAceCount >= 2) return true;
-        } else {
-          // 마이티 무늬 카드가 없으면 프렌드에게 선을 넘길 수 없음
-          // 노프렌드와 같은 효과: 내가 마이티도 없으므로 상대가 마이티로 이길 수 있음
-          // 이 경우 풀 불가 (상대가 마이티로 1트릭 가져감)
+          // 마이티 무늬 카드가 있으면 프렌드가 마이티를 낭비할 위험
           return false;
         }
+
+        // 마이티 무늬 카드가 없으면 안전하게 풀 가능
+        int leadKeepingCards = 3; // 조커 + 기루다 A + K (마이티는 프렌드가 보유)
+        if (hasGirudaQueen) leadKeepingCards++;
+        if (hasGirudaJack) leadKeepingCards++;
+        if (hasGirudaTen) leadKeepingCards++;
+        leadKeepingCards += nonGirudaAceCount;
+
+        // 마이티 프렌드 풀: 선공 유지 7장 이상 + 기루다 6장 이상 (1트릭은 프렌드)
+        if (leadKeepingCards >= 7 && girudaCount >= 6) return true;
+        // 또는: 선공 유지 6장 이상 + 기루다 5장 이상 + 비기루다 A 2장 이상
+        if (leadKeepingCards >= 6 && girudaCount >= 5 && nonGirudaAceCount >= 2) return true;
       }
 
       // === 조커 프렌드: 프렌드가 조커로 1트릭, 내가 마이티로 탈환 후 나머지 승리 ===
