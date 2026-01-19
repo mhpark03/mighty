@@ -1095,6 +1095,23 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         return cantWin.first;
       }
 
+      // ★ 스페이드 Q가 아직 안 나왔을 때 A/K 피하기
+      // 스페이드 리드 시 A/K를 내면 Q를 가진 플레이어가 Q를 버릴 수 있음
+      // 단, 내가 Q를 갖고 있으면 A/K를 내도 안전함
+      if (leadSuit == Suit.spade) {
+        final queenOfSpadesPlayed = playedCards.any((c) => c.isQueenOfSpades);
+        final iHaveQueen = sameSuitCards.any((c) => c.isQueenOfSpades);
+        if (!queenOfSpadesPlayed && !iHaveQueen) {
+          // Q가 아직 안 나왔고 내가 Q가 없으면 A/K(rank >= 13) 피하기
+          final safeSpades = sameSuitCards.where((c) => c.rank < 13).toList();
+          if (safeSpades.isNotEmpty) {
+            safeSpades.sort((a, b) => a.rank.compareTo(b.rank));
+            return safeSpades.first;
+          }
+          // A/K만 있으면 가장 낮은 카드 (어쩔 수 없음)
+        }
+      }
+
       // 낮은 카드로 안전하게 (Q 제외)
       final withoutQueen = sameSuitCards.where((c) => !c.isQueenOfSpades).toList();
       if (withoutQueen.isNotEmpty) {
