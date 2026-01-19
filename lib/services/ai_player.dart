@@ -2119,6 +2119,37 @@ class AIPlayer {
                 girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
                 return girudaCards.first;
               }
+            } else {
+              // 기루다 컷 가능성이 있지만 리드 무늬 카드가 다 나간 경우
+              // 팀원이 이기고 있으므로 낮은 카드 버리기 (간 방지)
+              final suitCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit == leadSuit).toList();
+              if (suitCards.isNotEmpty) {
+                suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                final nonPointCards = suitCards.where((c) => !c.isPointCard).toList();
+                if (nonPointCards.isNotEmpty) {
+                  return nonPointCards.first;
+                }
+                return suitCards.first;
+              }
+              // 리드 무늬가 없으면 비기루다 중 낮은 카드
+              final nonGirudaCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+              if (nonGirudaCards.isNotEmpty) {
+                nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
+                if (nonPointCards.isNotEmpty) {
+                  return nonPointCards.first;
+                }
+                return nonGirudaCards.first;
+              }
+              // 기루다만 있으면 낮은 기루다
+              final girudaCards2 = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+              if (girudaCards2.isNotEmpty) {
+                girudaCards2.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return girudaCards2.first;
+              }
             }
           }
         }

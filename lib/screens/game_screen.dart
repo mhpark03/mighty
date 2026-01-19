@@ -1424,17 +1424,18 @@ class _GameScreenState extends State<GameScreen> {
     String friendValue;
     Color valueColor = Colors.white;
 
-    if (state.friendRevealed && state.friend != null) {
+    // 노프렌드 체크를 먼저 해야 함 (노프렌드 시에도 friendRevealed=true가 됨)
+    if (state.friendDeclaration != null && state.friendDeclaration!.isNoFriend) {
+      friendValue = l10n.friendNone;
+      valueColor = Colors.grey;
+    } else if (state.friendRevealed && state.friend != null) {
       // 프렌드가 공개됨
       friendValue = _getLocalizedPlayerName(state.friend!, l10n);
       valueColor = Colors.lightBlueAccent;
     } else if (state.friendDeclaration != null) {
       // 프렌드 선언 조건 표시
       final decl = state.friendDeclaration!;
-      if (decl.isNoFriend) {
-        friendValue = l10n.friendNone;
-        valueColor = Colors.grey;
-      } else if (decl.isFirstTrickWinner) {
+      if (decl.isFirstTrickWinner) {
         friendValue = l10n.firstTrick;
         valueColor = Colors.amber;
       } else if (decl.trickNumber != null) {
