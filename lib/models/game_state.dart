@@ -544,6 +544,17 @@ class GameState {
     phase = GamePhase.declaringFriend;
   }
 
+  /// 풀(20) 선언 - 공약을 20으로 올림
+  void declareFull() {
+    if (currentBid != null) {
+      currentBid = Bid(
+        playerId: currentBid!.playerId,
+        suit: currentBid!.suit,
+        tricks: 20,
+      );
+    }
+  }
+
   void declareFriend(FriendDeclaration declaration) {
     friendDeclaration = declaration;
 

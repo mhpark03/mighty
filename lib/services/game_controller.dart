@@ -241,6 +241,12 @@ class GameController extends ChangeNotifier {
 
     final declarer = _state.players[_state.declarerId!];
     final declaration = _aiPlayer.declareFriend(declarer, _state);
+
+    // 풀(20) 선언 여부 검토 (노프렌드, 마이티 프렌드, 조커 프렌드)
+    if (_aiPlayer.shouldDeclareFull(declarer, _state, declaration)) {
+      _state.declareFull();
+    }
+
     _state.declareFriend(declaration);
 
     _isProcessing = false;

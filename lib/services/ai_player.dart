@@ -829,6 +829,130 @@ class AIPlayer {
     return (state.mighty.rank == Rank.ace) ? 3 : 4;
   }
 
+  /// AI가 풀(20) 선언 여부를 결정
+  /// 주공 팀(주공 + 프렌드)이 모든 트릭을 이길 확률이 높을 때 풀 선언
+  /// [declaration] 프렌드 선언 정보 (노프렌드, 마이티 프렌드, 조커 프렌드 등)
+  bool shouldDeclareFull(Player player, GameState state, FriendDeclaration declaration) {
+    final hand = player.hand;
+
+    bool hasMighty = _handContainsMighty(hand, state.mighty);
+    bool hasJoker = _handContainsJoker(hand);
+
+    // 기루다 A 보유 확인
+    bool hasGirudaAce = false;
+    if (state.giruda != null) {
+      if (!(state.mighty.suit == state.giruda && state.mighty.rank == Rank.ace)) {
+        hasGirudaAce = _handContainsCard(hand, state.giruda, Rank.ace);
+      }
+    }
+
+    // 기루다 K 보유 확인
+    bool hasGirudaKing = false;
+    if (state.giruda != null) {
+      hasGirudaKing = _handContainsCard(hand, state.giruda, Rank.king);
+    }
+
+    // 비기루다 A 개수
+    int nonGirudaAceCount = 0;
+    for (final suit in Suit.values) {
+      if (suit == state.giruda) continue;
+      if (!(state.mighty.suit == suit && state.mighty.rank == Rank.ace)) {
+        if (_handContainsCard(hand, suit, Rank.ace)) {
+          nonGirudaAceCount++;
+        }
+      }
+    }
+
+    // 기루다 장수 확인
+    int girudaCount = 0;
+    if (state.giruda != null) {
+      girudaCount = hand.where((c) => !c.isJoker && c.suit == state.giruda).length;
+    }
+
+    // 기루다 Q, J, 10 보유 확인
+    bool hasGirudaQueen = state.giruda != null && _handContainsCard(hand, state.giruda, Rank.queen);
+    bool hasGirudaJack = state.giruda != null && _handContainsCard(hand, state.giruda, Rank.jack);
+    bool hasGirudaTen = state.giruda != null && _handContainsCard(hand, state.giruda, Rank.ten);
+
+    // === 케이스별 풀 선언 검토 ===
+
+    if (declaration.isNoFriend) {
+      // === 노프렌드: 내가 모든 트릭 승리 ===
+      // 마이티 + 조커 필수
+      if (!hasMighty || !hasJoker) return false;
+      // 기루다 A + K 필수
+      if (!hasGirudaAce || !hasGirudaKing) return false;
+
+      int leadKeepingCards = 4; // 마이티 + 조커 + 기루다 A + K
+      if (hasGirudaQueen) leadKeepingCards++;
+      if (hasGirudaJack) leadKeepingCards++;
+      if (hasGirudaTen) leadKeepingCards++;
+      leadKeepingCards += nonGirudaAceCount;
+
+      // 노프렌드 풀: 선공 유지 8장 이상 + 기루다 6장 이상
+      if (leadKeepingCards >= 8 && girudaCount >= 6) return true;
+      // 또는: 선공 유지 7장 이상 + 기루다 5장 이상 + 비기루다 A 2장 이상
+      if (leadKeepingCards >= 7 && girudaCount >= 5 && nonGirudaAceCount >= 2) return true;
+
+    } else if (declaration.card != null) {
+      final friendCard = declaration.card!;
+
+      // === 마이티 프렌드: 프렌드가 마이티로 1트릭, 내가 조커로 탈환 후 나머지 승리 ===
+      if (friendCard.isMighty) {
+        // 내가 조커 필수 (탈환용)
+        if (!hasJoker) return false;
+        // 기루다 A + K 필수
+        if (!hasGirudaAce || !hasGirudaKing) return false;
+
+        // 마이티 무늬 카드가 있는지 확인 (프렌드에게 선을 넘기기 위해 필요)
+        final mightySuit = state.mighty.suit;
+        bool hasMightySuitCard = hand.any((c) =>
+            !c.isJoker && !c.isMighty && c.suit == mightySuit);
+
+        if (hasMightySuitCard) {
+          // 마이티 무늬 카드가 있으면 프렌드에게 선을 넘길 수 있음
+          int leadKeepingCards = 3; // 조커 + 기루다 A + K (마이티는 프렌드가 보유)
+          if (hasGirudaQueen) leadKeepingCards++;
+          if (hasGirudaJack) leadKeepingCards++;
+          if (hasGirudaTen) leadKeepingCards++;
+          leadKeepingCards += nonGirudaAceCount;
+
+          // 마이티 프렌드 풀: 선공 유지 7장 이상 + 기루다 6장 이상 (1트릭은 프렌드)
+          if (leadKeepingCards >= 7 && girudaCount >= 6) return true;
+          // 또는: 선공 유지 6장 이상 + 기루다 5장 이상 + 비기루다 A 2장 이상
+          if (leadKeepingCards >= 6 && girudaCount >= 5 && nonGirudaAceCount >= 2) return true;
+        } else {
+          // 마이티 무늬 카드가 없으면 프렌드에게 선을 넘길 수 없음
+          // 노프렌드와 같은 효과: 내가 마이티도 없으므로 상대가 마이티로 이길 수 있음
+          // 이 경우 풀 불가 (상대가 마이티로 1트릭 가져감)
+          return false;
+        }
+      }
+
+      // === 조커 프렌드: 프렌드가 조커로 1트릭, 내가 마이티로 탈환 후 나머지 승리 ===
+      if (friendCard.isJoker) {
+        // 내가 마이티 필수 (탈환용)
+        if (!hasMighty) return false;
+        // 기루다 A + K 필수
+        if (!hasGirudaAce || !hasGirudaKing) return false;
+
+        // 조커 프렌드는 어떤 무늬로든 선을 넘길 수 있음 (조커는 무늬 제한 없음)
+        int leadKeepingCards = 3; // 마이티 + 기루다 A + K (조커는 프렌드가 보유)
+        if (hasGirudaQueen) leadKeepingCards++;
+        if (hasGirudaJack) leadKeepingCards++;
+        if (hasGirudaTen) leadKeepingCards++;
+        leadKeepingCards += nonGirudaAceCount;
+
+        // 조커 프렌드 풀: 선공 유지 7장 이상 + 기루다 6장 이상 (1트릭은 프렌드)
+        if (leadKeepingCards >= 7 && girudaCount >= 6) return true;
+        // 또는: 선공 유지 6장 이상 + 기루다 5장 이상 + 비기루다 A 2장 이상
+        if (leadKeepingCards >= 6 && girudaCount >= 5 && nonGirudaAceCount >= 2) return true;
+      }
+    }
+
+    return false;
+  }
+
   FriendDeclaration declareFriend(Player player, GameState state) {
     final hand = player.hand;
 
