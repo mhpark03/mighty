@@ -1648,6 +1648,42 @@ class AIPlayer {
 
     // === 주공팀 또는 노기루다 선공 전략 ===
 
+    // === 주공이 조커 사용 전 프렌드에게 선 넘기기 ===
+    // 프렌드가 특정 카드로 선언되었고, 내가 그 무늬를 가지고 있으면
+    // 조커 사용 전에 그 무늬로 선공하여 프렌드에게 선을 넘김
+    if (player.isDeclarer && state.friendDeclaration?.card != null) {
+      final friendCard = state.friendDeclaration!.card!;
+
+      // 조커를 가지고 있는지 확인
+      bool hasJoker = playableCards.any((c) => c.isJoker);
+
+      if (hasJoker) {
+        Suit? friendSuit;
+
+        // 1. 마이티 프렌드인 경우 - 마이티 무늬로 선공
+        if (friendCard.isMighty) {
+          friendSuit = state.mighty.suit;
+        }
+        // 2. 일반 카드 프렌드인 경우 (조커 제외) - 해당 무늬로 선공
+        else if (!friendCard.isJoker && friendCard.suit != null) {
+          friendSuit = friendCard.suit;
+        }
+
+        if (friendSuit != null) {
+          // 프렌드 무늬 카드가 있는지 확인 (프렌드 카드 자체 제외, 마이티/조커 제외)
+          final friendSuitCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMighty &&
+              c.suit == friendSuit).toList();
+
+          if (friendSuitCards.isNotEmpty) {
+            // 프렌드 무늬의 낮은 카드로 선공하여 프렌드에게 선 넘기기
+            friendSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return friendSuitCards.first;
+          }
+        }
+      }
+    }
+
     // === 초반에 조커로 기루다 콜하여 상대 기루다 정리 ===
     // 초반(트릭 2-5)에 기루다가 적게 나왔고 상대 기루다가 많으면 조커로 기루다 콜
     if (state.giruda != null && state.currentTrickNumber >= 2 && state.currentTrickNumber <= 5) {
