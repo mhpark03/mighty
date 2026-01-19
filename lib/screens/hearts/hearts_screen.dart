@@ -901,6 +901,10 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
         List<PlayingCard> sureWins = [];
         List<PlayingCard> flushCards = [];
 
+        // ★ 스페이드 Q 상태 확인 (선공 시 A/K 회피용)
+        final queenOfSpadesPlayedForLead = playedCards.any((c) => c.isQueenOfSpades);
+        final iHaveQueenForLead = playable.any((c) => c.isQueenOfSpades);
+
         for (final suit in Suit.values) {
           if (suit == Suit.heart) continue;
 
@@ -912,9 +916,18 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
           final remainingHigher = _countRemainingHigherCards(highestInSuit, playerIndex);
 
           // ★ 스페이드 Q는 sureWins에서 제외 (가장 나중에 따야 함)
-          if (remainingHigher == 0 && !highestInSuit.isQueenOfSpades) {
+          // ★ 스페이드 A/K도 Q가 안 나왔고 내가 Q 없으면 제외 (Q 덤핑 위험)
+          bool isUnsafeSpade = false;
+          if (suit == Suit.spade && !queenOfSpadesPlayedForLead && !iHaveQueenForLead) {
+            // Q가 안 나왔고 내가 Q 없으면 A/K는 위험
+            if (highestInSuit.rank >= 13) { // K(13) 이상 = K, A
+              isUnsafeSpade = true;
+            }
+          }
+
+          if (remainingHigher == 0 && !highestInSuit.isQueenOfSpades && !isUnsafeSpade) {
             sureWins.add(highestInSuit);
-          } else if (remainingHigher == 1 && suitCards.length >= 2 && !highestInSuit.isQueenOfSpades) {
+          } else if (remainingHigher == 1 && suitCards.length >= 2 && !highestInSuit.isQueenOfSpades && !isUnsafeSpade) {
             // K로 A 유도 가능
             final secondHighest = suitCards[1];
             final remainingAfterFlush = _countRemainingHigherCards(secondHighest, playerIndex) - 1;
@@ -932,10 +945,12 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
 
         // A 유도 카드가 있으면 사용
         if (flushCards.isNotEmpty) {
-          // 스페이드 우선 (♠Q 보호를 위해 ♠K로 ♠A 유도)
-          final spadeFlush = flushCards.where((c) => c.suit == Suit.spade).toList();
-          if (spadeFlush.isNotEmpty) {
-            return spadeFlush.first;
+          // ★ 스페이드 K로 A 유도는 내가 Q를 가지고 있을 때만 (Q 보호용)
+          if (iHaveQueenForLead) {
+            final spadeFlush = flushCards.where((c) => c.suit == Suit.spade).toList();
+            if (spadeFlush.isNotEmpty) {
+              return spadeFlush.first;
+            }
           }
           // 그 외 클럽/다이아
           flushCards.sort((a, b) => b.rank.compareTo(a.rank));
