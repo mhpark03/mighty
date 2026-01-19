@@ -442,11 +442,16 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
     if (_statsRecorded || winnerIndex == null) return;
     _statsRecorded = true;
 
-    final statsService = Provider.of<OneCardStatsService>(context, listen: false);
-    statsService.recordGameResult(
-      winnerId: winnerIndex!,
-      playerCount: playerCount,
-    );
+    try {
+      final statsService = Provider.of<OneCardStatsService>(context, listen: false);
+      statsService.recordGameResult(
+        winnerId: winnerIndex!,
+        playerCount: playerCount,
+      );
+    } catch (e) {
+      // Provider가 없는 경우 무시 (통계는 기록되지 않지만 게임은 계속)
+      debugPrint('Failed to record game stats: $e');
+    }
   }
 
   // 게임 상태 저장
@@ -1093,6 +1098,15 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
       _initGame();
     });
     HapticFeedback.mediumImpact();
+
+    // 컴퓨터 턴인 경우 컴퓨터가 진행 (이전 게임 승자가 AI인 경우)
+    if (currentTurn > 0 && !gameOver) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted && !gameOver && currentTurn > 0) {
+          _computerTurn(currentTurn);
+        }
+      });
+    }
   }
 
   @override
