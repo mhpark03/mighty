@@ -1429,6 +1429,17 @@ class AIPlayer {
   PlayingCard _selectLeadCard(
       List<PlayingCard> playableCards, Player player, GameState state) {
 
+    // ★ 마이티는 선공에서 아끼기 (선공 탈환용으로 보존)
+    // 초반~중반(트릭 7 이전)에는 마이티를 선공 카드로 사용하지 않음
+    // 마이티는 선공을 빼앗겼을 때 되찾기 위해 사용해야 함
+    if (state.currentTrickNumber < 7) {
+      final nonMightyCards = playableCards.where((c) => !c.isMighty).toList();
+      if (nonMightyCards.isNotEmpty) {
+        // 마이티 제외한 카드들로 선공 카드 선택 진행
+        playableCards = nonMightyCards;
+      }
+    }
+
     // 방어팀인지 확인
     bool isDefenseTeam = _isPlayerOnDefenseTeam(player, state);
 
