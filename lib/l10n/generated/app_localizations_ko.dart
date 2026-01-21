@@ -1430,6 +1430,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get emptyDiscardPile => '버린 카드\n없음';
+
+  @override
   String get meldButton => '등록';
 
   @override

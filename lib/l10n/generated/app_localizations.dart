@@ -2652,6 +2652,12 @@ abstract class AppLocalizations {
   /// **'힌트 {status}'**
   String hintOnOff(String status);
 
+  /// No description provided for @emptyDiscardPile.
+  ///
+  /// In ko, this message translates to:
+  /// **'버린 카드\n없음'**
+  String get emptyDiscardPile;
+
   /// No description provided for @meldButton.
   ///
   /// In ko, this message translates to:

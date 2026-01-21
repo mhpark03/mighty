@@ -1439,6 +1439,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get emptyDiscardPile => 'No\nDiscards';
+
+  @override
   String get meldButton => 'Meld';
 
   @override

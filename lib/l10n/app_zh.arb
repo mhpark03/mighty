@@ -565,6 +565,7 @@
   "hulaWithPlayers": "胡拉 ({count}人)",
   "hintOnOff": "提示 {status}",
   "discardedCards": "弃牌",
+  "emptyDiscardPile": "无\n弃牌",
   "meldButton": "组合",
   "discardButton": "弃牌",
   "stopButton": "停止",

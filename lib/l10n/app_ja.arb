@@ -565,6 +565,7 @@
   "hulaWithPlayers": "フラ ({count}人)",
   "hintOnOff": "ヒント {status}",
   "discardedCards": "捨て札",
+  "emptyDiscardPile": "捨て札\nなし",
   "meldButton": "登録",
   "discardButton": "捨てる",
   "stopButton": "ストップ",

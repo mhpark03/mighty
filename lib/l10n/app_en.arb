@@ -566,6 +566,7 @@
   "hulaWithPlayers": "Hula ({count}P)",
   "hintOnOff": "Hint {status}",
   "discardedCards": "Discarded cards",
+  "emptyDiscardPile": "No\nDiscards",
   "meldButton": "Meld",
   "discardButton": "Discard",
   "stopButton": "Stop",

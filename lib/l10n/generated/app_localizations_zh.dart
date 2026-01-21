@@ -1415,6 +1415,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get emptyDiscardPile => '无\n弃牌';
+
+  @override
   String get meldButton => '组合';
 
   @override

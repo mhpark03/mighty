@@ -1424,6 +1424,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get emptyDiscardPile => '捨て札\nなし';
+
+  @override
   String get meldButton => '登録';
 
   @override
