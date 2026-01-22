@@ -221,10 +221,24 @@ class AIPlayer {
     // 1. 먼저 최적의 기루다를 선택
     Suit? bestSuit = findBestSuit(hand);
 
-    // 2. 선택된 기루다를 기준으로 핸드 강도 계산
+    // 2. 기루다가 없거나, 기루다에 A/K가 없으면 패스
+    if (bestSuit == null) {
+      return Bid.pass(player.id);
+    }
+
+    final girudaCards = hand.where((c) => !c.isJoker && c.suit == bestSuit).toList();
+    bool hasGirudaAce = girudaCards.any((c) => c.rank == Rank.ace);
+    bool hasGirudaKing = girudaCards.any((c) => c.rank == Rank.king);
+
+    // 기루다 A 또는 K 필수
+    if (!hasGirudaAce && !hasGirudaKing) {
+      return Bid.pass(player.id);
+    }
+
+    // 3. 선택된 기루다를 기준으로 핸드 강도 계산
     int strength = evaluateHandStrength(hand, bestSuit);
 
-    // 3. 배팅 결정 - 순서대로 1씩 증가하며 배팅
+    // 4. 배팅 결정 - 순서대로 1씩 증가하며 배팅
     int bidAmount;
     if (state.currentBid == null) {
       // 첫 배팅은 13부터 시작
@@ -395,6 +409,12 @@ class AIPlayer {
       bool hasKing = suitCards.any((c) => c.rank == Rank.king);
       bool hasQueen = suitCards.any((c) => c.rank == Rank.queen);
       bool hasJack = suitCards.any((c) => c.rank == Rank.jack);
+
+      // 기루다 A 또는 K 필수 - 없으면 후보에서 제외
+      if (!hasAce && !hasKing) {
+        suitStrength[suit] = 0;
+        continue;
+      }
 
       // 고위 카드에 높은 가중치
       if (hasAce) strength += 10;

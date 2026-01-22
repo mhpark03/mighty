@@ -1407,9 +1407,7 @@ class _GameScreenState extends State<GameScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildInfoItem(l10n.giruda, state.giruda != null
-              ? '${_getSuitSymbol(state.giruda!)} ($playedGirudaCount/13)'
-              : l10n.noGiruda),
+          _buildGirudaInfo(l10n, state.giruda, playedGirudaCount),
           _buildInfoItem(l10n.contract, '${state.currentBid?.tricks ?? 0} ($attackTeamPoints)'),
           _buildInfoItem(l10n.trick, '${state.tricksPlayed}/10'),
           // 프렌드 선언 정보 표시
@@ -1451,16 +1449,80 @@ class _GameScreenState extends State<GameScreen> {
       friendValue = '?';
     }
 
+    // 프렌드 카드인 경우 무늬 색상 적용
+    final decl = state.friendDeclaration;
+    final bool hasFriendCard = decl != null && decl.card != null && !state.friendRevealed;
+
     return Column(
       children: [
         Text(
           friendLabel,
           style: const TextStyle(color: Colors.white70, fontSize: 12),
         ),
+        hasFriendCard
+            ? _buildColoredCardText(decl.card!)
+            : Text(
+                friendValue,
+                style: TextStyle(
+                  color: valueColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+      ],
+    );
+  }
+
+  // 무늬 색상이 적용된 카드 텍스트 위젯
+  Widget _buildColoredCardText(PlayingCard card) {
+    if (card.isJoker) {
+      return const Text(
+        'Joker',
+        style: TextStyle(
+          color: Colors.purple,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    final suit = card.suit!;
+    String rank;
+    switch (card.rank) {
+      case Rank.ace:
+        rank = 'A';
+        break;
+      case Rank.king:
+        rank = 'K';
+        break;
+      case Rank.queen:
+        rank = 'Q';
+        break;
+      case Rank.jack:
+        rank = 'J';
+        break;
+      case Rank.ten:
+        rank = '10';
+        break;
+      default:
+        rank = '${card.rankValue}';
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
         Text(
-          friendValue,
+          _getSuitSymbol(suit),
           style: TextStyle(
-            color: valueColor,
+            color: _getSuitColor(suit),
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          rank,
+          style: const TextStyle(
+            color: Colors.amber,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
@@ -1508,6 +1570,20 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  // 무늬별 색상 반환 (검은 무늬 구분을 위해)
+  Color _getSuitColor(Suit suit) {
+    switch (suit) {
+      case Suit.heart:
+        return Colors.red;
+      case Suit.diamond:
+        return Colors.red[300]!; // 연한 빨강
+      case Suit.spade:
+        return Colors.white;
+      case Suit.club:
+        return Colors.lightGreenAccent; // 클로버는 녹색 계열로 구분
+    }
+  }
+
   String _getSuitName(Suit? suit, AppLocalizations l10n) {
     if (suit == null) return l10n.noGiruda;
     switch (suit) {
@@ -1537,6 +1613,48 @@ class _GameScreenState extends State<GameScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+      ],
+    );
+  }
+
+  // 기루다 정보 표시 (무늬별 색상 적용)
+  Widget _buildGirudaInfo(AppLocalizations l10n, Suit? giruda, int playedCount) {
+    return Column(
+      children: [
+        Text(
+          l10n.giruda,
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
+        ),
+        giruda != null
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _getSuitSymbol(giruda),
+                    style: TextStyle(
+                      color: _getSuitColor(giruda),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    ' ($playedCount/13)',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              )
+            : Text(
+                l10n.noGiruda,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ],
     );
   }
