@@ -281,6 +281,12 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   static const int _computerActionDelay = 2000; // 컴퓨터 액션 딜레이 (밀리초)
   VoidCallback? _pendingComputerAction; // 대기 후 실행할 컴퓨터 동작
 
+  // 땡큐 대기
+  bool _thankYouWaiting = false; // 플레이어 땡큐 대기 중
+  int _thankYouCountdown = 0; // 땡큐 대기 카운트다운
+  Timer? _thankYouTimer; // 땡큐 대기 타이머
+  static const int _thankYouWaitSeconds = 5; // 땡큐 대기 시간 (초)
+
   // 점수
   List<int> scores = [];      // 손패 점수 (남은 카드 합)
   List<int> roundScores = []; // 라운드 점수 (승자와의 차이)
@@ -317,6 +323,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     _messageTimer?.cancel();
     _nextTurnTimer?.cancel();
     _computerActionTimer?.cancel();
+    _thankYouTimer?.cancel();
     _animController.dispose();
     super.dispose();
   }
@@ -407,6 +414,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     _cancelNextTurnTimer();
     _messageTimer?.cancel();
     _computerActionTimer?.cancel();
+    _thankYouTimer?.cancel();
+    _thankYouWaiting = false;
+    _thankYouCountdown = 0;
 
     // 이전 게임 승자 저장 (새 게임 시작 플레이어로 사용)
     final previousWinner = winnerIndex;
@@ -793,10 +803,19 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
     // 플레이어 턴이거나, 대기 중일 때 (땡큐)
     if (currentTurn == 0 && hasDrawn) return;
-    if (currentTurn != 0 && !waitingForNextTurn) return;
+    if (currentTurn != 0 && !waitingForNextTurn && !_thankYouWaiting) return;
 
     // 땡큐 가능 여부 확인 (등록 가능한 경우에만)
     if (!_canThankYou()) return;
+
+    // 땡큐 대기 중이면 타이머 취소
+    if (_thankYouWaiting) {
+      _thankYouTimer?.cancel();
+      setState(() {
+        _thankYouWaiting = false;
+        _thankYouCountdown = 0;
+      });
+    }
 
     // 모든 가능한 옵션 찾기
     final options = _findAllThankYouOptions();
@@ -812,6 +831,10 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 땡큐 옵션 선택 다이얼로그 표시
   void _showThankYouOptionsDialog(List<ThankYouOption> options) {
+    // ★ 다이얼로그가 열려있는 동안 타이머로 인한 상태 변경 방지
+    _cancelNextTurnTimer();
+    _thankYouTimer?.cancel();
+
     final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
@@ -857,7 +880,16 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              // ★ 취소 시 대기 상태였다면 타이머 재시작
+              if (waitingForNextTurn) {
+                _startNextTurnTimer();
+              } else if (currentTurn != 0) {
+                // 땡큐 대기에서 취소하면 다음 턴 진행
+                _endThankYouWait();
+              }
+            },
             child: Text(l10n.cancel),
           ),
         ],
@@ -898,7 +930,15 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       });
     }
 
-    final card = discardPile.removeLast();
+    // ★ option.discardCard를 사용하여 정확한 카드 제거 (타이머로 인한 상태 변경 방지)
+    final card = option.discardCard;
+    // discardPile에서 해당 카드가 마지막에 있는지 확인 후 제거
+    if (discardPile.isNotEmpty && discardPile.last == card) {
+      discardPile.removeLast();
+    } else {
+      // 카드가 없거나 다른 카드면 무시 (이미 다른 처리로 제거됨)
+      return;
+    }
     String meldMessage = '';
 
     switch (option.type) {
@@ -1175,16 +1215,24 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 땡큐 가능 여부 확인 (버린 카드를 가져와서 바로 등록 가능한지)
   // 주의: 새로운 멜드 등록이 가능할 때만 가져올 수 있음 (붙이기만 가능하면 안됨)
+  // ★ 7 단독 땡큐 제거 - 3장 이상의 멜드로만 등록 가능
   bool _canThankYou() {
     if (discardPile.isEmpty) return false;
     final card = discardPile.last;
 
-    // 1. 7이면 단독 등록 가능
-    if (_isSeven(card)) return true;
-
-    // 2. 손패와 합쳐서 새로운 멜드 가능한지 확인 (붙이기는 제외)
+    // 손패와 합쳐서 새로운 멜드 가능한지 확인
     final thankYouCards = _findThankYouMeldCards(card);
     if (thankYouCards != null) return true;
+
+    // 기존 멜드에 붙이기 가능한지 확인
+    for (int i = 0; i < playerMelds.length; i++) {
+      if (_canAttachToMeldAtIndex(card, playerMelds, i)) return true;
+    }
+    for (int c = 0; c < computerMelds.length; c++) {
+      for (int i = 0; i < computerMelds[c].length; i++) {
+        if (_canAttachToMeldAtIndex(card, computerMelds[c], i)) return true;
+      }
+    }
 
     return false;
   }
@@ -1257,15 +1305,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     final options = <ThankYouOption>[];
     final aiNames = _getAiNames(context);
 
-    // 1. 7이면 단독 등록 가능
-    if (_isSeven(card)) {
-      options.add(ThankYouOption(
-        type: ThankYouType.seven,
-        discardCard: card,
-      ));
-    }
+    // ★ 7 단독 등록 제거 - 3장 이상의 멜드로만 등록 가능
 
-    // 2. 플레이어 멜드에 붙이기 가능
+    // 1. 플레이어 멜드에 붙이기 가능
     for (int i = 0; i < playerMelds.length; i++) {
       if (_canAttachToMeldAtIndex(card, playerMelds, i)) {
         options.add(ThankYouOption(
@@ -1276,7 +1318,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       }
     }
 
-    // 3. 컴퓨터 멜드에 붙이기 가능
+    // 2. 컴퓨터 멜드에 붙이기 가능
     for (int c = 0; c < computerMelds.length; c++) {
       for (int i = 0; i < computerMelds[c].length; i++) {
         if (_canAttachToMeldAtIndex(card, computerMelds[c], i)) {
@@ -1291,7 +1333,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       }
     }
 
-    // 4. 손패와 합쳐서 새 멜드 생성
+    // 3. 손패와 합쳐서 새 멜드 생성
     options.addAll(_findAllNewMeldOptions(card));
 
     return options;
@@ -2209,6 +2251,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
   // 땡큐 대기 시작 (플레이어에게 기회 부여)
   void _startThankYouWait() {
+    // 플레이어가 땡큐 가능한지 확인
+    final canPlayerThankYou = _canThankYou();
+
     setState(() {
       currentTurn = (currentTurn + 1) % playerCount;
       hasDrawn = false;
@@ -2218,15 +2263,64 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     _saveGame();
 
     if (currentTurn != 0) {
-      // 컴퓨터 턴: 타이머 없이 바로 진행 (드로우 후 타이머가 동작함)
-      Timer(const Duration(milliseconds: 300), () {
-        if (mounted && !gameOver) {
-          _onNextTurn();
-        }
-      });
+      // 다음이 컴퓨터 턴인데 플레이어가 땡큐 가능하면 대기 시간 부여
+      if (canPlayerThankYou) {
+        _startThankYouCountdown();
+      } else {
+        // 땡큐 불가능하면 바로 진행
+        Timer(const Duration(milliseconds: 300), () {
+          if (mounted && !gameOver) {
+            _onNextTurn();
+          }
+        });
+      }
     } else {
       // 플레이어 턴: 메시지 타이머만 취소 (메시지 유지)
       _messageTimer?.cancel();
+    }
+  }
+
+  // 땡큐 대기 카운트다운 시작
+  void _startThankYouCountdown() {
+    _thankYouTimer?.cancel();
+    setState(() {
+      _thankYouWaiting = true;
+      _thankYouCountdown = _thankYouWaitSeconds;
+    });
+
+    _thankYouTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted || gameOver) {
+        timer.cancel();
+        return;
+      }
+
+      setState(() {
+        _thankYouCountdown--;
+      });
+
+      if (_thankYouCountdown <= 0) {
+        timer.cancel();
+        _endThankYouWait();
+      }
+    });
+  }
+
+  // 땡큐 대기 종료 (시간 초과 또는 플레이어가 땡큐/패스)
+  void _endThankYouWait() {
+    _thankYouTimer?.cancel();
+    setState(() {
+      _thankYouWaiting = false;
+      _thankYouCountdown = 0;
+    });
+
+    if (mounted && !gameOver && currentTurn != 0) {
+      // 플레이어 후 순서 컴퓨터 땡큐 확인
+      final afterResult = _checkComputerThankYouAfterPlayer(_lastDiscardTurn);
+      if (afterResult != null) {
+        _executeComputerThankYou(afterResult);
+      } else {
+        _onNextTurn();
+      }
     }
   }
 
@@ -3644,43 +3738,82 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                 builder: (context) {
                   // 땡큐 가능: 대기 중이거나 플레이어 턴에서 드로우 안했을 때, 그리고 등록 가능할 때만
                   final canTakeDiscard = discardPile.isNotEmpty &&
-                      ((currentTurn == 0 && !hasDrawn) || waitingForNextTurn) &&
+                      ((currentTurn == 0 && !hasDrawn) || waitingForNextTurn || _thankYouWaiting) &&
                       _canThankYou();
-                  // 땡큐 상태면 주황색, 일반 드로우면 녹색
+                  // 땡큐 대기 상태면 주황색, 일반 드로우면 녹색
                   final borderColor =
-                      waitingForNextTurn && canTakeDiscard
+                      (_thankYouWaiting || waitingForNextTurn) && canTakeDiscard
                           ? Colors.orange
                           : (canTakeDiscard ? Colors.green : Colors.grey);
 
                   return GestureDetector(
                     onTap: canTakeDiscard ? _drawFromDiscard : null,
-                    child: Container(
+                    child: SizedBox(
                       width: cardWidth,
                       height: cardHeight,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: borderColor,
-                          width: canTakeDiscard ? 3 : 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(2, 2),
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: cardWidth,
+                            height: cardHeight,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: borderColor,
+                                width: canTakeDiscard ? 3 : 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(2, 2),
+                                ),
+                              ],
+                            ),
+                            child: discardPile.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      l10n.emptyDiscardPile,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(color: Colors.grey),
+                                    ),
+                                  )
+                                : _buildCardFace(discardPile.last, small: true),
                           ),
+                          // 땡큐 대기 카운트다운 표시
+                          if (_thankYouWaiting && canTakeDiscard)
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.withValues(alpha: 0.7),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      '${l10n.hulaGuideThankYou}?',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Text(
+                                      '$_thankYouCountdown',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 24,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                         ],
                       ),
-                      child: discardPile.isEmpty
-                          ? Center(
-                              child: Text(
-                                l10n.emptyDiscardPile,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            )
-                          : _buildCardFace(discardPile.last, small: true),
                     ),
                   );
                 },
