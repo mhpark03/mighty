@@ -930,6 +930,16 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       });
     }
 
+    // ★ 땡큐 대기 중에 가져가기 - 플레이어 턴으로 변경
+    if (_thankYouWaiting) {
+      _thankYouTimer?.cancel();
+      setState(() {
+        currentTurn = 0;
+        _thankYouWaiting = false;
+        _thankYouCountdown = 0;
+      });
+    }
+
     // ★ option.discardCard를 사용하여 정확한 카드 제거 (타이머로 인한 상태 변경 방지)
     final card = option.discardCard;
     // discardPile에서 해당 카드가 마지막에 있는지 확인 후 제거
@@ -1460,11 +1470,31 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       stopRisk = _estimateStopRisk(computerIndex + 1);
     }
 
+    // ★ 자신의 손패가 적으면 스톱 고려 (자신이 스톱할 가능성)
+    // 손패 5장 이하면 낮은 점수 카드 유지가 중요
+    double selfStopBonus = 0.0;
+    if (hand.length <= 3) {
+      selfStopBonus = 1.0; // 3장 이하: 최대 보너스
+    } else if (hand.length <= 4) {
+      selfStopBonus = 0.8; // 4장: 높은 보너스
+    } else if (hand.length <= 5) {
+      selfStopBonus = 0.5; // 5장: 중간 보너스
+    }
+
     // 각 카드의 "유지 가치" 점수 계산 (높을수록 유지해야 함)
     final scores = <PlayingCard, double>{};
 
     for (final card in hand) {
       double keepScore = 0;
+
+      // ★ 자신의 손패가 적을 때 낮은 점수 카드 유지 보너스
+      if (selfStopBonus > 0) {
+        if (card.point <= 3) {
+          keepScore += (4 - card.point) * 40 * selfStopBonus; // A: 120, 2: 80, 3: 40 (at 100%)
+        } else if (card.point >= 10) {
+          keepScore -= 50 * selfStopBonus; // K/Q/J/10 유지 가치 낮춤
+        }
+      }
 
       // 스톱 위험도가 높을 때 낮은 점수 카드 유지 보너스
       if (stopRisk >= 40.0) {
@@ -1574,7 +1604,24 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
         }
       }
 
-      // 4. 등록된 런에 붙일 가능성 확인 (중간 카드가 남아있으면 가치 높음)
+      // 4. 등록된 멜드에 바로 붙일 수 있는지 확인 (7 단독 포함)
+      bool canAttachNow = false;
+      if (_canAttachToMeldList(card, playerMelds) >= 0) {
+        canAttachNow = true;
+      }
+      if (!canAttachNow) {
+        for (final melds in computerMelds) {
+          if (_canAttachToMeldList(card, melds) >= 0) {
+            canAttachNow = true;
+            break;
+          }
+        }
+      }
+      if (canAttachNow) {
+        keepScore += 100; // ★ 바로 붙일 수 있는 카드는 높은 유지 가치
+      }
+
+      // 4-1. 등록된 런에 2칸 떨어진 경우 (중간 카드 필요)
       final runAttachBonus = _calculateRunAttachPotential(card);
       keepScore += runAttachBonus;
 
@@ -2768,6 +2815,11 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   void _executeComputerThankYou(int computerIndex) {
     if (discardPile.isEmpty) return;
     _computerActionTimer?.cancel();
+
+    // ★ 플레이어 땡큐 대기 상태 해제 (AI가 먼저 땡큐함)
+    _thankYouTimer?.cancel();
+    _thankYouWaiting = false;
+    _thankYouCountdown = 0;
 
     final aiNames = _getAiNames(context);
     final l10n = AppLocalizations.of(context)!;

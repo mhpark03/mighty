@@ -2228,7 +2228,17 @@ class AIPlayer {
                 }
               }
 
-              // 상대 최고 기루다보다 높은 내 기루다가 있으면 컷
+              // ★ 후반(7트릭 이후)에는 선을 잡는 것이 중요
+              // 현재 이기는 카드가 기루다가 아니면 낮은 기루다로 무조건 컷
+              bool isLateGame = state.currentTrickNumber >= 7;
+              bool currentWinnerIsNotGiruda = currentWinningCard.suit != state.giruda;
+
+              if (isLateGame && currentWinnerIsNotGiruda) {
+                girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return girudaCards.first;
+              }
+
+              // 초반/중반: 상대 최고 기루다보다 높은 내 기루다가 있으면 컷
               if (highestOpponentGiruda != null) {
                 final winningGirudas = girudaCards.where((c) =>
                     c.rankValue > highestOpponentGiruda!.rankValue).toList();
@@ -2238,6 +2248,10 @@ class AIPlayer {
                   winningGirudas.sort((a, b) => a.rankValue.compareTo(b.rankValue));
                   return winningGirudas.first;
                 }
+              } else {
+                // 상대에게 기루다가 없으면 낮은 기루다로 컷
+                girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return girudaCards.first;
               }
 
               // 확실히 이길 수 없으면 컷하지 않고 기존 로직으로 (낮은 카드 버림)
@@ -2610,7 +2624,7 @@ class AIPlayer {
                 }
               }
 
-              // 리드 무늬로 도울 수 없으면 낮은 카드 버리기 (기루다로 컷하지 않음)
+              // 리드 무늬가 있으면 낮은 카드 버리기
               final suitCards = playableCards.where((c) =>
                   !c.isJoker && !c.isMighty && c.suit == leadSuit).toList();
               if (suitCards.isNotEmpty) {
@@ -2621,7 +2635,22 @@ class AIPlayer {
                 }
                 return suitCards.first;
               }
-              // 리드 무늬가 없어도 기루다로 컷하지 않고 낮은 카드 버리기
+
+              // ★ 후반(7트릭 이후)에 리드 무늬가 없으면 기루다로 컷하여 선 탈환
+              // 현재 이기는 카드가 기루다가 아니면 낮은 기루다로 무조건 컷
+              bool isLateGameHere = state.currentTrickNumber >= 7;
+              if (isLateGameHere && state.giruda != null) {
+                final girudaCardsForCut = playableCards.where((c) =>
+                    !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+                if (girudaCardsForCut.isNotEmpty) {
+                  if (currentWinningCard.suit != state.giruda) {
+                    girudaCardsForCut.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                    return girudaCardsForCut.first;
+                  }
+                }
+              }
+
+              // 초반/중반: 리드 무늬가 없으면 비기루다 중 낮은 카드 버리기 (간 방지)
               final nonGirudaCards = playableCards.where((c) =>
                   !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
               if (nonGirudaCards.isNotEmpty) {
