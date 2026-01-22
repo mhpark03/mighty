@@ -1454,11 +1454,29 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       }
     }
 
+    // 스톱 위험도 계산 (컴퓨터의 경우)
+    double stopRisk = 0.0;
+    if (computerIndex != null) {
+      stopRisk = _estimateStopRisk(computerIndex + 1);
+    }
+
     // 각 카드의 "유지 가치" 점수 계산 (높을수록 유지해야 함)
     final scores = <PlayingCard, double>{};
 
     for (final card in hand) {
       double keepScore = 0;
+
+      // 스톱 위험도가 높을 때 낮은 점수 카드 유지 보너스
+      if (stopRisk >= 40.0) {
+        // 낮은 점수 카드 (A=1, 2=2, 3=3)는 유지 가치 높임
+        // 높은 점수 카드 (K/Q/J/10=10)는 유지 가치 낮춤
+        final riskMultiplier = stopRisk / 100.0; // 0.4 ~ 1.0
+        if (card.point <= 3) {
+          keepScore += (4 - card.point) * 30 * riskMultiplier; // A: 90, 2: 60, 3: 30 (at 100% risk)
+        } else if (card.point >= 10) {
+          keepScore -= 40 * riskMultiplier; // K/Q/J/10 유지 가치 낮춤
+        }
+      }
 
       // 1. 7 카드는 절대 버리면 안 됨 (단독 등록 가능)
       if (_isSeven(card)) {

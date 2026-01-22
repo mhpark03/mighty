@@ -1570,7 +1570,7 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  // 무늬별 색상 반환 (검은 무늬 구분을 위해)
+  // 무늬별 색상 반환
   Color _getSuitColor(Suit suit) {
     switch (suit) {
       case Suit.heart:
@@ -1578,9 +1578,8 @@ class _GameScreenState extends State<GameScreen> {
       case Suit.diamond:
         return Colors.red[300]!; // 연한 빨강
       case Suit.spade:
-        return Colors.white;
       case Suit.club:
-        return Colors.lightGreenAccent; // 클로버는 녹색 계열로 구분
+        return Colors.white; // 스페이드, 클로버 모두 흰색
     }
   }
 
