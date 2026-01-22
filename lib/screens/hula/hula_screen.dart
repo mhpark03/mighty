@@ -1127,6 +1127,50 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     }
 
     playerMelds[meldIndex] = Meld(cards: newCards, isRun: newIsRun);
+
+    // ★ 연속되는 Run 합치기
+    _mergeConsecutiveRuns(playerMelds);
+  }
+
+  // 연속되는 Run들을 하나로 합치기
+  void _mergeConsecutiveRuns(List<Meld> melds) {
+    bool merged = true;
+    while (merged) {
+      merged = false;
+      for (int i = 0; i < melds.length; i++) {
+        final meld1 = melds[i];
+        if (!meld1.isRun || meld1.cards.isEmpty) continue;
+
+        final suit1 = meld1.cards.first.suit;
+        final ranks1 = meld1.cards.map((c) => c.rank).toList()..sort();
+        final min1 = ranks1.first;
+        final max1 = ranks1.last;
+
+        for (int j = i + 1; j < melds.length; j++) {
+          final meld2 = melds[j];
+          if (!meld2.isRun || meld2.cards.isEmpty) continue;
+
+          final suit2 = meld2.cards.first.suit;
+          if (suit1 != suit2) continue;
+
+          final ranks2 = meld2.cards.map((c) => c.rank).toList()..sort();
+          final min2 = ranks2.first;
+          final max2 = ranks2.last;
+
+          // 연속되는지 확인 (max1 + 1 == min2 또는 max2 + 1 == min1)
+          if (max1 + 1 == min2 || max2 + 1 == min1) {
+            // 두 멜드 합치기
+            final combinedCards = [...meld1.cards, ...meld2.cards];
+            combinedCards.sort((a, b) => a.rank.compareTo(b.rank));
+            melds[i] = Meld(cards: combinedCards, isRun: true);
+            melds.removeAt(j);
+            merged = true;
+            break;
+          }
+        }
+        if (merged) break;
+      }
+    }
   }
 
   // 7 카드인지 확인
@@ -1436,6 +1480,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     }
 
     melds[meldIndex] = Meld(cards: newCards, isRun: newIsRun);
+
+    // ★ 연속되는 Run 합치기
+    _mergeConsecutiveRuns(melds);
   }
 
   // AI 추천 버릴 카드 인덱스 (플레이어용)
@@ -2343,6 +2390,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
     playerMelds.add(Meld(cards: selectedCards, isRun: isRun));
 
+    // ★ 연속되는 Run 합치기
+    _mergeConsecutiveRuns(playerMelds);
+
     setState(() {
       selectedCardIndices = [];
     });
@@ -2659,6 +2709,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     }
     melds.add(Meld(cards: cards, isRun: isRun));
 
+    // ★ 연속되는 Run 합치기
+    _mergeConsecutiveRuns(melds);
+
     // 메시지 표시
     if (type == '7group') {
       _showMessage(l10n.aiRegistersSeven(aiNames[computerIndex], l10n.group));
@@ -2868,15 +2921,36 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
 
       bool shouldThankYou = false;
 
-      // 7 카드는 항상 땡큐 (난이도 적용)
-      if (_isSeven(topCard)) {
+      // ★ 7 카드 땡큐 조건: 7 단독은 불가, 3장 이상 멜드를 만들 수 있어야 함
+      // 멜드를 만들 수 있으면 땡큐
+      final testHand = [...hand, topCard];
+      if (_findBestMeld(testHand) != null) {
         shouldThankYou = true;
-      } else {
-        // 멜드를 만들 수 있으면 땡큐
-        final testHand = [...hand, topCard];
-        if (_findBestMeld(testHand) != null) {
-          shouldThankYou = true;
+      }
+      // 7카드는 기존 멜드에 붙일 수 있으면 땡큐 가능
+      else if (_isSeven(topCard)) {
+        // 본인 또는 다른 플레이어의 멜드에 붙일 수 있는지 확인
+        bool canAttach = false;
+        // 본인 멜드에 붙이기
+        final computerMeldList = computerMelds[computerIndex];
+        if (_canAttachToMeldList(topCard, computerMeldList) >= 0) {
+          canAttach = true;
         }
+        // 플레이어 멜드에 붙이기
+        if (!canAttach && _canAttachToMeldList(topCard, playerMelds) >= 0) {
+          canAttach = true;
+        }
+        // 다른 컴퓨터 멜드에 붙이기
+        if (!canAttach) {
+          for (int c = 0; c < computerMelds.length; c++) {
+            if (c == computerIndex) continue;
+            if (_canAttachToMeldList(topCard, computerMelds[c]) >= 0) {
+              canAttach = true;
+              break;
+            }
+          }
+        }
+        shouldThankYou = canAttach;
       }
 
       if (shouldThankYou) {
@@ -2961,25 +3035,15 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       }
     }
 
-    // 7 카드 찾기
+    // ★ 땡큐에서는 7 단독 등록 불가 - 3장 이상의 7 그룹만 등록 가능
     final sevens = testHand.where((c) => _isSeven(c)).toList();
     if (sevens.length >= 3) {
-      final decision = _decideSevensStrategy(sevens, testHand);
-      if (decision == 'group') {
-        meldsToRegister.add({'cards': sevens.take(3).toList(), 'isRun': false, 'type': '7group'});
-        for (final seven in sevens.skip(3)) {
-          meldsToRegister.add({'cards': [seven], 'isRun': false, 'type': '7'});
-        }
-      } else {
-        for (final seven in sevens) {
-          meldsToRegister.add({'cards': [seven], 'isRun': false, 'type': '7'});
-        }
-      }
-    } else {
-      for (final seven in sevens) {
-        meldsToRegister.add({'cards': [seven], 'isRun': false, 'type': '7'});
-      }
+      // 3장 이상의 7이 있으면 7 그룹으로 등록
+      meldsToRegister.add({'cards': sevens.take(3).toList(), 'isRun': false, 'type': '7group'});
+      // 나머지 7들은 땡큐에서 단독 등록 불가
+      // (일반 턴에서 등록하거나 다른 멜드에 붙여야 함)
     }
+    // 7이 3장 미만이면 땡큐에서 등록하지 않음 (단독 등록 불가)
 
     // 순차적으로 등록 실행
     _executeComputerThankYouRegisterSequentially(computerIndex, meldsToRegister, 0);
@@ -3016,6 +3080,9 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       hand.remove(card);
     }
     melds.add(Meld(cards: cards, isRun: isRun));
+
+    // ★ 연속되는 Run 합치기
+    _mergeConsecutiveRuns(melds);
 
     // 메시지 표시
     if (type == '7group') {

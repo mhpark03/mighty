@@ -2030,10 +2030,18 @@ class AIPlayer {
       }
     }
 
+    // ★★★ 마이티 선공 제한 (탈환용으로 보존) ★★★
+    // 트릭 7 이전에는 마이티로 선공하지 않음 (마이티가 유일한 카드가 아닌 경우)
+    // 마이티는 선공을 빼앗겼을 때 되찾기 위해 사용해야 함
+    final nonMightyPlayable = playableCards.where((c) => !c.isMighty).toList();
+    final shouldAvoidMighty = state.currentTrickNumber < 7 && nonMightyPlayable.isNotEmpty;
+    final cardsToConsider = shouldAvoidMighty ? nonMightyPlayable : playableCards;
+
     // 오픈된 카드를 고려하여 실효 가치가 높은 카드 선택
-    playableCards.sort((a, b) {
-      if (a.isMighty) return -1;
-      if (b.isMighty) return 1;
+    cardsToConsider.sort((a, b) {
+      // 마이티는 후순위 (탈환용으로 보존)
+      if (a.isMighty) return 1;
+      if (b.isMighty) return -1;
 
       if (state.giruda != null) {
         if (a.suit == state.giruda && b.suit != state.giruda) return -1;
@@ -2044,14 +2052,14 @@ class AIPlayer {
       return _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state));
     });
 
-    // 첫 트릭에서도 마이티 대신 다른 최상위 카드 우선 (마이티는 아껴둠)
+    // 마이티/조커 제외한 카드 우선
     final nonJokerMighty =
-        playableCards.where((c) => !c.isJoker && !c.isMighty).toList();
+        cardsToConsider.where((c) => !c.isJoker && !c.isMighty).toList();
     if (nonJokerMighty.isNotEmpty) {
       return nonJokerMighty.first;
     }
 
-    return playableCards.first;
+    return cardsToConsider.first;
   }
 
   PlayingCard _selectFollowCard(
