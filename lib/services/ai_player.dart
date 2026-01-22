@@ -541,13 +541,18 @@ class AIPlayer {
       if (a.isJoker || a.isMighty) return 1;
       if (b.isJoker || b.isMighty) return -1;
 
-      // 2. 조커가 있으면 조커콜 카드 우선 버림
-      if (hasJoker) {
+      // 2. 조커콜 카드 처리
+      // ★ 조커 보유 시: 일반 카드로 처리 (해당 무늬 유지가 유리할 수 있음)
+      // ★ 조커 미보유 시: 조커콜 카드 보존 (상대 조커 콜용)
+      // (키티 선택 시점에는 프렌드 선언 전이므로 조커 프렌드 여부는 알 수 없음)
+      if (!hasJoker) {
         bool aIsJokerCall = a.suit == jokerCallCard.suit && a.rank == jokerCallCard.rank;
         bool bIsJokerCall = b.suit == jokerCallCard.suit && b.rank == jokerCallCard.rank;
-        if (aIsJokerCall && !bIsJokerCall) return -1;
-        if (!aIsJokerCall && bIsJokerCall) return 1;
+        // 조커 미보유 시: 조커콜 카드 보존
+        if (aIsJokerCall && !bIsJokerCall) return 1;
+        if (!aIsJokerCall && bIsJokerCall) return -1;
       }
+      // 조커 보유 시: 조커콜 카드는 일반 카드로 처리 (특별 처리 없음)
 
       // 3. 기루다는 버리지 않음
       if (state.giruda != null) {
@@ -674,31 +679,35 @@ class AIPlayer {
       if (aIsTop && !bIsTop) return 1;
       if (!aIsTop && bIsTop) return -1;
 
-      // 2. 조커가 있으면 조커콜 카드 우선 버림
-      if (hasJoker) {
+      // 3. 조커콜 카드 처리
+      // ★ 조커 보유 시: 일반 카드로 처리 (해당 무늬 유지가 유리할 수 있음)
+      // ★ 조커 미보유 시: 조커콜 카드 보존 (상대 조커 콜용)
+      if (!hasJoker) {
         bool aIsJokerCall = a.suit == jokerCallCard.suit && a.rank == jokerCallCard.rank;
         bool bIsJokerCall = b.suit == jokerCallCard.suit && b.rank == jokerCallCard.rank;
-        if (aIsJokerCall && !bIsJokerCall) return -1;
-        if (!aIsJokerCall && bIsJokerCall) return 1;
+        // 조커 미보유 시: 조커콜 카드 보존
+        if (aIsJokerCall && !bIsJokerCall) return 1;
+        if (!aIsJokerCall && bIsJokerCall) return -1;
       }
+      // 조커 보유 시: 조커콜 카드는 일반 카드로 처리 (특별 처리 없음)
 
-      // 3. 최종 기루다는 버리지 않음
+      // 4. 최종 기루다는 버리지 않음
       if (finalGiruda != null) {
         if (a.suit == finalGiruda && b.suit != finalGiruda) return 1;
         if (a.suit != finalGiruda && b.suit == finalGiruda) return -1;
       }
 
-      // 4. 점수 카드는 버리지 않음
+      // 5. 점수 카드는 버리지 않음
       if (a.isPointCard && !b.isPointCard) return 1;
       if (!a.isPointCard && b.isPointCard) return -1;
 
-      // 5. 최상위 카드가 있는 무늬는 버리기 우선순위 낮춤
+      // 6. 최상위 카드가 있는 무늬는 버리기 우선순위 낮춤
       bool aHasTop = a.suit != null && topSuits.contains(a.suit);
       bool bHasTop = b.suit != null && topSuits.contains(b.suit);
       if (aHasTop && !bHasTop) return 1;
       if (!aHasTop && bHasTop) return -1;
 
-      // 6. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
+      // 7. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
       int aCount = suitCount[a.suit] ?? 0;
       int bCount = suitCount[b.suit] ?? 0;
       if (aCount != bCount) {
@@ -1003,6 +1012,7 @@ class AIPlayer {
     int kingCount = hand.where((c) => !c.isJoker && c.rank == Rank.king).length;
 
     // 조건 2: 마이티 + 모든 A + 조커 콜 카드 + K 2장 이상 → 노 프렌드
+    // ★ 조커가 없어도 조커콜 카드가 있으면 2트릭에서 조커콜로 상대 조커 소진 가능
     int totalAces = (hasGirudaAce ? 1 : 0) + nonGirudaAceCount;
     // 마이티가 A인 경우 제외하고 3장의 A가 있으면 모든 A 보유
     int maxNonMightyAces = (state.mighty.rank == Rank.ace) ? 3 : 4;
@@ -1101,8 +1111,17 @@ class AIPlayer {
       if (player.isDeclarer) {
         // 주공: 조커 프렌드인 경우 조커콜 안 함
         final friendCard = state.friendDeclaration?.card;
-        if (friendCard != null && friendCard.isJoker) {
+        bool isJokerFriend = friendCard != null && friendCard.isJoker;
+        if (isJokerFriend) {
           return null;
+        }
+        // ★ 2트릭에서 조커콜 우선 사용 조건:
+        // - 노프렌드인 경우, 또는
+        // - 조커가 없고 조커 프렌드가 아닌 경우
+        bool isNoFriend = state.friendDeclaration?.isNoFriend == true;
+        bool shouldCallJokerEarly = isNoFriend || !isJokerFriend; // 조커 프렌드 아님 (이미 위에서 체크됨)
+        if (shouldCallJokerEarly && state.currentTrickNumber == 2) {
+          return jokerCallCard.suit;
         }
         // 그 외에는 50% 확률로 조커콜 (수비팀이 조커를 가지고 있을 수 있음)
         if (Random().nextDouble() > 0.5) return null;
@@ -1143,8 +1162,17 @@ class AIPlayer {
       if (player.isDeclarer) {
         // 주공: 조커 프렌드인 경우 조커콜 안 함
         final friendCard = state.friendDeclaration?.card;
-        if (friendCard != null && friendCard.isJoker) {
+        bool isJokerFriend = friendCard != null && friendCard.isJoker;
+        if (isJokerFriend) {
           return false;
+        }
+        // ★ 2트릭에서 조커콜 우선 사용 조건:
+        // - 노프렌드인 경우, 또는
+        // - 조커가 없고 조커 프렌드가 아닌 경우
+        bool isNoFriend = state.friendDeclaration?.isNoFriend == true;
+        bool shouldCallJokerEarly = isNoFriend || !isJokerFriend; // 조커 프렌드 아님 (이미 위에서 체크됨)
+        if (shouldCallJokerEarly && state.currentTrickNumber == 2) {
+          return true;
         }
         // 그 외에는 50% 확률로 조커콜
         return Random().nextDouble() < 0.5;
@@ -2355,7 +2383,7 @@ class AIPlayer {
     }
 
     // === 상대팀 조커에 대한 마이티 대응 ===
-    // 상대팀이 조커로 이기려 할 때 점수 카드 2장 이상이면 마이티로 선공 탈환
+    // 상대팀이 조커로 이기려 할 때 마이티로 선공 탈환
     if (currentWinningCard != null && currentWinningCard.isJoker) {
       // 상대팀이 조커로 이기고 있는지 확인
       bool opponentWinningWithJoker = (isAttackTeam && defenseWinning) ||
@@ -2366,8 +2394,12 @@ class AIPlayer {
         int pointCardsInTrick = state.currentTrick!.cards
             .where((c) => c.isPointCard || c.isJoker).length;
 
-        // 점수 카드 2장 이상이고 마이티가 있으면 마이티 사용
-        if (pointCardsInTrick >= 2) {
+        // ★ 노프렌드 주공은 선공 유지가 중요하므로 점수 카드 1장 이상이면 마이티 사용
+        // ★ 그 외에는 점수 카드 2장 이상이면 마이티 사용
+        bool isNoFriend = state.friendDeclaration?.isNoFriend == true;
+        int requiredPointCards = (player.isDeclarer && isNoFriend) ? 1 : 2;
+
+        if (pointCardsInTrick >= requiredPointCards) {
           final mighty = playableCards.where((c) => c.isMighty).toList();
           if (mighty.isNotEmpty) {
             return mighty.first;
@@ -2626,11 +2658,18 @@ class AIPlayer {
         if (allowFirstTrick && currentWinningCard != null && !currentWinningCard.isJoker) {
           // 순서/기루다 조건 확인
           bool shouldUseMighty = false;
+          // ★ 노프렌드 주공인지 확인
+          bool isNoFriend = state.friendDeclaration?.isNoFriend == true;
+          bool isNoFriendDeclarer = player.isDeclarer && isNoFriend;
+
           if (isMightyFriend && state.currentTrickNumber == 1) {
             // 마이티 프렌드 + 첫 트릭: 프렌드 공개 + 선 탈환을 위해 바로 사용
             shouldUseMighty = true;
           } else if (currentOrder >= 3 || isLastPlayer) {
             // 4번째 이후 또는 마지막: 마이티 사용
+            shouldUseMighty = true;
+          } else if (isNoFriendDeclarer && state.currentTrickNumber <= 4) {
+            // ★ 노프렌드 주공 + 초반(4트릭 이내): 선공 유지가 중요하므로 적극적으로 마이티 사용
             shouldUseMighty = true;
           } else {
             // 2~3번째: 기루다 소진 또는 점수 카드 2장 이상
