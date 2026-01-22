@@ -2728,6 +2728,76 @@ class AIPlayer {
             return mighty.first;
           }
         }
+
+        // ★ 마이티가 없으면 조커를 이길 수 없음 - 낮은 카드 버리기
+        // 선공 무늬가 있으면 선공 무늬 중 낮은 카드
+        final suitCardsForJoker = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit == leadSuit).toList();
+        if (suitCardsForJoker.isNotEmpty) {
+          suitCardsForJoker.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          final nonPointCards = suitCardsForJoker.where((c) => !c.isPointCard).toList();
+          if (nonPointCards.isNotEmpty) {
+            return nonPointCards.first;
+          }
+          return suitCardsForJoker.first;
+        }
+        // 선공 무늬가 없으면 비기루다 중 낮은 카드
+        final nonGirudaForJoker = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+        if (nonGirudaForJoker.isNotEmpty) {
+          nonGirudaForJoker.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          final nonPointCards = nonGirudaForJoker.where((c) => !c.isPointCard).toList();
+          if (nonPointCards.isNotEmpty) {
+            return nonPointCards.first;
+          }
+          return nonGirudaForJoker.first;
+        }
+        // 기루다만 있으면 가장 낮은 기루다
+        final girudaForJoker = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+        if (girudaForJoker.isNotEmpty) {
+          girudaForJoker.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return girudaForJoker.first;
+        }
+      }
+    }
+
+    // === 상대팀 마이티에 대한 대응 ===
+    // 마이티가 이기고 있으면 아무도 이길 수 없음 - 낮은 카드 버리기
+    if (currentWinningCard != null && currentWinningCard.isMighty) {
+      bool opponentWinningWithMighty = (isAttackTeam && defenseWinning) ||
+          (isDefenseTeam && !defenseWinning);
+
+      if (opponentWinningWithMighty) {
+        // 선공 무늬가 있으면 선공 무늬 중 낮은 카드
+        final suitCardsForMighty = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit == leadSuit).toList();
+        if (suitCardsForMighty.isNotEmpty) {
+          suitCardsForMighty.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          final nonPointCards = suitCardsForMighty.where((c) => !c.isPointCard).toList();
+          if (nonPointCards.isNotEmpty) {
+            return nonPointCards.first;
+          }
+          return suitCardsForMighty.first;
+        }
+        // 선공 무늬가 없으면 비기루다 중 낮은 카드
+        final nonGirudaForMighty = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit != state.giruda).toList();
+        if (nonGirudaForMighty.isNotEmpty) {
+          nonGirudaForMighty.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          final nonPointCards = nonGirudaForMighty.where((c) => !c.isPointCard).toList();
+          if (nonPointCards.isNotEmpty) {
+            return nonPointCards.first;
+          }
+          return nonGirudaForMighty.first;
+        }
+        // 기루다만 있으면 가장 낮은 기루다
+        final girudaForMighty = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty && c.suit == state.giruda).toList();
+        if (girudaForMighty.isNotEmpty) {
+          girudaForMighty.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return girudaForMighty.first;
+        }
       }
     }
 
