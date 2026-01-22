@@ -1459,16 +1459,23 @@ class _GameScreenState extends State<GameScreen> {
           friendLabel,
           style: const TextStyle(color: Colors.white70, fontSize: 12),
         ),
-        hasFriendCard
-            ? _buildColoredCardText(decl.card!)
-            : Text(
-                friendValue,
-                style: TextStyle(
-                  color: valueColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: Colors.amber.shade100,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: hasFriendCard
+              ? _buildColoredCardText(decl.card!)
+              : Text(
+                  friendValue,
+                  style: TextStyle(
+                    color: state.friendRevealed ? Colors.blue.shade800 : Colors.amber.shade900,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
+        ),
       ],
     );
   }
@@ -1625,26 +1632,33 @@ class _GameScreenState extends State<GameScreen> {
           style: const TextStyle(color: Colors.white70, fontSize: 12),
         ),
         giruda != null
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _getSuitSymbol(giruda),
-                    style: TextStyle(
-                      color: _getSuitColor(giruda),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+            ? Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade100,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _getSuitSymbol(giruda),
+                      style: TextStyle(
+                        color: _getSuitColor(giruda),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    ' ($playedCount/13)',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                    Text(
+                      ' ($playedCount/13)',
+                      style: TextStyle(
+                        color: Colors.blue.shade900,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               )
             : Text(
                 l10n.noGiruda,
@@ -2686,7 +2700,7 @@ class _GameScreenState extends State<GameScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.scoreMultipliers,
+            isNoFriend ? l10n.scoreMultipliersNoFriend : l10n.scoreMultipliers,
             style: TextStyle(fontSize: 11, color: Colors.grey[600]),
           ),
         ],

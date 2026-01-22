@@ -1044,6 +1044,12 @@ abstract class AppLocalizations {
   /// **'주공 ×2, 프렌드 ×1, 야당 ×(-1)'**
   String get scoreMultipliers;
 
+  /// No description provided for @scoreMultipliersNoFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'주공 ×3, 야당 ×(-1)'**
+  String get scoreMultipliersNoFriend;
+
   /// No description provided for @multiplierRun.
   ///
   /// In ko, this message translates to:

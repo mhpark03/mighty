@@ -157,6 +157,7 @@
   "scoreFormula": "(得点-契約+1) + (得点-最小)×2",
   "scoreFormulaLose": "-(契約 - 得点)",
   "scoreMultipliers": "宣言者 ×2, フレンド ×1, 守備 ×(-1)",
+  "scoreMultipliersNoFriend": "宣言者 ×3, 守備 ×(-1)",
   "multiplierRun": "ラン ×2",
   "multiplierNoGiruda": "ノートランプ ×2",
   "multiplierNoFriend": "ノーフレンド ×2",

@@ -522,6 +522,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get scoreMultipliers => '宣言者 ×2, フレンド ×1, 守備 ×(-1)';
 
   @override
+  String get scoreMultipliersNoFriend => '宣言者 ×3, 守備 ×(-1)';
+
+  @override
   String get multiplierRun => 'ラン ×2';
 
   @override

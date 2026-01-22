@@ -157,6 +157,7 @@
   "scoreFormula": "(得分-契约+1) + (得分-最小)×2",
   "scoreFormulaLose": "-(契约 - 得分)",
   "scoreMultipliers": "庄家 ×2, 朋友 ×1, 防守 ×(-1)",
+  "scoreMultipliersNoFriend": "庄家 ×3, 防守 ×(-1)",
   "multiplierRun": "满贯 ×2",
   "multiplierNoGiruda": "无将 ×2",
   "multiplierNoFriend": "无朋友 ×2",

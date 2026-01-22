@@ -249,6 +249,7 @@
   "scoreFormula": "(득점-공약+1) + (득점-최소)×2",
   "scoreFormulaLose": "-(공약 - 득점)",
   "scoreMultipliers": "주공 ×2, 프렌드 ×1, 야당 ×(-1)",
+  "scoreMultipliersNoFriend": "주공 ×3, 야당 ×(-1)",
   "multiplierRun": "런 ×2",
   "multiplierNoGiruda": "노기루다 ×2",
   "multiplierNoFriend": "노프렌드 ×2",

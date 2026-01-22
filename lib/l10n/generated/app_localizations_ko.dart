@@ -522,6 +522,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get scoreMultipliers => '주공 ×2, 프렌드 ×1, 야당 ×(-1)';
 
   @override
+  String get scoreMultipliersNoFriend => '주공 ×3, 야당 ×(-1)';
+
+  @override
   String get multiplierRun => '런 ×2';
 
   @override

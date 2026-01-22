@@ -158,6 +158,7 @@
   "scoreFormula": "(Points-Contract+1) + (Points-Min)×2",
   "scoreFormulaLose": "-(Contract - Points)",
   "scoreMultipliers": "Declarer ×2, Friend ×1, Defense ×(-1)",
+  "scoreMultipliersNoFriend": "Declarer ×3, Defense ×(-1)",
   "multiplierRun": "Run ×2",
   "multiplierNoGiruda": "No Trump ×2",
   "multiplierNoFriend": "No Friend ×2",

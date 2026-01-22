@@ -524,6 +524,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scoreMultipliers => 'Declarer ×2, Friend ×1, Defense ×(-1)';
 
   @override
+  String get scoreMultipliersNoFriend => 'Declarer ×3, Defense ×(-1)';
+
+  @override
   String get multiplierRun => 'Run ×2';
 
   @override

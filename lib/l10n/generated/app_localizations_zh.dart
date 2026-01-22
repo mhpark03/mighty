@@ -519,6 +519,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get scoreMultipliers => '庄家 ×2, 朋友 ×1, 防守 ×(-1)';
 
   @override
+  String get scoreMultipliersNoFriend => '庄家 ×3, 防守 ×(-1)';
+
+  @override
   String get multiplierRun => '满贯 ×2';
 
   @override

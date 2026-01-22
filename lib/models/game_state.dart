@@ -908,10 +908,11 @@ class GameState {
     baseScore *= specialMultiplier;
 
     // 역할별 배수 적용
-    // 야당과 프렌드는 baseScore, 주공은 2배
+    // 야당과 프렌드는 baseScore, 주공은 2배 (노프렌드시 주공은 3배)
     int roleMultiplier;
     if (player.isDeclarer) {
-      roleMultiplier = 2;  // 주공: x2
+      // 노프렌드: 주공이 프렌드 몫도 받음 (x2 + x1 = x3)
+      roleMultiplier = isNoFriend ? 3 : 2;  // 주공: x3 (노프렌드) 또는 x2
     } else if (player.isFriend) {
       roleMultiplier = 1;  // 프렌드: x1
     } else {
