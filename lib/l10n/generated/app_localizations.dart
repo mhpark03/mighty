@@ -249,7 +249,7 @@ abstract class AppLocalizations {
   /// No description provided for @receivedKitty.
   ///
   /// In ko, this message translates to:
-  /// **'받은 키티:'**
+  /// **'받은 카드:'**
   String get receivedKitty;
 
   /// No description provided for @myCards.

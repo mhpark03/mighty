@@ -678,17 +678,14 @@ class _GameScreenState extends State<GameScreen> {
     // 사용자가 직접 선택했거나 AI가 배팅을 추천한 경우에만 선택 표시
     final isSelected = _suitManuallySelected && _selectedBidSuit == suit;
     final isRed = suit == Suit.diamond || suit == Suit.heart;
-    final isClub = suit == Suit.club;
 
     Color symbolColor;
-    if (isSelected) {
-      symbolColor = Colors.black;
-    } else if (isRed) {
-      symbolColor = Colors.red[400]!;
-    } else if (isClub) {
-      symbolColor = Colors.green[300]!; // 클로버는 녹색으로 구분
+    if (isRed) {
+      symbolColor = Colors.red[700]!;
+    } else if (suit == Suit.spade || suit == Suit.club) {
+      symbolColor = Colors.black;  // 스페이드, 클로버는 검정
     } else {
-      symbolColor = Colors.white;
+      symbolColor = isSelected ? Colors.black : Colors.white;  // 노기루다
     }
 
     return GestureDetector(
@@ -699,7 +696,7 @@ class _GameScreenState extends State<GameScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.amber : Colors.white24,
+          color: isSelected ? Colors.amber : Colors.white54,
           borderRadius: BorderRadius.circular(8),
           border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
         ),
@@ -1462,15 +1459,15 @@ class _GameScreenState extends State<GameScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
-            color: Colors.amber.shade100,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(4),
           ),
           child: hasFriendCard
-              ? _buildColoredCardText(decl.card!)
+              ? _buildColoredCardTextForInfo(decl.card!)
               : Text(
                   friendValue,
                   style: TextStyle(
-                    color: state.friendRevealed ? Colors.blue.shade800 : Colors.amber.shade900,
+                    color: state.friendRevealed ? Colors.blue.shade800 : Colors.black87,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -1635,7 +1632,7 @@ class _GameScreenState extends State<GameScreen> {
             ? Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade100,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
@@ -1644,15 +1641,15 @@ class _GameScreenState extends State<GameScreen> {
                     Text(
                       _getSuitSymbol(giruda),
                       style: TextStyle(
-                        color: _getSuitColor(giruda),
+                        color: _getSuitColorForInfo(giruda),
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
                       ' ($playedCount/13)',
-                      style: TextStyle(
-                        color: Colors.blue.shade900,
+                      style: const TextStyle(
+                        color: Colors.black87,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1668,6 +1665,76 @@ class _GameScreenState extends State<GameScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+      ],
+    );
+  }
+
+  // 정보 표시용 무늬 색상 (스페이드/클로버는 검정, 하트/다이아는 빨강)
+  Color _getSuitColorForInfo(Suit suit) {
+    switch (suit) {
+      case Suit.spade:
+      case Suit.club:
+        return Colors.black;
+      case Suit.heart:
+      case Suit.diamond:
+        return Colors.red;
+    }
+  }
+
+  // 정보 표시용 무늬 색상이 적용된 카드 텍스트 위젯 (흰색 배경용 - 스페이드/클로버는 검정)
+  Widget _buildColoredCardTextForInfo(PlayingCard card) {
+    if (card.isJoker) {
+      return const Text(
+        'Joker',
+        style: TextStyle(
+          color: Colors.purple,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    final suit = card.suit!;
+    String rank;
+    switch (card.rank) {
+      case Rank.ace:
+        rank = 'A';
+        break;
+      case Rank.king:
+        rank = 'K';
+        break;
+      case Rank.queen:
+        rank = 'Q';
+        break;
+      case Rank.jack:
+        rank = 'J';
+        break;
+      case Rank.ten:
+        rank = '10';
+        break;
+      default:
+        rank = '${card.rankValue}';
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          _getSuitSymbol(suit),
+          style: TextStyle(
+            color: _getSuitColorForInfo(suit),
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          rank,
+          style: TextStyle(
+            color: _getSuitColorForInfo(suit),
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ],
     );
   }

@@ -189,24 +189,28 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                       Expanded(
                         child: _buildQuickButton(
                           'mighty',
-                          '${l10n.mighty}\n${_getMightySymbol()}',
+                          l10n.mighty,
                           Colors.amber,
+                          symbolCard: widget.mighty,
+                          forceBlackSymbol: true,
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: _buildQuickButton(
                           'joker',
-                          '${l10n.joker}\n🃏',
+                          l10n.joker,
                           Colors.purple,
+                          symbolCard: PlayingCard.joker(),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: _buildQuickButton(
                           'jokerCall',
-                          '${l10n.jokerCallTitle}\n${_getJokerCallSymbol()}',
+                          l10n.jokerCallTitle,
                           Colors.blue,
+                          symbolCard: _getJokerCallCard(),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -282,14 +286,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                       children: [
                         const Icon(Icons.check_circle, color: Colors.amber, size: 20),
                         const SizedBox(width: 8),
-                        Text(
-                          _getSelectionDescription(l10n),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
+                        _buildSelectionDescriptionWidget(l10n),
                       ],
                     ),
                   ),
@@ -379,7 +376,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
     );
   }
 
-  Widget _buildQuickButton(String type, String label, Color color) {
+  Widget _buildQuickButton(String type, String label, Color color, {PlayingCard? symbolCard, bool forceBlackSymbol = false}) {
     final isSelected = _selectedType == type;
     final isDisabled = _isQuickButtonDisabled(type);
 
@@ -414,16 +411,29 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         ),
         child: Column(
           children: [
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isDisabled ? Colors.grey[500] : Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 11,
-                height: 1.3,
+            if (symbolCard != null) ...[
+              Text(
+                label.split('\n').first,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isDisabled ? Colors.grey[500] : Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
               ),
-            ),
+              const SizedBox(height: 2),
+              _buildCardSymbolWidget(symbolCard, isDisabled, forceBlack: forceBlackSymbol),
+            ] else
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isDisabled ? Colors.grey[500] : Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  height: 1.3,
+                ),
+              ),
             if (isDisabled)
               Text(
                 AppLocalizations.of(context)!.inPossession,
@@ -436,6 +446,58 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildCardSymbolWidget(PlayingCard card, bool isDisabled, {bool forceBlack = false}) {
+    if (card.isJoker) {
+      return Text(
+        '🃏',
+        style: TextStyle(
+          fontSize: 13,
+          color: isDisabled ? Colors.grey[500] : Colors.white,
+        ),
+      );
+    }
+    final suit = card.suit!;
+    final suitSymbol = card.suitSymbol;
+    final rankSymbol = card.rankSymbol;
+    final suitColor = _getSuitColorForQuickButton(suit, isDisabled, forceBlack: forceBlack);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          suitSymbol,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: suitColor,
+          ),
+        ),
+        Text(
+          rankSymbol,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: suitColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Color _getSuitColorForQuickButton(Suit suit, bool isDisabled, {bool forceBlack = false}) {
+    if (isDisabled) return Colors.grey[500]!;
+    if (forceBlack) return Colors.black;
+    switch (suit) {
+      case Suit.spade:
+      case Suit.club:
+        return Colors.black;
+      case Suit.heart:
+      case Suit.diamond:
+        return Colors.red;
+    }
   }
 
   bool _isQuickButtonDisabled(String type) {
@@ -474,7 +536,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         width: 55,
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.2),
+          color: isSelected ? Colors.white : Colors.white54,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected ? Colors.amber : Colors.transparent,
@@ -486,9 +548,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
             symbol,
             style: TextStyle(
               fontSize: 20,
-              color: isSelected
-                  ? (isRed ? Colors.red : Colors.black)
-                  : (isRed ? Colors.red[300] : Colors.white70),
+              color: isRed ? Colors.red : Colors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -628,6 +688,74 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
       default:
         return '';
     }
+  }
+
+  // 선택 설명 위젯 (무늬 색상 검정)
+  Widget _buildSelectionDescriptionWidget(AppLocalizations l10n) {
+    PlayingCard? card;
+    String? prefix;
+
+    switch (_selectedType) {
+      case 'mighty':
+        prefix = l10n.mighty;
+        card = widget.mighty;
+        break;
+      case 'joker':
+        return Text(
+          l10n.joker,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+        );
+      case 'jokerCall':
+        prefix = l10n.jokerCallTitle;
+        card = _getJokerCallCard();
+        break;
+      case 'none':
+        return Text(
+          l10n.noFriend,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+        );
+      case 'card':
+        if (_selectedCard != null) {
+          card = _selectedCard;
+        } else {
+          return Text(
+            l10n.byCard,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+          );
+        }
+        break;
+      default:
+        return const SizedBox.shrink();
+    }
+
+    if (card == null) return const SizedBox.shrink();
+
+    final suitSymbol = card.isJoker ? '🃏' : card.suitSymbol;
+    final rankSymbol = card.isJoker ? '' : card.rankSymbol;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (prefix != null) ...[
+          Text(
+            prefix,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          const Text(
+            ' ',
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+        ],
+        Text(
+          suitSymbol,
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        Text(
+          rankSymbol,
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+      ],
+    );
   }
 
   bool _canConfirm() {

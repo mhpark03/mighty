@@ -24,7 +24,7 @@
   "clubName": "Club",
   "selectKitty": "Select Kitty",
   "selectKittyDesc": "Select 3 cards to discard (Selected: {count}/3)",
-  "receivedKitty": "Received Kitty:",
+  "receivedKitty": "Received Cards:",
   "myCards": "My Cards:",
   "changeGiruda": "Change Trump (Optional):",
   "confirm": "Confirm",

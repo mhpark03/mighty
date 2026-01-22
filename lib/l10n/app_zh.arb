@@ -24,7 +24,7 @@
   "clubName": "梅花",
   "selectKitty": "选择底牌",
   "selectKittyDesc": "选择3张要弃掉的牌 (已选: {count}/3)",
-  "receivedKitty": "收到的底牌:",
+  "receivedKitty": "收到的牌:",
   "myCards": "我的牌:",
   "changeGiruda": "更改王牌 (可选):",
   "confirm": "确认",

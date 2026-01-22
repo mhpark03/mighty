@@ -24,7 +24,7 @@
   "clubName": "クラブ",
   "selectKitty": "キティ選択",
   "selectKittyDesc": "捨てるカード3枚を選択 (選択済み: {count}/3)",
-  "receivedKitty": "受け取ったキティ:",
+  "receivedKitty": "受け取ったカード:",
   "myCards": "手札:",
   "changeGiruda": "切り札変更 (任意):",
   "confirm": "確認",

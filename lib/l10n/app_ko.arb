@@ -39,7 +39,7 @@
       "count": {"type": "int"}
     }
   },
-  "receivedKitty": "받은 키티:",
+  "receivedKitty": "받은 카드:",
   "myCards": "내 카드:",
   "changeGiruda": "기루다 변경 (선택사항):",
   "confirm": "확인",

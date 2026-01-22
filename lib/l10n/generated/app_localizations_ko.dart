@@ -87,7 +87,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get receivedKitty => '받은 키티:';
+  String get receivedKitty => '받은 카드:';
 
   @override
   String get myCards => '내 카드:';

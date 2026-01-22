@@ -87,7 +87,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get receivedKitty => '收到的底牌:';
+  String get receivedKitty => '收到的牌:';
 
   @override
   String get myCards => '我的牌:';

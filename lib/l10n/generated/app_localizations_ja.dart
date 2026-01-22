@@ -87,7 +87,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get receivedKitty => '受け取ったキティ:';
+  String get receivedKitty => '受け取ったカード:';
 
   @override
   String get myCards => '手札:';

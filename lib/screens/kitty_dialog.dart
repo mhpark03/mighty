@@ -96,6 +96,53 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
     }).join(' ');
   }
 
+  // 무늬별 색상이 적용된 키티 표시 위젯
+  Widget _buildKittyNotificationWidget() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: widget.kitty.asMap().entries.map((entry) {
+        final index = entry.key;
+        final card = entry.value;
+
+        if (card.isJoker) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (index > 0) const SizedBox(width: 8),
+              const Text('JK', style: TextStyle(color: Colors.purple, fontWeight: FontWeight.bold, fontSize: 13)),
+            ],
+          );
+        }
+
+        final suit = card.suit!;
+        final suitSymbol = _getSuitSymbol(suit);
+        final rank = _getRankSymbol(card.rank!);
+        final color = _getSuitColorForDisplay(suit);
+
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (index > 0) const SizedBox(width: 8),
+            Text(suitSymbol, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(rank, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13)),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  // 표시용 무늬 색상 (스페이드/클로버는 검정, 하트/다이아는 빨강)
+  Color _getSuitColorForDisplay(Suit suit) {
+    switch (suit) {
+      case Suit.spade:
+      case Suit.club:
+        return Colors.black;
+      case Suit.heart:
+      case Suit.diamond:
+        return Colors.red;
+    }
+  }
+
   String _getSuitSymbol(Suit suit) {
     switch (suit) {
       case Suit.spade: return '♠';
@@ -159,17 +206,10 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.amber.withValues(alpha: 0.3),
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Text(
-                      _getKittyNotification(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
-                    ),
+                    child: _buildKittyNotificationWidget(),
                   ),
                 ],
               ),
