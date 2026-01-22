@@ -1707,16 +1707,41 @@ class AIPlayer {
 
     // === 주공팀 또는 노기루다 선공 전략 ===
 
-    // === 주공이 조커 사용 전 프렌드에게 선 넘기기 ===
+    // === 주공이 프렌드에게 선 넘기기 ===
     // 프렌드가 특정 카드로 선언되었고, 내가 그 무늬를 가지고 있으면
-    // 조커 사용 전에 그 무늬로 선공하여 프렌드에게 선을 넘김
+    // 프렌드에게 선을 넘겨서 프렌드가 선을 유지하게 함
     if (player.isDeclarer && state.friendDeclaration?.card != null) {
       final friendCard = state.friendDeclaration!.card!;
 
       // 조커를 가지고 있는지 확인
       bool hasJoker = playableCards.any((c) => c.isJoker);
+      bool hasMighty = playableCards.any((c) => c.isMighty);
 
-      if (hasJoker) {
+      // 선을 유지할 수 있는 최상위 카드(A) 확인
+      bool hasAnyAce = false;
+      for (final suit in Suit.values) {
+        // 마이티는 제외
+        if (state.mighty.suit == suit && state.mighty.rank == Rank.ace) continue;
+        bool hasAce = playableCards.any((c) =>
+            !c.isJoker && !c.isMighty && c.suit == suit && c.rank == Rank.ace);
+        if (hasAce) {
+          hasAnyAce = true;
+          break;
+        }
+      }
+
+      // 실효가치 14+ 카드 확인
+      bool hasTopCard = playableCards.any((c) =>
+          !c.isJoker && !c.isMighty &&
+          _getEffectiveCardValue(c, state) >= 14);
+
+      // ★ 노기루다에서 선 유지 확률이 낮을 때 프렌드에게 선 넘기기
+      // 조건: 노기루다 + A가 없고 + 실효가치 14+ 카드도 없음
+      bool shouldPassToFriendNoGiruda = state.giruda == null &&
+          !hasAnyAce && !hasTopCard;
+
+      // 조커가 있거나, 노기루다에서 선 유지가 어려운 경우 프렌드에게 선 넘기기
+      if (hasJoker || shouldPassToFriendNoGiruda) {
         Suit? friendSuit;
 
         // 1. 마이티 프렌드인 경우 - 마이티 무늬로 선공
@@ -1738,6 +1763,25 @@ class AIPlayer {
             // 프렌드 무늬의 낮은 카드로 선공하여 프렌드에게 선 넘기기
             friendSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
             return friendSuitCards.first;
+          }
+        }
+
+        // ★ 노기루다에서 프렌드 무늬가 없을 때: 마이티/조커로 프렌드 공개 후 선 유지
+        // 프렌드가 공개되면 프렌드가 선을 도와줄 수 있음
+        if (shouldPassToFriendNoGiruda && !state.friendRevealed) {
+          // 프렌드 공개를 위해 프렌드 카드 무늬로 선공 시도
+          // (프렌드가 그 무늬의 최상위 카드를 내서 선을 잡음)
+          if (friendCard.isMighty || (friendCard.rank == Rank.ace && !friendCard.isJoker)) {
+            // 프렌드가 마이티나 A를 가지고 있으면, 해당 무늬의 낮은 카드로 선공
+            final anySuit = friendCard.isMighty ? state.mighty.suit : friendCard.suit;
+            if (anySuit != null) {
+              final suitCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMighty && c.suit == anySuit).toList();
+              if (suitCards.isNotEmpty) {
+                suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return suitCards.first;
+              }
+            }
           }
         }
       }
@@ -1849,6 +1893,69 @@ class AIPlayer {
 
         // 마이티 사용 (7트릭 이후)
         if (state.currentTrickNumber >= 7) {
+          final mighty = playableCards.where((c) => c.isMighty).toList();
+          if (mighty.isNotEmpty) {
+            return mighty.first;
+          }
+        }
+      }
+    }
+
+    // === 노기루다 선공 전략 ===
+    // 노기루다에서는 컷이 불가능하므로 선공 유지가 매우 중요
+    // 최상위 카드(A)가 없으면 마이티/조커로 선공 확보 필요
+    if (state.giruda == null) {
+      bool isAttackTeam = !_isPlayerOnDefenseTeam(player, state);
+
+      if (isAttackTeam) {
+        // 각 무늬별 A 보유 여부 확인 (마이티 제외)
+        final playedCards = _getPlayedCards(state);
+        bool hasAnyAce = false;
+        Suit? bestAceSuit;
+
+        for (final suit in Suit.values) {
+          // 마이티는 제외
+          if (state.mighty.suit == suit && state.mighty.rank == Rank.ace) continue;
+
+          bool hasAce = playableCards.any((c) =>
+              !c.isJoker && !c.isMighty && c.suit == suit && c.rank == Rank.ace);
+          if (hasAce) {
+            hasAnyAce = true;
+            bestAceSuit = suit;
+            break;
+          }
+        }
+
+        if (hasAnyAce && bestAceSuit != null) {
+          // A가 있으면 A로 선공 (확실한 승리)
+          final aceCard = playableCards.firstWhere((c) =>
+              !c.isJoker && !c.isMighty && c.suit == bestAceSuit && c.rank == Rank.ace);
+          return aceCard;
+        }
+
+        // A가 없으면 실효가치 14+ (현재 최상위) 카드 확인
+        final topCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMighty &&
+            _getEffectiveCardValue(c, state) >= 14).toList();
+
+        if (topCards.isNotEmpty) {
+          // 실효 최상위 카드가 있으면 사용
+          return topCards.first;
+        }
+
+        // 최상위 카드가 없으면 마이티/조커로 선공 확보 필요
+        // (선을 빼앗기면 점수 손실이 큼)
+
+        // 조커 사용 (첫 트릭 및 마지막 트릭 제외)
+        if (state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
+          final joker = playableCards.where((c) => c.isJoker).toList();
+          if (joker.isNotEmpty) {
+            return joker.first;
+          }
+        }
+
+        // 마이티 사용 (조커가 없거나 이미 사용된 경우, 중반 이후)
+        if (state.currentTrickNumber >= 4) {
           final mighty = playableCards.where((c) => c.isMighty).toList();
           if (mighty.isNotEmpty) {
             return mighty.first;
@@ -2645,7 +2752,15 @@ class AIPlayer {
                   (!c.isJoker && _getEffectiveCardValue(c, state) >= 14));
               // 순서/기루다 조건 확인
               bool shouldUseJoker = false;
-              if (currentOrder >= 3) {
+
+              // ★ 노기루다: 컷이 불가능하므로 조커로 선공 탈환이 중요
+              if (state.giruda == null) {
+                // 노기루다에서는 점수 카드 1장 이상이면 조커 사용
+                // (최상위 카드 없어도 선공 유지가 중요)
+                if (pointCardsInTrick >= 1 || currentOrder >= 2) {
+                  shouldUseJoker = true;
+                }
+              } else if (currentOrder >= 3) {
                 // 4번째 이후: 최상위 카드 있으면 조커 사용
                 shouldUseJoker = hasTopCards;
               } else {
@@ -2682,7 +2797,13 @@ class AIPlayer {
           bool isNoFriend = state.friendDeclaration?.isNoFriend == true;
           bool isNoFriendDeclarer = player.isDeclarer && isNoFriend;
 
-          if (isMightyFriend && state.currentTrickNumber == 1) {
+          // ★ 노기루다: 컷이 불가능하므로 마이티로 선공 탈환이 중요
+          if (state.giruda == null) {
+            // 노기루다에서는 점수 카드 1장 이상이거나 3번째 이후면 마이티 사용
+            if (pointCardsInTrick >= 1 || currentOrder >= 2) {
+              shouldUseMighty = true;
+            }
+          } else if (isMightyFriend && state.currentTrickNumber == 1) {
             // 마이티 프렌드 + 첫 트릭: 프렌드 공개 + 선 탈환을 위해 바로 사용
             shouldUseMighty = true;
           } else if (currentOrder >= 3 || isLastPlayer) {
