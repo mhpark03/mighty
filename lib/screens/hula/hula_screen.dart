@@ -3313,9 +3313,10 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     final playerRegistered = playerRegisteredCards > 0;
     scores[0] = _calculateHandScore(playerHand) * (playerRegistered ? 1 : 2);
     for (int i = 0; i < computerHands.length; i++) {
-      final computerRegisteredCards = computerMelds[i].fold<int>(0, (sum, meld) => sum + meld.cards.length);
-      final computerRegistered = computerRegisteredCards > 0;
-      scores[i + 1] = _calculateHandScore(computerHands[i]) * (computerRegistered ? 1 : 2);
+      // ★ 등록 여부를 리스트 비어있음 + 카드 수로 이중 확인
+      final meldList = computerMelds[i];
+      final hasAnyMeld = meldList.isNotEmpty && meldList.any((m) => m.cards.isNotEmpty);
+      scores[i + 1] = _calculateHandScore(computerHands[i]) * (hasAnyMeld ? 1 : 2);
     }
 
     // 최저 점수 찾기
@@ -3360,14 +3361,13 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
   // stopperIndex: 스톱 실패한 플레이어 인덱스 (null이면 일반 종료)
   void _endGame(int winnerIdx, {int? stopperIndex}) {
     // 손패 점수 계산 (등록하지 못한 플레이어는 2배 패널티)
-    // ★ 실제 등록된 카드 수로 확인 (빈 멜드 방지)
-    final playerRegisteredCards = playerMelds.fold<int>(0, (sum, meld) => sum + meld.cards.length);
-    final playerRegistered = playerRegisteredCards > 0;
-    scores[0] = _calculateHandScore(playerHand) * (playerRegistered ? 1 : 2);
+    // ★ 등록 여부를 리스트 비어있음 + 카드 수로 이중 확인
+    final playerHasAnyMeld = playerMelds.isNotEmpty && playerMelds.any((m) => m.cards.isNotEmpty);
+    scores[0] = _calculateHandScore(playerHand) * (playerHasAnyMeld ? 1 : 2);
     for (int i = 0; i < computerHands.length; i++) {
-      final computerRegisteredCards = computerMelds[i].fold<int>(0, (sum, meld) => sum + meld.cards.length);
-      final computerRegistered = computerRegisteredCards > 0;
-      scores[i + 1] = _calculateHandScore(computerHands[i]) * (computerRegistered ? 1 : 2);
+      final meldList = computerMelds[i];
+      final hasAnyMeld = meldList.isNotEmpty && meldList.any((m) => m.cards.isNotEmpty);
+      scores[i + 1] = _calculateHandScore(computerHands[i]) * (hasAnyMeld ? 1 : 2);
     }
 
     // 라운드 점수 계산
@@ -4011,31 +4011,34 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                           // 땡큐 대기 카운트다운 표시
                           if (_thankYouWaiting && canTakeDiscard)
                             Positioned.fill(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.withValues(alpha: 0.7),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      '${l10n.hulaGuideThankYou}?',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
+                              child: GestureDetector(
+                                onTap: _drawFromDiscard,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withValues(alpha: 0.7),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '${l10n.hulaGuideThankYou}?',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      '$_thankYouCountdown',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 24,
+                                      Text(
+                                        '$_thankYouCountdown',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 24,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
