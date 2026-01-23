@@ -3680,11 +3680,18 @@ class AIPlayer {
     }
 
     // 조커/마이티만 남은 경우
-    // 마이티가 이기고 있으면 조커를 내지 않고 마이티를 냄 (조커 보존)
+    // 마이티가 이기고 있으면 조커를 내지 않음 (조커는 마이티를 이길 수 없음)
     if (mightyWinning) {
+      // 마이티가 있으면 마이티를 냄 (조커 보존)
       final mighty = playableCards.where((c) => c.isMighty).toList();
       if (mighty.isNotEmpty) {
         return mighty.first;
+      }
+      // 마이티가 없으면 조커도 아끼고 아무거나 냄 (조커로는 마이티를 못 이김)
+      // 조커만 남은 경우 어쩔 수 없이 조커를 냄
+      final nonJoker = playableCards.where((c) => !c.isJoker).toList();
+      if (nonJoker.isNotEmpty) {
+        return nonJoker.first;
       }
     }
 
