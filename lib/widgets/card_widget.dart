@@ -155,6 +155,10 @@ class CardWidget extends StatelessWidget {
       );
     }
 
+    // 카드 크기에 비례한 폰트 크기
+    final cornerFontSize = height * 0.12;
+    final centerFontSize = height * 0.30;
+
     return Padding(
       padding: const EdgeInsets.all(2),
       child: Column(
@@ -166,7 +170,7 @@ class CardWidget extends StatelessWidget {
               '${card.rankSymbol}\n${card.suitSymbol}',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: cornerFontSize,
                 fontWeight: FontWeight.bold,
                 color: color,
                 height: 1.0,
@@ -179,7 +183,7 @@ class CardWidget extends StatelessWidget {
               child: Text(
                 card.suitSymbol,
                 style: TextStyle(
-                  fontSize: 26,
+                  fontSize: centerFontSize,
                   color: color,
                 ),
               ),
