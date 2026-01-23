@@ -3358,30 +3358,43 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     return hand.fold(0, (sum, card) => sum + card.point);
   }
 
+  // 멜드 리스트의 총 카드 수 계산
+  int _countTotalMeldCards(List<Meld> melds) {
+    return melds.fold(0, (sum, m) => sum + m.cards.length);
+  }
+
   // stopperIndex: 스톱 실패한 플레이어 인덱스 (null이면 일반 종료)
   void _endGame(int winnerIdx, {int? stopperIndex}) {
-    // 손패 점수 계산 (등록하지 못한 플레이어는 2배 패널티)
-    // ★ 등록 여부를 리스트 비어있음 + 카드 수로 이중 확인
-    final playerHasAnyMeld = playerMelds.isNotEmpty && playerMelds.any((m) => m.cards.isNotEmpty);
-    scores[0] = _calculateHandScore(playerHand) * (playerHasAnyMeld ? 1 : 2);
+    // 손패 점수 계산 (순수 손패 점수, 2배 패널티는 차이 계산 후 적용)
+    scores[0] = _calculateHandScore(playerHand);
     for (int i = 0; i < computerHands.length; i++) {
-      final meldList = computerMelds[i];
-      final hasAnyMeld = meldList.isNotEmpty && meldList.any((m) => m.cards.isNotEmpty);
-      scores[i + 1] = _calculateHandScore(computerHands[i]) * (hasAnyMeld ? 1 : 2);
+      scores[i + 1] = _calculateHandScore(computerHands[i]);
     }
 
+    // 멜드 등록 여부 계산 (등록하지 않은 플레이어는 차이의 2배 패널티)
+    final List<bool> hasMeld = List.generate(playerCount, (i) {
+      if (i == 0) {
+        return _countTotalMeldCards(playerMelds) > 0;
+      } else {
+        return _countTotalMeldCards(computerMelds[i - 1]) > 0;
+      }
+    });
+
     // 라운드 점수 계산
-    final multiplier = (isHula && winnerIdx == 0) ? 2 : 1;
+    final hulaMultiplier = (isHula && winnerIdx == 0) ? 2 : 1;
     final winnerHandScore = scores[winnerIdx];
     int winnerGain = 0;
 
     roundScores = List.generate(playerCount, (_) => 0);
 
-    // 승자가 얻을 총 점수 계산 (모든 플레이어와의 차이 합)
+    // 승자가 얻을 총 점수 계산 (차이 계산 후 2배 패널티 적용)
     for (int i = 0; i < playerCount; i++) {
       if (i == winnerIdx) continue;
-      final diff = (scores[i] - winnerHandScore) * multiplier;
-      winnerGain += diff;
+      final diff = scores[i] - winnerHandScore;
+      // 멜드 등록하지 않은 플레이어는 차이의 2배
+      final noMeldMultiplier = hasMeld[i] ? 1 : 2;
+      final finalDiff = diff * noMeldMultiplier * hulaMultiplier;
+      winnerGain += finalDiff;
     }
 
     if (stopperIndex != null) {
@@ -3391,11 +3404,13 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
       roundScores[stopperIndex] = -winnerGain;
       // 나머지 플레이어는 0 (이미 초기화됨)
     } else {
-      // 일반 종료: 각자 승자와의 차이만큼 감점
+      // 일반 종료: 각자 승자와의 차이만큼 감점 (멜드 없으면 2배)
       for (int i = 0; i < playerCount; i++) {
         if (i == winnerIdx) continue;
-        final diff = (scores[i] - winnerHandScore) * multiplier;
-        roundScores[i] = -diff;
+        final diff = scores[i] - winnerHandScore;
+        final noMeldMultiplier = hasMeld[i] ? 1 : 2;
+        final finalDiff = diff * noMeldMultiplier * hulaMultiplier;
+        roundScores[i] = -finalDiff;
       }
       roundScores[winnerIdx] = winnerGain;
     }
@@ -3786,7 +3801,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
                       AppLocalizations.of(context)!.cardCount(hand.length),
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
-                    if (melds.isNotEmpty) ...[
+                    if (_countTotalMeldCards(melds) > 0) ...[
                       const SizedBox(width: 8),
                       Text(
                         '(${AppLocalizations.of(context)!.meldCount(melds.length)})',
@@ -3856,7 +3871,7 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
             AppLocalizations.of(context)!.cardCount(hand.length),
             style: const TextStyle(color: Colors.white, fontSize: 11),
           ),
-          if (melds.isNotEmpty)
+          if (_countTotalMeldCards(melds) > 0)
             Text(
               AppLocalizations.of(context)!.meldCount(melds.length),
               style: const TextStyle(color: Colors.green, fontSize: 9),
