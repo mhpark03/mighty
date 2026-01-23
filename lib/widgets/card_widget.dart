@@ -148,6 +148,7 @@ class CardWidget extends StatelessWidget {
               style: TextStyle(
                 fontSize: height * 0.28,
                 color: color,
+                fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
               ),
             ),
           ],
@@ -174,6 +175,7 @@ class CardWidget extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: color,
                 height: 1.0,
+                fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
               ),
             ),
           ),
@@ -185,6 +187,7 @@ class CardWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: centerFontSize,
                   color: color,
+                  fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
                 ),
               ),
             ),
@@ -277,7 +280,11 @@ class MiniCardWidget extends StatelessWidget {
           children: [
             Text(
               card.suitSymbol,
-              style: TextStyle(fontSize: 14, color: color),
+              style: TextStyle(
+                fontSize: 14,
+                color: color,
+                fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
+              ),
             ),
             Text(
               card.rankSymbol,

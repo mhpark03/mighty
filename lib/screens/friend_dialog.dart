@@ -473,6 +473,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
             fontSize: 13,
             fontWeight: FontWeight.bold,
             color: suitColor,
+            fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
           ),
         ),
         Text(
@@ -653,7 +654,11 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         children: [
           Text(
             card.suitSymbol,
-            style: TextStyle(fontSize: suitFontSize, color: color),
+            style: TextStyle(
+              fontSize: suitFontSize,
+              color: color,
+              fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
+            ),
           ),
           Text(
             card.rankSymbol,
@@ -752,7 +757,12 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         ],
         Text(
           suitSymbol,
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
+          ),
         ),
         Text(
           rankSymbol,

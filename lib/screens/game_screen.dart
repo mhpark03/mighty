@@ -1995,6 +1995,7 @@ class _GameScreenState extends State<GameScreen> {
           color: isRed ? Colors.red[700] : Colors.black,
           fontSize: 11,
           fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
+          fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
         ),
       ),
     );
@@ -2056,6 +2057,7 @@ class _GameScreenState extends State<GameScreen> {
             color: isRed ? Colors.red[700] : Colors.black,
             fontSize: 12,
             fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
+            fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
           ),
         ),
       ),

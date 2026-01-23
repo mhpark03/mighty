@@ -123,7 +123,7 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (index > 0) const SizedBox(width: 8),
-            Text(suitSymbol, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13)),
+            Text(suitSymbol, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13, fontFamily: 'Roboto')),
             Text(rank, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 13)),
           ],
         );
