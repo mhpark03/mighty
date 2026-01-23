@@ -632,7 +632,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                       ? [BoxShadow(color: Colors.amber.withValues(alpha: 0.5), blurRadius: 8)]
                       : null,
                 ),
-                child: _buildMiniCard(card),
+                child: _buildMiniCard(card, cardHeight),
               ),
             ),
           ),
@@ -641,20 +641,24 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
     );
   }
 
-  Widget _buildMiniCard(PlayingCard card) {
+  Widget _buildMiniCard(PlayingCard card, double cardHeight) {
     final color = card.isRed ? Colors.red : Colors.black;
+    // 카드 높이에 비례한 폰트 크기
+    final suitFontSize = cardHeight * 0.28;
+    final rankFontSize = cardHeight * 0.24;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             card.suitSymbol,
-            style: TextStyle(fontSize: 16, color: color),
+            style: TextStyle(fontSize: suitFontSize, color: color),
           ),
           Text(
             card.rankSymbol,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: rankFontSize,
               fontWeight: FontWeight.bold,
               color: color,
             ),

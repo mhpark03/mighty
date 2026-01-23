@@ -843,11 +843,12 @@ class GameState {
     PlayingCard winningCard = currentTrick!.cards[0];
     final leadSuit = currentTrick!.leadSuit;
     bool jokerWasCalled = currentTrick!.jokerCall == JokerCallType.jokerCall;
+    bool isLastTrick = currentTrick!.trickNumber == 10;
 
     for (int i = 1; i < currentTrick!.cards.length; i++) {
       final card = currentTrick!.cards[i];
 
-      if (isCardStronger(card, winningCard, leadSuit, jokerWasCalled)) {
+      if (isCardStronger(card, winningCard, leadSuit, jokerWasCalled, isLastTrick)) {
         winnerIndex = i;
         winningCard = card;
       }
@@ -857,9 +858,15 @@ class GameState {
   }
 
   bool isCardStronger(
-      PlayingCard card, PlayingCard other, Suit? leadSuit, bool jokerCalled) {
+      PlayingCard card, PlayingCard other, Suit? leadSuit, bool jokerCalled, [bool isLastTrick = false]) {
     if (card == mighty) return true;
     if (other == mighty) return false;
+
+    // 마지막 트릭(10번째)에서 조커는 가장 약함 (조커 콜이 아니어도 약함)
+    if (isLastTrick) {
+      if (card.isJoker) return false;
+      if (other.isJoker) return true;
+    }
 
     // 조커는 마이티 다음으로 강함 (조커 콜 시에만 약해짐)
     if (card.isJoker) {
