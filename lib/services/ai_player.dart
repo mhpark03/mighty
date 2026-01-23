@@ -3447,6 +3447,37 @@ class AIPlayer {
       }
     }
 
+    // === 9번째 트릭 마이티 적극 사용 ===
+    // 9번째에서 선을 잡아 10번째에 자신의 카드로 선공하여 이길 확률을 높임
+    if (state.currentTrickNumber == 9) {
+      final mighty = playableCards.where((c) => c.isMighty).toList();
+      if (mighty.isNotEmpty) {
+        // 조커가 나오지 않고 상대팀이 이기고 있으면 마이티 사용 검토
+        bool jokerPlayed = state.currentTrick!.cards.any((c) => c.isJoker);
+        bool myTeamWinning = (isDefenseTeam && defenseWinning) || (isAttackTeam && !defenseWinning);
+        if (!jokerPlayed && !myTeamWinning) {
+          // 마이티 제외 남은 카드 중 10번째에서 이길 가능성 있는 카드 확인
+          final remainingCards = player.hand.where((c) => !c.isMighty).toList();
+          bool hasWinningCard = remainingCards.any((c) =>
+              c.isJoker ||
+              (c.suit == state.giruda && _getEffectiveCardValue(c, state) >= 12) ||
+              _getEffectiveCardValue(c, state) >= 14);
+
+          if (hasWinningCard) {
+            // 10번째에서 이길 카드가 있으면 마이티 사용하여 선 확보
+            return mighty.first;
+          } else {
+            // 이길 카드가 없으면 점수 카드가 많을 때만 마이티 사용
+            int pointCardsInTrick = state.currentTrick!.cards
+                .where((c) => c.isPointCard || c.isJoker).length;
+            if (pointCardsInTrick >= 2) {
+              return mighty.first;
+            }
+          }
+        }
+      }
+    }
+
     // === 수비팀 후반전 마이티 전략 ===
     // 후반전(트릭 8 이후)에 마이티를 사용하여 점수 확보
     if (isDefenseTeam && state.currentTrickNumber >= 8) {
