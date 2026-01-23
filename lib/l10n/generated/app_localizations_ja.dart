@@ -1519,4 +1519,24 @@ class AppLocalizationsJa extends AppLocalizations {
   String meldCount(int count) {
     return '$countメルド';
   }
+
+  @override
+  String get cannotPlayFirstTrickDeclarerGiruda => '最初のトリックでは、主公は切り札でリードできません';
+
+  @override
+  String get cannotPlayFirstTrickJoker => '最初のトリックではジョーカーを出せません';
+
+  @override
+  String get cannotPlayLastTrickJoker => '最後のトリックではジョーカーを出せません';
+
+  @override
+  String get cannotPlayLastTrickJokerHasLeadSuit => 'リードスートがある場合、ジョーカーを出せません';
+
+  @override
+  String get mustPlayJokerCall => 'ジョーカーコール！ジョーカーを出さなければなりません';
+
+  @override
+  String mustFollowSuit(String suit) {
+    return '$suitのスートを出さなければなりません';
+  }
 }

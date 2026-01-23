@@ -654,5 +654,16 @@
     "placeholders": {
       "count": {"type": "int"}
     }
+  },
+  "cannotPlayFirstTrickDeclarerGiruda": "最初のトリックでは、主公は切り札でリードできません",
+  "cannotPlayFirstTrickJoker": "最初のトリックではジョーカーを出せません",
+  "cannotPlayLastTrickJoker": "最後のトリックではジョーカーを出せません",
+  "cannotPlayLastTrickJokerHasLeadSuit": "リードスートがある場合、ジョーカーを出せません",
+  "mustPlayJokerCall": "ジョーカーコール！ジョーカーを出さなければなりません",
+  "mustFollowSuit": "{suit}のスートを出さなければなりません",
+  "@mustFollowSuit": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
   }
 }

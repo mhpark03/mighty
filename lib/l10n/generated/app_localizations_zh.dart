@@ -1510,4 +1510,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String meldCount(int count) {
     return '$count组';
   }
+
+  @override
+  String get cannotPlayFirstTrickDeclarerGiruda => '第一轮庄家不能用王牌先出';
+
+  @override
+  String get cannotPlayFirstTrickJoker => '第一轮不能出小丑';
+
+  @override
+  String get cannotPlayLastTrickJoker => '最后一轮不能出小丑';
+
+  @override
+  String get cannotPlayLastTrickJokerHasLeadSuit => '有首出花色时不能出小丑';
+
+  @override
+  String get mustPlayJokerCall => '小丑呼叫！你必须出小丑';
+
+  @override
+  String mustFollowSuit(String suit) {
+    return '你必须出$suit花色';
+  }
 }

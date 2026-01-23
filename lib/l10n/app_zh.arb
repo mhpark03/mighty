@@ -654,5 +654,16 @@
     "placeholders": {
       "count": {"type": "int"}
     }
+  },
+  "cannotPlayFirstTrickDeclarerGiruda": "第一轮庄家不能用王牌先出",
+  "cannotPlayFirstTrickJoker": "第一轮不能出小丑",
+  "cannotPlayLastTrickJoker": "最后一轮不能出小丑",
+  "cannotPlayLastTrickJokerHasLeadSuit": "有首出花色时不能出小丑",
+  "mustPlayJokerCall": "小丑呼叫！你必须出小丑",
+  "mustFollowSuit": "你必须出{suit}花色",
+  "@mustFollowSuit": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
   }
 }

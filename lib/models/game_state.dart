@@ -679,7 +679,8 @@ class GameState {
     return false;
   }
 
-  // 카드를 낼 수 없는 이유 반환 (null이면 낼 수 있음)
+  // 카드를 낼 수 없는 이유 코드 반환 (null이면 낼 수 있음)
+  // 코드 형식: 'firstTrickDeclarerGiruda', 'firstTrickJoker', 'lastTrickJoker', 'jokerCall', 'followSuit:N'
   String? getCannotPlayReason(PlayingCard card, Player player) {
     bool isMightyCard(PlayingCard c) => c.suit == mighty.suit && c.rank == mighty.rank;
 
@@ -691,7 +692,7 @@ class GameState {
               .where((c) => !c.isJoker && !isMightyCard(c) && c.suit != giruda)
               .toList();
           if (nonGirudaCards.isNotEmpty) {
-            return '첫 트릭에서 주공은 기루다로 선공할 수 없습니다';
+            return 'firstTrickDeclarerGiruda';
           }
         }
       }
@@ -700,7 +701,7 @@ class GameState {
       if (currentTrickNumber == 1 && !mightyJokerUsed && card.isJoker) {
         final otherCards = player.hand.where((c) => !c.isJoker).toList();
         if (otherCards.isNotEmpty) {
-          return '첫 트릭에서는 조커를 낼 수 없습니다';
+          return 'firstTrickJoker';
         }
       }
 
@@ -708,7 +709,7 @@ class GameState {
       if (currentTrickNumber == 10 && card.isJoker) {
         final otherCards = player.hand.where((c) => !c.isJoker).toList();
         if (otherCards.isNotEmpty) {
-          return '마지막 트릭에서는 조커를 낼 수 없습니다';
+          return 'lastTrickJoker';
         }
       }
 
@@ -721,7 +722,7 @@ class GameState {
     if (currentTrick!.jokerCall == JokerCallType.jokerCall) {
       bool hasJoker = player.hand.any((c) => c.isJoker);
       if (hasJoker && !card.isJoker) {
-        return '조커 콜! 조커를 내야 합니다';
+        return 'jokerCall';
       }
     }
 
@@ -731,11 +732,11 @@ class GameState {
     if (currentTrickNumber == 10 && card.isJoker) {
       bool hasLeadSuit = player.hand.any((c) => !c.isJoker && c.suit == leadSuit);
       if (hasLeadSuit) {
-        return '선공 무늬가 있으면 조커를 낼 수 없습니다';
+        return 'lastTrickJokerHasLeadSuit';
       }
       final otherCards = player.hand.where((c) => !c.isJoker).toList();
       if (otherCards.isNotEmpty) {
-        return '마지막 트릭에서는 조커를 낼 수 없습니다';
+        return 'lastTrickJoker';
       }
     }
 
@@ -743,7 +744,7 @@ class GameState {
     if (currentTrickNumber == 1 && !mightyJokerUsed && card.isJoker) {
       final otherCards = player.hand.where((c) => !c.isJoker).toList();
       if (otherCards.isNotEmpty) {
-        return '첫 트릭에서는 조커를 낼 수 없습니다';
+        return 'firstTrickJoker';
       }
     }
 
@@ -758,20 +759,10 @@ class GameState {
     }
 
     if (player.hasSuit(leadSuit)) {
-      final suitName = _getSuitName(leadSuit);
-      return '$suitName 무늬를 내야 합니다';
+      return 'followSuit:${leadSuit.index}';
     }
 
     return null;
-  }
-
-  String _getSuitName(Suit suit) {
-    switch (suit) {
-      case Suit.spade: return '스페이드';
-      case Suit.heart: return '하트';
-      case Suit.diamond: return '다이아몬드';
-      case Suit.club: return '클로버';
-    }
   }
 
   // 조커 콜 선언 (선공 시에만 가능)

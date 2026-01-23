@@ -2801,6 +2801,42 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'{count}개 멜드'**
   String meldCount(int count);
+
+  /// No description provided for @cannotPlayFirstTrickDeclarerGiruda.
+  ///
+  /// In ko, this message translates to:
+  /// **'첫 트릭에서 주공은 기루다로 선공할 수 없습니다'**
+  String get cannotPlayFirstTrickDeclarerGiruda;
+
+  /// No description provided for @cannotPlayFirstTrickJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'첫 트릭에서는 조커를 낼 수 없습니다'**
+  String get cannotPlayFirstTrickJoker;
+
+  /// No description provided for @cannotPlayLastTrickJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'마지막 트릭에서는 조커를 낼 수 없습니다'**
+  String get cannotPlayLastTrickJoker;
+
+  /// No description provided for @cannotPlayLastTrickJokerHasLeadSuit.
+  ///
+  /// In ko, this message translates to:
+  /// **'선공 무늬가 있으면 조커를 낼 수 없습니다'**
+  String get cannotPlayLastTrickJokerHasLeadSuit;
+
+  /// No description provided for @mustPlayJokerCall.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 콜! 조커를 내야 합니다'**
+  String get mustPlayJokerCall;
+
+  /// No description provided for @mustFollowSuit.
+  ///
+  /// In ko, this message translates to:
+  /// **'{suit} 무늬를 내야 합니다'**
+  String mustFollowSuit(String suit);
 }
 
 class _AppLocalizationsDelegate

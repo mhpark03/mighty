@@ -655,5 +655,16 @@
     "placeholders": {
       "count": {"type": "int"}
     }
+  },
+  "cannotPlayFirstTrickDeclarerGiruda": "Declarer cannot lead with trump on the first trick",
+  "cannotPlayFirstTrickJoker": "Cannot play Joker on the first trick",
+  "cannotPlayLastTrickJoker": "Cannot play Joker on the last trick",
+  "cannotPlayLastTrickJokerHasLeadSuit": "Cannot play Joker when you have the lead suit",
+  "mustPlayJokerCall": "Joker Call! You must play the Joker",
+  "mustFollowSuit": "You must follow {suit}",
+  "@mustFollowSuit": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
   }
 }

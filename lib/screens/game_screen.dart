@@ -2458,16 +2458,52 @@ class _GameScreenState extends State<GameScreen> {
     return a.suit == b.suit && a.rank == b.rank;
   }
 
+  // 무늬 이름 로컬라이즈
+  String _getSuitNameLocalized(Suit suit, AppLocalizations l10n) {
+    switch (suit) {
+      case Suit.spade:
+        return l10n.suitSpade;
+      case Suit.diamond:
+        return l10n.suitDiamond;
+      case Suit.heart:
+        return l10n.suitHeart;
+      case Suit.club:
+        return l10n.suitClub;
+    }
+  }
+
+  // 카드 규칙 코드를 로컬라이즈된 메시지로 변환
+  String _getLocalizedCannotPlayReason(String code, AppLocalizations l10n) {
+    if (code == 'firstTrickDeclarerGiruda') {
+      return l10n.cannotPlayFirstTrickDeclarerGiruda;
+    } else if (code == 'firstTrickJoker') {
+      return l10n.cannotPlayFirstTrickJoker;
+    } else if (code == 'lastTrickJoker') {
+      return l10n.cannotPlayLastTrickJoker;
+    } else if (code == 'lastTrickJokerHasLeadSuit') {
+      return l10n.cannotPlayLastTrickJokerHasLeadSuit;
+    } else if (code == 'jokerCall') {
+      return l10n.mustPlayJokerCall;
+    } else if (code.startsWith('followSuit:')) {
+      final suitIndex = int.tryParse(code.split(':')[1]) ?? 0;
+      final suitName = _getSuitNameLocalized(Suit.values[suitIndex], l10n);
+      return l10n.mustFollowSuit(suitName);
+    }
+    return code;
+  }
+
   void _onCardTap(PlayingCard card, GameController controller) {
     if (controller.state.phase != GamePhase.playing) return;
     if (!controller.isHumanTurn) return;
     if (!controller.canPlayCard(card)) {
       // 낼 수 없는 이유를 토스트로 표시
-      final reason = controller.getCannotPlayReason(card);
-      if (reason != null) {
+      final reasonCode = controller.getCannotPlayReason(card);
+      if (reasonCode != null) {
+        final l10n = AppLocalizations.of(context)!;
+        final localizedReason = _getLocalizedCannotPlayReason(reasonCode, l10n);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(reason),
+            content: Text(localizedReason),
             duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
           ),
