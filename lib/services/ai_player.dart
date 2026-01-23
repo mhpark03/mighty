@@ -2313,6 +2313,35 @@ class AIPlayer {
         bool mightyInMyHand = player.hand.any((c) => c.isMighty);
         winningCardIsTop = mightyPlayed || mightyInMyHand ||
             !playableCards.any((c) => c.isMighty);
+      } else if (currentWinningCard.suit == state.giruda && leadSuit != state.giruda) {
+        // ★ 팀원이 기루다로 컷해서 이기고 있는 경우
+        // 선공 무늬가 처음 나온 경우 간을 칠 확률이 낮으므로 마이티 아끼기
+        final playedCards = _getPlayedCards(state);
+
+        // 선공 무늬가 이번 게임에서 처음 나왔는지 확인
+        bool leadSuitFirstTime = !playedCards.any((c) => c.suit == leadSuit);
+
+        // 상대에게 더 높은 기루다가 남아있는지 확인
+        int winningGirudaRank = currentWinningCard.rankValue;
+        bool higherGirudaRemaining = false;
+        for (int rankVal = winningGirudaRank + 1; rankVal <= 14; rankVal++) {
+          final rank = Rank.values[rankVal - 2];
+          bool inMyHand = player.hand.any((c) => c.suit == state.giruda && c.rank == rank);
+          bool alreadyPlayed = playedCards.any((c) => c.suit == state.giruda && c.rank == rank);
+          if (!inMyHand && !alreadyPlayed) {
+            higherGirudaRemaining = true;
+            break;
+          }
+        }
+
+        // 선공 무늬가 처음이고 더 높은 기루다가 없으면 확실히 이김
+        if (leadSuitFirstTime && !higherGirudaRemaining) {
+          winningCardIsTop = true;
+        }
+        // 선공 무늬가 처음이면 간을 칠 확률이 낮으므로 마이티 아끼기
+        else if (leadSuitFirstTime) {
+          winningCardIsTop = true;
+        }
       } else {
         // 일반 카드: 더 높은 카드가 나올 수 있는지 확인
         final playedCards = _getPlayedCards(state);
