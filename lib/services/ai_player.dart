@@ -3447,19 +3447,39 @@ class AIPlayer {
       }
     }
 
-    // === 9번째 트릭 마이티 적극 사용 ===
+    // === 9번째 트릭 조커/마이티 적극 사용 ===
     // 9번째에서 선을 잡아 10번째에 자신의 카드로 선공하여 이길 확률을 높임
+    // 마지막 트릭에서 조커는 조커콜에 취약하므로 9번째에서 조커를 먼저 사용
     if (state.currentTrickNumber == 9) {
+      final joker = playableCards.where((c) => c.isJoker).toList();
       final mighty = playableCards.where((c) => c.isMighty).toList();
-      if (mighty.isNotEmpty) {
-        // 조커가 나오지 않고 상대팀이 이기고 있으면 마이티 사용 검토
-        bool jokerPlayed = state.currentTrick!.cards.any((c) => c.isJoker);
-        bool myTeamWinning = (isDefenseTeam && defenseWinning) || (isAttackTeam && !defenseWinning);
-        if (!jokerPlayed && !myTeamWinning) {
+
+      // 조커가 나오지 않고 상대팀이 이기고 있으면 사용 검토
+      bool jokerPlayed = state.currentTrick!.cards.any((c) => c.isJoker);
+      bool myTeamWinning = (isDefenseTeam && defenseWinning) || (isAttackTeam && !defenseWinning);
+
+      if (!jokerPlayed && !myTeamWinning) {
+        // 마이티와 조커 둘 다 있으면 조커 우선 (10번째에서 마이티로 확실하게 이김)
+        if (joker.isNotEmpty && mighty.isNotEmpty) {
+          bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
+          if (!jokerCalled) {
+            return joker.first;
+          }
+        }
+
+        // 조커만 있으면 조커 사용 (10번째에서 조커는 조커콜에 취약)
+        if (joker.isNotEmpty && mighty.isEmpty) {
+          bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
+          if (!jokerCalled) {
+            return joker.first;
+          }
+        }
+
+        // 마이티만 있으면 마이티 사용
+        if (mighty.isNotEmpty) {
           // 마이티 제외 남은 카드 중 10번째에서 이길 가능성 있는 카드 확인
           final remainingCards = player.hand.where((c) => !c.isMighty).toList();
           bool hasWinningCard = remainingCards.any((c) =>
-              c.isJoker ||
               (c.suit == state.giruda && _getEffectiveCardValue(c, state) >= 12) ||
               _getEffectiveCardValue(c, state) >= 14);
 
