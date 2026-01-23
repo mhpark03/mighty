@@ -2037,13 +2037,22 @@ class AIPlayer {
     final shouldAvoidMighty = state.currentTrickNumber < 7 && nonMightyPlayable.isNotEmpty;
     final cardsToConsider = shouldAvoidMighty ? nonMightyPlayable : playableCards;
 
+    // 상대에게 기루다가 남아있는지 확인
+    final opponentHasGiruda = state.giruda != null &&
+        _getRemainingGirudaCount(state, player) > 0;
+
     // 오픈된 카드를 고려하여 실효 가치가 높은 카드 선택
     cardsToConsider.sort((a, b) {
       // 마이티는 후순위 (탈환용으로 보존)
       if (a.isMighty) return 1;
       if (b.isMighty) return -1;
 
-      if (state.giruda != null) {
+      // ★ 상대에게 기루다가 없으면 비기루다 우선 (기루다로 선공할 필요 없음)
+      if (state.giruda != null && !opponentHasGiruda) {
+        if (a.suit == state.giruda && b.suit != state.giruda) return 1;  // 기루다 후순위
+        if (a.suit != state.giruda && b.suit == state.giruda) return -1; // 비기루다 우선
+      } else if (state.giruda != null) {
+        // 상대에게 기루다가 있으면 기존대로 기루다 우선
         if (a.suit == state.giruda && b.suit != state.giruda) return -1;
         if (a.suit != state.giruda && b.suit == state.giruda) return 1;
       }
