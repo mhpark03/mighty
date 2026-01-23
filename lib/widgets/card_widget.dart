@@ -28,7 +28,7 @@ class CardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: isPlayable ? onTap : null,
+      onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         width: width,
@@ -53,6 +53,17 @@ class CardWidget extends StatelessWidget {
               ),
               child: faceDown ? _buildCardBack() : _buildCardFront(),
             ),
+            // 낼 수 없는 카드 어둡게 표시
+            if (!isPlayable && !faceDown)
+              Positioned.fill(
+                child: Container(
+                  margin: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+              ),
             // 추천 표시 배지
             if (isRecommended)
               Positioned(

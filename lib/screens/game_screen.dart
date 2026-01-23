@@ -2461,7 +2461,20 @@ class _GameScreenState extends State<GameScreen> {
   void _onCardTap(PlayingCard card, GameController controller) {
     if (controller.state.phase != GamePhase.playing) return;
     if (!controller.isHumanTurn) return;
-    if (!controller.canPlayCard(card)) return;
+    if (!controller.canPlayCard(card)) {
+      // 낼 수 없는 이유를 토스트로 표시
+      final reason = controller.getCannotPlayReason(card);
+      if (reason != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(reason),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
 
     if (selectedCard == card) {
       // 조커 콜 카드(♣3 또는 ♠3)를 선공으로 낼 때만 조커 콜 가능

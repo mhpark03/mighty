@@ -429,6 +429,10 @@ class GameController extends ChangeNotifier {
     return _state.canPlayCard(card, humanPlayer);
   }
 
+  String? getCannotPlayReason(PlayingCard card) {
+    return _state.getCannotPlayReason(card, humanPlayer);
+  }
+
   /// 사용자에게 추천할 카드를 반환
   /// AI 로직을 사용하여 최적의 카드를 선택
   PlayingCard? getRecommendedCard() {
