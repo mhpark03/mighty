@@ -808,10 +808,11 @@ class _HulaScreenState extends State<HulaScreen> with TickerProviderStateMixin {
     // 땡큐 가능 여부 확인 (등록 가능한 경우에만)
     if (!_canThankYou()) return;
 
-    // 땡큐 대기 중이면 타이머 취소
+    // 땡큐 대기 중이면 타이머 취소하고 플레이어 턴으로 변경
     if (_thankYouWaiting) {
       _thankYouTimer?.cancel();
       setState(() {
+        currentTurn = 0;  // ★ 플레이어 턴으로 변경
         _thankYouWaiting = false;
         _thankYouCountdown = 0;
       });
