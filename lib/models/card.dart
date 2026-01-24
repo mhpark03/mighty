@@ -34,6 +34,18 @@ class PlayingCard {
 
   factory PlayingCard.joker() => const PlayingCard(isJoker: true);
 
+  /// 기루다에 따른 마이티 판별
+  /// - 기루다가 스페이드 → 마이티는 다이아몬드 A
+  /// - 그 외 → 마이티는 스페이드 A
+  bool isMightyWith(Suit? giruda) {
+    if (giruda == Suit.spade) {
+      return suit == Suit.diamond && rank == Rank.ace;
+    }
+    return suit == Suit.spade && rank == Rank.ace;
+  }
+
+  /// 기본 마이티 판별 (기루다가 스페이드가 아닌 경우)
+  /// 주의: 기루다가 스페이드인 경우 isMightyWith(giruda) 사용 필요
   bool get isMighty => suit == Suit.spade && rank == Rank.ace;
 
   bool get isPointCard {
