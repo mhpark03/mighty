@@ -3356,7 +3356,7 @@ class AIPlayer {
     }
 
     // === 수비팀 조커로 점수 카드 탈취 전략 ===
-    // 공격팀이 점수 카드를 많이 가져갈 때 조커로 뺏기
+    // 공격팀이 기루다 고액(A/K/Q/J)으로 이기고 있고 점수 카드가 2장 이상일 때만 조커 사용
     if (isDefenseTeam && state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
       final joker = playableCards.where((c) => c.isJoker).toList();
       if (joker.isNotEmpty) {
@@ -3364,9 +3364,16 @@ class AIPlayer {
         int pointCardsInTrick = state.currentTrick!.cards
             .where((c) => c.isPointCard || c.isJoker).length;
 
-        // 점수 카드 2장 이상이고 공격팀이 이기고 있을 때 조커 사용
+        // 점수 카드 2장 이상이고 공격팀이 기루다 고액으로 이기고 있을 때 조커 사용
         if (pointCardsInTrick >= 2 && !defenseWinning) {
-          if (currentWinningCard == null || !currentWinningCard.isMighty) {
+          // ★ 현재 이기는 카드가 기루다 고액(A/K/Q/J)인지 확인
+          bool isHighGiruda = currentWinningCard != null &&
+              !currentWinningCard.isMighty &&
+              !currentWinningCard.isJoker &&
+              currentWinningCard.suit == state.giruda &&
+              [Rank.ace, Rank.king, Rank.queen, Rank.jack].contains(currentWinningCard.rank);
+
+          if (isHighGiruda) {
             bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
             if (!jokerCalled) {
               return joker.first;
@@ -3377,24 +3384,27 @@ class AIPlayer {
     }
 
     // === 수비팀 선공권 탈환 전략 ===
-    // 공격팀이 이기고 있을 때 조커로 선공권 뺏기
+    // 공격팀이 기루다 고액으로 이기고 있고 점수 카드 2장 이상일 때만 조커로 선공권 뺏기
     if (isDefenseTeam && !defenseWinning) {
       // 조커로 선공권 탈환 (첫 트릭 및 마지막 트릭 제외)
       if (state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
         final joker = playableCards.where((c) => c.isJoker).toList();
         if (joker.isNotEmpty) {
-          // 현재 이기고 있는 카드가 마이티가 아니면 조커 사용
-          if (currentWinningCard != null && !currentWinningCard.isMighty) {
+          // ★ 현재 이기는 카드가 기루다 고액(A/K/Q/J)인지 확인
+          bool isHighGiruda = currentWinningCard != null &&
+              !currentWinningCard.isMighty &&
+              !currentWinningCard.isJoker &&
+              currentWinningCard.suit == state.giruda &&
+              [Rank.ace, Rank.king, Rank.queen, Rank.jack].contains(currentWinningCard.rank);
+
+          if (isHighGiruda) {
             bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
             if (!jokerCalled) {
-              // ★ 마지막 순서이고 점수 카드가 없으면 조커 사용 스킵
+              // ★ 점수 카드 2장 이상일 때만 조커 사용
               int pointCardsInTrick = state.currentTrick!.cards
                   .where((c) => c.isPointCard || c.isJoker).length;
-              if (isLastPlayer && pointCardsInTrick == 0) {
-                // 점수 없으면 조커 낭비하지 않음
-              } else {
+              if (pointCardsInTrick >= 2) {
                 // 선공권 탈환 후 유지할 최상위 카드가 있는지 확인
-                // 최상위 카드 없으면 점수 많을 때 사용하는 게 나음
                 bool hasTopCards = player.hand.any((c) =>
                     c.isMighty ||
                     (!c.isJoker && _getEffectiveCardValue(c, state) >= 14));
@@ -3409,37 +3419,25 @@ class AIPlayer {
     }
 
     // === 수비팀 후반전 조커 전략 ===
-    // 후반전(트릭 7 이후)에 공격팀 기루다가 소진되었으면 조커로 점수 확보
-    if (isDefenseTeam && state.currentTrickNumber >= 7 && state.currentTrickNumber < 10) {
+    // 후반전(트릭 7 이후)에 공격팀이 기루다 고액으로 이기고 점수 2장 이상일 때 조커 사용
+    if (isDefenseTeam && !defenseWinning && state.currentTrickNumber >= 7 && state.currentTrickNumber < 10) {
       final joker = playableCards.where((c) => c.isJoker).toList();
       if (joker.isNotEmpty) {
-        final remainingGiruda = _getRemainingGirudaCount(state, player);
-        // 상대(공격팀) 기루다가 3장 이하로 남았고, 조커로 이길 수 있으면 사용
-        if (remainingGiruda <= 3) {
-          if (currentWinningCard == null || !currentWinningCard.isMighty) {
-            bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
-            if (!jokerCalled) {
-              // 같은 팀이 확실히 이기고 있는지 확인
-              bool teamWinningSecurely = false;
-              if (defenseWinning && currentWinningCard != null) {
-                if (currentWinningCard.isMighty || currentWinningCard.isJoker) {
-                  teamWinningSecurely = true;
-                } else {
-                  int effectiveValue = _getEffectiveCardValue(currentWinningCard, state);
-                  if (effectiveValue >= 14) {
-                    teamWinningSecurely = true;
-                  }
-                }
-              }
-              // 공격팀이 이기고 있을 때만 조커 사용
-              if (!teamWinningSecurely && !defenseWinning) {
-                // ★ 마지막 순서이고 점수 카드가 없으면 조커 사용 스킵
-                int pointCardsInTrick = state.currentTrick!.cards
-                    .where((c) => c.isPointCard || c.isJoker).length;
-                if (!(isLastPlayer && pointCardsInTrick == 0)) {
-                  return joker.first;
-                }
-              }
+        // ★ 현재 이기는 카드가 기루다 고액(A/K/Q/J)인지 확인
+        bool isHighGiruda = currentWinningCard != null &&
+            !currentWinningCard.isMighty &&
+            !currentWinningCard.isJoker &&
+            currentWinningCard.suit == state.giruda &&
+            [Rank.ace, Rank.king, Rank.queen, Rank.jack].contains(currentWinningCard.rank);
+
+        if (isHighGiruda) {
+          bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
+          if (!jokerCalled) {
+            // ★ 점수 카드 2장 이상일 때만 조커 사용
+            int pointCardsInTrick = state.currentTrick!.cards
+                .where((c) => c.isPointCard || c.isJoker).length;
+            if (pointCardsInTrick >= 2) {
+              return joker.first;
             }
           }
         }
@@ -3785,14 +3783,15 @@ class AIPlayer {
         return mighty.first;
       }
       // 마이티가 없으면 조커도 아끼고 아무거나 냄 (조커로는 마이티를 못 이김)
-      // 조커만 남은 경우 어쩔 수 없이 조커를 냄
       final nonJoker = playableCards.where((c) => !c.isJoker).toList();
       if (nonJoker.isNotEmpty) {
         return nonJoker.first;
       }
+      // ★ 조커만 남은 경우 어쩔 수 없이 조커를 냄 (여기서 return 해야 fallback 방지)
+      return playableCards.first;
     }
 
-    // 그 외에는 조커 우선 (마이티는 더 강하므로 아끼기)
+    // 마이티가 이기고 있지 않을 때만 조커 우선 (마이티는 더 강하므로 아끼기)
     final joker = playableCards.where((c) => c.isJoker).toList();
     if (joker.isNotEmpty) {
       return joker.first;
