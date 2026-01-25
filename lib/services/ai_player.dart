@@ -2077,7 +2077,18 @@ class AIPlayer {
     // 트릭 7 이전에는 마이티로 선공하지 않음 (마이티가 유일한 카드가 아닌 경우)
     // 마이티는 선공을 빼앗겼을 때 되찾기 위해 사용해야 함
     final nonMightyPlayable = playableCards.where((c) => !c.isMightyWith(state.giruda)).toList();
-    final shouldAvoidMighty = state.currentTrickNumber < 7 && nonMightyPlayable.isNotEmpty;
+
+    // ★ 프렌드가 조커이고 트릭 9이면 마이티를 트릭 10용으로 보존
+    // 조커는 마지막 트릭(10)에 낼 수 없으므로 트릭 9에서 조커가 나옴
+    // 주공은 마이티를 트릭 10에서 사용하여 마지막 트릭 확보
+    final friendIsJoker = state.friendDeclaration?.card?.isJoker ?? false;
+    final shouldSaveMightyForTrick10 = friendIsJoker &&
+        state.currentTrickNumber == 9 &&
+        player.isDeclarer &&
+        nonMightyPlayable.isNotEmpty;
+
+    final shouldAvoidMighty = (state.currentTrickNumber < 7 || shouldSaveMightyForTrick10) &&
+        nonMightyPlayable.isNotEmpty;
     final cardsToConsider = shouldAvoidMighty ? nonMightyPlayable : playableCards;
 
     // 상대에게 기루다가 남아있는지 확인
