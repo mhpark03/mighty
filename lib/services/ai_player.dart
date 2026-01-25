@@ -2115,7 +2115,23 @@ class AIPlayer {
         final myHighestGiruda = myGirudaCards.first;
 
         if (highestOpponentGiruda == null) {
-          // 상대에게 기루다가 없음 → 내 기루다가 최상위 → 가장 높은 기루다 사용
+          // 상대에게 기루다가 없음 → 우리 팀만 기루다 보유
+          // 남은 트릭이 기루다 수 + 2 이상이면 기루다를 선 탈환용으로 보존
+          final remainingTricks = 10 - state.currentTrickNumber + 1;
+          final myGirudaCount = myGirudaCards.length;
+
+          if (remainingTricks >= myGirudaCount + 2) {
+            // 기루다를 아끼고 비기루다로 선공
+            final nonGirudaCards = cardsToConsider.where((c) =>
+                !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
+            if (nonGirudaCards.isNotEmpty) {
+              // 비기루다 중 실효가치가 높은 카드 선택
+              nonGirudaCards.sort((a, b) =>
+                  _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+              return nonGirudaCards.first;
+            }
+          }
+          // 남은 트릭이 적거나 비기루다가 없으면 기루다 사용
           return myHighestGiruda;
         } else if (myHighestGiruda.rankValue > highestOpponentGiruda.rankValue) {
           // 내 기루다가 상대 최상위보다 높음 → 확실히 이김 → 가장 높은 기루다 사용
