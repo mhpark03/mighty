@@ -2084,6 +2084,59 @@ class AIPlayer {
     final opponentHasGiruda = state.giruda != null &&
         _getRemainingGirudaCount(state, player) > 0;
 
+    // ★★★ 주공 기루다 리드 전략 (2025.01 개선) ★★★
+    // 기루다 최상위가 있으면 → 최상위로 확실히 승리
+    // 기루다 최상위가 없으면 → 가장 낮은 기루다로 물패 처리 + 상대 고액 기루다 유도
+    if (state.giruda != null && player.isDeclarer && opponentHasGiruda) {
+      final myGirudaCards = cardsToConsider.where((c) =>
+          !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
+
+      if (myGirudaCards.isNotEmpty) {
+        // 나간 기루다 + 내 손의 기루다 확인하여 최상위 기루다 보유 여부 판단
+        final playedCards = _getPlayedCards(state);
+
+        // 상대가 가진 기루다 중 가장 높은 것 찾기
+        PlayingCard? highestOpponentGiruda;
+        for (int rankVal = 14; rankVal >= 2; rankVal--) {
+          final rank = Rank.values[rankVal - 2];
+          bool inMyHand = player.hand.any((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) &&
+              c.suit == state.giruda && c.rank == rank);
+          bool alreadyPlayed = playedCards.any((c) =>
+              !c.isJoker && c.suit == state.giruda && c.rank == rank);
+          if (!inMyHand && !alreadyPlayed) {
+            highestOpponentGiruda = PlayingCard(suit: state.giruda, rank: rank);
+            break;
+          }
+        }
+
+        // 내 기루다 중 가장 높은 것 찾기
+        myGirudaCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+        final myHighestGiruda = myGirudaCards.first;
+
+        if (highestOpponentGiruda == null) {
+          // 상대에게 기루다가 없음 → 내 기루다가 최상위 → 가장 높은 기루다 사용
+          return myHighestGiruda;
+        } else if (myHighestGiruda.rankValue > highestOpponentGiruda.rankValue) {
+          // 내 기루다가 상대 최상위보다 높음 → 확실히 이김 → 가장 높은 기루다 사용
+          return myHighestGiruda;
+        } else {
+          // 내 기루다가 상대 최상위보다 낮음 → 중간 기루다(비점수)로 상대 고액 유도
+          // 너무 낮은 카드를 내면 상대가 A/K 대신 중간 카드로 이길 수 있음
+          // 점수 카드가 아닌 중간 카드(9~2)로 선공하여 상대 고액 유도
+          final nonPointGirudaCards = myGirudaCards.where((c) => !c.isPointCard).toList();
+          if (nonPointGirudaCards.isNotEmpty) {
+            // 비점수 카드 중 가장 높은 것 (9가 있으면 9, 없으면 8...)
+            nonPointGirudaCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+            return nonPointGirudaCards.first;
+          }
+          // 비점수 기루다가 없으면 점수 카드 중 가장 낮은 것 (10)
+          myGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return myGirudaCards.first;
+        }
+      }
+    }
+
     // 오픈된 카드를 고려하여 실효 가치가 높은 카드 선택
     cardsToConsider.sort((a, b) {
       // 마이티는 후순위 (탈환용으로 보존)
