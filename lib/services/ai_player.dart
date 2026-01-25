@@ -2086,8 +2086,9 @@ class AIPlayer {
 
     // ★★★ 주공 기루다 리드 전략 (2025.01 개선) ★★★
     // 기루다 최상위가 있으면 → 최상위로 확실히 승리
-    // 기루다 최상위가 없으면 → 가장 낮은 기루다로 물패 처리 + 상대 고액 기루다 유도
-    if (state.giruda != null && player.isDeclarer && opponentHasGiruda) {
+    // 기루다 최상위가 없으면 → 중간 기루다로 상대 고액 기루다 유도
+    // 상대에게 기루다가 없으면 → 비기루다로 선공하여 기루다 보존
+    if (state.giruda != null && player.isDeclarer) {
       final myGirudaCards = cardsToConsider.where((c) =>
           !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
 
@@ -2116,22 +2117,36 @@ class AIPlayer {
 
         if (highestOpponentGiruda == null) {
           // 상대에게 기루다가 없음 → 우리 팀만 기루다 보유
-          // 남은 트릭이 기루다 수 + 2 이상이면 기루다를 선 탈환용으로 보존
           final remainingTricks = 10 - state.currentTrickNumber + 1;
           final myGirudaCount = myGirudaCards.length;
 
-          if (remainingTricks >= myGirudaCount + 2) {
-            // 기루다를 아끼고 비기루다로 선공
-            final nonGirudaCards = cardsToConsider.where((c) =>
-                !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
-            if (nonGirudaCards.isNotEmpty) {
-              // 비기루다 중 실효가치가 높은 카드 선택
-              nonGirudaCards.sort((a, b) =>
-                  _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
-              return nonGirudaCards.first;
-            }
+          // 비기루다 카드 분석
+          final nonGirudaCards = cardsToConsider.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
+
+          // 비기루다 중 선 유지 가능한 카드 (실효가치 14+, 즉 현재 최상위 카드)
+          final leadMaintainCards = nonGirudaCards.where((c) =>
+              _getEffectiveCardValue(c, state) >= 14).toList();
+
+          // 선 유지 확률 계산: 최상위 카드 수 / 남은 트릭 수 (기루다 제외)
+          final nonGirudaTricks = remainingTricks - myGirudaCount;
+          final canMaintainLead = leadMaintainCards.length >= nonGirudaTricks ||
+              leadMaintainCards.length >= 2; // 최상위 카드 2장 이상이면 선 유지 가능
+
+          if (canMaintainLead) {
+            // 선 유지 가능 → 기루다로 공격해도 괜찮음
+            return myHighestGiruda;
           }
-          // 남은 트릭이 적거나 비기루다가 없으면 기루다 사용
+
+          // 선 유지 어려움 → 기루다 보존하고 비기루다로 선공
+          if (nonGirudaCards.isNotEmpty && remainingTricks >= myGirudaCount + 2) {
+            // 비기루다 중 실효가치가 높은 카드 선택
+            nonGirudaCards.sort((a, b) =>
+                _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+            return nonGirudaCards.first;
+          }
+
+          // 비기루다가 없거나 남은 트릭이 적으면 기루다 사용
           return myHighestGiruda;
         } else if (myHighestGiruda.rankValue > highestOpponentGiruda.rankValue) {
           // 내 기루다가 상대 최상위보다 높음 → 확실히 이김 → 가장 높은 기루다 사용
