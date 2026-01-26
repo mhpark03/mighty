@@ -1023,8 +1023,12 @@ class AIPlayer {
 
     // === 노 프렌드 조건 체크 ===
 
-    // 조건 1: 마이티 + 조커 + 기루다 A + 기루다 K + 기루다 외 A 1개 이상 → 노 프렌드
-    if (hasMighty && hasJoker && hasGirudaAce && hasGirudaKing && nonGirudaAceCount >= 1) {
+    // 비기루다 K 개수 확인
+    int nonGirudaKingCount = hand.where((c) =>
+        !c.isJoker && c.rank == Rank.king && c.suit != state.giruda).length;
+
+    // 조건 1: 마이티 + 조커 + 기루다 A + 기루다 K + 기루다 외 A 2개 이상 + 기루다 외 K 1개 이상 → 노 프렌드
+    if (hasMighty && hasJoker && hasGirudaAce && hasGirudaKing && nonGirudaAceCount >= 2 && nonGirudaKingCount >= 1) {
       return FriendDeclaration.noFriend();
     }
 
@@ -1630,6 +1634,29 @@ class AIPlayer {
       final bool isJokerFriend = state.friendDeclaration?.card?.isJoker ?? false;
       final Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
 
+      // === 프렌드 트릭 2~3 기루다 선공 전략 ===
+      // 비기루다로 선공하면 수비팀에게 컷당할 위험이 있으므로 기루다 우선
+      if (state.currentTrickNumber == 2 || state.currentTrickNumber == 3) {
+        final myGirudaCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
+
+        if (myGirudaCards.isNotEmpty) {
+          myGirudaCards.sort((a, b) => b.rankValue.compareTo(a.rankValue)); // 내림차순
+
+          // 최상위/차상위 기루다 확인 (실효가치 13 이상 = K 이상)
+          final highGiruda = myGirudaCards.where((c) =>
+              _getEffectiveCardValue(c, state) >= 13).toList();
+
+          if (highGiruda.isNotEmpty) {
+            // 최상위/차상위 기루다가 있으면 가장 높은 것 사용
+            return highGiruda.first;
+          } else {
+            // 없으면 가장 낮은 기루다 사용 (주공에게 선 넘기기)
+            return myGirudaCards.last;
+          }
+        }
+      }
+
       // 실효가치 14+ 최상위 카드가 있으면 우선 사용 (마이티/조커보다 먼저)
       // 마이티/조커는 점수 카드가 많을 때 사용하는 것이 유리
       // 조커 프렌드일 때는 마이티 무늬 제외
@@ -2160,22 +2187,37 @@ class AIPlayer {
     // 조커는 마지막 트릭(10)에 낼 수 없으므로 트릭 9에서 조커가 나옴
     // 주공은 마이티를 트릭 10에서 사용하여 마지막 트릭 확보
     final friendIsJoker = state.friendDeclaration?.card?.isJoker ?? false;
+
+    // 조커가 이미 나갔는지 확인
+    final playedCards = _getPlayedCards(state);
+    final jokerAlreadyPlayed = playedCards.any((c) => c.isJoker) ||
+        (state.currentTrick?.cards.any((c) => c.isJoker) ?? false);
+
+    // ★★★ 트릭 9에서 조커 프렌드 + 조커가 아직 안 나왔으면 마이티 보존 ★★★
+    // 조커에게 선을 넘겨서 트릭 9를 조커가 이기게 하고, 10트릭에서 마이티 사용
     final shouldSaveMightyForTrick10 = friendIsJoker &&
         state.currentTrickNumber == 9 &&
         player.isDeclarer &&
+        !jokerAlreadyPlayed &&
         nonMightyPlayable.isNotEmpty;
 
-    // ★★★ 트릭 9에서 조커 프렌드가 아직 안 나왔으면 기루다 보존 ★★★
-    // 조커 프렌드가 트릭 9에서 나와야 하므로, 비기루다로 선공하여 기루다를 트릭 10용으로 보존
+    // ★★★ 트릭 9에서 조커 프렌드가 아직 안 나왔으면 프렌드에게 선 넘기기 ★★★
+    // 비기루다 낮은 카드로 선공하여 조커가 이기게 함
     bool shouldSaveGirudaForTrick10 = false;
-    if (friendIsJoker && state.currentTrickNumber == 9 && !state.friendRevealed) {
-      final nonGirudaCards = nonMightyPlayable.where((c) =>
+    if (friendIsJoker && state.currentTrickNumber == 9 && !jokerAlreadyPlayed) {
+      final nonGirudaMightyCards = nonMightyPlayable.where((c) =>
           !c.isJoker && c.suit != state.giruda).toList();
-      if (nonGirudaCards.isNotEmpty) {
-        // 비기루다가 있으면 비기루다로 선공하여 기루다 보존
-        nonGirudaCards.sort((a, b) =>
-            _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
-        return nonGirudaCards.first;
+      if (nonGirudaMightyCards.isNotEmpty) {
+        // 비기루다 낮은 카드로 선공하여 프렌드(조커)에게 선 넘기기
+        nonGirudaMightyCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        return nonGirudaMightyCards.first;
+      }
+      // 비기루다가 없으면 낮은 기루다로 선공
+      final lowGirudaCards = nonMightyPlayable.where((c) =>
+          !c.isJoker && c.suit == state.giruda).toList();
+      if (lowGirudaCards.isNotEmpty) {
+        lowGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        return lowGirudaCards.first;
       }
       shouldSaveGirudaForTrick10 = true;
     }
