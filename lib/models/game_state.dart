@@ -585,9 +585,10 @@ class GameState {
       // 주공이 첫 트릭 선공일 때 기루다를 낼 수 없음
       if (currentTrickNumber == 1 && player.isDeclarer && giruda != null) {
         if (!card.isJoker && !isMightyCard(card) && card.suit == giruda) {
-          // 기루다가 아닌 다른 카드가 있는지 확인
+          // 기루다 외에 낼 수 있는 카드가 있는지 확인
+          // 조커와 마이티는 항상 낼 수 있으므로 "기루다 외의 카드"로 취급
           final nonGirudaCards = player.hand
-              .where((c) => !c.isJoker && !isMightyCard(c) && c.suit != giruda)
+              .where((c) => c.isJoker || isMightyCard(c) || c.suit != giruda)
               .toList();
           if (nonGirudaCards.isNotEmpty) {
             return false;
@@ -688,8 +689,10 @@ class GameState {
       // 초구 주공 기루다 제한
       if (currentTrickNumber == 1 && player.isDeclarer && giruda != null) {
         if (!card.isJoker && !isMightyCard(card) && card.suit == giruda) {
+          // 기루다 외에 낼 수 있는 카드가 있는지 확인
+          // 조커와 마이티는 항상 낼 수 있으므로 "기루다 외의 카드"로 취급
           final nonGirudaCards = player.hand
-              .where((c) => !c.isJoker && !isMightyCard(c) && c.suit != giruda)
+              .where((c) => c.isJoker || isMightyCard(c) || c.suit != giruda)
               .toList();
           if (nonGirudaCards.isNotEmpty) {
             return 'firstTrickDeclarerGiruda';
