@@ -1539,4 +1539,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String mustFollowSuit(String suit) {
     return '$suitのスートを出さなければなりません';
   }
+
+  @override
+  String get fullDeclarationWarning => 'フル宣言で契約が20に上がります';
 }

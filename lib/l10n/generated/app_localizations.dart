@@ -2837,6 +2837,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'{suit} 무늬를 내야 합니다'**
   String mustFollowSuit(String suit);
+
+  /// No description provided for @fullDeclarationWarning.
+  ///
+  /// In ko, this message translates to:
+  /// **'풀 선언 시 공약이 20으로 올라갑니다'**
+  String get fullDeclarationWarning;
 }
 
 class _AppLocalizationsDelegate

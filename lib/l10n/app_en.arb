@@ -666,5 +666,6 @@
     "placeholders": {
       "suit": {"type": "String"}
     }
-  }
+  },
+  "fullDeclarationWarning": "Declaring Full raises the contract to 20"
 }

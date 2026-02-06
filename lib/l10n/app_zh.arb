@@ -665,5 +665,6 @@
     "placeholders": {
       "suit": {"type": "String"}
     }
-  }
+  },
+  "fullDeclarationWarning": "宣布满分后合约将提升至20"
 }

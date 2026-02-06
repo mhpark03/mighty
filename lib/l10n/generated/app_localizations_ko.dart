@@ -1545,4 +1545,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String mustFollowSuit(String suit) {
     return '$suit 무늬를 내야 합니다';
   }
+
+  @override
+  String get fullDeclarationWarning => '풀 선언 시 공약이 20으로 올라갑니다';
 }

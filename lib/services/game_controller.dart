@@ -222,11 +222,14 @@ class GameController extends ChangeNotifier {
     _processAIFriendDeclaration();
   }
 
-  void humanSelectKitty(List<PlayingCard> discardCards, Suit? newGiruda) {
+  void humanSelectKitty(List<PlayingCard> discardCards, Suit? newGiruda, {bool isFull = false}) {
     if (_state.declarerId != 0) return;
     if (discardCards.length != 3) return;
 
     _state.selectKitty(discardCards, newGiruda);
+    if (isFull) {
+      _state.declareFull();
+    }
     notifyListeners();
     saveGame(); // 자동 저장
   }

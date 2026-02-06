@@ -955,10 +955,10 @@ class _GameScreenState extends State<GameScreen> {
           kitty: controller.state.kitty,
           currentGiruda: controller.state.giruda,
           gameState: controller.state,
-          onConfirm: (discards, newGiruda) {
+          onConfirm: (discards, newGiruda, isFull) {
             Navigator.pop(context);
             _kittyDialogShown = false;
-            controller.humanSelectKitty(discards, newGiruda);
+            controller.humanSelectKitty(discards, newGiruda, isFull: isFull);
           },
         ),
       ),

@@ -665,5 +665,6 @@
     "placeholders": {
       "suit": {"type": "String"}
     }
-  }
+  },
+  "fullDeclarationWarning": "フル宣言で契約が20に上がります"
 }

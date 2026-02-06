@@ -1557,4 +1557,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String mustFollowSuit(String suit) {
     return 'You must follow $suit';
   }
+
+  @override
+  String get fullDeclarationWarning =>
+      'Declaring Full raises the contract to 20';
 }

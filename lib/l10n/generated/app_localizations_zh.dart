@@ -1530,4 +1530,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String mustFollowSuit(String suit) {
     return '你必须出$suit花色';
   }
+
+  @override
+  String get fullDeclarationWarning => '宣布满分后合约将提升至20';
 }

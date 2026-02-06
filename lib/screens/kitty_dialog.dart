@@ -11,7 +11,7 @@ class KittySelectionScreen extends StatefulWidget {
   final List<PlayingCard> kitty;
   final Suit? currentGiruda;
   final GameState gameState;
-  final Function(List<PlayingCard>, Suit?) onConfirm;
+  final Function(List<PlayingCard>, Suit?, bool isFull) onConfirm;
 
   const KittySelectionScreen({
     super.key,
@@ -37,6 +37,7 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
   late List<PlayingCard> _recommendedDiscards;
   late Suit? _recommendedGiruda;
   late bool _recommendedNoGiruda;
+  bool _isFull = false;
 
   @override
   void initState() {
@@ -301,6 +302,65 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
                       ),
                     ),
                   ],
+                  const SizedBox(height: 8),
+                  // 풀 선언 체크박스
+                  GestureDetector(
+                    onTap: () => setState(() { _isFull = !_isFull; }),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _isFull ? Colors.red.withValues(alpha: 0.3) : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: _isFull ? Colors.red : Colors.white30,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _isFull ? Icons.check_box : Icons.check_box_outline_blank,
+                            color: _isFull ? Colors.red : Colors.white70,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.fullPoints,
+                            style: TextStyle(
+                              color: _isFull ? Colors.red : Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (_isFull) ...[
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.warning_amber, color: Colors.red, size: 16),
+                          const SizedBox(width: 6),
+                          Text(
+                            l10n.fullDeclarationWarning,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 12),
                   // 확인 버튼
                   SizedBox(
@@ -311,6 +371,7 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
                               widget.onConfirm(
                                 _selectedDiscards.toList(),
                                 _noGiruda ? null : _selectedGiruda,
+                                _isFull,
                               );
                             }
                           : null,
