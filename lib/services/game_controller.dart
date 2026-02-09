@@ -303,7 +303,12 @@ class GameController extends ChangeNotifier {
         final jokerCallCard = _state.jokerCall;
         if (card.suit == jokerCallCard.suit && card.rank == jokerCallCard.rank) {
           bool hasJoker = currentPlayer.hand.any((c) => c.isJoker);
-          if (!hasJoker && !_state.isJokerPlayed && _state.currentTrickNumber > 1) {
+          // 조커 프렌드인 경우 주공/프렌드는 자동 조커콜 안 함
+          final friendCard = _state.friendDeclaration?.card;
+          bool isJokerFriend = friendCard != null && friendCard.isJoker;
+          bool isAttackTeam = currentPlayer.isDeclarer || currentPlayer.isFriend;
+          if (!hasJoker && !_state.isJokerPlayed && _state.currentTrickNumber > 1 &&
+              !(isJokerFriend && isAttackTeam)) {
             _state.declareJokerCall(jokerCallCard.suit!);
             notifyListeners();
             await Future.delayed(const Duration(milliseconds: 500));
