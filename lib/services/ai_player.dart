@@ -2530,7 +2530,14 @@ class AIPlayer {
           // 내 기루다가 상대 최상위보다 높음 → 확실히 이김 → 가장 높은 기루다 사용
           return myHighestGiruda;
         } else {
-          // 내 기루다가 상대 최상위보다 낮음 → 중간 기루다(비점수)로 상대 고액 유도
+          // 내 기루다가 상대 최상위보다 낮음
+          // ★ 조커가 있으면 조커로 기루다 콜 (확실히 이기면서 상대 기루다 소진)
+          // 낮은 기루다를 내면 트릭+선공을 잃지만, 조커는 확실히 이김
+          final jokerForGirudaCall = playableCards.where((c) => c.isJoker).toList();
+          if (jokerForGirudaCall.isNotEmpty && state.currentTrickNumber >= 2) {
+            return jokerForGirudaCall.first;
+          }
+          // 조커 없으면 중간 기루다(비점수)로 상대 고액 유도
           // 너무 낮은 카드를 내면 상대가 A/K 대신 중간 카드로 이길 수 있음
           // 점수 카드가 아닌 중간 카드(9~2)로 선공하여 상대 고액 유도
           final nonPointGirudaCards = myGirudaCards.where((c) => !c.isPointCard).toList();
