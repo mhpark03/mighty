@@ -1600,6 +1600,55 @@ class AIPlayer {
       }
     }
 
+    // === 트릭 9 선공: 조커 대응 전략 ===
+    // 조커가 아직 안 나왔으면 이번 트릭에서 반드시 나옴 (트릭 10에는 조커 사용 불가)
+    if (state.currentTrickNumber == 9) {
+      final playedCardsForJoker = _getPlayedCards(state);
+      bool jokerPlayed = playedCardsForJoker.any((c) => c.isJoker);
+
+      if (!jokerPlayed) {
+        bool hasMighty = playableCards.any((c) => c.isMightyWith(state.giruda));
+        bool isAttackTeam = !_isPlayerOnDefenseTeam(player, state);
+
+        // 조커가 같은 편인지 판단
+        // 조커 프렌드 + 공격팀 → 같은 편 (프렌드가 조커 보유)
+        // 그 외 → 적에게 있다고 가정 (수비 3명이 보유할 확률 높음)
+        final friendCard = state.friendDeclaration?.card;
+        bool friendIsJoker = friendCard != null && friendCard.isJoker;
+        bool jokerOnMyTeam = friendIsJoker && isAttackTeam;
+
+        if (!jokerOnMyTeam && hasMighty) {
+          // 적 조커가 나올 것이므로 마이티로 잡기
+          return playableCards.firstWhere((c) => c.isMightyWith(state.giruda));
+        }
+
+        if (jokerOnMyTeam) {
+          // 같은 편 조커가 트릭 9를 가져갈 것이므로
+          // 마이티, 기루다 최상위 등을 아껴서 트릭 10에서 사용
+          final saveableCards = playableCards.where((c) {
+            if (c.isMightyWith(state.giruda)) return false; // 마이티 아끼기
+            if (c.isJoker) return false;
+            // 기루다 최상위(실효 가치 14+)도 트릭 10용으로 아끼기
+            if (state.giruda != null && c.suit == state.giruda &&
+                _getEffectiveCardValue(c, state) >= 14) return false;
+            return true;
+          }).toList();
+
+          if (saveableCards.isNotEmpty) {
+            // 가장 낮은 비점수 카드 선공 (팀 조커가 이김)
+            final nonPointCards = saveableCards.where((c) => !c.isPointCard).toList();
+            if (nonPointCards.isNotEmpty) {
+              nonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return nonPointCards.first;
+            }
+            saveableCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return saveableCards.first;
+          }
+          // 아끼기 가능한 카드가 없으면 기존 로직으로 진행
+        }
+      }
+    }
+
     // 방어팀인지 확인
     bool isDefenseTeam = _isPlayerOnDefenseTeam(player, state);
 
@@ -2021,11 +2070,12 @@ class AIPlayer {
           return myTopGiruda;
         }
 
-        // === 2. 기루다 최상위 없음 + 마이티/조커/기루다 프렌드 → 중간 기루다로 선공 ===
+        // === 2. 기루다 최상위 없음 + 마이티/조커/기루다 프렌드 → 최상위 기루다로 선공 ===
+        // 프렌드가 지원 가능하므로 최상위 기루다로 선공하여 이길 확률 최대화
+        // (중간 카드를 내면 Q/J 등에 불필요하게 트릭 상실)
         if (!hasEffectiveTopGiruda && friendIsSpecialOrGiruda && myGirudaCardsForLead.isNotEmpty) {
-          myGirudaCardsForLead.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-          final midIndex = myGirudaCardsForLead.length ~/ 2;
-          return myGirudaCardsForLead[midIndex];
+          myGirudaCardsForLead.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+          return myGirudaCardsForLead.first;
         }
 
         // 3. 위 조건 해당 안 됨 → 아래 일반 선공 정책으로 진행
@@ -2617,8 +2667,12 @@ class AIPlayer {
         // 주공이 위험한 상황인지 확인
         bool declarerInDanger = _isDeclarerInDanger(state, currentWinnerId);
 
+        // 주공이 이미 이기고 있으면 프렌드 카드 낭비 방지
+        bool declarerAlreadyWinning = currentWinnerId != null &&
+            state.players[currentWinnerId].isDeclarer;
+
         // 조건 1: 주공이 두 번째 순서에서 낮은 카드를 냈을 때 (신호)
-        if (_declarerPlayedLowAsSecond(state)) {
+        if (_declarerPlayedLowAsSecond(state) && !declarerAlreadyWinning) {
           // 프렌드 카드로 이길 수 있으면 사용
           if (currentWinningCard != null &&
               state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
@@ -3213,7 +3267,11 @@ class AIPlayer {
               // ★ 단, 마지막 순서면 어차피 팀원이 이기므로 조커/마이티 낭비 방지
               bool isLastPlayerHere = state.currentTrick != null &&
                   state.currentTrick!.cards.length == 4;
-              if (currentWinningCard.rankValue <= 7 && !isLastPlayerHere) {
+              // 기루다 선공 시 상대에게 더 높은 기루다가 남아있으면 마이티/조커로 지원
+              // (주공이 프렌드를 믿고 기루다를 냈으므로 뒤집히지 않게 보호)
+              bool girudaLeadAtRisk = leadSuit == state.giruda &&
+                  highestRemaining.rankValue > currentWinningCard.rankValue;
+              if ((currentWinningCard.rankValue <= 7 || girudaLeadAtRisk) && !isLastPlayerHere) {
                 // 마이티가 있으면 사용 (조커보다 강함)
                 final mighty = playableCards.where((c) => c.isMightyWith(state.giruda)).toList();
                 if (mighty.isNotEmpty) {
@@ -4586,6 +4644,12 @@ class AIPlayer {
     // 낮은 카드인지 확인 (9 이하, 점수 카드 아님, 조커/마이티 아님)
     if (declarerCard.isJoker || declarerCard.isMightyWith(state.giruda)) return false;
     if (declarerCard.isPointCard) return false;
+
+    // 기루다(트럼프)로 컷한 경우는 낮은 카드여도 신호가 아님 (이미 이기고 있음)
+    final leadSuit = state.currentTrick!.leadSuit;
+    if (state.giruda != null && declarerCard.suit == state.giruda && leadSuit != state.giruda) {
+      return false;
+    }
 
     // 낮은 카드 (2-9)를 냈으면 신호로 판단
     return declarerCard.rankValue <= 9;
