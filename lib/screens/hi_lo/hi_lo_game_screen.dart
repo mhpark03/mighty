@@ -2203,10 +2203,26 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                               ),
                               Expanded(
                                 flex: 2,
-                                child: Text(
-                                  '${playerStats?.wins.toStringAsFixed(1) ?? '0.0'}/${playerStats?.losses.toStringAsFixed(1) ?? '0.0'}',
+                                child: RichText(
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 13),
+                                  text: TextSpan(
+                                    style: const TextStyle(fontSize: 13),
+                                    children: [
+                                      TextSpan(
+                                        text: playerStats?.wins.toStringAsFixed(1) ?? '0.0',
+                                        style: (playerStats != null && playerStats.wins > playerStats.losses)
+                                            ? const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)
+                                            : null,
+                                      ),
+                                      const TextSpan(text: '/'),
+                                      TextSpan(
+                                        text: playerStats?.losses.toStringAsFixed(1) ?? '0.0',
+                                        style: (playerStats != null && playerStats.losses > playerStats.wins)
+                                            ? const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)
+                                            : null,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                               Expanded(

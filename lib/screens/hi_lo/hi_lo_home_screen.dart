@@ -345,12 +345,25 @@ class _HiLoHomeScreenState extends State<HiLoHomeScreen> {
           ),
           Expanded(
             flex: 2,
-            child: Text(
-              '${playerStats.wins.toStringAsFixed(1)}${l10n.win} / ${playerStats.losses.toStringAsFixed(1)}${l10n.loss}',
+            child: RichText(
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: valueSize,
+              text: TextSpan(
+                style: TextStyle(fontSize: valueSize, color: Colors.white),
+                children: [
+                  TextSpan(
+                    text: '${playerStats.wins.toStringAsFixed(1)}${l10n.win}',
+                    style: playerStats.wins > playerStats.losses
+                        ? const TextStyle(color: Colors.lightGreenAccent, fontWeight: FontWeight.bold)
+                        : null,
+                  ),
+                  const TextSpan(text: ' / '),
+                  TextSpan(
+                    text: '${playerStats.losses.toStringAsFixed(1)}${l10n.loss}',
+                    style: playerStats.losses > playerStats.wins
+                        ? const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)
+                        : null,
+                  ),
+                ],
               ),
             ),
           ),
