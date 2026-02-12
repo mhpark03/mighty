@@ -2874,14 +2874,26 @@ class _GameScreenState extends State<GameScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                state.declarerWon ? l10n.declarerTeamWins : l10n.defenderTeamWins,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: state.declarerWon ? Colors.green : Colors.red,
-                ),
-              ),
+              () {
+                final isPlayerWinner = state.getPlayerScore(state.players[0].id) >= 0;
+                return Column(
+                  children: [
+                    Text(
+                      isPlayerWinner ? l10n.victory : l10n.defeat,
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: isPlayerWinner ? Colors.green : Colors.red,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      state.declarerWon ? l10n.declarerTeamWins : l10n.defenderTeamWins,
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    ),
+                  ],
+                );
+              }(),
             const SizedBox(height: 16),
             Text(
               state.declarerTeamPoints == 20

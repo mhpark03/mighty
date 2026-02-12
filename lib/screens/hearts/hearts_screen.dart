@@ -2095,11 +2095,19 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    isPlayerWinner ? l10n.wins : l10n.playerNameWins(playerNames[winnerId]),
+                    isPlayerWinner ? l10n.victory : l10n.defeat,
                     style: TextStyle(
-                      color: isPlayerWinner ? Colors.amber : Colors.white,
+                      color: isPlayerWinner ? Colors.amber : Colors.red,
                       fontSize: isSmallScreen ? 24 : 32,
                       fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.playerNameWins(playerNames[winnerId]),
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: isSmallScreen ? 14 : 16,
                     ),
                   ),
                   const SizedBox(height: 24),
