@@ -385,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             flex: 2,
             child: Text(
-              '${playerStats.wins}${l10n.win} / ${playerStats.losses}${l10n.loss}',
+              '${playerStats.wins.toStringAsFixed(1)}${l10n.win} / ${playerStats.losses.toStringAsFixed(1)}${l10n.loss}',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,

@@ -80,6 +80,9 @@ class StatsService extends ChangeNotifier {
   }) async {
     if (!_isLoaded) await loadStats();
 
+    final isNoFriend = friendId == null;
+    final numDefenders = isNoFriend ? 4 : 3;
+
     for (int i = 0; i < 5; i++) {
       final score = playerScores[i] ?? 0;
       final isDeclarer = i == declarerId;
@@ -89,7 +92,16 @@ class StatsService extends ChangeNotifier {
       // 주공팀이 이기면 주공팀 승리, 수비팀이 이기면 수비팀 승리
       final won = declarerWon ? isDeclarerTeam : !isDeclarerTeam;
 
-      _playerStats[i].addGameResult(won: won, score: score);
+      // 역할별 승/패 배율 (점수 배분 방식과 동일)
+      // 주공: 2/3 (노프렌드: 4/4=1), 프렌드: 1/3, 수비: 각 1/3 (노프렌드: 1/4)
+      double amount;
+      if (isDeclarer) {
+        amount = (isNoFriend ? 4 : 2) / numDefenders;
+      } else {
+        amount = 1 / numDefenders;
+      }
+
+      _playerStats[i].addGameResult(won: won, score: score, amount: amount);
     }
 
     await _saveStats();

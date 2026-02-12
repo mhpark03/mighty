@@ -1952,29 +1952,49 @@ class AIPlayer {
         }
       }
 
-      // 전략 3: 비기루다 중 낮은 카드로 선공 (수비팀이 이길 가능성, 주공이 다음 기회에)
+      // 전략 3: 비기루다 중 짧은 무늬의 비점수 카드로 선공 (void 만들기 → 기루다 컷 가능)
       // 조커 프렌드일 때는 마이티 무늬를 마지막에 사용
       final nonGirudaCards = playableCards.where((c) =>
           !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
       if (nonGirudaCards.isNotEmpty) {
-        nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
         // 컷되지 않은 무늬 우선, 조커 프렌드일 때 마이티 무늬 제외
-        final cutSuits = _getCutSuits(state);
-        final nonCutCards = nonGirudaCards.where((c) =>
-            c.suit != null && !cutSuits.contains(c.suit) &&
+        final cutSuits2 = _getCutSuits(state);
+        var candidates = nonGirudaCards.where((c) =>
+            c.suit != null && !cutSuits2.contains(c.suit) &&
             !(isJokerFriend && c.suit == mightySuit)).toList();
-        if (nonCutCards.isNotEmpty) {
-          return nonCutCards.first;
-        }
-        // 마이티 무늬가 아닌 카드가 있으면 우선
-        if (isJokerFriend) {
-          final nonMightySuitCards = nonGirudaCards.where((c) =>
-              c.suit != mightySuit).toList();
-          if (nonMightySuitCards.isNotEmpty) {
-            return nonMightySuitCards.first;
+        if (candidates.isEmpty) {
+          if (isJokerFriend) {
+            candidates = nonGirudaCards.where((c) => c.suit != mightySuit).toList();
+          }
+          if (candidates.isEmpty) {
+            candidates = nonGirudaCards;
           }
         }
-        return nonGirudaCards.first;
+
+        // 가장 짧은 무늬 찾기 (void 만들기 → 이후 기루다 컷 가능)
+        Map<Suit, List<PlayingCard>> suitGroups = {};
+        for (final c in candidates) {
+          if (c.suit != null) {
+            suitGroups.putIfAbsent(c.suit!, () => []).add(c);
+          }
+        }
+        if (suitGroups.isNotEmpty) {
+          // 가장 짧은 무늬 선택
+          final shortestSuit = suitGroups.entries
+              .reduce((a, b) => a.value.length <= b.value.length ? a : b);
+          final suitCards = shortestSuit.value;
+          // 비점수 카드 우선, 없으면 가장 낮은 카드
+          final nonPoint = suitCards.where((c) => !c.isPointCard).toList();
+          if (nonPoint.isNotEmpty) {
+            nonPoint.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return nonPoint.first;
+          }
+          suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return suitCards.first;
+        }
+        // 무늬 없는 경우 fallback
+        candidates.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        return candidates.first;
       }
     }
 
@@ -2854,7 +2874,10 @@ class AIPlayer {
                 return girudaCards.first;
               }
 
-              // 확실히 이길 수 없으면 컷하지 않고 기존 로직으로 (낮은 카드 버림)
+              // 확실히 이길 수 없어도 프렌드 신호이므로 가장 높은 기루다로 컷
+              // (프렌드가 약한 비기루다를 낸 것은 주공에게 선을 넘기려는 신호)
+              girudaCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+              return girudaCards.first;
             }
           }
         }
@@ -3299,14 +3322,24 @@ class AIPlayer {
                 return suitCards.first;
               }
 
-              // ★ 후반(7트릭 이후)에 리드 무늬가 없으면 기루다로 컷하여 선 탈환
-              // 현재 이기는 카드가 기루다가 아니면 낮은 기루다로 무조건 컷
-              bool isLateGameHere = state.currentTrickNumber >= 7;
-              if (isLateGameHere && state.giruda != null) {
-                final girudaCardsForCut = playableCards.where((c) =>
-                    !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
-                if (girudaCardsForCut.isNotEmpty) {
-                  if (currentWinningCard.suit != state.giruda) {
+              // ★ 리드 무늬가 없고 팀원이 약한 카드로 이기고 있으면 기루다로 컷하여 선 탈환
+              // 후반(7트릭+)이거나, 프렌드가 약한 카드로 선공한 경우 (선 넘기기 신호)
+              if (state.giruda != null && currentWinningCard.suit != state.giruda) {
+                bool isLateGameHere = state.currentTrickNumber >= 7;
+                // 프렌드가 선공한 약한 카드인지 확인
+                bool friendLedWeak = false;
+                if (state.currentTrick != null && state.currentTrick!.playerOrder.isNotEmpty) {
+                  final leaderId2 = state.currentTrick!.playerOrder.first;
+                  final leader2 = state.players[leaderId2];
+                  friendLedWeak = state.friendRevealed &&
+                      leader2.isFriend && !leader2.isDeclarer &&
+                      currentWinningCard.rankValue <= 10;
+                }
+
+                if (isLateGameHere || friendLedWeak) {
+                  final girudaCardsForCut = playableCards.where((c) =>
+                      !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
+                  if (girudaCardsForCut.isNotEmpty) {
                     girudaCardsForCut.sort((a, b) => a.rankValue.compareTo(b.rankValue));
                     return girudaCardsForCut.first;
                   }

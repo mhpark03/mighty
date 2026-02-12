@@ -2204,7 +2204,7 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  '${playerStats?.wins ?? 0}/${playerStats?.losses ?? 0}',
+                                  '${playerStats?.wins.toStringAsFixed(1) ?? '0.0'}/${playerStats?.losses.toStringAsFixed(1) ?? '0.0'}',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(fontSize: 13),
                                 ),

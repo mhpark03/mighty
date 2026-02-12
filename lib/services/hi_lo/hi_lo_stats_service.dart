@@ -4,10 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class HiLoPlayerStats {
   String name;
-  int hiWins;
-  int loWins;
-  int swingWins;
-  int losses;
+  double hiWins;
+  double loWins;
+  double swingWins;
+  double losses;
   int totalScore;
 
   HiLoPlayerStats({
@@ -19,8 +19,8 @@ class HiLoPlayerStats {
     this.totalScore = 0,
   });
 
-  int get wins => hiWins + loWins + swingWins;
-  int get gamesPlayed => wins + losses;
+  double get wins => hiWins + loWins + swingWins;
+  int get gamesPlayed => (wins + losses).round();
 
   void addGameResult({
     bool hiWin = false,
@@ -28,19 +28,21 @@ class HiLoPlayerStats {
     bool swingWin = false,
     bool lost = false,
     required int score,
+    double winAmount = 1.0,
+    double lossAmount = 1.0,
   }) {
     totalScore += score;
-    if (hiWin) hiWins++;
-    if (loWin) loWins++;
-    if (swingWin) swingWins++;
-    if (lost) losses++;
+    if (hiWin) hiWins += winAmount;
+    if (loWin) loWins += winAmount;
+    if (swingWin) swingWins += winAmount;
+    if (lost) losses += lossAmount;
   }
 
   void reset() {
-    hiWins = 0;
-    loWins = 0;
-    swingWins = 0;
-    losses = 0;
+    hiWins = 0.0;
+    loWins = 0.0;
+    swingWins = 0.0;
+    losses = 0.0;
     totalScore = 0;
   }
 
@@ -55,10 +57,10 @@ class HiLoPlayerStats {
 
   factory HiLoPlayerStats.fromJson(Map<String, dynamic> json) => HiLoPlayerStats(
     name: json['name'] as String,
-    hiWins: json['hiWins'] as int? ?? 0,
-    loWins: json['loWins'] as int? ?? 0,
-    swingWins: json['swingWins'] as int? ?? 0,
-    losses: json['losses'] as int? ?? 0,
+    hiWins: (json['hiWins'] as num?)?.toDouble() ?? 0,
+    loWins: (json['loWins'] as num?)?.toDouble() ?? 0,
+    swingWins: (json['swingWins'] as num?)?.toDouble() ?? 0,
+    losses: (json['losses'] as num?)?.toDouble() ?? 0,
     totalScore: json['totalScore'] as int? ?? 0,
   );
 }
@@ -135,6 +137,19 @@ class HiLoStatsService extends ChangeNotifier {
   }) async {
     if (!_isLoaded) await loadStats();
 
+    // 승리 횟수와 패배 인원 계산 (균형 배율 적용)
+    // 승리 증분: 스윙=1, 일반=2 (hi+lo), 패배 인원: score < 0인 플레이어 수
+    int totalWinIncrements;
+    if (swingSuccess) {
+      totalWinIncrements = 1;
+    } else {
+      totalWinIncrements = (hiWinnerId != null ? 1 : 0) + (loWinnerId != null ? 1 : 0);
+    }
+    final numLosers = playerScores.values.where((s) => s < 0).length;
+
+    final winAmount = totalWinIncrements > 0 ? 1.0 / totalWinIncrements : 1.0;
+    final lossAmount = numLosers > 0 ? 1.0 / numLosers : 1.0;
+
     for (int i = 0; i < 5; i++) {
       final score = playerScores[i] ?? 0;
       final isHiWinner = i == hiWinnerId && !swingSuccess;
@@ -148,6 +163,8 @@ class HiLoStatsService extends ChangeNotifier {
         swingWin: isSwingWinner,
         lost: isLoser,
         score: score,
+        winAmount: winAmount,
+        lossAmount: lossAmount,
       );
     }
 

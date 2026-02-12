@@ -2,8 +2,8 @@ import 'dart:convert';
 
 class PlayerStats {
   String name;
-  int wins;
-  int losses;
+  double wins;
+  double losses;
   int totalScore;
   int gamesPlayed;
 
@@ -21,21 +21,21 @@ class PlayerStats {
   /// 평균 점수
   double get averageScore => gamesPlayed > 0 ? totalScore / gamesPlayed : 0;
 
-  /// 게임 결과 추가
-  void addGameResult({required bool won, required int score}) {
+  /// 게임 결과 추가 (amount: 역할별 배율 적용된 승/패 값)
+  void addGameResult({required bool won, required int score, double amount = 1.0}) {
     gamesPlayed++;
     totalScore += score;
     if (won) {
-      wins++;
+      wins += amount;
     } else {
-      losses++;
+      losses += amount;
     }
   }
 
   /// 통계 초기화
   void reset() {
-    wins = 0;
-    losses = 0;
+    wins = 0.0;
+    losses = 0.0;
     totalScore = 0;
     gamesPlayed = 0;
   }
@@ -50,8 +50,8 @@ class PlayerStats {
 
   factory PlayerStats.fromJson(Map<String, dynamic> json) => PlayerStats(
         name: json['name'] as String,
-        wins: json['wins'] as int? ?? 0,
-        losses: json['losses'] as int? ?? 0,
+        wins: (json['wins'] as num?)?.toDouble() ?? 0,
+        losses: (json['losses'] as num?)?.toDouble() ?? 0,
         totalScore: json['totalScore'] as int? ?? 0,
         gamesPlayed: json['gamesPlayed'] as int? ?? 0,
       );
