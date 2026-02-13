@@ -135,6 +135,48 @@ class AIPlayer {
     return voidSuits;
   }
 
+  // 수비팀 동료가 기루다를 가지고 있는지 추정 (조커 선공용)
+  // 수비팀 동료만 확인 (본인, 주공, 프렌드 제외)
+  bool _estimateDefenseTeammatesHaveGiruda(Player player, GameState state) {
+    if (state.giruda == null) return false;
+
+    // 수비팀 동료 ID (본인, 주공, 공개된 프렌드 제외)
+    Set<int> teammateIds = {};
+    for (final p in state.players) {
+      if (p.id == player.id) continue; // 본인 제외
+      if (p.id == state.declarerId) continue; // 주공 제외
+      if (state.friendRevealed && p.isFriend) continue; // 공개된 프렌드 제외
+      teammateIds.add(p.id);
+    }
+
+    if (teammateIds.isEmpty) return false;
+
+    // 기루다 void가 확인된 동료
+    Set<int> girudaVoidPlayers = {};
+
+    for (final trick in state.tricks) {
+      if (trick.leadSuit != state.giruda) continue;
+
+      for (int i = 0; i < trick.playerOrder.length && i < trick.cards.length; i++) {
+        int playerId = trick.playerOrder[i];
+        if (!teammateIds.contains(playerId)) continue;
+
+        PlayingCard card = trick.cards[i];
+        if (!card.isJoker && card.suit != state.giruda) {
+          girudaVoidPlayers.add(playerId);
+        }
+      }
+    }
+
+    bool hasNonVoidTeammate = teammateIds.any((id) => !girudaVoidPlayers.contains(id));
+
+    final playedGirudaCount = _getPlayedGirudaCount(state);
+    final myGirudaCount = player.hand.where((c) => !c.isJoker && c.suit == state.giruda).length;
+    final remainingGiruda = 13 - playedGirudaCount - myGirudaCount;
+
+    return hasNonVoidTeammate && remainingGiruda > 0;
+  }
+
   // 수비팀에 기루다가 남아있는지 추정 (프렌드용)
   // 트릭 히스토리에서 수비팀 플레이어가 기루다 void인지 확인
   bool _estimateDefenseTeamHasGiruda(Player player, GameState state) {
@@ -1282,11 +1324,16 @@ class AIPlayer {
       // === 수비팀 조커 선공 ===
       // 수비팀이 조커를 가지고 있으면 마이티 프렌드일 가능성 높음
 
-      // 1. 기루다가 있고 공격팀 기루다가 남아있으면 기루다 호출 (공격력 감소)
+      // 1. 기루다가 공격팀에만 있으면 기루다 호출 (간 확률 감소)
       if (state.giruda != null) {
         final remainingGiruda = _getRemainingGirudaCount(state, player);
         if (remainingGiruda >= 1) {
-          return state.giruda!;
+          // 수비팀 동료가 기루다를 가지고 있는지 추정
+          bool teammatesHaveGiruda = _estimateDefenseTeammatesHaveGiruda(player, state);
+          if (!teammatesHaveGiruda) {
+            // 기루다가 공격팀에만 있으면 → 기루다 호출 (공격팀 간 능력 감소)
+            return state.giruda!;
+          }
         }
       }
 
@@ -3049,6 +3096,14 @@ class AIPlayer {
 
       // 팀원이 최상위 카드로 이기고 있으면 낮은 카드 버리기
       if (winningCardIsTop) {
+        // 수비팀이고 조커를 가지고 있고 마이티에게 안전하면 점수카드 적극 사용
+        bool aggressivePointDump = false;
+        if (isDefenseTeam && defenseWinning && player.hand.any((c) => c.isJoker)) {
+          bool mightyPlayed = _getPlayedCards(state).any((c) => c.isMightyWith(state.giruda));
+          bool mightyInMyHand = player.hand.any((c) => c.isMightyWith(state.giruda));
+          aggressivePointDump = mightyPlayed || mightyInMyHand;
+        }
+
         // 리드 무늬가 있으면 리드 무늬 중 낮은 카드
         final suitCards = playableCards.where((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == leadSuit).toList();
@@ -3056,22 +3111,30 @@ class AIPlayer {
           suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
 
           // 수비팀이 확실히 이기고 있으면 점수 카드 우선 (더 많은 점수 획득)
-          // 단, 나중에 이길 가능성이 있는 점수카드는 보존
           if (isDefenseTeam && defenseWinning) {
-            // 이길 확률이 낮은 점수카드 우선 (A/K가 오픈된 J/Q/10 등)
-            final lowProbPointCards = suitCards.where((c) =>
-                c.isPointCard && _isLowWinProbabilityPointCard(c, player, state)).toList();
-            if (lowProbPointCards.isNotEmpty) {
-              lowProbPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-              return lowProbPointCards.first;
+            if (aggressivePointDump) {
+              // 조커가 안전 → 모든 점수카드 적극 사용
+              final pointCards = suitCards.where((c) => c.isPointCard).toList();
+              if (pointCards.isNotEmpty) {
+                pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return pointCards.first;
+              }
+            } else {
+              // 조커가 없음 → 이길 확률 낮은 점수카드만
+              final lowProbPointCards = suitCards.where((c) =>
+                  c.isPointCard && _isLowWinProbabilityPointCard(c, player, state)).toList();
+              if (lowProbPointCards.isNotEmpty) {
+                lowProbPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return lowProbPointCards.first;
+              }
             }
-            // 이길 가능성 있는 점수카드는 보존하고 비점수카드 버리기
+            // 점수카드가 없거나 보존 → 비점수카드 버리기
             final nonPointSuitCards = suitCards.where((c) => !c.isPointCard).toList();
             if (nonPointSuitCards.isNotEmpty) {
               nonPointSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
               return nonPointSuitCards.first;
             }
-            // 점수카드만 있으면 낮은 것 버리기 (어쩔 수 없음)
+            // 점수카드만 있으면 낮은 것 버리기
             return suitCards.first;
           }
 
@@ -3089,14 +3152,22 @@ class AIPlayer {
             !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
 
         // 수비팀이 확실히 이기고 있으면 점수 카드 우선 (더 많은 점수 획득)
-        // 단, 나중에 이길 가능성이 있는 점수카드는 보존
         if (isDefenseTeam && defenseWinning && nonGirudaCards.isNotEmpty) {
-          // 이길 확률이 낮은 점수카드 우선
-          final lowProbPointCards = nonGirudaCards.where((c) =>
-              c.isPointCard && _isLowWinProbabilityPointCard(c, player, state)).toList();
-          if (lowProbPointCards.isNotEmpty) {
-            lowProbPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-            return lowProbPointCards.first;
+          if (aggressivePointDump) {
+            // 조커가 안전 → 모든 점수카드 적극 사용
+            final pointCards = nonGirudaCards.where((c) => c.isPointCard).toList();
+            if (pointCards.isNotEmpty) {
+              pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return pointCards.first;
+            }
+          } else {
+            // 조커가 없음 → 이길 확률 낮은 점수카드만
+            final lowProbPointCards = nonGirudaCards.where((c) =>
+                c.isPointCard && _isLowWinProbabilityPointCard(c, player, state)).toList();
+            if (lowProbPointCards.isNotEmpty) {
+              lowProbPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return lowProbPointCards.first;
+            }
           }
         }
 
@@ -3109,13 +3180,23 @@ class AIPlayer {
         final girudaCards = playableCards.where((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
         if (girudaCards.isNotEmpty) {
-          // 수비팀이 확실히 이기고 있으면 이길 확률 낮은 점수 카드 우선
+          // 수비팀이 확실히 이기고 있으면 점수 카드 우선
           if (isDefenseTeam && defenseWinning) {
-            final lowProbPointGirudaCards = girudaCards.where((c) =>
-                c.isPointCard && _isLowWinProbabilityPointCard(c, player, state)).toList();
-            if (lowProbPointGirudaCards.isNotEmpty) {
-              lowProbPointGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-              return lowProbPointGirudaCards.first;
+            if (aggressivePointDump) {
+              // 조커가 안전 → 모든 점수카드 적극 사용
+              final pointGirudaCards = girudaCards.where((c) => c.isPointCard).toList();
+              if (pointGirudaCards.isNotEmpty) {
+                pointGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return pointGirudaCards.first;
+              }
+            } else {
+              // 조커가 없음 → 이길 확률 낮은 점수카드만
+              final lowProbPointGirudaCards = girudaCards.where((c) =>
+                  c.isPointCard && _isLowWinProbabilityPointCard(c, player, state)).toList();
+              if (lowProbPointGirudaCards.isNotEmpty) {
+                lowProbPointGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return lowProbPointGirudaCards.first;
+              }
             }
           }
           girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
@@ -3493,39 +3574,75 @@ class AIPlayer {
     }
 
     // === 같은 팀이 조커로 이기고 있을 때 ===
-    // 팀원이 조커로 이기고 있으면 마이티 낭비 없이 낮은 카드 버리기
+    // 팀원이 조커로 이기고 있으면:
+    // - 마이티에게 질 가능성이 낮으면 점수 카드를 내서 수비 점수 극대화 (언 방지)
+    // - 마이티에게 질 가능성이 있으면 낮은 카드 버리기
     if (currentWinningCard != null && currentWinningCard.isJoker) {
       bool teammateWinningWithJoker = (isAttackTeam && !defenseWinning) ||
           (isDefenseTeam && defenseWinning);
 
       if (teammateWinningWithJoker) {
-        // 선공 무늬가 있으면 선공 무늬 중 낮은 카드 버리기
+        // 마이티가 조커를 이길 가능성 판단
+        final playedCards = _getPlayedCards(state);
+        bool mightyPlayed = playedCards.any((c) => c.isMightyWith(state.giruda));
+        bool mightyInMyHand = player.hand.any((c) => c.isMightyWith(state.giruda));
+        bool isLastPlayerJoker = state.currentTrick != null &&
+            state.currentTrick!.cards.length == 4;
+        // 마이티가 이미 나왔거나, 내 손에 있거나, 마지막 순서이면 조커가 안전
+        bool jokerIsSafe = mightyPlayed || mightyInMyHand || isLastPlayerJoker;
+
+        // 수비팀이고 조커가 안전하면 점수 카드 우선 (공격팀 언 방지)
+        bool dumpPointCards = isDefenseTeam && defenseWinning && jokerIsSafe;
+
+        // 선공 무늬가 있으면
         final suitCardsTeamJoker = playableCards.where((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == leadSuit).toList();
         if (suitCardsTeamJoker.isNotEmpty) {
           suitCardsTeamJoker.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          if (dumpPointCards) {
+            // 점수 카드 우선 (낮은 점수 카드부터)
+            final pointCards = suitCardsTeamJoker.where((c) => c.isPointCard).toList();
+            if (pointCards.isNotEmpty) {
+              pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return pointCards.first;
+            }
+          }
           final nonPointCards = suitCardsTeamJoker.where((c) => !c.isPointCard).toList();
           if (nonPointCards.isNotEmpty) {
             return nonPointCards.first;
           }
           return suitCardsTeamJoker.first;
         }
-        // 선공 무늬가 없으면 비기루다 중 낮은 카드
+        // 선공 무늬가 없으면 비기루다 중
         final nonGirudaTeamJoker = playableCards.where((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
         if (nonGirudaTeamJoker.isNotEmpty) {
           nonGirudaTeamJoker.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          if (dumpPointCards) {
+            final pointCards = nonGirudaTeamJoker.where((c) => c.isPointCard).toList();
+            if (pointCards.isNotEmpty) {
+              pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return pointCards.first;
+            }
+          }
           final nonPointCards = nonGirudaTeamJoker.where((c) => !c.isPointCard).toList();
           if (nonPointCards.isNotEmpty) {
             return nonPointCards.first;
           }
           return nonGirudaTeamJoker.first;
         }
-        // 기루다만 있으면 가장 낮은 기루다
+        // 기루다만 있으면 가장 낮은 기루다 (점수 카드 여부 확인)
         final girudaTeamJoker = playableCards.where((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
         if (girudaTeamJoker.isNotEmpty) {
           girudaTeamJoker.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          if (dumpPointCards) {
+            final pointCards = girudaTeamJoker.where((c) => c.isPointCard).toList();
+            if (pointCards.isNotEmpty) {
+              pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return pointCards.first;
+            }
+          }
           return girudaTeamJoker.first;
         }
       }
@@ -3589,39 +3706,63 @@ class AIPlayer {
     }
 
     // === 같은 팀이 마이티로 이기고 있을 때 ===
-    // 팀원이 마이티로 이기고 있으면 조커 낭비 없이 낮은 카드 버리기
+    // 마이티는 무적이므로 수비팀은 점수 카드를 내서 점수 극대화 (공격팀 언 방지)
     if (currentWinningCard != null && currentWinningCard.isMightyWith(state.giruda)) {
       bool teammateWinningWithMighty = (isAttackTeam && !defenseWinning) ||
           (isDefenseTeam && defenseWinning);
 
       if (teammateWinningWithMighty) {
-        // 선공 무늬가 있으면 선공 무늬 중 낮은 카드 버리기
+        // 수비팀이면 점수 카드 우선 (마이티는 무적이므로 항상 안전)
+        bool dumpPointCards = isDefenseTeam && defenseWinning;
+
+        // 선공 무늬가 있으면
         final suitCardsTeamMighty = playableCards.where((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == leadSuit).toList();
         if (suitCardsTeamMighty.isNotEmpty) {
           suitCardsTeamMighty.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          if (dumpPointCards) {
+            final pointCards = suitCardsTeamMighty.where((c) => c.isPointCard).toList();
+            if (pointCards.isNotEmpty) {
+              pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return pointCards.first;
+            }
+          }
           final nonPointCards = suitCardsTeamMighty.where((c) => !c.isPointCard).toList();
           if (nonPointCards.isNotEmpty) {
             return nonPointCards.first;
           }
           return suitCardsTeamMighty.first;
         }
-        // 선공 무늬가 없으면 비기루다 중 낮은 카드
+        // 선공 무늬가 없으면 비기루다 중
         final nonGirudaTeamMighty = playableCards.where((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
         if (nonGirudaTeamMighty.isNotEmpty) {
           nonGirudaTeamMighty.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          if (dumpPointCards) {
+            final pointCards = nonGirudaTeamMighty.where((c) => c.isPointCard).toList();
+            if (pointCards.isNotEmpty) {
+              pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return pointCards.first;
+            }
+          }
           final nonPointCards = nonGirudaTeamMighty.where((c) => !c.isPointCard).toList();
           if (nonPointCards.isNotEmpty) {
             return nonPointCards.first;
           }
           return nonGirudaTeamMighty.first;
         }
-        // 기루다만 있으면 가장 낮은 기루다
+        // 기루다만 있으면
         final girudaTeamMighty = playableCards.where((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
         if (girudaTeamMighty.isNotEmpty) {
           girudaTeamMighty.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          if (dumpPointCards) {
+            final pointCards = girudaTeamMighty.where((c) => c.isPointCard).toList();
+            if (pointCards.isNotEmpty) {
+              pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return pointCards.first;
+            }
+          }
           return girudaTeamMighty.first;
         }
       }
@@ -3662,6 +3803,54 @@ class AIPlayer {
         if (girudaForMighty.isNotEmpty) {
           girudaForMighty.sort((a, b) => a.rankValue.compareTo(b.rankValue));
           return girudaForMighty.first;
+        }
+      }
+    }
+
+    // === 수비팀이 이기고 있고 조커 보유 시 점수 카드 적극 사용 ===
+    // 조커/마이티가 아닌 카드로 이기고 있지만, 조커를 가지고 있고 마이티에게 안전하면
+    // 점수 카드를 적극 사용하여 공격팀 언 방지
+    if (isDefenseTeam && defenseWinning && player.hand.any((c) => c.isJoker)) {
+      bool mightyAlreadyPlayed = _getPlayedCards(state).any((c) => c.isMightyWith(state.giruda));
+      bool mightyInMyHand = player.hand.any((c) => c.isMightyWith(state.giruda));
+      bool jokerSafeFromMighty = mightyAlreadyPlayed || mightyInMyHand;
+
+      if (jokerSafeFromMighty) {
+        // 선공 무늬가 있으면 점수 카드 우선
+        final suitCardsJokerHold = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == leadSuit).toList();
+        if (suitCardsJokerHold.isNotEmpty) {
+          final pointCards = suitCardsJokerHold.where((c) => c.isPointCard).toList();
+          if (pointCards.isNotEmpty) {
+            pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return pointCards.first;
+          }
+          suitCardsJokerHold.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return suitCardsJokerHold.first;
+        }
+        // 선공 무늬가 없으면 비기루다 중 점수 카드 우선
+        final nonGirudaJokerHold = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
+        if (nonGirudaJokerHold.isNotEmpty) {
+          final pointCards = nonGirudaJokerHold.where((c) => c.isPointCard).toList();
+          if (pointCards.isNotEmpty) {
+            pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return pointCards.first;
+          }
+          nonGirudaJokerHold.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return nonGirudaJokerHold.first;
+        }
+        // 기루다만 있으면 점수 카드 우선
+        final girudaJokerHold = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
+        if (girudaJokerHold.isNotEmpty) {
+          final pointCards = girudaJokerHold.where((c) => c.isPointCard).toList();
+          if (pointCards.isNotEmpty) {
+            pointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return pointCards.first;
+          }
+          girudaJokerHold.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return girudaJokerHold.first;
         }
       }
     }
@@ -4177,88 +4366,33 @@ class AIPlayer {
       }
     }
 
-    // === 수비팀 조커로 점수 카드 탈취 전략 ===
-    // 공격팀이 기루다 고액(A/K/Q/J)으로 이기고 있고 점수 카드가 2장 이상일 때만 조커 사용
-    if (isDefenseTeam && state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
+    // === 수비팀 조커로 점수 카드 탈취 (공격팀 런 방지 최우선) ===
+    // 트릭 2~9에서 공격팀이 이기고 있고, 점수 카드가 있고,
+    // 마이티에게 질 확률이 낮으면 조커를 적극 사용
+    if (isDefenseTeam && !defenseWinning &&
+        state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
       final joker = playableCards.where((c) => c.isJoker).toList();
       if (joker.isNotEmpty) {
-        // 현재 트릭의 점수 카드 수 계산
-        int pointCardsInTrick = state.currentTrick!.cards
-            .where((c) => c.isPointCard || c.isJoker).length;
+        bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
+        // 마이티가 이기고 있으면 조커로 이길 수 없음
+        bool winningWithMighty = currentWinningCard != null &&
+            currentWinningCard.isMightyWith(state.giruda);
 
-        // 점수 카드 2장 이상이고 공격팀이 기루다 고액으로 이기고 있을 때 조커 사용
-        if (pointCardsInTrick >= 2 && !defenseWinning) {
-          // ★ 현재 이기는 카드가 기루다 고액(A/K/Q/J)인지 확인
-          bool isHighGiruda = currentWinningCard != null &&
-              !currentWinningCard.isMightyWith(state.giruda) &&
-              !currentWinningCard.isJoker &&
-              currentWinningCard.suit == state.giruda &&
-              [Rank.ace, Rank.king, Rank.queen, Rank.jack].contains(currentWinningCard.rank);
+        if (!jokerCalled && !winningWithMighty) {
+          // 트릭에 점수 카드가 1장 이상 있는지 확인
+          int pointCardsInTrick = state.currentTrick!.cards
+              .where((c) => c.isPointCard || c.isJoker).length;
 
-          if (isHighGiruda) {
-            bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
-            if (!jokerCalled) {
-              return joker.first;
-            }
-          }
-        }
-      }
-    }
+          if (pointCardsInTrick >= 1) {
+            // 마이티에게 질 확률 판단
+            final allPlayedCards = _getPlayedCards(state);
+            bool mightyPlayed = allPlayedCards.any((c) => c.isMightyWith(state.giruda));
+            bool mightyInMyHand = player.hand.any((c) => c.isMightyWith(state.giruda));
+            bool isLastPlayer = state.currentTrick != null &&
+                state.currentTrick!.cards.length == 4;
+            bool jokerSafe = mightyPlayed || mightyInMyHand || isLastPlayer;
 
-    // === 수비팀 선공권 탈환 전략 ===
-    // 공격팀이 기루다 고액으로 이기고 있고 점수 카드 2장 이상일 때만 조커로 선공권 뺏기
-    if (isDefenseTeam && !defenseWinning) {
-      // 조커로 선공권 탈환 (첫 트릭 및 마지막 트릭 제외)
-      if (state.currentTrickNumber > 1 && state.currentTrickNumber < 10) {
-        final joker = playableCards.where((c) => c.isJoker).toList();
-        if (joker.isNotEmpty) {
-          // ★ 현재 이기는 카드가 기루다 고액(A/K/Q/J)인지 확인
-          bool isHighGiruda = currentWinningCard != null &&
-              !currentWinningCard.isMightyWith(state.giruda) &&
-              !currentWinningCard.isJoker &&
-              currentWinningCard.suit == state.giruda &&
-              [Rank.ace, Rank.king, Rank.queen, Rank.jack].contains(currentWinningCard.rank);
-
-          if (isHighGiruda) {
-            bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
-            if (!jokerCalled) {
-              // ★ 점수 카드 2장 이상일 때만 조커 사용
-              int pointCardsInTrick = state.currentTrick!.cards
-                  .where((c) => c.isPointCard || c.isJoker).length;
-              if (pointCardsInTrick >= 2) {
-                // 선공권 탈환 후 유지할 최상위 카드가 있는지 확인
-                bool hasTopCards = player.hand.any((c) =>
-                    c.isMightyWith(state.giruda) ||
-                    (!c.isJoker && _getEffectiveCardValue(c, state) >= 14));
-                if (hasTopCards) {
-                  return joker.first;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // === 수비팀 후반전 조커 전략 ===
-    // 후반전(트릭 7 이후)에 공격팀이 기루다 고액으로 이기고 점수 2장 이상일 때 조커 사용
-    if (isDefenseTeam && !defenseWinning && state.currentTrickNumber >= 7 && state.currentTrickNumber < 10) {
-      final joker = playableCards.where((c) => c.isJoker).toList();
-      if (joker.isNotEmpty) {
-        // ★ 현재 이기는 카드가 기루다 고액(A/K/Q/J)인지 확인
-        bool isHighGiruda = currentWinningCard != null &&
-            !currentWinningCard.isMightyWith(state.giruda) &&
-            !currentWinningCard.isJoker &&
-            currentWinningCard.suit == state.giruda &&
-            [Rank.ace, Rank.king, Rank.queen, Rank.jack].contains(currentWinningCard.rank);
-
-        if (isHighGiruda) {
-          bool jokerCalled = state.currentTrick?.jokerCallSuit != null;
-          if (!jokerCalled) {
-            // ★ 점수 카드 2장 이상일 때만 조커 사용
-            int pointCardsInTrick = state.currentTrick!.cards
-                .where((c) => c.isPointCard || c.isJoker).length;
-            if (pointCardsInTrick >= 2) {
+            if (jokerSafe) {
               return joker.first;
             }
           }
