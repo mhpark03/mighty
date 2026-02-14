@@ -1023,17 +1023,28 @@ class GameController extends ChangeNotifier {
     }
 
     // === 1. 프렌드 연결 전략 ===
+    bool friendIsGirudaCard = false;
     if (friendCard != null) {
       if (friendCard.isMightyWith(giruda)) {
         strategies.add('적은 무늬 저액으로 프렌드(마이티)에게 선 넘기기');
       } else if (friendCard.isJoker) {
         strategies.add('적은 무늬 저액으로 프렌드(조커)에게 선 넘기기');
       } else if (friendCard.suit == giruda && giruda != null) {
-        // 기루다 프렌드 (예: ♦K)
+        // 기루다 프렌드 (예: ♦K) → 9이하 중간 기루다(높은 순)로 선 넘기기
+        friendIsGirudaCard = true;
         final lowerGiruda = girudaCards.where((c) => c.rankValue < friendCard.rankValue).toList();
         if (lowerGiruda.isNotEmpty) {
-          lowerGiruda.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-          strategies.add('${cs(lowerGiruda.first)}로 프렌드(${cs(friendCard)})에게 선 넘기기 → ${rs(friendCard.rank)}딸랑 방지');
+          // 9이하 중간 기루다 우선 (AI 로직과 일치)
+          final midGiruda = lowerGiruda.where((c) => c.rankValue <= 9).toList();
+          PlayingCard passCard;
+          if (midGiruda.isNotEmpty) {
+            midGiruda.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+            passCard = midGiruda.first;
+          } else {
+            lowerGiruda.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            passCard = lowerGiruda.first;
+          }
+          strategies.add('${cs(passCard)}로 프렌드(${cs(friendCard)})에게 선 넘기기 → ${rs(friendCard.rank)}딸랑 방지');
         }
       } else if (friendCard.suit != null) {
         // 비기루다 프렌드 (예: ♥K)
@@ -1051,10 +1062,12 @@ class GameController extends ChangeNotifier {
     // === 2. 기루다 공격 전략 ===
     if (giruda != null && highGiruda.isNotEmpty) {
       final highNames = highGiruda.map((c) => rs(c.rank)).join('/');
+      // 기루다 프렌드 → "프렌드 트릭 후" / 그 외 → "선 탈환 후"
+      final leadSource = friendIsGirudaCard ? '프렌드 트릭 후' : '선 탈환 후';
       if (girudaCards.length >= 5) {
-        strategies.add('선 탈환 후 ${ss(giruda)}$highNames로 기루다 지배 → 수비팀 기루다 소진');
+        strategies.add('$leadSource ${ss(giruda)}$highNames로 기루다 지배 → 수비팀 기루다 소진');
       } else {
-        strategies.add('선 탈환 후 ${ss(giruda)}$highNames로 수비팀 기루다 소진');
+        strategies.add('$leadSource ${ss(giruda)}$highNames로 수비팀 기루다 소진');
       }
     } else if (giruda != null && girudaCards.length >= 3) {
       strategies.add('${ss(giruda)}중간 기루다로 수비팀 고액 기루다 소진 유도');
