@@ -543,15 +543,18 @@ class _GameScreenState extends State<GameScreen> {
     final giruda = state.giruda;
     final targetTricks = bid.tricks;
 
-    // 점수 시뮬레이션
-    // 승리 시 최소 점수 (목표 딱 맞춤): (target - target + 1) + (target - 13) * 2
-    final winMinScore = 1 + (targetTricks - 13) * 2;
-    // 현실적 예상 최대 (핸드 강도 기반)
-    final strength = controller.getDeclarerStrength();
-    final expectedMax = (strength + 1).clamp(targetTricks + 1, 20);
-    final winExpectedScore = (expectedMax - targetTricks + 1) + (expectedMax - 13) * 2;
-    // 패배 시 최대 실점 (0점 획득): 0 - target
-    final loseMaxScore = -targetTricks;
+    // 트릭 기반 예상 득점 범위
+    final (estMinPoints, estMaxPoints) = controller.getEstimatedPointRange();
+    // 점수 계산: 득점 >= 목표이면 승리, 미만이면 패배
+    int _calcScore(int points) {
+      if (points >= targetTricks) {
+        return ((points - targetTricks + 1) + (points - 13) * 2) * 2;
+      } else {
+        return -targetTricks;
+      }
+    }
+    final maxScore = _calcScore(estMaxPoints);
+    final minScore = _calcScore(estMinPoints);
 
     // 노기루다 여부
     final isNoGiruda = giruda == null;
@@ -704,7 +707,7 @@ class _GameScreenState extends State<GameScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l10n.bidSummaryScoreTitle,
+                    l10n.bidSummaryEstimatedRange,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -712,23 +715,28 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  // 승리 시
+                  // 최대 (프렌드 포함)
                   _buildScoreRow(
-                    l10n.bidSummaryWinMin,
-                    '+${winMinScore * 2}',
-                    Colors.green,
+                    l10n.bidSummaryEstMax(estMaxPoints),
+                    '${maxScore >= 0 ? '+' : ''}$maxScore',
+                    maxScore >= 0 ? Colors.green : Colors.red[300]!,
                   ),
-                  const SizedBox(height: 6),
-                  _buildScoreRow(
-                    l10n.bidSummaryWinExpected(expectedMax),
-                    '+${winExpectedScore * 2}',
-                    Colors.green[300]!,
+                  const SizedBox(height: 2),
+                  Text(
+                    l10n.bidSummaryEstMaxDesc,
+                    style: const TextStyle(color: Colors.white38, fontSize: 10),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
+                  // 최소 (프렌드 없이)
                   _buildScoreRow(
-                    l10n.bidSummaryLose,
-                    '$loseMaxScore',
-                    Colors.red[300]!,
+                    l10n.bidSummaryEstMin(estMinPoints),
+                    '${minScore >= 0 ? '+' : ''}$minScore',
+                    minScore >= 0 ? Colors.green[300]! : Colors.red[300]!,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    l10n.bidSummaryEstMinDesc,
+                    style: const TextStyle(color: Colors.white38, fontSize: 10),
                   ),
                   const SizedBox(height: 10),
                   // 배수 정보

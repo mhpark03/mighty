@@ -43,6 +43,13 @@ class GameController extends ChangeNotifier {
     return _aiPlayer.evaluateHandStrength(declarer.hand, _state.giruda);
   }
 
+  /// 주공의 예상 득점 범위 (최소/최대 점수 카드 수)
+  (int, int) getEstimatedPointRange() {
+    if (_state.declarerId == null) return (0, 0);
+    final declarer = _state.players[_state.declarerId!];
+    return _aiPlayer.estimatePointRange(declarer.hand, _state.giruda);
+  }
+
   // 저장된 게임이 있는지 확인
   static Future<bool> hasSavedGame() async {
     return await GameSaveService.hasSavedGame(_gameType);

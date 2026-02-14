@@ -923,15 +923,21 @@
   "friendReasonNeedStrongCard": "강한 카드 보유자를 프렌드로 지정",
   "friendReasonNoFriendAll": "모든 핵심 카드를 보유하여 노프렌드 선언",
   "bidSummaryTitle": "배팅 결과",
-  "bidSummaryScoreTitle": "예상 점수 (주공 기준)",
-  "bidSummaryWinMin": "승리 시 (최소 득점)",
-  "bidSummaryWinExpected": "승리 시 (예상 최대 {points}점)",
-  "@bidSummaryWinExpected": {
+  "bidSummaryEstimatedRange": "예상 득점 범위 (주공 기준)",
+  "bidSummaryEstMax": "최대 ({points}점)",
+  "@bidSummaryEstMax": {
     "placeholders": {
       "points": {"type": "int"}
     }
   },
-  "bidSummaryLose": "패배 시 (0점 획득)",
+  "bidSummaryEstMaxDesc": "프렌드 포함, 선 유지 시",
+  "bidSummaryEstMin": "최소 ({points}점)",
+  "@bidSummaryEstMin": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "bidSummaryEstMinDesc": "프렌드 도움 없이 (조커콜 등)",
   "bidSummaryMultipliers": "주공 ×2, 프렌드 ×1, 야당 ×(-1)",
   "firstTrickStrategy": "초구 전략",
   "scoreStrategy": "점수 획득 전략",

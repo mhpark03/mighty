@@ -763,15 +763,21 @@
   "friendReasonNeedStrongCard": "指定强牌持有者为朋友",
   "friendReasonNoFriendAll": "拥有所有关键牌，无需朋友",
   "bidSummaryTitle": "竞标结果",
-  "bidSummaryScoreTitle": "预计分数 (庄家基准)",
-  "bidSummaryWinMin": "胜利时 (最低得分)",
-  "bidSummaryWinExpected": "胜利时 (预计最多 {points}分)",
-  "@bidSummaryWinExpected": {
+  "bidSummaryEstimatedRange": "预计得分范围 (庄家基准)",
+  "bidSummaryEstMax": "最大 ({points}分)",
+  "@bidSummaryEstMax": {
     "placeholders": {
       "points": {"type": "int"}
     }
   },
-  "bidSummaryLose": "失败时 (0分获得)",
+  "bidSummaryEstMaxDesc": "含朋友，保持先手时",
+  "bidSummaryEstMin": "最小 ({points}分)",
+  "@bidSummaryEstMin": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "bidSummaryEstMinDesc": "无朋友帮助（Joker Call等）",
   "bidSummaryMultipliers": "庄家 ×2、朋友 ×1、防守 ×(-1)",
   "firstTrickStrategy": "首墩策略",
   "scoreStrategy": "得分策略",

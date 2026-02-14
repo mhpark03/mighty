@@ -763,15 +763,21 @@
   "friendReasonNeedStrongCard": "強いカード所有者をフレンドに指定",
   "friendReasonNoFriendAll": "全ての重要カードを所有、ノーフレンド宣言",
   "bidSummaryTitle": "入札結果",
-  "bidSummaryScoreTitle": "予想スコア (宣言者基準)",
-  "bidSummaryWinMin": "勝利時 (最低得点)",
-  "bidSummaryWinExpected": "勝利時 (予想最大 {points}点)",
-  "@bidSummaryWinExpected": {
+  "bidSummaryEstimatedRange": "予想得点範囲 (宣言者基準)",
+  "bidSummaryEstMax": "最大 ({points}点)",
+  "@bidSummaryEstMax": {
     "placeholders": {
       "points": {"type": "int"}
     }
   },
-  "bidSummaryLose": "敗北時 (0点獲得)",
+  "bidSummaryEstMaxDesc": "フレンド含む、リード維持時",
+  "bidSummaryEstMin": "最小 ({points}点)",
+  "@bidSummaryEstMin": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "bidSummaryEstMinDesc": "フレンドの助けなし（ジョーカーコール等）",
   "bidSummaryMultipliers": "宣言者 ×2、フレンド ×1、守備 ×(-1)",
   "firstTrickStrategy": "初手戦略",
   "scoreStrategy": "得点戦略",

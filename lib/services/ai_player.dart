@@ -606,6 +606,100 @@ class AIPlayer {
     return strength;
   }
 
+  /// 주공의 예상 득점 범위 계산 (트릭 기반)
+  /// 최대: 프렌드 포함, 모든 가능한 트릭 고려
+  /// 최소: 프렌드 도움 없이 (조커콜/컷 당함), 확실한 트릭만
+  /// 반환: (minPoints, maxPoints)
+  (int, int) estimatePointRange(List<PlayingCard> hand, Suit? giruda) {
+    final mightySuit = (giruda == Suit.spade) ? Suit.diamond : Suit.spade;
+    bool hasMighty = hand.any((c) =>
+        !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace);
+    bool hasJoker = hand.any((c) => c.isJoker);
+
+    int minTricks = 0; // 프렌드 도움 없이 확실한 트릭
+    int maxTricks = 0; // 프렌드 포함 최대 트릭
+
+    // === 마이티: 확실한 1트릭 ===
+    if (hasMighty) { minTricks++; maxTricks++; }
+
+    // === 조커: 거의 확실하지만 조커콜 위험 ===
+    if (hasJoker) {
+      maxTricks++; // 최대에 포함
+      // 최소에서는 조커콜 당할 수 있으므로 제외
+    }
+
+    // === 기루다 분석 ===
+    if (giruda != null) {
+      final gc = hand.where((c) => !c.isJoker && c.suit == giruda).toList();
+      bool gA = gc.any((c) => c.rank == Rank.ace);
+      bool gK = gc.any((c) => c.rank == Rank.king);
+      bool gQ = gc.any((c) => c.rank == Rank.queen);
+
+      // 기루다 A: 확실한 1트릭
+      if (gA) { minTricks++; maxTricks++; }
+      // A 다음 K: A 이후 선 유지로 K도 확보
+      if (gA && gK) { minTricks++; maxTricks++; }
+      // A-K-Q 연속: Q까지 확보 가능 (최대만)
+      if (gA && gK && gQ) { maxTricks++; }
+      // K만 있고 A 없으면: 최대에서만 1트릭 (수비A에 잡힐 수 있음)
+      if (gK && !gA) { maxTricks++; }
+
+      // 기루다 장수가 많으면 후반 지배 (최대)
+      if (gc.length >= 5 && gA) maxTricks++;
+      if (gc.length >= 6 && gA) maxTricks++;
+    }
+
+    // === 비기루다 에이스/킹 ===
+    for (final suit in Suit.values) {
+      if (suit == giruda) continue;
+      final sc = hand.where((c) => !c.isJoker && c.suit == suit).toList();
+      if (sc.isEmpty) continue;
+
+      bool hasAce = sc.any((c) =>
+          c.rank == Rank.ace && !(c.suit == mightySuit && c.rank == Rank.ace));
+      bool hasKing = sc.any((c) => c.rank == Rank.king);
+
+      // 비기루다 A: 선공 시 확실한 1트릭
+      if (hasAce) { minTricks++; maxTricks++; }
+      // A-K 연속: 선 유지하여 K도 확보 (최대)
+      if (hasAce && hasKing) { maxTricks++; }
+    }
+
+    // === 보이드 컷 기회 (최대만) ===
+    if (giruda != null) {
+      final girudaCount = hand.where((c) => !c.isJoker && c.suit == giruda).length;
+      for (final suit in Suit.values) {
+        if (suit == giruda) continue;
+        final suitCount = hand.where((c) => !c.isJoker && c.suit == suit).length;
+        if (suitCount == 0 && girudaCount >= 3) {
+          maxTricks++;
+        }
+      }
+    }
+
+    // === 프렌드 기여 ===
+    if (!hasMighty) {
+      // 마이티 프렌드: 확실한 1트릭 (마이티는 무조건 이김)
+      minTricks++;
+      maxTricks++;
+    } else if (!hasJoker) {
+      // 조커 프렌드: 조커콜 위험 → 최대에만 포함
+      maxTricks++;
+    } else {
+      // 에이스 프렌드: 비교적 안정적이지만 컷 위험 → 최대에만
+      maxTricks++;
+    }
+
+    // 트릭당 평균 점수 카드: 약 2장 (20장 / 10트릭)
+    // 최소는 보수적으로 1.8장, 최대는 2장
+    int minPoints = (minTricks * 1.8).round().clamp(0, 20);
+    int maxPoints = (maxTricks * 2).clamp(0, 20);
+
+    if (minPoints > maxPoints) minPoints = maxPoints;
+
+    return (minPoints, maxPoints);
+  }
+
   // Public method for debugging
   Suit? findBestSuit(List<PlayingCard> hand) {
     Map<Suit, int> suitStrength = {};
