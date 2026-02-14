@@ -605,8 +605,11 @@ class AIPlayer {
       if (gA && gK && gQ) { maxTricks++; }
       // A+Q (K 없이): A 이후 Q가 차상위 → 최대에 포함
       if (gA && gQ && !gK) { maxTricks++; }
-      // K만 있고 A 없으면: 최대에서만 1트릭 (수비A에 잡힐 수 있음)
-      if (gK && !gA) { maxTricks++; }
+      // K만 있고 A 없으면: A 소진 후 K 승리 가능
+      if (gK && !gA) {
+        maxTricks++;
+        if (gc.length >= 3) minTricks++; // 3장+ K: A가 일찍 나가므로 K 거의 확실
+      }
       // K+Q 연속 (A 없이): A 소진 후 K→Q 연속 승리
       if (gK && gQ && !gA) { maxTricks++; }
 
@@ -627,14 +630,16 @@ class AIPlayer {
         if (gc.length >= 6) maxTricks++;
       }
 
-      // A, K 없이 Q 최상위 기루다
+      // A, K 없이 Q 최상위 기루다 (4장+ 부터 유효, 3장 Q는 너무 약함)
       if (!gA && !gK && gQ) {
-        maxTricks++; // 상대 A,K 소진 후 Q가 최상위
         if (gc.length >= 5) {
+          maxTricks++; // Q가 최상위
           maxTricks += 2; // 후반 기루다 지배
         } else if (gc.length >= 4) {
+          maxTricks++; // Q가 최상위
           maxTricks++; // 일부 후반 지배
         }
+        // 3장 Q: A,K 둘 다 소진되기 어려움 → 보너스 없음
       }
     }
 
