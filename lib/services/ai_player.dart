@@ -328,8 +328,8 @@ class AIPlayer {
 
     for (final suit in Suit.values) {
       final suitCards = hand.where((c) => !c.isJoker && c.suit == suit).toList();
-      // 최소 2장은 있어야 기루다 후보
-      if (suitCards.length < 2) continue;
+      // 최소 3장은 있어야 기루다 후보 (2장은 상대 기루다에 압도됨)
+      if (suitCards.length < 3) continue;
 
       final (minPts, maxPts) = estimatePointRange(hand, suit);
       final optimal = ((minPts + maxPts) / 2 + 1).round();
@@ -625,6 +625,16 @@ class AIPlayer {
           maxTricks++;    // 4장+K: 일부 후반 지배
         }
         if (gc.length >= 6) maxTricks++;
+      }
+
+      // A, K 없이 Q 최상위 기루다
+      if (!gA && !gK && gQ) {
+        maxTricks++; // 상대 A,K 소진 후 Q가 최상위
+        if (gc.length >= 5) {
+          maxTricks += 2; // 후반 기루다 지배
+        } else if (gc.length >= 4) {
+          maxTricks++; // 일부 후반 지배
+        }
       }
     }
 
