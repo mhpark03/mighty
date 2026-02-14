@@ -659,22 +659,23 @@ class AIPlayer {
     }
 
     // === 프렌드 기여 ===
+    // 최소: 프렌드가 마이티만 보유한 경우 (바닥패 가능성 감안, 보수적)
+    // 최대: 프렌드가 마이티/조커/A를 보유한 경우
     if (!hasMighty) {
-      // 마이티 프렌드: 확실한 1트릭 (마이티는 무조건 이김)
+      // 마이티 프렌드: 확실한 1트릭 (바닥패에 있을 수 있지만 93% 확률로 누군가 보유)
       minTricks++;
       maxTricks++;
-    } else if (!hasJoker) {
-      // 조커 프렌드: 조커콜 위험 → 최대에만 포함
+    }
+    if (!hasJoker) {
+      // 최대: 프렌드가 조커도 보유 가능 (조커콜 위험 → 최대에만)
       maxTricks++;
-    } else {
-      // 마이티+조커 모두 보유 → 프렌드는 일반 카드 (기루다 K 등)
-      // 비교적 안정적: 기루다 프렌드는 기루다A 플레이 후 확정
-      maxTricks++;
-      // 기루다 프렌드(K/Q)이고 기루다A 보유 시 → 프렌드 트릭 거의 확실
-      if (giruda != null) {
-        bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
-        if (hasGirudaAce) { minTricks++; }
-      }
+    }
+    // 최대: 프렌드가 비기루다 A를 추가로 보유 가능
+    maxTricks++;
+    // 마이티+조커 모두 보유 시 기루다 프렌드(K/Q)의 안정성
+    if (hasMighty && hasJoker && giruda != null) {
+      bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+      if (hasGirudaAce) { minTricks++; } // 기루다A 보유 → 프렌드 K/Q 거의 확실
     }
 
     // 트릭당 평균 점수 카드: 약 2장 (20장 / 10트릭)
