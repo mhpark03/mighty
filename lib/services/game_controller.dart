@@ -36,6 +36,13 @@ class GameController extends ChangeNotifier {
   FriendExplanation? get friendExplanation => _friendExplanation;
   bool get showFriendSummary => _showFriendSummary;
 
+  /// 주공의 현재 핸드 강도 계산 (키티 선택 후 기준)
+  int getDeclarerStrength() {
+    if (_state.declarerId == null) return 0;
+    final declarer = _state.players[_state.declarerId!];
+    return _aiPlayer.evaluateHandStrength(declarer.hand, _state.giruda);
+  }
+
   // 저장된 게임이 있는지 확인
   static Future<bool> hasSavedGame() async {
     return await GameSaveService.hasSavedGame(_gameType);

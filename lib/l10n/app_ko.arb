@@ -925,7 +925,12 @@
   "bidSummaryTitle": "배팅 결과",
   "bidSummaryScoreTitle": "예상 점수 (주공 기준)",
   "bidSummaryWinMin": "승리 시 (최소 득점)",
-  "bidSummaryWinMax": "승리 시 (풀 - 20점)",
+  "bidSummaryWinExpected": "승리 시 (예상 최대 {points}점)",
+  "@bidSummaryWinExpected": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
   "bidSummaryLose": "패배 시 (0점 획득)",
   "bidSummaryMultipliers": "주공 ×2, 프렌드 ×1, 야당 ×(-1)",
   "firstTrickStrategy": "초구 전략",

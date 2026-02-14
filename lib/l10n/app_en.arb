@@ -766,7 +766,12 @@
   "bidSummaryTitle": "Bidding Result",
   "bidSummaryScoreTitle": "Expected Score (Declarer)",
   "bidSummaryWinMin": "Win (minimum points)",
-  "bidSummaryWinMax": "Win (full - 20 pts)",
+  "bidSummaryWinExpected": "Win (expected max {points} pts)",
+  "@bidSummaryWinExpected": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
   "bidSummaryLose": "Lose (0 pts earned)",
   "bidSummaryMultipliers": "Declarer ×2, Friend ×1, Defender ×(-1)",
   "firstTrickStrategy": "First Trick Strategy",

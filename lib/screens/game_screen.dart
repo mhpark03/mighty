@@ -546,8 +546,10 @@ class _GameScreenState extends State<GameScreen> {
     // 점수 시뮬레이션
     // 승리 시 최소 점수 (목표 딱 맞춤): (target - target + 1) + (target - 13) * 2
     final winMinScore = 1 + (targetTricks - 13) * 2;
-    // 승리 시 풀(20점 획득): (20 - target + 1) + (20 - 13) * 2
-    final winMaxScore = (20 - targetTricks + 1) + (20 - 13) * 2;
+    // 현실적 예상 최대 (핸드 강도 기반)
+    final strength = controller.getDeclarerStrength();
+    final expectedMax = (strength + 1).clamp(targetTricks + 1, 20);
+    final winExpectedScore = (expectedMax - targetTricks + 1) + (expectedMax - 13) * 2;
     // 패배 시 최대 실점 (0점 획득): 0 - target
     final loseMaxScore = -targetTricks;
 
@@ -718,8 +720,8 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                   const SizedBox(height: 6),
                   _buildScoreRow(
-                    l10n.bidSummaryWinMax,
-                    '+${winMaxScore * 2}',
+                    l10n.bidSummaryWinExpected(expectedMax),
+                    '+${winExpectedScore * 2}',
                     Colors.green[300]!,
                   ),
                   const SizedBox(height: 6),

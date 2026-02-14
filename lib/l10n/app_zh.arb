@@ -765,7 +765,12 @@
   "bidSummaryTitle": "竞标结果",
   "bidSummaryScoreTitle": "预计分数 (庄家基准)",
   "bidSummaryWinMin": "胜利时 (最低得分)",
-  "bidSummaryWinMax": "胜利时 (满分 - 20分)",
+  "bidSummaryWinExpected": "胜利时 (预计最多 {points}分)",
+  "@bidSummaryWinExpected": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
   "bidSummaryLose": "失败时 (0分获得)",
   "bidSummaryMultipliers": "庄家 ×2、朋友 ×1、防守 ×(-1)",
   "firstTrickStrategy": "首墩策略",

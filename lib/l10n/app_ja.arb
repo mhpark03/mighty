@@ -765,7 +765,12 @@
   "bidSummaryTitle": "入札結果",
   "bidSummaryScoreTitle": "予想スコア (宣言者基準)",
   "bidSummaryWinMin": "勝利時 (最低得点)",
-  "bidSummaryWinMax": "勝利時 (フル - 20点)",
+  "bidSummaryWinExpected": "勝利時 (予想最大 {points}点)",
+  "@bidSummaryWinExpected": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
   "bidSummaryLose": "敗北時 (0点獲得)",
   "bidSummaryMultipliers": "宣言者 ×2、フレンド ×1、守備 ×(-1)",
   "firstTrickStrategy": "初手戦略",
