@@ -939,54 +939,149 @@ class GameController extends ChangeNotifier {
     return (bestFirstCard, strategy);
   }
 
-  /// 점수 획득 전략 생성
+  /// 점수 획득 전략 생성 (손패 기반 구체적 전략)
   List<String> _generateStrategyPoints(Player declarer, GameState state) {
     final hand = declarer.hand;
     final giruda = state.giruda;
     final strategies = <String>[];
 
-    final hasMighty = hand.any((c) => c.suit == state.mighty.suit && c.rank == state.mighty.rank);
+    // 헬퍼: 카드 표시
+    String ss(Suit? s) => switch (s) {
+      Suit.spade => '♠', Suit.heart => '♥',
+      Suit.diamond => '♦', Suit.club => '♣', _ => ''
+    };
+    String rs(Rank? r) => switch (r) {
+      Rank.ace => 'A', Rank.king => 'K', Rank.queen => 'Q',
+      Rank.jack => 'J', Rank.ten => '10', Rank.nine => '9',
+      Rank.eight => '8', Rank.seven => '7', Rank.six => '6',
+      Rank.five => '5', Rank.four => '4', Rank.three => '3',
+      Rank.two => '2', _ => ''
+    };
+    String cs(PlayingCard c) => c.isJoker ? '조커' : '${ss(c.suit)}${rs(c.rank)}';
+
+    final hasMighty = hand.any((c) => c.isMightyWith(giruda));
     final hasJoker = hand.any((c) => c.isJoker);
+    final friendCard = state.friendDeclaration?.card;
+    final mightySuit = state.mighty.suit;
 
-    // 기루다 장수
-    int girudaCount = 0;
-    if (giruda != null) {
-      girudaCount = hand.where((c) => !c.isJoker && c.suit == giruda).length;
+    // === 0. 초구 전략 ===
+    // 비기루다 A 찾기 (마이티 제외)
+    PlayingCard? firstTrickAce;
+    for (final card in hand) {
+      if (card.isJoker || card.isMightyWith(giruda)) continue;
+      if (card.suit == giruda) continue;
+      if (card.rank == Rank.ace && card.suit != mightySuit) {
+        firstTrickAce = card;
+        break;
+      }
     }
-
-    // 비기루다 에이스 수
-    int nonGirudaAceCount = 0;
-    for (final suit in Suit.values) {
-      if (suit == giruda) continue;
-      if (state.mighty.suit == suit && state.mighty.rank == Rank.ace) continue;
-      if (hand.any((c) => c.suit == suit && c.rank == Rank.ace)) {
-        nonGirudaAceCount++;
+    if (firstTrickAce != null) {
+      strategies.add('초구: ${cs(firstTrickAce)}로 선공하여 확실한 트릭 획득');
+    } else {
+      // A 없으면 프렌드 타입에 따라 초구 설명
+      if (friendCard != null && (friendCard.isMightyWith(giruda) || friendCard.isJoker)) {
+        strategies.add('초구: 적은 무늬 저액으로 프렌드에게 선 넘기기 (프렌드가 트릭 획득)');
+      } else {
+        // 비기루다 K 확인
+        PlayingCard? firstTrickKing;
+        for (final card in hand) {
+          if (card.isJoker || card.isMightyWith(giruda)) continue;
+          if (card.suit == giruda) continue;
+          if (card.rank == Rank.king) { firstTrickKing = card; break; }
+        }
+        if (firstTrickKing != null) {
+          strategies.add('초구: ${cs(firstTrickKing)}로 선공 (A가 나왔으면 승리)');
+        } else {
+          strategies.add('초구: 적은 무늬 저액으로 프렌드에게 선 넘기기');
+        }
       }
     }
 
-    // 컷 가능 무늬 (0장인 무늬)
-    int cutSuits = 0;
+    // 기루다 카드 (마이티 제외, 높은 순)
+    final girudaCards = giruda != null
+        ? (hand.where((c) => !c.isJoker && !c.isMightyWith(giruda) && c.suit == giruda).toList()
+          ..sort((a, b) => b.rankValue.compareTo(a.rankValue)))
+        : <PlayingCard>[];
+    final highGiruda = girudaCards.where((c) => c.rankValue >= 12).toList(); // A,K,Q
+
+    // void 무늬 (비기루다)
+    Set<Suit> voidSuits = {};
     for (final suit in Suit.values) {
       if (suit == giruda) continue;
-      if (!hand.any((c) => !c.isJoker && c.suit == suit)) {
-        cutSuits++;
+      if (!hand.any((c) => !c.isJoker && !c.isMightyWith(giruda) && c.suit == suit)) {
+        voidSuits.add(suit);
       }
     }
 
-    // 전략 포인트 생성
-    if (hasMighty) strategies.add('STRATEGY_MIGHTY');
-    if (hasJoker) strategies.add('STRATEGY_JOKER');
-    if (girudaCount >= 5) {
-      strategies.add('STRATEGY_GIRUDA_DOMINANT');
-    } else if (girudaCount >= 3) {
-      strategies.add('STRATEGY_GIRUDA_SUPPORT');
+    // 물패 무늬 (void 또는 A없이 1-2장)
+    List<Suit> weakSuits = [];
+    for (final suit in Suit.values) {
+      if (suit == giruda) continue;
+      final sc = hand.where((c) => !c.isJoker && !c.isMightyWith(giruda) && c.suit == suit).toList();
+      if (sc.isEmpty) { weakSuits.add(suit); continue; }
+      if (!sc.any((c) => c.rank == Rank.ace) && sc.length <= 2) weakSuits.add(suit);
     }
-    if (nonGirudaAceCount >= 2) {
-      strategies.add('STRATEGY_MULTI_ACE');
-    } else if (nonGirudaAceCount == 1) {
-      strategies.add('STRATEGY_SINGLE_ACE');
+
+    // === 1. 프렌드 연결 전략 ===
+    if (friendCard != null) {
+      if (friendCard.isMightyWith(giruda)) {
+        strategies.add('적은 무늬 저액으로 프렌드(마이티)에게 선 넘기기');
+      } else if (friendCard.isJoker) {
+        strategies.add('적은 무늬 저액으로 프렌드(조커)에게 선 넘기기');
+      } else if (friendCard.suit == giruda && giruda != null) {
+        // 기루다 프렌드 (예: ♦K)
+        final lowerGiruda = girudaCards.where((c) => c.rankValue < friendCard.rankValue).toList();
+        if (lowerGiruda.isNotEmpty) {
+          lowerGiruda.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          strategies.add('${cs(lowerGiruda.first)}로 프렌드(${cs(friendCard)})에게 선 넘기기 → ${rs(friendCard.rank)}딸랑 방지');
+        }
+      } else if (friendCard.suit != null) {
+        // 비기루다 프렌드 (예: ♥K)
+        final friendSuitCards = hand.where((c) =>
+            !c.isJoker && !c.isMightyWith(giruda) &&
+            c.suit == friendCard.suit &&
+            c.rankValue < friendCard.rankValue).toList();
+        if (friendSuitCards.isNotEmpty) {
+          friendSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          strategies.add('${cs(friendSuitCards.first)}로 프렌드(${cs(friendCard)})에게 선 넘기기');
+        }
+      }
     }
-    if (cutSuits >= 1) strategies.add('STRATEGY_CUT');
+
+    // === 2. 기루다 공격 전략 ===
+    if (giruda != null && highGiruda.isNotEmpty) {
+      final highNames = highGiruda.map((c) => rs(c.rank)).join('/');
+      if (girudaCards.length >= 5) {
+        strategies.add('선 탈환 후 ${ss(giruda)}$highNames로 기루다 지배 → 수비팀 기루다 소진');
+      } else {
+        strategies.add('선 탈환 후 ${ss(giruda)}$highNames로 수비팀 기루다 소진');
+      }
+    } else if (giruda != null && girudaCards.length >= 3) {
+      strategies.add('${ss(giruda)}중간 기루다로 수비팀 고액 기루다 소진 유도');
+    }
+
+    // === 3. 조커 활용 전략 ===
+    if (hasJoker && giruda != null) {
+      final callSuits = weakSuits.map((s) => ss(s)).toList();
+      if (callSuits.isNotEmpty && callSuits.length <= 3) {
+        strategies.add('수비팀 기루다 소진 후 조커로 물패 무늬(${callSuits.join("/")}) 호출');
+      } else {
+        strategies.add('수비팀 기루다 소진 후 조커로 물패 무늬 호출');
+      }
+    } else if (hasJoker) {
+      strategies.add('조커로 원하는 타이밍에 트릭 획득');
+    }
+
+    // === 4. 마이티 타이밍 ===
+    if (hasMighty) {
+      strategies.add('마이티를 9트릭에서 사용 → 10트릭 선행 확보');
+    }
+
+    // === 5. 컷 전략 ===
+    if (voidSuits.isNotEmpty && giruda != null && girudaCards.isNotEmpty) {
+      final voidSymbols = voidSuits.map((s) => ss(s)).join("/");
+      strategies.add('$voidSymbols void → 상대 선공 시 기루다 컷으로 트릭 탈환');
+    }
 
     return strategies;
   }

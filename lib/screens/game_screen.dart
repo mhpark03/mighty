@@ -1295,24 +1295,8 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   String _getStrategyText(String strategy, AppLocalizations l10n) {
-    switch (strategy) {
-      case 'STRATEGY_MIGHTY':
-        return l10n.strategyMighty;
-      case 'STRATEGY_JOKER':
-        return l10n.strategyJoker;
-      case 'STRATEGY_GIRUDA_DOMINANT':
-        return l10n.strategyGirudaDominant;
-      case 'STRATEGY_GIRUDA_SUPPORT':
-        return l10n.strategyGirudaSupport;
-      case 'STRATEGY_MULTI_ACE':
-        return l10n.strategyMultiAce;
-      case 'STRATEGY_SINGLE_ACE':
-        return l10n.strategySingleAce;
-      case 'STRATEGY_CUT':
-        return l10n.strategyCut;
-      default:
-        return '';
-    }
+    // 구체적 전략 텍스트는 controller에서 직접 생성 → 그대로 반환
+    return strategy;
   }
 
   String _getFriendReason(String reason, AppLocalizations l10n) {
