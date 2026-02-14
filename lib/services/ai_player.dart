@@ -465,6 +465,38 @@ class AIPlayer {
       if (girudaCards.length >= 4) {
         strength += girudaCards.length - 3;
       }
+
+      // === 1-1. 기루다 품질 조정 ===
+      // A+K+Q 연속 보유: 기루다 지배력 보너스 (수비가 기루다로 이기기 어려움)
+      if (hasGirudaAce && hasGirudaKing && hasGirudaQueen) {
+        strength += 1;
+      }
+
+      // K만 있고 A 없음: 수비의 A에 K가 잡힐 리스크
+      if (hasGirudaKing && !hasGirudaAce) {
+        strength -= 1;
+      }
+
+      // 로우 기루다 다수 + A 부재: 컷용으로만 사용 가능, 수비 고기루다에 취약
+      int girudaHighCount = (hasGirudaAce ? 1 : 0) + (hasGirudaKing ? 1 : 0) +
+          (hasGirudaQueen ? 1 : 0) + (hasGirudaJack ? 1 : 0) + (hasGirudaTen ? 1 : 0);
+      int girudaLowCount = girudaCards.length - girudaHighCount;
+      if (girudaLowCount >= 3 && !hasGirudaAce) {
+        strength -= 1;
+      }
+    }
+
+    // === 1-2. 짧은 무늬 평가 (컷 기회) ===
+    if (giruda != null) {
+      final girudaCount = hand.where((c) => !c.isJoker && c.suit == giruda).length;
+      for (final suit in Suit.values) {
+        if (suit == giruda) continue;
+        final suitCount = hand.where((c) => !c.isJoker && c.suit == suit).length;
+        // void + 기루다 3장 이상 = 컷으로 추가 트릭 확보 가능
+        if (suitCount == 0 && girudaCount >= 3) {
+          strength += 1;
+        }
+      }
     }
 
     // === 2. 마이티 (확실한 1트릭) ===
@@ -489,6 +521,21 @@ class AIPlayer {
         strength += aceCount;  // 에이스 개당 +1
       }
     }
+
+    // === 3-2. 프렌드 기여 (프렌드가 파워 카드로 약 1트릭 기여) ===
+    // 주공은 자신이 없는 가장 강한 카드를 프렌드로 지명
+    // 프렌드가 그 카드로 트릭을 이기면 점수 카드를 보호할 수 있음
+    if (!hasMighty && !hasJoker) {
+      // 마이티를 프렌드로 지명 → 확실한 1트릭
+      strength += 1;
+    } else if (hasMighty && !hasJoker) {
+      // 조커를 프렌드로 지명 → 초구 사용 불가이므로 약간 불확실
+      strength += 1;
+    } else if (!hasMighty && hasJoker) {
+      // 마이티를 프렌드로 지명 → 확실한 1트릭
+      strength += 1;
+    }
+    // 둘 다 있으면 → 에이스 프렌드, section 3-1에서 이미 계산됨
 
     // === 4. 초구 최상위 카드 평가 (주공은 초구에 기루다 선공 불가) ===
     // 초구에 주공이 선공하므로, 비기루다 최상위 카드가 매우 중요
