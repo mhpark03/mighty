@@ -1542,4 +1542,61 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get fullDeclarationWarning => 'フル宣言で契約が20に上がります';
+
+  @override
+  String get watchAiGame => 'AI対戦観戦';
+
+  @override
+  String get demoMode => 'デモモード';
+
+  @override
+  String get stopDemo => '観戦終了';
+
+  @override
+  String get pauseDemo => '一時停止';
+
+  @override
+  String get resumeDemo => '再開';
+
+  @override
+  String get nextGameAuto => '次のゲーム';
+
+  @override
+  String bidExplanation(String name, String suit, int strength) {
+    return '$name: 最適切り札 $suit、強度 $strength';
+  }
+
+  @override
+  String bidExplanationBid(String name, String suit, int tricks, int strength) {
+    return '$name: $suit $tricks ビッド (強度 $strength)';
+  }
+
+  @override
+  String get passReasonNoSuit => '切り札候補なし (4枚以上のスートなし)';
+
+  @override
+  String get passReasonNoHighCard => '切り札A/Kなし';
+
+  @override
+  String passReasonWeakHand(int strength, int needed) {
+    return 'ハンド強度不足 (強度 $strength、必要 $needed)';
+  }
+
+  @override
+  String get bidSummaryTitle => '入札結果';
+
+  @override
+  String get bidSummaryScoreTitle => '予想スコア (宣言者基準)';
+
+  @override
+  String get bidSummaryWinMin => '勝利時 (最低得点)';
+
+  @override
+  String get bidSummaryWinMax => '勝利時 (フル - 20点)';
+
+  @override
+  String get bidSummaryLose => '敗北時 (0点獲得)';
+
+  @override
+  String get bidSummaryMultipliers => '宣言者 ×2、フレンド ×1、守備 ×(-1)';
 }

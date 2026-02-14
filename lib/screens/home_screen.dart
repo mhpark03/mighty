@@ -182,6 +182,43 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
+                  SizedBox(height: isSmallScreen ? 6 : 8),
+
+                  // AI 대전 관전 버튼
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        controller.startAutoPlay();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const GameScreen(isAutoPlay: true),
+                          ),
+                        );
+                      },
+                      icon: Icon(
+                        Icons.smart_display,
+                        color: Colors.white,
+                        size: buttonIconSize,
+                      ),
+                      label: Text(
+                        l10n.watchAiGame,
+                        style: TextStyle(
+                          fontSize: buttonFontSize - 2,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        padding: EdgeInsets.symmetric(vertical: buttonPadding - 2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: sectionGap),
 
                   // 통계 테이블 (Expanded로 남은 공간 채움)

@@ -13,10 +13,19 @@ class GameController extends ChangeNotifier {
   bool _waitingForTrickConfirm = false;
   Trick? _lastCompletedTrick;
   static const String _gameType = 'mighty';
+  bool _isAutoPlayMode = false;
+  bool _isAutoPlayPaused = false;
+  BidExplanation? _lastBidExplanation;
+  bool _showBidSummary = false;
 
   GameController() {
     _initializePlayers();
   }
+
+  bool get isAutoPlayMode => _isAutoPlayMode;
+  bool get isAutoPlayPaused => _isAutoPlayPaused;
+  BidExplanation? get lastBidExplanation => _lastBidExplanation;
+  bool get showBidSummary => _showBidSummary;
 
   // 저장된 게임이 있는지 확인
   static Future<bool> hasSavedGame() async {
@@ -56,14 +65,27 @@ class GameController extends ChangeNotifier {
 
   // 게임 재개 시 AI 턴이면 자동 진행
   void _resumeAIIfNeeded() {
-    if (_state.phase == GamePhase.bidding && _state.currentBidder != 0) {
-      _processBiddingIfNeeded();
-    } else if (_state.phase == GamePhase.selectingKitty && _state.declarerId != 0) {
-      _processAIKittySelection();
-    } else if (_state.phase == GamePhase.declaringFriend && _state.declarerId != 0) {
-      _processAIFriendDeclaration();
-    } else if (_state.phase == GamePhase.playing && _state.currentPlayer != 0) {
-      _processAIPlayIfNeeded();
+    if (_isAutoPlayMode) {
+      // auto-play: 모든 플레이어를 AI로 처리
+      if (_state.phase == GamePhase.bidding) {
+        _processBiddingIfNeeded();
+      } else if (_state.phase == GamePhase.selectingKitty) {
+        _processAIKittySelection();
+      } else if (_state.phase == GamePhase.declaringFriend) {
+        _processAIFriendDeclaration();
+      } else if (_state.phase == GamePhase.playing) {
+        _processAIPlayIfNeeded();
+      }
+    } else {
+      if (_state.phase == GamePhase.bidding && _state.currentBidder != 0) {
+        _processBiddingIfNeeded();
+      } else if (_state.phase == GamePhase.selectingKitty && _state.declarerId != 0) {
+        _processAIKittySelection();
+      } else if (_state.phase == GamePhase.declaringFriend && _state.declarerId != 0) {
+        _processAIFriendDeclaration();
+      } else if (_state.phase == GamePhase.playing && _state.currentPlayer != 0) {
+        _processAIPlayIfNeeded();
+      }
     }
   }
 
@@ -98,34 +120,109 @@ class GameController extends ChangeNotifier {
   }
 
   void startNewGame() {
+    _lastBidExplanation = null;
+    _showBidSummary = false;
     _state.startNewGame();
     notifyListeners();
-    saveGame(); // 자동 저장
+    if (!_isAutoPlayMode) saveGame(); // 자동 저장 (auto-play 시 스킵)
     _processBiddingIfNeeded();
   }
 
   void _processBiddingIfNeeded() async {
     if (_state.phase != GamePhase.bidding) return;
-    if (_state.currentBidder == 0) return;
+    if (!_isAutoPlayMode && _state.currentBidder == 0) return;
 
     _isProcessing = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 800));
+    if (_isAutoPlayMode) {
+      // auto-play: 먼저 배팅 결정 + 설명 생성 후 5초 표시
+      await Future.delayed(const Duration(milliseconds: 500));
+      if (_state.phase != GamePhase.bidding) return;
+      if (_isAutoPlayPaused) { _isProcessing = false; notifyListeners(); return; }
 
-    final currentPlayer = _state.players[_state.currentBidder];
-    final bid = _aiPlayer.decideBid(currentPlayer, _state);
-    _state.placeBid(bid);
+      final currentPlayer = _state.players[_state.currentBidder];
+      final bid = _aiPlayer.decideBid(currentPlayer, _state);
 
-    _isProcessing = false;
-    notifyListeners();
-    saveGame(); // 자동 저장
+      final bestSuit = _aiPlayer.findBestSuit(currentPlayer.hand);
+      final strength = bestSuit != null ? _aiPlayer.evaluateHandStrength(currentPlayer.hand, bestSuit) : 0;
+      final girudaCards = bestSuit != null
+          ? currentPlayer.hand.where((c) => !c.isJoker && c.suit == bestSuit).toList()
+          : <PlayingCard>[];
+      final hasAce = girudaCards.any((c) => c.rank == Rank.ace);
+      final hasKing = girudaCards.any((c) => c.rank == Rank.king);
 
-    if (_state.phase == GamePhase.bidding) {
-      _processBiddingIfNeeded();
-    } else if (_state.phase == GamePhase.selectingKitty &&
-        _state.declarerId != 0) {
-      _processAIKittySelection();
+      String passReason = '';
+      if (bid.passed) {
+        if (bestSuit == null) {
+          passReason = 'NO_SUIT';
+        } else if (!hasAce && !hasKing) {
+          passReason = 'NO_HIGH_CARD';
+        } else {
+          passReason = 'WEAK_HAND';
+        }
+      }
+
+      _lastBidExplanation = BidExplanation(
+        playerId: currentPlayer.id,
+        playerName: currentPlayer.name,
+        passed: bid.passed,
+        suit: bid.suit ?? bestSuit,
+        tricks: bid.tricks,
+        maxStrength: strength,
+        girudaCount: girudaCards.length,
+        passReason: passReason,
+      );
+
+      _state.placeBid(bid);
+      _isProcessing = false;
+      notifyListeners();
+
+      // 설명을 5초간 표시 후 다음 진행
+      await Future.delayed(const Duration(seconds: 5));
+      if (_state.phase != GamePhase.bidding && !(_state.phase == GamePhase.waiting && _state.allPassed) && _state.phase != GamePhase.selectingKitty) return;
+      if (_isAutoPlayPaused) return;
+
+      if (_state.phase == GamePhase.bidding) {
+        _processBiddingIfNeeded();
+      } else if (_state.phase == GamePhase.selectingKitty) {
+        if (_state.declarerId != 0 || _isAutoPlayMode) {
+          // 배팅 결과 요약 화면 5초 표시
+          _showBidSummary = true;
+          _lastBidExplanation = null;
+          notifyListeners();
+
+          await Future.delayed(const Duration(seconds: 5));
+          if (_isAutoPlayPaused) return;
+
+          _showBidSummary = false;
+          notifyListeners();
+          _processAIKittySelection();
+        }
+      } else if (_state.phase == GamePhase.waiting && _state.allPassed) {
+        // UI에서 "다음 게임" 버튼으로 처리
+        notifyListeners();
+      }
+    } else {
+      // 일반 모드
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (_state.phase != GamePhase.bidding) return;
+
+      final currentPlayer = _state.players[_state.currentBidder];
+      final bid = _aiPlayer.decideBid(currentPlayer, _state);
+      _state.placeBid(bid);
+
+      _isProcessing = false;
+      notifyListeners();
+      saveGame();
+
+      if (_state.phase == GamePhase.bidding) {
+        _processBiddingIfNeeded();
+      } else if (_state.phase == GamePhase.selectingKitty) {
+        if (_state.declarerId != 0) {
+          _processAIKittySelection();
+        }
+      }
     }
   }
 
@@ -202,7 +299,9 @@ class GameController extends ChangeNotifier {
     _isProcessing = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(Duration(milliseconds: _isAutoPlayMode ? 600 : 1000));
+    if (_isAutoPlayMode && _state.phase != GamePhase.selectingKitty) return;
+    if (_isAutoPlayPaused) { _isProcessing = false; notifyListeners(); return; }
 
     final declarer = _state.players[_state.declarerId!];
 
@@ -217,7 +316,7 @@ class GameController extends ChangeNotifier {
 
     _isProcessing = false;
     notifyListeners();
-    saveGame(); // 자동 저장
+    if (!_isAutoPlayMode) saveGame(); // 자동 저장
 
     _processAIFriendDeclaration();
   }
@@ -235,12 +334,14 @@ class GameController extends ChangeNotifier {
   }
 
   void _processAIFriendDeclaration() async {
-    if (_state.declarerId == 0) return;
+    if (!_isAutoPlayMode && _state.declarerId == 0) return;
 
     _isProcessing = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(Duration(milliseconds: _isAutoPlayMode ? 500 : 800));
+    if (_isAutoPlayMode && _state.phase != GamePhase.declaringFriend) return;
+    if (_isAutoPlayPaused) { _isProcessing = false; notifyListeners(); return; }
 
     final declarer = _state.players[_state.declarerId!];
     final declaration = _aiPlayer.declareFriend(declarer, _state);
@@ -254,7 +355,7 @@ class GameController extends ChangeNotifier {
 
     _isProcessing = false;
     notifyListeners();
-    saveGame(); // 자동 저장
+    if (!_isAutoPlayMode) saveGame(); // 자동 저장
 
     _processAIPlayIfNeeded();
   }
@@ -271,13 +372,16 @@ class GameController extends ChangeNotifier {
 
   void _processAIPlayIfNeeded() async {
     if (_state.phase != GamePhase.playing) return;
-    if (_state.currentPlayer == 0) return;
+    if (!_isAutoPlayMode && _state.currentPlayer == 0) return;
     if (_waitingForTrickConfirm) return;
 
     _isProcessing = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(milliseconds: 600));
+    await Future.delayed(Duration(milliseconds: _isAutoPlayMode ? 300 : 600));
+    if (!_isAutoPlayMode && _state.phase != GamePhase.playing) return;
+    if (_isAutoPlayMode && _state.phase != GamePhase.playing) return;
+    if (_isAutoPlayPaused) { _isProcessing = false; notifyListeners(); return; }
 
     final currentPlayer = _state.players[_state.currentPlayer];
     PlayingCard card;
@@ -289,7 +393,7 @@ class GameController extends ChangeNotifier {
       if (jokerCallSuit != null) {
         _state.declareJokerCall(jokerCallSuit);
         notifyListeners();
-        await Future.delayed(const Duration(milliseconds: 500));
+        await Future.delayed(Duration(milliseconds: _isAutoPlayMode ? 300 : 500));
         // 조커 콜 시 조커 콜 카드를 냄
         card = _state.jokerCall;
       } else {
@@ -311,7 +415,7 @@ class GameController extends ChangeNotifier {
               !(isJokerFriend && isAttackTeam)) {
             _state.declareJokerCall(jokerCallCard.suit!);
             notifyListeners();
-            await Future.delayed(const Duration(milliseconds: 500));
+            await Future.delayed(Duration(milliseconds: _isAutoPlayMode ? 300 : 500));
           }
         }
       }
@@ -329,24 +433,41 @@ class GameController extends ChangeNotifier {
     // 트릭이 완료되었는지 확인
     if (_state.tricks.length > trickCountBefore && _state.phase == GamePhase.playing) {
       _lastCompletedTrick = _state.tricks.last;
-      // 사용자가 다음 선공이면 확인 없이 바로 카드 선택 가능
-      if (_state.currentPlayer == 0) {
-        _waitingForTrickConfirm = false;
-      } else {
+      if (_isAutoPlayMode) {
+        // auto-play: 일시정지 중이면 멈춤, 아니면 2초 후 자동 진행
         _waitingForTrickConfirm = true;
+        notifyListeners();
+        if (!_isAutoPlayPaused) {
+          await Future.delayed(const Duration(seconds: 2));
+          if (_isAutoPlayMode && _waitingForTrickConfirm && !_isAutoPlayPaused) {
+            confirmTrick();
+          }
+        }
+      } else {
+        // 사용자가 다음 선공이면 확인 없이 바로 카드 선택 가능
+        if (_state.currentPlayer == 0) {
+          _waitingForTrickConfirm = false;
+        } else {
+          _waitingForTrickConfirm = true;
+        }
+        notifyListeners();
+        saveGame(); // 자동 저장
       }
-      notifyListeners();
-      saveGame(); // 자동 저장
-      return; // 사용자 확인 대기 또는 카드 선택 대기
+      return;
     }
 
-    // 게임 종료 시 저장 삭제
+    // 게임 종료
     if (_state.phase == GamePhase.gameEnd) {
-      clearSavedGame();
+      if (_isAutoPlayMode) {
+        notifyListeners();
+        return;
+      } else {
+        clearSavedGame();
+      }
     }
 
     notifyListeners();
-    saveGame(); // 자동 저장
+    if (!_isAutoPlayMode) saveGame(); // 자동 저장
 
     if (_state.phase == GamePhase.playing) {
       _processAIPlayIfNeeded();
@@ -466,8 +587,77 @@ class GameController extends ChangeNotifier {
     return _aiPlayer.decideBid(humanPlayer, _state);
   }
 
+  void startAutoPlay() {
+    _isAutoPlayMode = true;
+    _isAutoPlayPaused = false;
+    startNewGame();
+  }
+
+  void stopAutoPlay() {
+    _isAutoPlayMode = false;
+    _isAutoPlayPaused = false;
+    _isProcessing = false;
+    _waitingForTrickConfirm = false;
+    _showBidSummary = false;
+    _lastCompletedTrick = null;
+    _initializePlayers();
+    notifyListeners();
+  }
+
+  void pauseAutoPlay() {
+    _isAutoPlayPaused = true;
+    notifyListeners();
+  }
+
+  void resumeAutoPlay() {
+    if (!_isAutoPlayMode || !_isAutoPlayPaused) return;
+    _isAutoPlayPaused = false;
+    notifyListeners();
+    // 트릭 확인 대기 중이면 confirmTrick으로 진행
+    if (_waitingForTrickConfirm) {
+      confirmTrick();
+      return;
+    }
+    // 배팅 요약 화면에서 일시정지 후 재개 시 키티 선택으로 진행
+    if (_showBidSummary) {
+      _showBidSummary = false;
+      notifyListeners();
+      _processAIKittySelection();
+      return;
+    }
+    _resumeAIIfNeeded();
+  }
+
+  void startNextAutoGame() {
+    if (!_isAutoPlayMode) return;
+    _isAutoPlayPaused = false;
+    startNewGame();
+  }
+
   void reset() {
     _initializePlayers();
     notifyListeners();
   }
+}
+
+class BidExplanation {
+  final int playerId;
+  final String playerName;
+  final bool passed;
+  final Suit? suit;
+  final int tricks;
+  final int maxStrength;
+  final int girudaCount;
+  final String passReason; // 'NO_SUIT', 'NO_HIGH_CARD', 'WEAK_HAND', ''
+
+  BidExplanation({
+    required this.playerId,
+    required this.playerName,
+    required this.passed,
+    this.suit,
+    required this.tricks,
+    required this.maxStrength,
+    this.girudaCount = 0,
+    this.passReason = '',
+  });
 }

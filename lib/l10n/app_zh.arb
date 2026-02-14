@@ -666,5 +666,43 @@
       "suit": {"type": "String"}
     }
   },
-  "fullDeclarationWarning": "宣布满分后合约将提升至20"
+  "fullDeclarationWarning": "宣布满分后合约将提升至20",
+  "watchAiGame": "AI对战观战",
+  "demoMode": "演示模式",
+  "stopDemo": "停止观战",
+  "pauseDemo": "暂停",
+  "resumeDemo": "继续",
+  "nextGameAuto": "下一局",
+  "bidExplanation": "{name}: 最佳王牌 {suit}，强度 {strength}",
+  "@bidExplanation": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suit": {"type": "String"},
+      "strength": {"type": "int"}
+    }
+  },
+  "bidExplanationBid": "{name}: {suit} {tricks} 叫牌 (强度 {strength})",
+  "@bidExplanationBid": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suit": {"type": "String"},
+      "tricks": {"type": "int"},
+      "strength": {"type": "int"}
+    }
+  },
+  "passReasonNoSuit": "无王牌候选 (无4张以上花色)",
+  "passReasonNoHighCard": "无王牌A/K",
+  "passReasonWeakHand": "牌力不足 (强度 {strength}，需要 {needed})",
+  "@passReasonWeakHand": {
+    "placeholders": {
+      "strength": {"type": "int"},
+      "needed": {"type": "int"}
+    }
+  },
+  "bidSummaryTitle": "竞标结果",
+  "bidSummaryScoreTitle": "预计分数 (庄家基准)",
+  "bidSummaryWinMin": "胜利时 (最低得分)",
+  "bidSummaryWinMax": "胜利时 (满分 - 20分)",
+  "bidSummaryLose": "失败时 (0分获得)",
+  "bidSummaryMultipliers": "庄家 ×2、朋友 ×1、防守 ×(-1)"
 }

@@ -1561,4 +1561,61 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get fullDeclarationWarning =>
       'Declaring Full raises the contract to 20';
+
+  @override
+  String get watchAiGame => 'Watch AI Game';
+
+  @override
+  String get demoMode => 'Demo Mode';
+
+  @override
+  String get stopDemo => 'Stop Demo';
+
+  @override
+  String get pauseDemo => 'Pause';
+
+  @override
+  String get resumeDemo => 'Resume';
+
+  @override
+  String get nextGameAuto => 'Next Game';
+
+  @override
+  String bidExplanation(String name, String suit, int strength) {
+    return '$name: Best trump $suit, Strength $strength';
+  }
+
+  @override
+  String bidExplanationBid(String name, String suit, int tricks, int strength) {
+    return '$name: $suit $tricks bid (Strength $strength)';
+  }
+
+  @override
+  String get passReasonNoSuit => 'No trump candidate (no suit with 4+ cards)';
+
+  @override
+  String get passReasonNoHighCard => 'No trump A/K';
+
+  @override
+  String passReasonWeakHand(int strength, int needed) {
+    return 'Weak hand (strength $strength, need $needed)';
+  }
+
+  @override
+  String get bidSummaryTitle => 'Bidding Result';
+
+  @override
+  String get bidSummaryScoreTitle => 'Expected Score (Declarer)';
+
+  @override
+  String get bidSummaryWinMin => 'Win (minimum points)';
+
+  @override
+  String get bidSummaryWinMax => 'Win (full - 20 pts)';
+
+  @override
+  String get bidSummaryLose => 'Lose (0 pts earned)';
+
+  @override
+  String get bidSummaryMultipliers => 'Declarer ×2, Friend ×1, Defender ×(-1)';
 }

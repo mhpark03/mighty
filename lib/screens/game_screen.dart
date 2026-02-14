@@ -14,7 +14,9 @@ import 'kitty_dialog.dart';
 import 'friend_dialog.dart' show FriendSelectionScreen;
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key});
+  final bool isAutoPlay;
+
+  const GameScreen({super.key, this.isAutoPlay = false});
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -90,6 +92,10 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _exitGame() {
+    if (widget.isAutoPlay) {
+      final controller = context.read<GameController>();
+      controller.stopAutoPlay();
+    }
     Navigator.pop(context); // Go back to home screen
   }
 
@@ -190,14 +196,45 @@ class _GameScreenState extends State<GameScreen> {
         return Scaffold(
           backgroundColor: Colors.green[800],
           appBar: AppBar(
-            title: Text(l10n.appTitle, style: const TextStyle(color: Colors.white)),
-            backgroundColor: Colors.green[900],
+            title: Text(
+              widget.isAutoPlay ? l10n.demoMode : l10n.appTitle,
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: widget.isAutoPlay ? Colors.teal[800] : Colors.green[900],
             iconTheme: const IconThemeData(color: Colors.white),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: _exitGame,
+              onPressed: widget.isAutoPlay ? () {
+                controller.stopAutoPlay();
+                Navigator.pop(context);
+              } : _exitGame,
             ),
-            actions: [
+            actions: widget.isAutoPlay ? [
+              // 일시정지/재개 버튼
+              IconButton(
+                onPressed: () {
+                  if (controller.isAutoPlayPaused) {
+                    controller.resumeAutoPlay();
+                  } else {
+                    controller.pauseAutoPlay();
+                  }
+                },
+                icon: Icon(
+                  controller.isAutoPlayPaused ? Icons.play_arrow : Icons.pause,
+                  color: Colors.white,
+                ),
+                tooltip: controller.isAutoPlayPaused ? l10n.resumeDemo : l10n.pauseDemo,
+              ),
+              // 관전 종료 버튼
+              TextButton.icon(
+                onPressed: () {
+                  controller.stopAutoPlay();
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.stop, color: Colors.white),
+                label: Text(l10n.stopDemo, style: const TextStyle(color: Colors.white)),
+              ),
+            ] : [
               IconButton(
                 icon: Icon(Icons.lightbulb, color: _showHint ? Colors.yellow : Colors.white),
                 tooltip: _showHint ? l10n.hintOff : l10n.hint,
@@ -228,12 +265,17 @@ class _GameScreenState extends State<GameScreen> {
 
     switch (state.phase) {
       case GamePhase.waiting:
-        // 모두 패스한 경우 팝업 표시
-        if (state.allPassed && !_allPassedDialogShown) {
-          _allPassedDialogShown = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _showAllPassedDialog(controller);
-          });
+        // 모두 패스한 경우
+        if (state.allPassed) {
+          if (widget.isAutoPlay) {
+            return _buildAutoPlayAllPassedScreen(controller);
+          }
+          if (!_allPassedDialogShown) {
+            _allPassedDialogShown = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showAllPassedDialog(controller);
+            });
+          }
         }
         return _buildWaitingScreen(controller);
       case GamePhase.dealing:
@@ -243,6 +285,9 @@ class _GameScreenState extends State<GameScreen> {
       case GamePhase.bidding:
         return _buildBiddingScreen(controller);
       case GamePhase.selectingKitty:
+        if (widget.isAutoPlay && controller.showBidSummary) {
+          return _buildBidSummaryScreen(controller);
+        }
         return _buildKittyScreen(controller);
       case GamePhase.declaringFriend:
         return _buildFriendScreen(controller);
@@ -250,6 +295,10 @@ class _GameScreenState extends State<GameScreen> {
       case GamePhase.roundEnd:
         return _buildPlayingScreen(controller);
       case GamePhase.gameEnd:
+        if (widget.isAutoPlay) {
+          // auto-play: 게임 결과를 보여주되, controller가 자동으로 새 게임 시작
+          return _buildGameEndScreen(controller);
+        }
         if (_showGameResult) {
           return _buildGameEndScreen(controller);
         } else {
@@ -298,9 +347,60 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  Widget _buildAutoPlayAllPassedScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.refresh, size: 48, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(
+              l10n.allPassedTitle,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.allPassedMessage,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                controller.startNextAutoGame();
+              },
+              icon: const Icon(Icons.skip_next, color: Colors.white),
+              label: Text(
+                l10n.nextGameAuto,
+                style: const TextStyle(fontSize: 16, color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildBiddingScreen(GameController controller) {
     final l10n = AppLocalizations.of(context)!;
     final state = controller.state;
+
+    if (widget.isAutoPlay) {
+      return _buildAutoPlayBiddingScreen(controller);
+    }
 
     return Column(
       children: [
@@ -385,6 +485,501 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  Widget _buildAutoPlayBiddingScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+    final state = controller.state;
+    final explanation = controller.lastBidExplanation;
+
+    return Column(
+      children: [
+        // 상단 정보 바
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: Colors.black38,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.biddingPhase,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              if (state.currentBid != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(12)),
+                  child: Text(
+                    l10n.highestBid(_formatBid(state.currentBid!)),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                )
+              else
+                Text(l10n.noBidYet, style: const TextStyle(color: Colors.white70)),
+            ],
+          ),
+        ),
+        // 5명 플레이어 카드 공개 + 설명을 해당 플레이어 아래에 표시
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Column(
+              children: [
+                for (int i = 0; i < state.players.length; i++)
+                  _buildBiddingPlayerWithCards(state, i, controller.isProcessing, l10n, explanation),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBidSummaryScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+    final state = controller.state;
+    final bid = state.currentBid!;
+    final declarer = state.players[state.declarerId!];
+    final declarerName = _getLocalizedPlayerName(declarer, l10n);
+    final giruda = state.giruda;
+    final targetTricks = bid.tricks;
+
+    // 점수 시뮬레이션
+    // 승리 시 최소 점수 (목표 딱 맞춤): (target - target + 1) + (target - 13) * 2
+    final winMinScore = 1 + (targetTricks - 13) * 2;
+    // 승리 시 풀(20점 획득): (20 - target + 1) + (20 - 13) * 2
+    final winMaxScore = (20 - targetTricks + 1) + (20 - 13) * 2;
+    // 패배 시 최대 실점 (0점 획득): 0 - target
+    final loseMaxScore = -targetTricks;
+
+    // 노기루다 여부
+    final isNoGiruda = giruda == null;
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 타이틀
+            Text(
+              l10n.bidSummaryTitle,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.amber,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // 주공 정보
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.amber.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.amber, width: 2),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    l10n.declarer,
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    declarerName,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 기루다 + 목표
+            Row(
+              children: [
+                // 기루다
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          l10n.giruda,
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        const SizedBox(height: 8),
+                        if (isNoGiruda)
+                          Text(
+                            l10n.noGiruda,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          )
+                        else
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                _getSuitSymbol(giruda),
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  color: (giruda == Suit.heart || giruda == Suit.diamond)
+                                      ? Colors.red[300]
+                                      : Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                _getSuitName(giruda, l10n),
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // 목표
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          l10n.tricks,
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '$targetTricks',
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // 점수 설명
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.bidSummaryScoreTitle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // 승리 시
+                  _buildScoreRow(
+                    l10n.bidSummaryWinMin,
+                    '+${winMinScore * 2}',
+                    Colors.green,
+                  ),
+                  const SizedBox(height: 6),
+                  _buildScoreRow(
+                    l10n.bidSummaryWinMax,
+                    '+${winMaxScore * 2}',
+                    Colors.green[300]!,
+                  ),
+                  const SizedBox(height: 6),
+                  _buildScoreRow(
+                    l10n.bidSummaryLose,
+                    '$loseMaxScore',
+                    Colors.red[300]!,
+                  ),
+                  const SizedBox(height: 10),
+                  // 배수 정보
+                  Text(
+                    l10n.bidSummaryMultipliers,
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
+                  if (isNoGiruda)
+                    Text(
+                      l10n.multiplierNoGiruda,
+                      style: const TextStyle(color: Colors.amber, fontSize: 12),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // 자동 진행 타이머 표시
+            const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white38,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScoreRow(String label, String value, Color valueColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+        Text(
+          value,
+          style: TextStyle(
+            color: valueColor,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBiddingPlayerWithCards(GameState state, int playerId, bool isProcessing, AppLocalizations l10n, BidExplanation? explanation) {
+    final player = state.players[playerId];
+    final isPassed = state.passedPlayers[playerId];
+    final isCurrentBidder = state.currentBidder == playerId;
+    final hasBid = state.currentBid?.playerId == playerId;
+    // 이 플레이어가 마지막 설명 대상인지
+    final hasExplanation = explanation != null && explanation.playerId == playerId;
+
+    final handCards = List<PlayingCard>.from(player.hand);
+    handCards.sort((a, b) {
+      if (a.isJoker) return -1;
+      if (b.isJoker) return 1;
+      if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
+      return b.rankValue.compareTo(a.rankValue);
+    });
+
+    Color borderColor;
+    String statusText;
+    Color statusColor;
+
+    if (isPassed) {
+      borderColor = Colors.grey;
+      statusText = l10n.pass;
+      statusColor = Colors.grey;
+    } else if (isCurrentBidder && isProcessing) {
+      borderColor = Colors.orange;
+      statusText = l10n.bidding;
+      statusColor = Colors.orange;
+    } else if (hasBid) {
+      borderColor = Colors.amber;
+      statusText = '${state.currentBid!.tricks} ${_getSuitName(state.currentBid!.suit, l10n)}';
+      statusColor = Colors.amber;
+    } else {
+      borderColor = Colors.white38;
+      statusText = l10n.waiting;
+      statusColor = Colors.white54;
+    }
+
+    // 하이라이트: 설명 대상 플레이어
+    if (hasExplanation) {
+      borderColor = explanation.passed ? Colors.grey[300]! : Colors.amber;
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(bottom: 2),
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: hasExplanation
+                ? (explanation.passed
+                    ? Colors.grey.withValues(alpha: 0.25)
+                    : Colors.amber.withValues(alpha: 0.2))
+                : (isCurrentBidder && isProcessing
+                    ? Colors.orange.withValues(alpha: 0.15)
+                    : Colors.black38),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: borderColor,
+              width: hasExplanation || (isCurrentBidder && isProcessing) ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 왼쪽: 이름 + 상태
+              SizedBox(
+                width: 60,
+                child: Column(
+                  children: [
+                    Text(
+                      _getLocalizedPlayerName(player, l10n),
+                      style: TextStyle(
+                        color: hasExplanation
+                            ? (explanation.passed ? Colors.white : Colors.amber)
+                            : (isCurrentBidder ? Colors.orange : Colors.white),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        statusText,
+                        style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+              // 오른쪽: 카드 목록
+              Expanded(
+                child: Wrap(
+                  spacing: 2,
+                  runSpacing: 2,
+                  children: handCards.map((card) => _buildTinyCardFixed(card, state, 24.0)).toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        // 설명을 해당 플레이어 카드 바로 아래에 표시
+        if (hasExplanation)
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(left: 16, right: 16, bottom: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: explanation.passed
+                  ? Colors.grey[800]!.withValues(alpha: 0.9)
+                  : Colors.amber.withValues(alpha: 0.15),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(8),
+                bottomRight: Radius.circular(8),
+              ),
+              border: Border.all(
+                color: explanation.passed ? Colors.grey[600]! : Colors.amber.withValues(alpha: 0.6),
+                width: 1,
+              ),
+            ),
+            child: _buildBidExplanationContent(explanation, state, l10n),
+          )
+        else
+          const SizedBox(height: 4),
+      ],
+    );
+  }
+
+  Widget _buildBidExplanationContent(BidExplanation explanation, GameState state, AppLocalizations l10n) {
+    if (explanation.passed) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.block, color: Colors.grey, size: 16),
+              const SizedBox(width: 4),
+              Text(
+                l10n.pass,
+                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text(
+            _getPassReason(explanation, state, l10n),
+            style: const TextStyle(color: Colors.white70, fontSize: 11),
+          ),
+          if (explanation.suit != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              '${_getSuitSymbol(explanation.suit!)} ${_getSuitName(explanation.suit, l10n)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.score} ${explanation.maxStrength}',
+              style: const TextStyle(color: Colors.white54, fontSize: 10),
+            ),
+          ],
+        ],
+      );
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.gavel, color: Colors.amber, size: 16),
+              const SizedBox(width: 4),
+              Text(
+                '${explanation.tricks} ${_getSuitName(explanation.suit, l10n)}',
+                style: const TextStyle(color: Colors.amber, fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text(
+            '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.score} ${explanation.maxStrength}',
+            style: const TextStyle(color: Colors.white70, fontSize: 11),
+          ),
+        ],
+      );
+    }
+  }
+
+  String _getPassReason(BidExplanation explanation, GameState state, AppLocalizations l10n) {
+    switch (explanation.passReason) {
+      case 'NO_SUIT':
+        return l10n.passReasonNoSuit;
+      case 'NO_HIGH_CARD':
+        return l10n.passReasonNoHighCard;
+      case 'WEAK_HAND':
+        final needed = state.currentBid != null ? state.currentBid!.tricks + 1 : 13;
+        return l10n.passReasonWeakHand(explanation.maxStrength, needed);
+      default:
+        return '';
+    }
+  }
+
   Widget _buildBiddingPlayerStatus(GameState state, int playerId, bool isProcessing) {
     final player = state.players[playerId];
     final isPassed = state.passedPlayers[playerId];
@@ -456,7 +1051,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget _buildCenterBiddingArea(GameController controller) {
     final l10n = AppLocalizations.of(context)!;
     final state = controller.state;
-    final isHumanTurn = state.currentBidder == 0 && !controller.isProcessing;
+    final isHumanTurn = !widget.isAutoPlay && state.currentBidder == 0 && !controller.isProcessing;
 
     // AI 추천 배팅 가져오기
     final recommendedBid = isHumanTurn ? controller.getRecommendedBid() : null;
@@ -748,7 +1343,7 @@ class _GameScreenState extends State<GameScreen> {
     final state = controller.state;
     final hand = state.players[0].hand;
     final isPassed = state.passedPlayers[0];
-    final isCurrentBidder = state.currentBidder == 0;
+    final isCurrentBidder = !widget.isAutoPlay && state.currentBidder == 0;
 
     // 세로 모드 확인
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
@@ -898,7 +1493,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget _buildKittyScreen(GameController controller) {
     final l10n = AppLocalizations.of(context)!;
 
-    if (controller.state.declarerId != 0) {
+    if (widget.isAutoPlay || controller.state.declarerId != 0) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -970,7 +1565,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget _buildFriendScreen(GameController controller) {
     final l10n = AppLocalizations.of(context)!;
 
-    if (controller.state.declarerId != 0) {
+    if (widget.isAutoPlay || controller.state.declarerId != 0) {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -1037,8 +1632,8 @@ class _GameScreenState extends State<GameScreen> {
   Widget _buildPlayingScreen(GameController controller) {
     final state = controller.state;
 
-    // 트릭 완료 대기 중이면 타이머 시작 (사용자가 선공이 아닐 때만)
-    if (controller.waitingForTrickConfirm && !_timerRunning) {
+    // 트릭 완료 대기 중이면 타이머 시작 (auto-play 시에는 controller가 자동 진행)
+    if (controller.waitingForTrickConfirm && !_timerRunning && !widget.isAutoPlay) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _startTrickTimer(controller);
       });
@@ -1324,46 +1919,57 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // 타이머 & 진행 버튼
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // 타이머 표시
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _trickCountdown <= 3 ? Colors.red : Colors.grey[700],
-                      ),
-                      child: Center(
-                        child: Text(
-                          '$_trickCountdown',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                if (widget.isAutoPlay)
+                  // auto-play: 자동 진행 표시
+                  const SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(
+                      color: Colors.amber,
+                      strokeWidth: 3,
+                    ),
+                  )
+                else
+                  // 타이머 & 진행 버튼
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 타이머 표시
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _trickCountdown <= 3 ? Colors.red : Colors.grey[700],
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$_trickCountdown',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 20),
-                    // 진행 버튼
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        _stopTrickTimer();
-                        controller.confirmTrick();
-                      },
-                      icon: const Icon(Icons.play_arrow),
-                      label: Text(l10n.nextTrick),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      const SizedBox(width: 20),
+                      // 진행 버튼
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          _stopTrickTimer();
+                          controller.confirmTrick();
+                        },
+                        icon: const Icon(Icons.play_arrow),
+                        label: Text(l10n.nextTrick),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.amber,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -1417,28 +2023,22 @@ class _GameScreenState extends State<GameScreen> {
   Widget _buildFriendInfo(GameState state, AppLocalizations l10n) {
     String friendLabel = l10n.friend;
     String friendValue;
-    Color valueColor = Colors.white;
 
     // 노프렌드 체크를 먼저 해야 함 (노프렌드 시에도 friendRevealed=true가 됨)
     if (state.friendDeclaration != null && state.friendDeclaration!.isNoFriend) {
       friendValue = l10n.friendNone;
-      valueColor = Colors.grey;
     } else if (state.friendRevealed && state.friend != null) {
       // 프렌드가 공개됨
       friendValue = _getLocalizedPlayerName(state.friend!, l10n);
-      valueColor = Colors.lightBlueAccent;
     } else if (state.friendDeclaration != null) {
       // 프렌드 선언 조건 표시
       final decl = state.friendDeclaration!;
       if (decl.isFirstTrickWinner) {
         friendValue = l10n.firstTrick;
-        valueColor = Colors.amber;
       } else if (decl.trickNumber != null) {
         friendValue = l10n.nthTrickShort(decl.trickNumber!);
-        valueColor = Colors.amber;
       } else if (decl.card != null) {
         friendValue = _getCardString(decl.card!);
-        valueColor = Colors.amber;
       } else {
         friendValue = '?';
       }
@@ -1472,64 +2072,6 @@ class _GameScreenState extends State<GameScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-        ),
-      ],
-    );
-  }
-
-  // 무늬 색상이 적용된 카드 텍스트 위젯
-  Widget _buildColoredCardText(PlayingCard card) {
-    if (card.isJoker) {
-      return const Text(
-        'Joker',
-        style: TextStyle(
-          color: Colors.purple,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      );
-    }
-
-    final suit = card.suit!;
-    String rank;
-    switch (card.rank) {
-      case Rank.ace:
-        rank = 'A';
-        break;
-      case Rank.king:
-        rank = 'K';
-        break;
-      case Rank.queen:
-        rank = 'Q';
-        break;
-      case Rank.jack:
-        rank = 'J';
-        break;
-      case Rank.ten:
-        rank = '10';
-        break;
-      default:
-        rank = '${card.rankValue}';
-    }
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          _getSuitSymbol(suit),
-          style: TextStyle(
-            color: _getSuitColor(suit),
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          rank,
-          style: const TextStyle(
-            color: Colors.amber,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
         ),
       ],
     );
@@ -1571,19 +2113,6 @@ class _GameScreenState extends State<GameScreen> {
         return '♥';
       case Suit.club:
         return '♣';
-    }
-  }
-
-  // 무늬별 색상 반환
-  Color _getSuitColor(Suit suit) {
-    switch (suit) {
-      case Suit.heart:
-        return Colors.red;
-      case Suit.diamond:
-        return Colors.red[300]!; // 연한 빨강
-      case Suit.spade:
-      case Suit.club:
-        return Colors.white; // 스페이드, 클로버 모두 흰색
     }
   }
 
@@ -1843,7 +2372,7 @@ class _GameScreenState extends State<GameScreen> {
     final l10n = AppLocalizations.of(context)!;
     final isCurrentPlayer = state.currentPlayer == index;
     final isDeclarer = player.isDeclarer;
-    final isFriend = player.isFriend && state.friendRevealed;
+    final isFriend = player.isFriend && (state.friendRevealed || widget.isAutoPlay);
     final isLeadPlayer = state.currentTrick != null &&
         state.currentTrick!.leadPlayerId == index;
 
@@ -1852,6 +2381,15 @@ class _GameScreenState extends State<GameScreen> {
         .where((c) => c.isPointCard && !c.isJoker)
         .toList();
     pointCards.sort((a, b) {
+      if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
+      return b.rankValue.compareTo(a.rankValue);
+    });
+
+    // auto-play 시 핸드 카드 정렬
+    final handCards = List<PlayingCard>.from(player.hand);
+    handCards.sort((a, b) {
+      if (a.isJoker) return -1;
+      if (b.isJoker) return 1;
       if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
       return b.rankValue.compareTo(a.rankValue);
     });
@@ -1926,8 +2464,8 @@ class _GameScreenState extends State<GameScreen> {
               ),
           ],
         ),
-        // 획득한 점수 카드 표시 (고정 크기)
-        if (pointCards.isNotEmpty)
+        // auto-play: 핸드 카드 공개
+        if (widget.isAutoPlay && handCards.isNotEmpty)
           Container(
             margin: const EdgeInsets.only(top: 4),
             padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
@@ -1939,7 +2477,34 @@ class _GameScreenState extends State<GameScreen> {
               spacing: 2,
               runSpacing: 2,
               alignment: WrapAlignment.center,
-              children: pointCards.map((card) => _buildTinyCardFixed(card, state, 28.0)).toList(),
+              children: handCards.map((card) => _buildTinyCardFixed(card, state, 24.0)).toList(),
+            ),
+          ),
+        // 획득한 점수 카드 표시 (고정 크기)
+        if (pointCards.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.amber.withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: Colors.amber.withValues(alpha: 0.5), width: 1),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  l10n.wonCards,
+                  style: const TextStyle(color: Colors.amber, fontSize: 8, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 1),
+                Wrap(
+                  spacing: 2,
+                  runSpacing: 2,
+                  alignment: WrapAlignment.center,
+                  children: pointCards.map((card) => _buildTinyCardFixed(card, state, 28.0)).toList(),
+                ),
+              ],
             ),
           ),
       ],
@@ -2495,6 +3060,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _onCardTap(PlayingCard card, GameController controller) {
+    if (widget.isAutoPlay) return;
     if (controller.state.phase != GamePhase.playing) return;
     if (!controller.isHumanTurn) return;
     if (!controller.canPlayCard(card)) {
@@ -2830,8 +3396,8 @@ class _GameScreenState extends State<GameScreen> {
     final l10n = AppLocalizations.of(context)!;
     final state = controller.state;
 
-    // 통계 기록 (한 번만)
-    if (!_statsRecorded && state.declarerId != null) {
+    // 통계 기록 (한 번만, auto-play 시 스킵)
+    if (!_statsRecorded && state.declarerId != null && !widget.isAutoPlay) {
       _statsRecorded = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final statsService = context.read<StatsService>();
@@ -3008,48 +3574,72 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _showGameResult = false;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[300],
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  ),
-                  child: Text(
-                    l10n.confirm,
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton(
+            if (widget.isAutoPlay)
+              // auto-play: 다음 게임 버튼
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: ElevatedButton.icon(
                   onPressed: () {
                     setState(() {
                       _statsRecorded = false;
                       _showGameResult = true;
-                      _showHint = false;
                     });
-                    controller.reset();
-                    controller.startNewGame();
+                    controller.startNextAutoGame();
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  icon: const Icon(Icons.skip_next, color: Colors.white),
+                  label: Text(
+                    l10n.nextGameAuto,
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
                   ),
-                  child: Text(
-                    l10n.newGame,
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
                 ),
-              ],
-            ),
+              )
+            else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _showGameResult = false;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[300],
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ),
+                    child: Text(
+                      l10n.confirm,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _statsRecorded = false;
+                        _showGameResult = true;
+                        _showHint = false;
+                      });
+                      controller.reset();
+                      controller.startNewGame();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber,
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ),
+                    child: Text(
+                      l10n.newGame,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                  ),
+                ],
+              ),
           ],
           ),
         ),

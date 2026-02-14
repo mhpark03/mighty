@@ -1548,4 +1548,61 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get fullDeclarationWarning => '풀 선언 시 공약이 20으로 올라갑니다';
+
+  @override
+  String get watchAiGame => 'AI 대전 관전';
+
+  @override
+  String get demoMode => '데모 모드';
+
+  @override
+  String get stopDemo => '관전 종료';
+
+  @override
+  String get pauseDemo => '일시정지';
+
+  @override
+  String get resumeDemo => '재개';
+
+  @override
+  String get nextGameAuto => '다음 게임';
+
+  @override
+  String bidExplanation(String name, String suit, int strength) {
+    return '$name: 최적 기루다 $suit, 예상 강도 $strength';
+  }
+
+  @override
+  String bidExplanationBid(String name, String suit, int tricks, int strength) {
+    return '$name: $suit $tricks 배팅 (강도 $strength)';
+  }
+
+  @override
+  String get passReasonNoSuit => '기루다 후보 없음 (4장 이상 무늬 없음)';
+
+  @override
+  String get passReasonNoHighCard => '기루다 A/K 없음';
+
+  @override
+  String passReasonWeakHand(int strength, int needed) {
+    return '핸드 강도 부족 (강도 $strength, 필요 $needed)';
+  }
+
+  @override
+  String get bidSummaryTitle => '배팅 결과';
+
+  @override
+  String get bidSummaryScoreTitle => '예상 점수 (주공 기준)';
+
+  @override
+  String get bidSummaryWinMin => '승리 시 (최소 득점)';
+
+  @override
+  String get bidSummaryWinMax => '승리 시 (풀 - 20점)';
+
+  @override
+  String get bidSummaryLose => '패배 시 (0점 획득)';
+
+  @override
+  String get bidSummaryMultipliers => '주공 ×2, 프렌드 ×1, 야당 ×(-1)';
 }

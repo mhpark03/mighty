@@ -2843,6 +2843,108 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'풀 선언 시 공약이 20으로 올라갑니다'**
   String get fullDeclarationWarning;
+
+  /// No description provided for @watchAiGame.
+  ///
+  /// In ko, this message translates to:
+  /// **'AI 대전 관전'**
+  String get watchAiGame;
+
+  /// No description provided for @demoMode.
+  ///
+  /// In ko, this message translates to:
+  /// **'데모 모드'**
+  String get demoMode;
+
+  /// No description provided for @stopDemo.
+  ///
+  /// In ko, this message translates to:
+  /// **'관전 종료'**
+  String get stopDemo;
+
+  /// No description provided for @pauseDemo.
+  ///
+  /// In ko, this message translates to:
+  /// **'일시정지'**
+  String get pauseDemo;
+
+  /// No description provided for @resumeDemo.
+  ///
+  /// In ko, this message translates to:
+  /// **'재개'**
+  String get resumeDemo;
+
+  /// No description provided for @nextGameAuto.
+  ///
+  /// In ko, this message translates to:
+  /// **'다음 게임'**
+  String get nextGameAuto;
+
+  /// No description provided for @bidExplanation.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}: 최적 기루다 {suit}, 예상 강도 {strength}'**
+  String bidExplanation(String name, String suit, int strength);
+
+  /// No description provided for @bidExplanationBid.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name}: {suit} {tricks} 배팅 (강도 {strength})'**
+  String bidExplanationBid(String name, String suit, int tricks, int strength);
+
+  /// No description provided for @passReasonNoSuit.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 후보 없음 (4장 이상 무늬 없음)'**
+  String get passReasonNoSuit;
+
+  /// No description provided for @passReasonNoHighCard.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 A/K 없음'**
+  String get passReasonNoHighCard;
+
+  /// No description provided for @passReasonWeakHand.
+  ///
+  /// In ko, this message translates to:
+  /// **'핸드 강도 부족 (강도 {strength}, 필요 {needed})'**
+  String passReasonWeakHand(int strength, int needed);
+
+  /// No description provided for @bidSummaryTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'배팅 결과'**
+  String get bidSummaryTitle;
+
+  /// No description provided for @bidSummaryScoreTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'예상 점수 (주공 기준)'**
+  String get bidSummaryScoreTitle;
+
+  /// No description provided for @bidSummaryWinMin.
+  ///
+  /// In ko, this message translates to:
+  /// **'승리 시 (최소 득점)'**
+  String get bidSummaryWinMin;
+
+  /// No description provided for @bidSummaryWinMax.
+  ///
+  /// In ko, this message translates to:
+  /// **'승리 시 (풀 - 20점)'**
+  String get bidSummaryWinMax;
+
+  /// No description provided for @bidSummaryLose.
+  ///
+  /// In ko, this message translates to:
+  /// **'패배 시 (0점 획득)'**
+  String get bidSummaryLose;
+
+  /// No description provided for @bidSummaryMultipliers.
+  ///
+  /// In ko, this message translates to:
+  /// **'주공 ×2, 프렌드 ×1, 야당 ×(-1)'**
+  String get bidSummaryMultipliers;
 }
 
 class _AppLocalizationsDelegate

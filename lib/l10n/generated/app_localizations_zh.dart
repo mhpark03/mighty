@@ -1533,4 +1533,61 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get fullDeclarationWarning => '宣布满分后合约将提升至20';
+
+  @override
+  String get watchAiGame => 'AI对战观战';
+
+  @override
+  String get demoMode => '演示模式';
+
+  @override
+  String get stopDemo => '停止观战';
+
+  @override
+  String get pauseDemo => '暂停';
+
+  @override
+  String get resumeDemo => '继续';
+
+  @override
+  String get nextGameAuto => '下一局';
+
+  @override
+  String bidExplanation(String name, String suit, int strength) {
+    return '$name: 最佳王牌 $suit，强度 $strength';
+  }
+
+  @override
+  String bidExplanationBid(String name, String suit, int tricks, int strength) {
+    return '$name: $suit $tricks 叫牌 (强度 $strength)';
+  }
+
+  @override
+  String get passReasonNoSuit => '无王牌候选 (无4张以上花色)';
+
+  @override
+  String get passReasonNoHighCard => '无王牌A/K';
+
+  @override
+  String passReasonWeakHand(int strength, int needed) {
+    return '牌力不足 (强度 $strength，需要 $needed)';
+  }
+
+  @override
+  String get bidSummaryTitle => '竞标结果';
+
+  @override
+  String get bidSummaryScoreTitle => '预计分数 (庄家基准)';
+
+  @override
+  String get bidSummaryWinMin => '胜利时 (最低得分)';
+
+  @override
+  String get bidSummaryWinMax => '胜利时 (满分 - 20分)';
+
+  @override
+  String get bidSummaryLose => '失败时 (0分获得)';
+
+  @override
+  String get bidSummaryMultipliers => '庄家 ×2、朋友 ×1、防守 ×(-1)';
 }

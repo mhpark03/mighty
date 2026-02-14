@@ -666,5 +666,43 @@
       "suit": {"type": "String"}
     }
   },
-  "fullDeclarationWarning": "フル宣言で契約が20に上がります"
+  "fullDeclarationWarning": "フル宣言で契約が20に上がります",
+  "watchAiGame": "AI対戦観戦",
+  "demoMode": "デモモード",
+  "stopDemo": "観戦終了",
+  "pauseDemo": "一時停止",
+  "resumeDemo": "再開",
+  "nextGameAuto": "次のゲーム",
+  "bidExplanation": "{name}: 最適切り札 {suit}、強度 {strength}",
+  "@bidExplanation": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suit": {"type": "String"},
+      "strength": {"type": "int"}
+    }
+  },
+  "bidExplanationBid": "{name}: {suit} {tricks} ビッド (強度 {strength})",
+  "@bidExplanationBid": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suit": {"type": "String"},
+      "tricks": {"type": "int"},
+      "strength": {"type": "int"}
+    }
+  },
+  "passReasonNoSuit": "切り札候補なし (4枚以上のスートなし)",
+  "passReasonNoHighCard": "切り札A/Kなし",
+  "passReasonWeakHand": "ハンド強度不足 (強度 {strength}、必要 {needed})",
+  "@passReasonWeakHand": {
+    "placeholders": {
+      "strength": {"type": "int"},
+      "needed": {"type": "int"}
+    }
+  },
+  "bidSummaryTitle": "入札結果",
+  "bidSummaryScoreTitle": "予想スコア (宣言者基準)",
+  "bidSummaryWinMin": "勝利時 (最低得点)",
+  "bidSummaryWinMax": "勝利時 (フル - 20点)",
+  "bidSummaryLose": "敗北時 (0点獲得)",
+  "bidSummaryMultipliers": "宣言者 ×2、フレンド ×1、守備 ×(-1)"
 }

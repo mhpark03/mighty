@@ -667,5 +667,43 @@
       "suit": {"type": "String"}
     }
   },
-  "fullDeclarationWarning": "Declaring Full raises the contract to 20"
+  "fullDeclarationWarning": "Declaring Full raises the contract to 20",
+  "watchAiGame": "Watch AI Game",
+  "demoMode": "Demo Mode",
+  "stopDemo": "Stop Demo",
+  "pauseDemo": "Pause",
+  "resumeDemo": "Resume",
+  "nextGameAuto": "Next Game",
+  "bidExplanation": "{name}: Best trump {suit}, Strength {strength}",
+  "@bidExplanation": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suit": {"type": "String"},
+      "strength": {"type": "int"}
+    }
+  },
+  "bidExplanationBid": "{name}: {suit} {tricks} bid (Strength {strength})",
+  "@bidExplanationBid": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "suit": {"type": "String"},
+      "tricks": {"type": "int"},
+      "strength": {"type": "int"}
+    }
+  },
+  "passReasonNoSuit": "No trump candidate (no suit with 4+ cards)",
+  "passReasonNoHighCard": "No trump A/K",
+  "passReasonWeakHand": "Weak hand (strength {strength}, need {needed})",
+  "@passReasonWeakHand": {
+    "placeholders": {
+      "strength": {"type": "int"},
+      "needed": {"type": "int"}
+    }
+  },
+  "bidSummaryTitle": "Bidding Result",
+  "bidSummaryScoreTitle": "Expected Score (Declarer)",
+  "bidSummaryWinMin": "Win (minimum points)",
+  "bidSummaryWinMax": "Win (full - 20 pts)",
+  "bidSummaryLose": "Lose (0 pts earned)",
+  "bidSummaryMultipliers": "Declarer ×2, Friend ×1, Defender ×(-1)"
 }
