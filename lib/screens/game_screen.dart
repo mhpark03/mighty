@@ -1560,13 +1560,13 @@ class _GameScreenState extends State<GameScreen> {
     String cardName;
     switch (explanation.friendType) {
       case 'MIGHTY':
-        cardName = '${l10n.friendCardMighty} (${_getSuitSymbol(explanation.friendSuit)}A)';
+        cardName = '${l10n.friendCardMighty} (${_getSuitSymbol(explanation.friendSuit!)}A)';
         break;
       case 'JOKER':
         cardName = l10n.friendCardJoker;
         break;
       case 'ACE':
-        cardName = '${_getSuitSymbol(explanation.friendSuit)}A';
+        cardName = explanation.friendSuit != null ? '${_getSuitSymbol(explanation.friendSuit!)}A' : 'A';
         break;
       default:
         return '';
