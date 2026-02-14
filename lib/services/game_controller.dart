@@ -426,7 +426,7 @@ class GameController extends ChangeNotifier {
         strategyPoints: strategyPoints,
       );
 
-      _state.declareFriend(declaration);
+      // declareFriend 호출 전에 요약 화면 표시 (호출 시 phase가 playing으로 변경됨)
       _showFriendSummary = true;
       _isProcessing = false;
       notifyListeners();
@@ -436,6 +436,7 @@ class GameController extends ChangeNotifier {
 
       _showFriendSummary = false;
       _friendExplanation = null;
+      _state.declareFriend(declaration);
       notifyListeners();
       _processAIPlayIfNeeded();
     } else {
@@ -732,7 +733,9 @@ class GameController extends ChangeNotifier {
     // 프렌드 요약 화면에서 일시정지 후 재개 시 플레이로 진행
     if (_showFriendSummary && _friendExplanation != null) {
       _showFriendSummary = false;
+      final declaration = _friendExplanation!.declaration;
       _friendExplanation = null;
+      _state.declareFriend(declaration);
       notifyListeners();
       _processAIPlayIfNeeded();
       return;
