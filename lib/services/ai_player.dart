@@ -629,8 +629,10 @@ class AIPlayer {
     }
 
     // === 기루다 분석 ===
+    int girudaLen = 0;
     if (giruda != null) {
       final gc = hand.where((c) => !c.isJoker && c.suit == giruda).toList();
+      girudaLen = gc.length;
       bool gA = gc.any((c) => c.rank == Rank.ace);
       bool gK = gc.any((c) => c.rank == Rank.king);
       bool gQ = gc.any((c) => c.rank == Rank.queen);
@@ -639,13 +641,17 @@ class AIPlayer {
       if (gA) { minTricks++; maxTricks++; }
       // A 다음 K: A 이후 선 유지로 K도 확보
       if (gA && gK) { minTricks++; maxTricks++; }
-      // A-K-Q 연속: Q까지 확보 가능 (최대만)
+      // A-K-Q 연속: Q까지 확보 가능
       if (gA && gK && gQ) { maxTricks++; }
+      // A+Q (K 없이): A 이후 Q가 차상위 → 최대에 포함
+      if (gA && gQ && !gK) { maxTricks++; }
       // K만 있고 A 없으면: 최대에서만 1트릭 (수비A에 잡힐 수 있음)
       if (gK && !gA) { maxTricks++; }
 
       // 기루다 장수가 많으면 후반 지배 (최대)
-      if (gc.length >= 5 && gA) maxTricks++;
+      // 5장+A: 상대 기루다 소진 후 남은 기루다가 전부 승리
+      if (gc.length >= 5 && gA) maxTricks += 2;
+      else if (gc.length >= 4 && gA) maxTricks++;
       if (gc.length >= 6 && gA) maxTricks++;
     }
 
@@ -663,6 +669,8 @@ class AIPlayer {
       if (hasAce) { minTricks++; maxTricks++; }
       // A-K 연속: 선 유지하여 K도 확보 (최대)
       if (hasAce && hasKing) { maxTricks++; }
+      // K만 있고 A 없으면: 후반에 A가 나간 후 K가 이김 (최대)
+      if (hasKing && !hasAce) { maxTricks++; }
     }
 
     // === 보이드 컷 기회 (최대만) ===
@@ -686,14 +694,26 @@ class AIPlayer {
       // 조커 프렌드: 조커콜 위험 → 최대에만 포함
       maxTricks++;
     } else {
-      // 에이스 프렌드: 비교적 안정적이지만 컷 위험 → 최대에만
+      // 마이티+조커 모두 보유 → 프렌드는 일반 카드 (기루다 K 등)
+      // 비교적 안정적: 기루다 프렌드는 기루다A 플레이 후 확정
       maxTricks++;
+      // 기루다 프렌드(K/Q)이고 기루다A 보유 시 → 프렌드 트릭 거의 확실
+      if (giruda != null) {
+        bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+        if (hasGirudaAce) { minTricks++; }
+      }
     }
 
     // 트릭당 평균 점수 카드: 약 2장 (20장 / 10트릭)
     // 최소는 보수적으로 1.8장, 최대는 2장
     int minPoints = (minTricks * 1.8).round().clamp(0, 20);
     int maxPoints = (maxTricks * 2).clamp(0, 20);
+
+    // === 런 감지: 마이티+조커+기루다A+5장기루다 → 최대 18점 이상 ===
+    if (hasMighty && hasJoker && giruda != null && girudaLen >= 5) {
+      bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+      if (hasGirudaAce && maxPoints < 18) { maxPoints = 18; }
+    }
 
     if (minPoints > maxPoints) minPoints = maxPoints;
 
