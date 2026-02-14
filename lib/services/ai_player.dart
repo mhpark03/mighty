@@ -2408,6 +2408,28 @@ class AIPlayer {
           }
         }
 
+        // === 0. 기루다 프렌드 보호: 프렌드 카드가 아직 안 나왔으면 저액 기루다 선공 ===
+        // 예: 프렌드가 ♦K이고 내가 ♦A를 내면 프렌드가 K딸랑일 때 K를 무의미하게 버림
+        // → 프렌드 카드보다 낮은 기루다로 선공하여 프렌드에게 선 넘기기
+        if (friendIsGiruda && friendCard != null && hasEffectiveTopGiruda) {
+          bool friendCardPlayed = playedGirudaCards.any((c) =>
+              c.rank == friendCard.rank);
+          if (!friendCardPlayed) {
+            final lowerCards = myGirudaCardsForLead.where((c) =>
+                c.rankValue < friendCard.rankValue).toList();
+            if (lowerCards.isNotEmpty) {
+              // 9 이하 중간 기루다 우선 (높은 순)
+              final midGiruda = lowerCards.where((c) => c.rankValue <= 9).toList();
+              if (midGiruda.isNotEmpty) {
+                midGiruda.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+                return midGiruda.first;
+              }
+              lowerCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return lowerCards.first;
+            }
+          }
+        }
+
         // === 1. 기루다 최상위 카드 있음 → 기루다 최상위 카드로 선공 ===
         if (hasEffectiveTopGiruda && myTopGiruda != null) {
           return myTopGiruda;
