@@ -1607,6 +1607,42 @@ class AppLocalizationsJa extends AppLocalizations {
   String get discardReasonLeastUseful => '最も不要なカード';
 
   @override
+  String get friendSummaryTitle => 'フレンド宣言結果';
+
+  @override
+  String get friendReasonNoFriendStrong => '強いハンドで一人で勝てる';
+
+  @override
+  String get friendReasonFirstTrick => '最初のトリック勝者をフレンドに指定';
+
+  @override
+  String get friendReasonNthTrick => '特定トリック勝者をフレンドに指定';
+
+  @override
+  String get friendReasonNeedMighty => 'マイティがないため所有者が必要';
+
+  @override
+  String get friendReasonNeedJoker => 'ジョーカーがないため所有者が必要';
+
+  @override
+  String get friendReasonNeedGirudaAce => '切り札Aがないため所有者が必要';
+
+  @override
+  String get friendReasonNeedGirudaKing => '切り札Kがないため所有者が必要';
+
+  @override
+  String get friendReasonNeedGirudaMid => '切り札中間カード所有者が必要';
+
+  @override
+  String get friendReasonNeedAce => 'エース所有者をフレンドに指定';
+
+  @override
+  String get friendReasonNeedStrongCard => '強いカード所有者をフレンドに指定';
+
+  @override
+  String get friendReasonNoFriendAll => '全ての重要カードを所有、ノーフレンド宣言';
+
+  @override
   String get bidSummaryTitle => '入札結果';
 
   @override

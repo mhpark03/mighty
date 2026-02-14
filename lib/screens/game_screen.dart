@@ -1015,6 +1015,181 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  Widget _buildFriendSummaryScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+    final state = controller.state;
+    final explanation = controller.friendExplanation!;
+    final declaration = explanation.declaration;
+    final declarerName = _getLocalizedPlayerName(state.players[state.declarerId!], l10n);
+
+    // 프렌드 카드/타입 표시 문자열
+    String friendTypeText;
+    Widget? friendCardWidget;
+    Color friendColor;
+    IconData friendIcon;
+
+    if (declaration.isNoFriend) {
+      friendTypeText = l10n.noFriend;
+      friendColor = Colors.grey;
+      friendIcon = Icons.person_off;
+    } else if (declaration.isFirstTrickWinner) {
+      friendTypeText = l10n.firstTrickFriend;
+      friendColor = Colors.amber;
+      friendIcon = Icons.emoji_events;
+    } else if (declaration.trickNumber != null) {
+      friendTypeText = l10n.trickWinner(declaration.trickNumber!);
+      friendColor = Colors.amber;
+      friendIcon = Icons.emoji_events;
+    } else if (declaration.card != null) {
+      friendTypeText = l10n.cardOwner(_getCardString(declaration.card!));
+      friendColor = Colors.lightBlueAccent;
+      friendIcon = Icons.style;
+      friendCardWidget = _buildTinyCardFixed(declaration.card!, state, 40.0);
+    } else {
+      friendTypeText = '?';
+      friendColor = Colors.white;
+      friendIcon = Icons.help_outline;
+    }
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 타이틀
+            Text(
+              l10n.friendSummaryTitle,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.amber,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              declarerName,
+              style: const TextStyle(fontSize: 16, color: Colors.white70),
+            ),
+            const SizedBox(height: 24),
+
+            // 프렌드 선언 내용
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: friendColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: friendColor.withValues(alpha: 0.6), width: 2),
+              ),
+              child: Column(
+                children: [
+                  Icon(friendIcon, color: friendColor, size: 40),
+                  const SizedBox(height: 12),
+                  if (friendCardWidget != null) ...[
+                    friendCardWidget,
+                    const SizedBox(height: 10),
+                  ],
+                  Text(
+                    friendTypeText,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: friendColor,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (explanation.isFull) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        l10n.fullDeclarationWarning,
+                        style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 선택 이유
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.lightbulb_outline, color: Colors.amber, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _getFriendReason(explanation.reason, l10n),
+                      style: const TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+            // 자동 진행 타이머
+            const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white38,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getFriendReason(String reason, AppLocalizations l10n) {
+    switch (reason) {
+      case 'NO_FRIEND_STRONG':
+        return l10n.friendReasonNoFriendStrong;
+      case 'FIRST_TRICK':
+        return l10n.friendReasonFirstTrick;
+      case 'NTH_TRICK':
+        return l10n.friendReasonNthTrick;
+      case 'NEED_MIGHTY':
+        return l10n.friendReasonNeedMighty;
+      case 'NEED_JOKER':
+        return l10n.friendReasonNeedJoker;
+      case 'NEED_GIRUDA_ACE':
+        return l10n.friendReasonNeedGirudaAce;
+      case 'NEED_GIRUDA_KING':
+        return l10n.friendReasonNeedGirudaKing;
+      case 'NEED_GIRUDA_MID':
+        return l10n.friendReasonNeedGirudaMid;
+      case 'NEED_ACE':
+        return l10n.friendReasonNeedAce;
+      case 'NEED_STRONG_CARD':
+        return l10n.friendReasonNeedStrongCard;
+      case 'NO_FRIEND_ALL':
+        return l10n.friendReasonNoFriendAll;
+      default:
+        return '';
+    }
+  }
+
   Widget _buildBiddingPlayerWithCards(GameState state, int playerId, bool isProcessing, AppLocalizations l10n, BidExplanation? explanation) {
     final player = state.players[playerId];
     final isPassed = state.passedPlayers[playerId];
@@ -1809,6 +1984,11 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildFriendScreen(GameController controller) {
     final l10n = AppLocalizations.of(context)!;
+
+    // auto-play: 프렌드 요약 화면
+    if (widget.isAutoPlay && controller.showFriendSummary && controller.friendExplanation != null) {
+      return _buildFriendSummaryScreen(controller);
+    }
 
     if (widget.isAutoPlay || controller.state.declarerId != 0) {
       return Column(

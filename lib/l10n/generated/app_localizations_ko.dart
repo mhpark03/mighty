@@ -1613,6 +1613,42 @@ class AppLocalizationsKo extends AppLocalizations {
   String get discardReasonLeastUseful => '가장 불필요한 카드';
 
   @override
+  String get friendSummaryTitle => '프렌드 선언 결과';
+
+  @override
+  String get friendReasonNoFriendStrong => '강한 핸드로 혼자서 충분히 이길 수 있음';
+
+  @override
+  String get friendReasonFirstTrick => '첫 트릭 승자를 프렌드로 지정';
+
+  @override
+  String get friendReasonNthTrick => '특정 트릭 승자를 프렌드로 지정';
+
+  @override
+  String get friendReasonNeedMighty => '마이티가 없어서 마이티 소유자가 필요';
+
+  @override
+  String get friendReasonNeedJoker => '조커가 없어서 조커 소유자가 필요';
+
+  @override
+  String get friendReasonNeedGirudaAce => '기루다 A가 없어서 보유자가 필요';
+
+  @override
+  String get friendReasonNeedGirudaKing => '기루다 K가 없어서 보유자가 필요';
+
+  @override
+  String get friendReasonNeedGirudaMid => '기루다 중간 카드 보유자가 필요';
+
+  @override
+  String get friendReasonNeedAce => '에이스 보유자를 프렌드로 지정';
+
+  @override
+  String get friendReasonNeedStrongCard => '강한 카드 보유자를 프렌드로 지정';
+
+  @override
+  String get friendReasonNoFriendAll => '모든 핵심 카드를 보유하여 노프렌드 선언';
+
+  @override
   String get bidSummaryTitle => '배팅 결과';
 
   @override

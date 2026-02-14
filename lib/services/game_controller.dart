@@ -19,6 +19,8 @@ class GameController extends ChangeNotifier {
   bool _showBidSummary = false;
   KittyExplanation? _kittyExplanation;
   bool _showKittySummary = false;
+  FriendExplanation? _friendExplanation;
+  bool _showFriendSummary = false;
 
   GameController() {
     _initializePlayers();
@@ -30,6 +32,8 @@ class GameController extends ChangeNotifier {
   bool get showBidSummary => _showBidSummary;
   KittyExplanation? get kittyExplanation => _kittyExplanation;
   bool get showKittySummary => _showKittySummary;
+  FriendExplanation? get friendExplanation => _friendExplanation;
+  bool get showFriendSummary => _showFriendSummary;
 
   // 저장된 게임이 있는지 확인
   static Future<bool> hasSavedGame() async {
@@ -128,6 +132,8 @@ class GameController extends ChangeNotifier {
     _showBidSummary = false;
     _kittyExplanation = null;
     _showKittySummary = false;
+    _friendExplanation = null;
+    _showFriendSummary = false;
     _state.startNewGame();
     notifyListeners();
     if (!_isAutoPlayMode) saveGame(); // 자동 저장 (auto-play 시 스킵)
@@ -399,17 +405,39 @@ class GameController extends ChangeNotifier {
     final declaration = _aiPlayer.declareFriend(declarer, _state);
 
     // 풀(20) 선언 여부 검토 (노프렌드, 마이티 프렌드, 조커 프렌드)
-    if (_aiPlayer.shouldDeclareFull(declarer, _state, declaration)) {
+    final isFull = _aiPlayer.shouldDeclareFull(declarer, _state, declaration);
+    if (isFull) {
       _state.declareFull();
     }
 
-    _state.declareFriend(declaration);
+    if (_isAutoPlayMode) {
+      // 프렌드 선택 이유 생성
+      final reason = _generateFriendReason(declaration, declarer, _state);
+      _friendExplanation = FriendExplanation(
+        declaration: declaration,
+        reason: reason,
+        isFull: isFull,
+      );
 
-    _isProcessing = false;
-    notifyListeners();
-    if (!_isAutoPlayMode) saveGame(); // 자동 저장
+      _state.declareFriend(declaration);
+      _showFriendSummary = true;
+      _isProcessing = false;
+      notifyListeners();
 
-    _processAIPlayIfNeeded();
+      await Future.delayed(const Duration(seconds: 5));
+      if (_isAutoPlayPaused) return;
+
+      _showFriendSummary = false;
+      _friendExplanation = null;
+      notifyListeners();
+      _processAIPlayIfNeeded();
+    } else {
+      _state.declareFriend(declaration);
+      _isProcessing = false;
+      notifyListeners();
+      saveGame();
+      _processAIPlayIfNeeded();
+    }
   }
 
   void humanDeclareFriend(FriendDeclaration declaration) {
@@ -653,6 +681,8 @@ class GameController extends ChangeNotifier {
     _showBidSummary = false;
     _kittyExplanation = null;
     _showKittySummary = false;
+    _friendExplanation = null;
+    _showFriendSummary = false;
     _lastCompletedTrick = null;
     _initializePlayers();
     notifyListeners();
@@ -686,6 +716,14 @@ class GameController extends ChangeNotifier {
       _kittyExplanation = null;
       notifyListeners();
       _processAIFriendDeclaration();
+      return;
+    }
+    // 프렌드 요약 화면에서 일시정지 후 재개 시 플레이로 진행
+    if (_showFriendSummary && _friendExplanation != null) {
+      _showFriendSummary = false;
+      _friendExplanation = null;
+      notifyListeners();
+      _processAIPlayIfNeeded();
       return;
     }
     _resumeAIIfNeeded();
@@ -725,10 +763,53 @@ class GameController extends ChangeNotifier {
     }).toList();
   }
 
+  /// 프렌드 선택 이유 생성
+  String _generateFriendReason(FriendDeclaration declaration, Player declarer, GameState state) {
+    if (declaration.isNoFriend) {
+      return 'NO_FRIEND_STRONG';
+    }
+    if (declaration.isFirstTrickWinner) {
+      return 'FIRST_TRICK';
+    }
+    if (declaration.trickNumber != null) {
+      return 'NTH_TRICK';
+    }
+    if (declaration.card != null) {
+      final card = declaration.card!;
+      final mighty = state.mighty;
+      if (card.suit == mighty.suit && card.rank == mighty.rank) {
+        return 'NEED_MIGHTY';
+      }
+      if (card.isJoker) {
+        return 'NEED_JOKER';
+      }
+      if (state.giruda != null && card.suit == state.giruda) {
+        if (card.rank == Rank.ace) return 'NEED_GIRUDA_ACE';
+        if (card.rank == Rank.king) return 'NEED_GIRUDA_KING';
+        return 'NEED_GIRUDA_MID';
+      }
+      if (card.rank == Rank.ace) return 'NEED_ACE';
+      return 'NEED_STRONG_CARD';
+    }
+    return '';
+  }
+
   void reset() {
     _initializePlayers();
     notifyListeners();
   }
+}
+
+class FriendExplanation {
+  final FriendDeclaration declaration;
+  final String reason;    // 'NO_FRIEND_STRONG', 'NEED_MIGHTY', 'NEED_JOKER', 'NEED_GIRUDA_ACE', 'NEED_GIRUDA_KING', 'NEED_ACE', 'NEED_GIRUDA_MID', 'NO_FRIEND_ALL'
+  final bool isFull;       // 풀 선언 여부
+
+  FriendExplanation({
+    required this.declaration,
+    required this.reason,
+    this.isFull = false,
+  });
 }
 
 class KittyExplanation {

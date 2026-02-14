@@ -1626,6 +1626,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discardReasonLeastUseful => 'Least useful card';
 
   @override
+  String get friendSummaryTitle => 'Friend Declaration';
+
+  @override
+  String get friendReasonNoFriendStrong => 'Strong hand, can win alone';
+
+  @override
+  String get friendReasonFirstTrick => 'First trick winner as friend';
+
+  @override
+  String get friendReasonNthTrick => 'Specific trick winner as friend';
+
+  @override
+  String get friendReasonNeedMighty => 'Need Mighty card owner as ally';
+
+  @override
+  String get friendReasonNeedJoker => 'Need Joker owner as ally';
+
+  @override
+  String get friendReasonNeedGirudaAce => 'Need trump Ace owner as ally';
+
+  @override
+  String get friendReasonNeedGirudaKing => 'Need trump King owner as ally';
+
+  @override
+  String get friendReasonNeedGirudaMid => 'Need trump mid-card owner as ally';
+
+  @override
+  String get friendReasonNeedAce => 'Ace owner designated as friend';
+
+  @override
+  String get friendReasonNeedStrongCard =>
+      'Strong card owner designated as friend';
+
+  @override
+  String get friendReasonNoFriendAll => 'Holds all key cards, no friend needed';
+
+  @override
   String get bidSummaryTitle => 'Bidding Result';
 
   @override

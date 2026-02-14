@@ -1598,6 +1598,42 @@ class AppLocalizationsZh extends AppLocalizations {
   String get discardReasonLeastUseful => '最不需要的牌';
 
   @override
+  String get friendSummaryTitle => '朋友宣言结果';
+
+  @override
+  String get friendReasonNoFriendStrong => '手牌强力，可以独自获胜';
+
+  @override
+  String get friendReasonFirstTrick => '指定第一墩赢家为朋友';
+
+  @override
+  String get friendReasonNthTrick => '指定特定墩赢家为朋友';
+
+  @override
+  String get friendReasonNeedMighty => '没有Mighty，需要持有者为盟友';
+
+  @override
+  String get friendReasonNeedJoker => '没有Joker，需要持有者为盟友';
+
+  @override
+  String get friendReasonNeedGirudaAce => '没有王牌A，需要持有者为盟友';
+
+  @override
+  String get friendReasonNeedGirudaKing => '没有王牌K，需要持有者为盟友';
+
+  @override
+  String get friendReasonNeedGirudaMid => '需要王牌中间牌持有者为盟友';
+
+  @override
+  String get friendReasonNeedAce => '指定A持有者为朋友';
+
+  @override
+  String get friendReasonNeedStrongCard => '指定强牌持有者为朋友';
+
+  @override
+  String get friendReasonNoFriendAll => '拥有所有关键牌，无需朋友';
+
+  @override
   String get bidSummaryTitle => '竞标结果';
 
   @override

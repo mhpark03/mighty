@@ -2958,6 +2958,78 @@ abstract class AppLocalizations {
   /// **'가장 불필요한 카드'**
   String get discardReasonLeastUseful;
 
+  /// No description provided for @friendSummaryTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 선언 결과'**
+  String get friendSummaryTitle;
+
+  /// No description provided for @friendReasonNoFriendStrong.
+  ///
+  /// In ko, this message translates to:
+  /// **'강한 핸드로 혼자서 충분히 이길 수 있음'**
+  String get friendReasonNoFriendStrong;
+
+  /// No description provided for @friendReasonFirstTrick.
+  ///
+  /// In ko, this message translates to:
+  /// **'첫 트릭 승자를 프렌드로 지정'**
+  String get friendReasonFirstTrick;
+
+  /// No description provided for @friendReasonNthTrick.
+  ///
+  /// In ko, this message translates to:
+  /// **'특정 트릭 승자를 프렌드로 지정'**
+  String get friendReasonNthTrick;
+
+  /// No description provided for @friendReasonNeedMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티가 없어서 마이티 소유자가 필요'**
+  String get friendReasonNeedMighty;
+
+  /// No description provided for @friendReasonNeedJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커가 없어서 조커 소유자가 필요'**
+  String get friendReasonNeedJoker;
+
+  /// No description provided for @friendReasonNeedGirudaAce.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 A가 없어서 보유자가 필요'**
+  String get friendReasonNeedGirudaAce;
+
+  /// No description provided for @friendReasonNeedGirudaKing.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 K가 없어서 보유자가 필요'**
+  String get friendReasonNeedGirudaKing;
+
+  /// No description provided for @friendReasonNeedGirudaMid.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 중간 카드 보유자가 필요'**
+  String get friendReasonNeedGirudaMid;
+
+  /// No description provided for @friendReasonNeedAce.
+  ///
+  /// In ko, this message translates to:
+  /// **'에이스 보유자를 프렌드로 지정'**
+  String get friendReasonNeedAce;
+
+  /// No description provided for @friendReasonNeedStrongCard.
+  ///
+  /// In ko, this message translates to:
+  /// **'강한 카드 보유자를 프렌드로 지정'**
+  String get friendReasonNeedStrongCard;
+
+  /// No description provided for @friendReasonNoFriendAll.
+  ///
+  /// In ko, this message translates to:
+  /// **'모든 핵심 카드를 보유하여 노프렌드 선언'**
+  String get friendReasonNoFriendAll;
+
   /// No description provided for @bidSummaryTitle.
   ///
   /// In ko, this message translates to:
