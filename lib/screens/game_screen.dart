@@ -1583,6 +1583,98 @@ class _GameScreenState extends State<GameScreen> {
     return '${l10n.friendExpected}: $cardName - $holder$note';
   }
 
+  String _getTrickAnalysis(Trick trick, GameState state, AppLocalizations l10n) {
+    if (trick.cards.isEmpty) return '';
+
+    final giruda = state.giruda;
+    final leadCard = trick.cards.first;
+    final leadPlayer = state.players[trick.leadPlayerId];
+    final leadName = _getLocalizedPlayerName(leadPlayer, l10n);
+    final winnerId = trick.winnerId ?? 0;
+    final winnerPlayer = state.players[winnerId];
+    final leadWon = trick.leadPlayerId == winnerId;
+
+    // 트릭 내 점수 카드 수
+    final pointCount = trick.cards.where((c) => c.isPointCard).length;
+
+    // 선공 카드 설명
+    String leadCardDesc;
+    if (leadCard.isJoker) {
+      leadCardDesc = l10n.friendCardJoker;
+    } else if (leadCard.isMightyWith(giruda)) {
+      leadCardDesc = l10n.friendCardMighty;
+    } else {
+      leadCardDesc = '${_getSuitSymbol(leadCard.suit!)}${_getRankName(leadCard.rank!)}';
+    }
+
+    // 선공 의도 분석
+    String intention;
+    if (leadCard.isJoker) {
+      intention = l10n.trickIntentJoker;
+    } else if (leadCard.isMightyWith(giruda)) {
+      intention = l10n.trickIntentMighty;
+    } else if (giruda != null && !leadCard.isJoker && leadCard.suit == giruda) {
+      intention = l10n.trickIntentGiruda;
+    } else if (leadCard.rank == Rank.ace) {
+      intention = l10n.trickIntentAce;
+    } else if (leadCard.rank == Rank.king || leadCard.rank == Rank.queen) {
+      intention = l10n.trickIntentHighCard;
+    } else if (!leadCard.isPointCard) {
+      intention = l10n.trickIntentLowCard;
+    } else {
+      intention = l10n.trickIntentMidCard;
+    }
+
+    // 결과 분석
+    String result;
+    if (leadWon) {
+      if (pointCount >= 3) {
+        result = l10n.trickResultBigWin(pointCount);
+      } else if (pointCount >= 1) {
+        result = l10n.trickResultWin(pointCount);
+      } else {
+        result = l10n.trickResultWinNoPoint;
+      }
+    } else {
+      final winCard = trick.cards[trick.playerOrder.indexOf(winnerId)];
+      String winReason;
+      if (winCard.isJoker) {
+        winReason = l10n.trickLostToJoker;
+      } else if (winCard.isMightyWith(giruda)) {
+        winReason = l10n.trickLostToMighty;
+      } else if (giruda != null && !winCard.isJoker && winCard.suit == giruda && trick.leadSuit != giruda) {
+        winReason = l10n.trickLostToCut;
+      } else {
+        winReason = l10n.trickLostToHigher;
+      }
+      final winnerName = _getLocalizedPlayerName(winnerPlayer, l10n);
+      result = '$winnerName: $winReason';
+      if (pointCount >= 2) {
+        result += ' (${l10n.trickPointCards(pointCount)})';
+      }
+    }
+
+    return '$leadName $leadCardDesc ${l10n.trickLead}\n$intention\n→ $result';
+  }
+
+  String _getRankName(Rank rank) {
+    switch (rank) {
+      case Rank.ace: return 'A';
+      case Rank.king: return 'K';
+      case Rank.queen: return 'Q';
+      case Rank.jack: return 'J';
+      case Rank.ten: return '10';
+      case Rank.nine: return '9';
+      case Rank.eight: return '8';
+      case Rank.seven: return '7';
+      case Rank.six: return '6';
+      case Rank.five: return '5';
+      case Rank.four: return '4';
+      case Rank.three: return '3';
+      case Rank.two: return '2';
+    }
+  }
+
   String _getPassReason(BidExplanation explanation, GameState state, AppLocalizations l10n) {
     switch (explanation.passReason) {
       case 'NO_SUIT':
@@ -2547,6 +2639,22 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                   ),
                 ),
+                // 선공 의도 및 결과 설명 (데모 모드)
+                if (widget.isAutoPlay) ...[
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      _getTrickAnalysis(trick, controller.state, l10n),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 10,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 20),
                 if (widget.isAutoPlay)
                   // auto-play: 자동 진행 표시

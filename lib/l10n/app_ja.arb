@@ -711,6 +711,37 @@
   },
   "friendInKitty": "キティにある可能性",
   "friendJokerNote": "初手使用不可",
+  "trickLead": "リード",
+  "trickIntentJoker": "ジョーカーで確実にトリック獲得",
+  "trickIntentMighty": "マイティで確実にトリック獲得",
+  "trickIntentGiruda": "切り札リードで相手の切り札を消耗させる",
+  "trickIntentAce": "エースでリードを維持しトリック獲得",
+  "trickIntentHighCard": "高位カードでトリック挑戦",
+  "trickIntentLowCard": "低いカードで探索/犠牲",
+  "trickIntentMidCard": "中位カードでトリック挑戦",
+  "trickResultBigWin": "リード勝利！得点カード{count}枚獲得",
+  "@trickResultBigWin": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultWin": "リード勝利、得点カード{count}枚獲得",
+  "@trickResultWin": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultWinNoPoint": "リード勝利、得点カードなし",
+  "trickLostToJoker": "ジョーカーに奪われた",
+  "trickLostToMighty": "マイティに奪われた",
+  "trickLostToCut": "切り札カットで奪われた",
+  "trickLostToHigher": "より高いカードに奪われた",
+  "trickPointCards": "得点カード{count}枚",
+  "@trickPointCards": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "kittySummaryTitle": "キティ選択結果",
   "kittyReceivedCards": "キティから受け取ったカード",
   "kittyDiscardCards": "捨てるカード",

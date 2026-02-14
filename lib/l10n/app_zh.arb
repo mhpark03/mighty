@@ -711,6 +711,37 @@
   },
   "friendInKitty": "可能在底牌中",
   "friendJokerNote": "首轮不可使用",
+  "trickLead": "先攻",
+  "trickIntentJoker": "用Joker确保赢墩",
+  "trickIntentMighty": "用Mighty确保赢墩",
+  "trickIntentGiruda": "出王牌消耗对手王牌",
+  "trickIntentAce": "用A保持先手确保赢墩",
+  "trickIntentHighCard": "用高牌挑战赢墩",
+  "trickIntentLowCard": "用低牌试探/牺牲",
+  "trickIntentMidCard": "用中牌挑战赢墩",
+  "trickResultBigWin": "先攻胜利！获得{count}张分数牌",
+  "@trickResultBigWin": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultWin": "先攻胜利，获得{count}张分数牌",
+  "@trickResultWin": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultWinNoPoint": "先攻胜利，无分数牌",
+  "trickLostToJoker": "被Joker夺走",
+  "trickLostToMighty": "被Mighty夺走",
+  "trickLostToCut": "被王牌切走",
+  "trickLostToHigher": "被更高的牌夺走",
+  "trickPointCards": "{count}张分数牌",
+  "@trickPointCards": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "kittySummaryTitle": "底牌选择结果",
   "kittyReceivedCards": "从底牌获得的牌",
   "kittyDiscardCards": "丢弃的牌",

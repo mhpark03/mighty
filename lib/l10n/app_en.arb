@@ -712,6 +712,37 @@
   },
   "friendInKitty": "may be in kitty",
   "friendJokerNote": "cannot play 1st trick",
+  "trickLead": "leads",
+  "trickIntentJoker": "Secure trick with Joker",
+  "trickIntentMighty": "Secure trick with Mighty",
+  "trickIntentGiruda": "Lead trump to exhaust opponents' trumps",
+  "trickIntentAce": "Hold lead with Ace to secure trick",
+  "trickIntentHighCard": "Challenge trick with high card",
+  "trickIntentLowCard": "Probe/sacrifice with low card",
+  "trickIntentMidCard": "Challenge trick with mid card",
+  "trickResultBigWin": "Lead wins! {count} point cards taken",
+  "@trickResultBigWin": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultWin": "Lead wins, {count} point card(s) taken",
+  "@trickResultWin": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultWinNoPoint": "Lead wins, no point cards",
+  "trickLostToJoker": "taken by Joker",
+  "trickLostToMighty": "taken by Mighty",
+  "trickLostToCut": "taken by trump cut",
+  "trickLostToHigher": "taken by higher card",
+  "trickPointCards": "{count} point cards",
+  "@trickPointCards": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "kittySummaryTitle": "Kitty Selection Result",
   "kittyReceivedCards": "Cards from Kitty",
   "kittyDiscardCards": "Discarded Cards",

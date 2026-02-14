@@ -871,6 +871,37 @@
   },
   "friendInKitty": "키티에 있을 수 있음",
   "friendJokerNote": "초구 사용 불가",
+  "trickLead": "선공",
+  "trickIntentJoker": "조커로 확실한 트릭 확보",
+  "trickIntentMighty": "마이티로 확실한 트릭 확보",
+  "trickIntentGiruda": "기루다 선공으로 상대 기루다 소진 유도",
+  "trickIntentAce": "에이스로 선 유지하며 트릭 확보",
+  "trickIntentHighCard": "고위 카드로 트릭 도전",
+  "trickIntentLowCard": "낮은 카드로 탐색/희생",
+  "trickIntentMidCard": "중간 카드로 트릭 도전",
+  "trickResultBigWin": "선공 승리! 점수 카드 {count}장 획득",
+  "@trickResultBigWin": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultWin": "선공 승리, 점수 카드 {count}장 획득",
+  "@trickResultWin": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultWinNoPoint": "선공 승리, 점수 카드 없음",
+  "trickLostToJoker": "조커에 빼앗김",
+  "trickLostToMighty": "마이티에 빼앗김",
+  "trickLostToCut": "기루다 컷으로 빼앗김",
+  "trickLostToHigher": "더 높은 카드에 빼앗김",
+  "trickPointCards": "점수 카드 {count}장",
+  "@trickPointCards": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "kittySummaryTitle": "키티 선택 결과",
   "kittyReceivedCards": "바닥에서 받은 카드",
   "kittyDiscardCards": "버릴 카드",
