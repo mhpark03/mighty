@@ -1024,12 +1024,12 @@ class _GameScreenState extends State<GameScreen> {
                       padding: const EdgeInsets.only(bottom: 6),
                       child: Row(
                         children: [
-                          _buildTinyCardFixed(explanation.discardCards[i], state, 36.0),
+                          _buildTinyCardFixed(explanation.discardCards[i], state, 36.0, dimmed: true),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               _getDiscardReason(explanation.discardReasons[i], l10n),
-                              style: const TextStyle(color: Colors.white70, fontSize: 13),
+                              style: const TextStyle(color: Colors.white38, fontSize: 13),
                             ),
                           ),
                         ],
@@ -1124,9 +1124,13 @@ class _GameScreenState extends State<GameScreen> {
                     spacing: 3,
                     runSpacing: 4,
                     alignment: WrapAlignment.center,
-                    children: explanation.finalHand
-                        .map((card) => _buildTinyCardFixed(card, state, 30.0))
-                        .toList(),
+                    children: [
+                      ...explanation.finalHand
+                          .map((card) => _buildTinyCardFixed(card, state, 30.0)),
+                      // 버려진 카드를 흐리게 표시
+                      ...explanation.discardCards
+                          .map((card) => _buildTinyCardFixed(card, state, 30.0, dimmed: true)),
+                    ],
                   ),
                 ],
               ),
@@ -3770,66 +3774,72 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   // 고정 너비의 작은 카드 (3열 레이아웃용)
-  Widget _buildTinyCardFixed(PlayingCard card, GameState state, double width) {
+  Widget _buildTinyCardFixed(PlayingCard card, GameState state, double width, {bool dimmed = false}) {
     final isMighty = card == state.mighty;
 
+    Widget cardWidget;
     if (card.isJoker) {
-      return Container(
+      cardWidget = Container(
         width: width,
         padding: const EdgeInsets.symmetric(vertical: 1),
         decoration: BoxDecoration(
-          color: Colors.purple[600],
+          color: dimmed ? Colors.grey[700] : Colors.purple[600],
           borderRadius: BorderRadius.circular(3),
         ),
         child: const Center(
           child: Text('🃏', style: TextStyle(fontSize: 10)),
         ),
       );
-    }
+    } else {
+      final isRed = card.suit == Suit.diamond || card.suit == Suit.heart;
+      final suitSymbol = _getSuitSymbol(card.suit!);
+      String rank;
+      switch (card.rank) {
+        case Rank.ace:
+          rank = 'A';
+          break;
+        case Rank.king:
+          rank = 'K';
+          break;
+        case Rank.queen:
+          rank = 'Q';
+          break;
+        case Rank.jack:
+          rank = 'J';
+          break;
+        case Rank.ten:
+          rank = '10';
+          break;
+        default:
+          rank = '${card.rankValue}';
+      }
 
-    final isRed = card.suit == Suit.diamond || card.suit == Suit.heart;
-    final suitSymbol = _getSuitSymbol(card.suit!);
-    String rank;
-    switch (card.rank) {
-      case Rank.ace:
-        rank = 'A';
-        break;
-      case Rank.king:
-        rank = 'K';
-        break;
-      case Rank.queen:
-        rank = 'Q';
-        break;
-      case Rank.jack:
-        rank = 'J';
-        break;
-      case Rank.ten:
-        rank = '10';
-        break;
-      default:
-        rank = '${card.rankValue}';
-    }
-
-    return Container(
-      width: width,
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 1),
-      decoration: BoxDecoration(
-        color: isMighty ? Colors.amber[700] : Colors.white,
-        borderRadius: BorderRadius.circular(3),
-      ),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          '$suitSymbol$rank',
-          style: TextStyle(
-            color: isRed ? Colors.red[700] : Colors.black,
-            fontSize: 12,
-            fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
-            fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
+      cardWidget = Container(
+        width: width,
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 1),
+        decoration: BoxDecoration(
+          color: dimmed ? Colors.grey[400] : (isMighty ? Colors.amber[700] : Colors.white),
+          borderRadius: BorderRadius.circular(3),
+        ),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            '$suitSymbol$rank',
+            style: TextStyle(
+              color: dimmed ? Colors.grey[600] : (isRed ? Colors.red[700] : Colors.black),
+              fontSize: 12,
+              fontWeight: isMighty ? FontWeight.bold : FontWeight.normal,
+              fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
+
+    if (dimmed) {
+      return Opacity(opacity: 0.45, child: cardWidget);
+    }
+    return cardWidget;
   }
 
   Widget _buildTrickCards(Trick? trick, GameState state, GameController controller, double cardWidth, double cardHeight) {
