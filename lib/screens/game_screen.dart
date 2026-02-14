@@ -1741,14 +1741,17 @@ class _GameScreenState extends State<GameScreen> {
 
     if (keyRanks.isEmpty) return null;
 
+    // 마이티: 플레이어 자신의 기루다 후보 기준으로 계산
+    final mightySuit = (giruda == Suit.spade) ? Suit.diamond : Suit.spade;
+    final mightyRank = Rank.ace;
+
     // 비기루다 초구 카드 추출 (A 우선, 없으면 K)
-    final mighty = state.mighty;
     final firstTrickCards = <String>[];
     for (final suit in Suit.values) {
       if (suit == giruda) continue;
       final suitCards = hand.where((c) =>
           !c.isJoker && c.suit == suit &&
-          !(c.suit == mighty.suit && c.rank == mighty.rank)).toList(); // 마이티 제외
+          !(c.suit == mightySuit && c.rank == mightyRank)).toList(); // 마이티 제외
       final hasAce = suitCards.any((c) => c.rank == Rank.ace);
       final hasKing = suitCards.any((c) => c.rank == Rank.king);
       if (hasAce) {
@@ -1758,8 +1761,8 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
 
-    // 마이티/조커 보유 여부
-    final hasMighty = hand.any((c) => !c.isJoker && c.suit == mighty.suit && c.rank == mighty.rank);
+    // 마이티/조커 보유 여부 (플레이어 자신의 기루다 기준)
+    final hasMighty = hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == mightyRank);
     final hasJoker = hand.any((c) => c.isJoker);
 
     final parts = <String>[];
