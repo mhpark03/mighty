@@ -552,9 +552,11 @@ class _GameScreenState extends State<GameScreen> {
     // 점수 계산: 득점 >= 목표이면 승리, 미만이면 패배
     int _calcScore(int points) {
       if (points >= targetTricks) {
+        // 승리: (득점-공약+1 + (득점-최소)×2) × 주공배수2
         return ((points - targetTricks + 1) + (points - 13) * 2) * 2;
       } else {
-        return -targetTricks;
+        // 패배: (득점-목표) × 주공배수2
+        return (points - targetTricks) * 2;
       }
     }
     final maxScore = _calcScore(estMaxPoints);
