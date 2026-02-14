@@ -1606,6 +1606,8 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildBidExplanationContent(BidExplanation explanation, GameState state, AppLocalizations l10n) {
+    final keyCardInfo = _getKeyCardInfo(explanation, state, l10n);
+
     if (explanation.passed) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1632,6 +1634,13 @@ class _GameScreenState extends State<GameScreen> {
               '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.estimatedRange(explanation.minPoints, explanation.maxPoints)} (${l10n.optimalScore(explanation.optimalPoints)})',
               style: const TextStyle(color: Colors.white54, fontSize: 10),
             ),
+            if (keyCardInfo != null) ...[
+              const SizedBox(height: 1),
+              Text(
+                keyCardInfo,
+                style: const TextStyle(color: Colors.white54, fontSize: 10),
+              ),
+            ],
           ],
         ],
       );
@@ -1655,6 +1664,13 @@ class _GameScreenState extends State<GameScreen> {
             '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.estimatedRange(explanation.minPoints, explanation.maxPoints)} (${l10n.optimalScore(explanation.optimalPoints)})',
             style: const TextStyle(color: Colors.white70, fontSize: 11),
           ),
+          if (keyCardInfo != null) ...[
+            const SizedBox(height: 1),
+            Text(
+              keyCardInfo,
+              style: const TextStyle(color: Colors.white70, fontSize: 10),
+            ),
+          ],
           if (explanation.friendType != null) ...[
             const SizedBox(height: 3),
             Row(
@@ -1673,6 +1689,50 @@ class _GameScreenState extends State<GameScreen> {
         ],
       );
     }
+  }
+
+  /// 배팅 설명에 핵심 카드 정보 라인 생성
+  String? _getKeyCardInfo(BidExplanation explanation, GameState state, AppLocalizations l10n) {
+    if (explanation.suit == null) return null;
+
+    final hand = state.players[explanation.playerId].hand;
+    final giruda = explanation.suit!;
+
+    // 기루다 핵심 카드 추출
+    final gc = hand.where((c) => !c.isJoker && c.suit == giruda).toList();
+    final keyRanks = <String>[];
+    if (gc.any((c) => c.rank == Rank.ace)) keyRanks.add('A');
+    if (gc.any((c) => c.rank == Rank.king)) keyRanks.add('K');
+    if (gc.any((c) => c.rank == Rank.queen)) keyRanks.add('Q');
+    if (gc.any((c) => c.rank == Rank.jack)) keyRanks.add('J');
+    if (gc.any((c) => c.rank == Rank.ten)) keyRanks.add('10');
+
+    if (keyRanks.isEmpty) return null;
+
+    // 마이티/조커 보유 여부
+    final mighty = state.mighty;
+    final hasMighty = hand.any((c) => !c.isJoker && c.suit == mighty.suit && c.rank == mighty.rank);
+    final hasJoker = hand.any((c) => c.isJoker);
+
+    final parts = <String>[];
+
+    // 기루다 핵심 카드
+    parts.add(l10n.bidInfoGirudaKeys(keyRanks.join('·')));
+
+    // 마이티/조커 + 프렌드 정보
+    if (hasMighty && hasJoker) {
+      parts.add(l10n.bidInfoHasBoth(l10n.friendCardMighty, l10n.friendCardJoker));
+    } else if (hasMighty) {
+      parts.add(l10n.bidInfoHasCard(l10n.friendCardMighty));
+      if (!hasJoker) parts.add(l10n.bidInfoFriend(l10n.friendCardJoker));
+    } else if (hasJoker) {
+      parts.add(l10n.bidInfoHasCard(l10n.friendCardJoker));
+      parts.add(l10n.bidInfoFriend(l10n.friendCardMighty));
+    } else {
+      parts.add(l10n.bidInfoFriend(l10n.friendCardMighty));
+    }
+
+    return parts.join(', ');
   }
 
   String _getFriendExpectedText(BidExplanation explanation, AppLocalizations l10n) {

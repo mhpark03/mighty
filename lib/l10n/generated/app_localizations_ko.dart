@@ -1805,4 +1805,24 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get strategyCut => '짧은 무늬로 기루다 컷 가능';
+
+  @override
+  String bidInfoGirudaKeys(String keys) {
+    return '기루다 $keys';
+  }
+
+  @override
+  String bidInfoFriend(String card) {
+    return '프렌드: $card';
+  }
+
+  @override
+  String bidInfoHasBoth(String card1, String card2) {
+    return '$card1·$card2 보유';
+  }
+
+  @override
+  String bidInfoHasCard(String card) {
+    return '$card 보유';
+  }
 }

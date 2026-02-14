@@ -1799,4 +1799,24 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get strategyCut => '短いスートで切り札カット可能';
+
+  @override
+  String bidInfoGirudaKeys(String keys) {
+    return '切り札 $keys';
+  }
+
+  @override
+  String bidInfoFriend(String card) {
+    return 'フレンド: $card';
+  }
+
+  @override
+  String bidInfoHasBoth(String card1, String card2) {
+    return '$card1·$card2 所持';
+  }
+
+  @override
+  String bidInfoHasCard(String card) {
+    return '$card 所持';
+  }
 }

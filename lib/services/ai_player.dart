@@ -607,12 +607,25 @@ class AIPlayer {
       if (gA && gQ && !gK) { maxTricks++; }
       // K만 있고 A 없으면: 최대에서만 1트릭 (수비A에 잡힐 수 있음)
       if (gK && !gA) { maxTricks++; }
+      // K+Q 연속 (A 없이): A 소진 후 K→Q 연속 승리
+      if (gK && gQ && !gA) { maxTricks++; }
 
       // 기루다 장수가 많으면 후반 지배 (최대)
       // 5장+A: 상대 기루다 소진 후 남은 기루다가 전부 승리
       if (gc.length >= 5 && gA) maxTricks += 2;
       else if (gc.length >= 4 && gA) maxTricks++;
       if (gc.length >= 6 && gA) maxTricks++;
+
+      // A 없이 K 보유 시 기루다 장수 보너스
+      if (!gA && gK) {
+        if (gc.length >= 5) {
+          minTricks++;    // 5장+K: 상대 A 소진 후 K 거의 확실
+          maxTricks += 2; // 후반 기루다 지배
+        } else if (gc.length >= 4) {
+          maxTricks++;    // 4장+K: 일부 후반 지배
+        }
+        if (gc.length >= 6) maxTricks++;
+      }
     }
 
     // === 비기루다 에이스/킹 ===

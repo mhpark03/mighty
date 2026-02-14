@@ -3305,6 +3305,30 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'짧은 무늬로 기루다 컷 가능'**
   String get strategyCut;
+
+  /// No description provided for @bidInfoGirudaKeys.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 {keys}'**
+  String bidInfoGirudaKeys(String keys);
+
+  /// No description provided for @bidInfoFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드: {card}'**
+  String bidInfoFriend(String card);
+
+  /// No description provided for @bidInfoHasBoth.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card1}·{card2} 보유'**
+  String bidInfoHasBoth(String card1, String card2);
+
+  /// No description provided for @bidInfoHasCard.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card} 보유'**
+  String bidInfoHasCard(String card);
 }
 
 class _AppLocalizationsDelegate

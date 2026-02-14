@@ -816,5 +816,30 @@
   "strategyGirudaSupport": "切り札3枚以上で切り札サポート可能",
   "strategyMultiAce": "複数エースで多くのトリック獲得可能",
   "strategySingleAce": "エース1枚で追加トリックの機会",
-  "strategyCut": "短いスートで切り札カット可能"
+  "strategyCut": "短いスートで切り札カット可能",
+  "bidInfoGirudaKeys": "切り札 {keys}",
+  "@bidInfoGirudaKeys": {
+    "placeholders": {
+      "keys": {"type": "String"}
+    }
+  },
+  "bidInfoFriend": "フレンド: {card}",
+  "@bidInfoFriend": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "bidInfoHasBoth": "{card1}·{card2} 所持",
+  "@bidInfoHasBoth": {
+    "placeholders": {
+      "card1": {"type": "String"},
+      "card2": {"type": "String"}
+    }
+  },
+  "bidInfoHasCard": "{card} 所持",
+  "@bidInfoHasCard": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  }
 }

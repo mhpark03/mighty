@@ -817,5 +817,30 @@
   "strategyGirudaSupport": "3+ trump cards provide trump support",
   "strategyMultiAce": "Multiple Aces enable winning several tricks",
   "strategySingleAce": "One Ace provides an extra trick opportunity",
-  "strategyCut": "Short suit enables trump cut"
+  "strategyCut": "Short suit enables trump cut",
+  "bidInfoGirudaKeys": "Trump {keys}",
+  "@bidInfoGirudaKeys": {
+    "placeholders": {
+      "keys": {"type": "String"}
+    }
+  },
+  "bidInfoFriend": "Friend: {card}",
+  "@bidInfoFriend": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "bidInfoHasBoth": "Has {card1}·{card2}",
+  "@bidInfoHasBoth": {
+    "placeholders": {
+      "card1": {"type": "String"},
+      "card2": {"type": "String"}
+    }
+  },
+  "bidInfoHasCard": "Has {card}",
+  "@bidInfoHasCard": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  }
 }

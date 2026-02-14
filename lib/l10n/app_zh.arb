@@ -816,5 +816,30 @@
   "strategyGirudaSupport": "3张以上王牌提供王牌支援",
   "strategyMultiAce": "多张A可获得多墩",
   "strategySingleAce": "1张A提供额外获墩机会",
-  "strategyCut": "短花色可用王牌切牌"
+  "strategyCut": "短花色可用王牌切牌",
+  "bidInfoGirudaKeys": "王牌 {keys}",
+  "@bidInfoGirudaKeys": {
+    "placeholders": {
+      "keys": {"type": "String"}
+    }
+  },
+  "bidInfoFriend": "朋友: {card}",
+  "@bidInfoFriend": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "bidInfoHasBoth": "持有 {card1}·{card2}",
+  "@bidInfoHasBoth": {
+    "placeholders": {
+      "card1": {"type": "String"},
+      "card2": {"type": "String"}
+    }
+  },
+  "bidInfoHasCard": "持有 {card}",
+  "@bidInfoHasCard": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  }
 }

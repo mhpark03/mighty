@@ -976,5 +976,30 @@
   "strategyGirudaSupport": "기루다 3장 이상으로 기루다 지원 가능",
   "strategyMultiAce": "여러 에이스 보유로 다수 트릭 획득 가능",
   "strategySingleAce": "에이스 1장으로 추가 트릭 기회",
-  "strategyCut": "짧은 무늬로 기루다 컷 가능"
+  "strategyCut": "짧은 무늬로 기루다 컷 가능",
+  "bidInfoGirudaKeys": "기루다 {keys}",
+  "@bidInfoGirudaKeys": {
+    "placeholders": {
+      "keys": {"type": "String"}
+    }
+  },
+  "bidInfoFriend": "프렌드: {card}",
+  "@bidInfoFriend": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "bidInfoHasBoth": "{card1}·{card2} 보유",
+  "@bidInfoHasBoth": {
+    "placeholders": {
+      "card1": {"type": "String"},
+      "card2": {"type": "String"}
+    }
+  },
+  "bidInfoHasCard": "{card} 보유",
+  "@bidInfoHasCard": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  }
 }

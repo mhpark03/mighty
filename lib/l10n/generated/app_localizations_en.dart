@@ -1821,4 +1821,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get strategyCut => 'Short suit enables trump cut';
+
+  @override
+  String bidInfoGirudaKeys(String keys) {
+    return 'Trump $keys';
+  }
+
+  @override
+  String bidInfoFriend(String card) {
+    return 'Friend: $card';
+  }
+
+  @override
+  String bidInfoHasBoth(String card1, String card2) {
+    return 'Has $card1·$card2';
+  }
+
+  @override
+  String bidInfoHasCard(String card) {
+    return 'Has $card';
+  }
 }

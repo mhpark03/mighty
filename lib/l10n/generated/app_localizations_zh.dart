@@ -1790,4 +1790,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get strategyCut => '短花色可用王牌切牌';
+
+  @override
+  String bidInfoGirudaKeys(String keys) {
+    return '王牌 $keys';
+  }
+
+  @override
+  String bidInfoFriend(String card) {
+    return '朋友: $card';
+  }
+
+  @override
+  String bidInfoHasBoth(String card1, String card2) {
+    return '持有 $card1·$card2';
+  }
+
+  @override
+  String bidInfoHasCard(String card) {
+    return '持有 $card';
+  }
 }
