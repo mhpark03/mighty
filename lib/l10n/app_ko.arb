@@ -964,6 +964,12 @@
     }
   },
   "bidSummaryEstMinDesc": "프렌드 도움 없이 (조커콜 등)",
+  "bidSummaryEstMinDescDynamic": "프렌드({friend}) 기본 기여만, 바닥패 가능",
+  "@bidSummaryEstMinDescDynamic": {
+    "placeholders": {
+      "friend": {"type": "String"}
+    }
+  },
   "bidSummaryMultipliers": "주공 ×2, 프렌드 ×1, 야당 ×(-1)",
   "firstTrickStrategy": "초구 전략",
   "scoreStrategy": "점수 획득 전략",

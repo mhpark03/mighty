@@ -3228,6 +3228,12 @@ abstract class AppLocalizations {
   /// **'프렌드 도움 없이 (조커콜 등)'**
   String get bidSummaryEstMinDesc;
 
+  /// No description provided for @bidSummaryEstMinDescDynamic.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드({friend}) 기본 기여만, 바닥패 가능'**
+  String bidSummaryEstMinDescDynamic(String friend);
+
   /// No description provided for @bidSummaryMultipliers.
   ///
   /// In ko, this message translates to:

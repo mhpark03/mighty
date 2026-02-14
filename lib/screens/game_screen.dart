@@ -745,7 +745,7 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    l10n.bidSummaryEstMinDesc,
+                    _getBidMinDesc(controller, l10n),
                     style: const TextStyle(color: Colors.white38, fontSize: 10),
                   ),
                   const SizedBox(height: 10),
@@ -873,6 +873,32 @@ class _GameScreenState extends State<GameScreen> {
         ],
       ),
     );
+  }
+
+  /// 배팅 결과 최소 점수 설명: 프렌드 타입에 따라 동적 생성
+  String _getBidMinDesc(GameController controller, AppLocalizations l10n) {
+    final declaration = controller.pendingDeclaration;
+    if (declaration == null) return l10n.bidSummaryEstMinDesc;
+
+    final card = declaration.card;
+    if (card == null) return l10n.bidSummaryEstMinDesc;
+
+    // 프렌드 카드 이름 결정
+    String friendName;
+    if (card.isJoker) {
+      friendName = l10n.friendCardJoker;
+    } else if (card.rank == Rank.ace) {
+      final mighty = controller.state.mighty;
+      if (card.suit == mighty.suit && card.rank == mighty.rank) {
+        friendName = l10n.friendCardMighty;
+      } else {
+        friendName = '${_getSuitSymbol(card.suit!)}A';
+      }
+    } else {
+      friendName = '${_getSuitSymbol(card.suit!)}${card.rank == Rank.king ? "K" : card.rank == Rank.queen ? "Q" : ""}';
+    }
+
+    return l10n.bidSummaryEstMinDescDynamic(friendName);
   }
 
   Widget _buildScoreRow(String label, String value, Color valueColor) {

@@ -1783,6 +1783,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bidSummaryEstMinDesc => 'Without friend help (joker called, etc.)';
 
   @override
+  String bidSummaryEstMinDescDynamic(String friend) {
+    return 'Friend ($friend) basic only, may be in kitty';
+  }
+
+  @override
   String get bidSummaryMultipliers => 'Declarer ×2, Friend ×1, Defender ×(-1)';
 
   @override

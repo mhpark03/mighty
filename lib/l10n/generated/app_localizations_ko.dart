@@ -1768,6 +1768,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get bidSummaryEstMinDesc => '프렌드 도움 없이 (조커콜 등)';
 
   @override
+  String bidSummaryEstMinDescDynamic(String friend) {
+    return '프렌드($friend) 기본 기여만, 바닥패 가능';
+  }
+
+  @override
   String get bidSummaryMultipliers => '주공 ×2, 프렌드 ×1, 야당 ×(-1)';
 
   @override

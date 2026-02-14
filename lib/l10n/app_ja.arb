@@ -804,6 +804,12 @@
     }
   },
   "bidSummaryEstMinDesc": "フレンドの助けなし（ジョーカーコール等）",
+  "bidSummaryEstMinDescDynamic": "フレンド({friend})基本のみ、キティの可能性あり",
+  "@bidSummaryEstMinDescDynamic": {
+    "placeholders": {
+      "friend": {"type": "String"}
+    }
+  },
   "bidSummaryMultipliers": "宣言者 ×2、フレンド ×1、守備 ×(-1)",
   "firstTrickStrategy": "初手戦略",
   "scoreStrategy": "得点戦略",

@@ -804,6 +804,12 @@
     }
   },
   "bidSummaryEstMinDesc": "无朋友帮助（Joker Call等）",
+  "bidSummaryEstMinDescDynamic": "朋友({friend})仅基本贡献，可能在底牌中",
+  "@bidSummaryEstMinDescDynamic": {
+    "placeholders": {
+      "friend": {"type": "String"}
+    }
+  },
   "bidSummaryMultipliers": "庄家 ×2、朋友 ×1、防守 ×(-1)",
   "firstTrickStrategy": "首墩策略",
   "scoreStrategy": "得分策略",

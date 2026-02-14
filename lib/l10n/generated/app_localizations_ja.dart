@@ -1762,6 +1762,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get bidSummaryEstMinDesc => 'フレンドの助けなし（ジョーカーコール等）';
 
   @override
+  String bidSummaryEstMinDescDynamic(String friend) {
+    return 'フレンド($friend)基本のみ、キティの可能性あり';
+  }
+
+  @override
   String get bidSummaryMultipliers => '宣言者 ×2、フレンド ×1、守備 ×(-1)';
 
   @override

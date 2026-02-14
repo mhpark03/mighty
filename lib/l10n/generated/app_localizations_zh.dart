@@ -1753,6 +1753,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bidSummaryEstMinDesc => '无朋友帮助（Joker Call等）';
 
   @override
+  String bidSummaryEstMinDescDynamic(String friend) {
+    return '朋友($friend)仅基本贡献，可能在底牌中';
+  }
+
+  @override
   String get bidSummaryMultipliers => '庄家 ×2、朋友 ×1、防守 ×(-1)';
 
   @override

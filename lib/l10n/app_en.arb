@@ -805,6 +805,12 @@
     }
   },
   "bidSummaryEstMinDesc": "Without friend help (joker called, etc.)",
+  "bidSummaryEstMinDescDynamic": "Friend ({friend}) basic only, may be in kitty",
+  "@bidSummaryEstMinDescDynamic": {
+    "placeholders": {
+      "friend": {"type": "String"}
+    }
+  },
   "bidSummaryMultipliers": "Declarer ×2, Friend ×1, Defender ×(-1)",
   "firstTrickStrategy": "First Trick Strategy",
   "scoreStrategy": "Scoring Strategy",
