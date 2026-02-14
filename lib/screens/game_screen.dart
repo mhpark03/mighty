@@ -9,6 +9,7 @@ import '../models/game_state.dart';
 import '../services/ad_service.dart';
 import '../services/game_controller.dart';
 import '../services/stats_service.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/card_widget.dart';
 import 'kitty_dialog.dart';
 import 'friend_dialog.dart' show FriendSelectionScreen;
@@ -763,6 +764,9 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            // 배너 광고
+            const BannerAdWidget(),
           ],
         ),
       ),
