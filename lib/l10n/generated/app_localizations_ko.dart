@@ -1665,4 +1665,40 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get bidSummaryMultipliers => '주공 ×2, 프렌드 ×1, 야당 ×(-1)';
+
+  @override
+  String get firstTrickStrategy => '초구 전략';
+
+  @override
+  String get scoreStrategy => '점수 획득 전략';
+
+  @override
+  String get firstTrickAce => '비기루다 A로 선공하여 확실한 트릭 획득';
+
+  @override
+  String get firstTrickKing => '비기루다 K로 선공하여 트릭 획득 시도';
+
+  @override
+  String get firstTrickGiveUp => '강한 선공 카드 없음, 낮은 카드로 정보 수집';
+
+  @override
+  String get strategyMighty => '마이티로 확실한 트릭 1개 보장';
+
+  @override
+  String get strategyJoker => '조커로 원하는 타이밍에 트릭 획득 가능';
+
+  @override
+  String get strategyGirudaDominant => '기루다 5장 이상으로 기루다 지배력 확보';
+
+  @override
+  String get strategyGirudaSupport => '기루다 3장 이상으로 기루다 지원 가능';
+
+  @override
+  String get strategyMultiAce => '여러 에이스 보유로 다수 트릭 획득 가능';
+
+  @override
+  String get strategySingleAce => '에이스 1장으로 추가 트릭 기회';
+
+  @override
+  String get strategyCut => '짧은 무늬로 기루다 컷 가능';
 }

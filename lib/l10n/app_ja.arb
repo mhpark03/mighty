@@ -724,5 +724,17 @@
   "bidSummaryWinMin": "勝利時 (最低得点)",
   "bidSummaryWinMax": "勝利時 (フル - 20点)",
   "bidSummaryLose": "敗北時 (0点獲得)",
-  "bidSummaryMultipliers": "宣言者 ×2、フレンド ×1、守備 ×(-1)"
+  "bidSummaryMultipliers": "宣言者 ×2、フレンド ×1、守備 ×(-1)",
+  "firstTrickStrategy": "初手戦略",
+  "scoreStrategy": "得点戦略",
+  "firstTrickAce": "非切り札Aでリードし確実にトリック獲得",
+  "firstTrickKing": "非切り札Kでリードしトリック獲得を試みる",
+  "firstTrickGiveUp": "強いリードカードなし、低いカードで情報収集",
+  "strategyMighty": "マイティで確実に1トリック確保",
+  "strategyJoker": "ジョーカーで好きなタイミングでトリック獲得可能",
+  "strategyGirudaDominant": "切り札5枚以上で切り札支配力確保",
+  "strategyGirudaSupport": "切り札3枚以上で切り札サポート可能",
+  "strategyMultiAce": "複数エースで多くのトリック獲得可能",
+  "strategySingleAce": "エース1枚で追加トリックの機会",
+  "strategyCut": "短いスートで切り札カット可能"
 }

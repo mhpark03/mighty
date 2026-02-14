@@ -725,5 +725,17 @@
   "bidSummaryWinMin": "Win (minimum points)",
   "bidSummaryWinMax": "Win (full - 20 pts)",
   "bidSummaryLose": "Lose (0 pts earned)",
-  "bidSummaryMultipliers": "Declarer ×2, Friend ×1, Defender ×(-1)"
+  "bidSummaryMultipliers": "Declarer ×2, Friend ×1, Defender ×(-1)",
+  "firstTrickStrategy": "First Trick Strategy",
+  "scoreStrategy": "Scoring Strategy",
+  "firstTrickAce": "Lead with non-trump Ace for a guaranteed trick",
+  "firstTrickKing": "Lead with non-trump King to attempt a trick win",
+  "firstTrickGiveUp": "No strong lead card, play low to gather info",
+  "strategyMighty": "Mighty guarantees one trick",
+  "strategyJoker": "Joker allows winning a trick at any time",
+  "strategyGirudaDominant": "5+ trump cards ensure trump dominance",
+  "strategyGirudaSupport": "3+ trump cards provide trump support",
+  "strategyMultiAce": "Multiple Aces enable winning several tricks",
+  "strategySingleAce": "One Ace provides an extra trick opportunity",
+  "strategyCut": "Short suit enables trump cut"
 }

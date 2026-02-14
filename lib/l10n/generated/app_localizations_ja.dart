@@ -1659,4 +1659,40 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get bidSummaryMultipliers => '宣言者 ×2、フレンド ×1、守備 ×(-1)';
+
+  @override
+  String get firstTrickStrategy => '初手戦略';
+
+  @override
+  String get scoreStrategy => '得点戦略';
+
+  @override
+  String get firstTrickAce => '非切り札Aでリードし確実にトリック獲得';
+
+  @override
+  String get firstTrickKing => '非切り札Kでリードしトリック獲得を試みる';
+
+  @override
+  String get firstTrickGiveUp => '強いリードカードなし、低いカードで情報収集';
+
+  @override
+  String get strategyMighty => 'マイティで確実に1トリック確保';
+
+  @override
+  String get strategyJoker => 'ジョーカーで好きなタイミングでトリック獲得可能';
+
+  @override
+  String get strategyGirudaDominant => '切り札5枚以上で切り札支配力確保';
+
+  @override
+  String get strategyGirudaSupport => '切り札3枚以上で切り札サポート可能';
+
+  @override
+  String get strategyMultiAce => '複数エースで多くのトリック獲得可能';
+
+  @override
+  String get strategySingleAce => 'エース1枚で追加トリックの機会';
+
+  @override
+  String get strategyCut => '短いスートで切り札カット可能';
 }

@@ -1650,4 +1650,40 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bidSummaryMultipliers => '庄家 ×2、朋友 ×1、防守 ×(-1)';
+
+  @override
+  String get firstTrickStrategy => '首墩策略';
+
+  @override
+  String get scoreStrategy => '得分策略';
+
+  @override
+  String get firstTrickAce => '用非王牌A领出，确保获得一墩';
+
+  @override
+  String get firstTrickKing => '用非王牌K领出，尝试获得一墩';
+
+  @override
+  String get firstTrickGiveUp => '没有强力领出牌，出小牌收集信息';
+
+  @override
+  String get strategyMighty => 'Mighty保证获得一墩';
+
+  @override
+  String get strategyJoker => 'Joker可在任意时机获得一墩';
+
+  @override
+  String get strategyGirudaDominant => '5张以上王牌确保王牌支配力';
+
+  @override
+  String get strategyGirudaSupport => '3张以上王牌提供王牌支援';
+
+  @override
+  String get strategyMultiAce => '多张A可获得多墩';
+
+  @override
+  String get strategySingleAce => '1张A提供额外获墩机会';
+
+  @override
+  String get strategyCut => '短花色可用王牌切牌';
 }

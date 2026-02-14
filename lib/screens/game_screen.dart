@@ -1144,6 +1144,101 @@ class _GameScreenState extends State<GameScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 14),
+
+            // 초구 전략
+            if (explanation.firstTrickCard != null)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange.withValues(alpha: 0.4)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.play_circle_outline, color: Colors.orange, size: 18),
+                        const SizedBox(width: 6),
+                        Text(
+                          l10n.firstTrickStrategy,
+                          style: const TextStyle(
+                            color: Colors.orange,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        _buildTinyCardFixed(explanation.firstTrickCard!, state, 36.0),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            _getFirstTrickStrategy(explanation.firstTrickStrategy, l10n),
+                            style: const TextStyle(color: Colors.white70, fontSize: 13),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+            // 점수 획득 전략
+            if (explanation.strategyPoints.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green.withValues(alpha: 0.4)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.military_tech, color: Colors.greenAccent, size: 18),
+                        const SizedBox(width: 6),
+                        Text(
+                          l10n.scoreStrategy,
+                          style: const TextStyle(
+                            color: Colors.greenAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    for (final strategy in explanation.strategyPoints)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('• ', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                            Expanded(
+                              child: Text(
+                                _getStrategyText(strategy, l10n),
+                                style: const TextStyle(color: Colors.white70, fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
 
             const SizedBox(height: 20),
             // 자동 진행 타이머
@@ -1159,6 +1254,40 @@ class _GameScreenState extends State<GameScreen> {
         ),
       ),
     );
+  }
+
+  String _getFirstTrickStrategy(String strategy, AppLocalizations l10n) {
+    switch (strategy) {
+      case 'FIRST_ACE':
+        return l10n.firstTrickAce;
+      case 'FIRST_KING':
+        return l10n.firstTrickKing;
+      case 'FIRST_GIVE_UP':
+        return l10n.firstTrickGiveUp;
+      default:
+        return '';
+    }
+  }
+
+  String _getStrategyText(String strategy, AppLocalizations l10n) {
+    switch (strategy) {
+      case 'STRATEGY_MIGHTY':
+        return l10n.strategyMighty;
+      case 'STRATEGY_JOKER':
+        return l10n.strategyJoker;
+      case 'STRATEGY_GIRUDA_DOMINANT':
+        return l10n.strategyGirudaDominant;
+      case 'STRATEGY_GIRUDA_SUPPORT':
+        return l10n.strategyGirudaSupport;
+      case 'STRATEGY_MULTI_ACE':
+        return l10n.strategyMultiAce;
+      case 'STRATEGY_SINGLE_ACE':
+        return l10n.strategySingleAce;
+      case 'STRATEGY_CUT':
+        return l10n.strategyCut;
+      default:
+        return '';
+    }
   }
 
   String _getFriendReason(String reason, AppLocalizations l10n) {

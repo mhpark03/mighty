@@ -884,5 +884,17 @@
   "bidSummaryWinMin": "승리 시 (최소 득점)",
   "bidSummaryWinMax": "승리 시 (풀 - 20점)",
   "bidSummaryLose": "패배 시 (0점 획득)",
-  "bidSummaryMultipliers": "주공 ×2, 프렌드 ×1, 야당 ×(-1)"
+  "bidSummaryMultipliers": "주공 ×2, 프렌드 ×1, 야당 ×(-1)",
+  "firstTrickStrategy": "초구 전략",
+  "scoreStrategy": "점수 획득 전략",
+  "firstTrickAce": "비기루다 A로 선공하여 확실한 트릭 획득",
+  "firstTrickKing": "비기루다 K로 선공하여 트릭 획득 시도",
+  "firstTrickGiveUp": "강한 선공 카드 없음, 낮은 카드로 정보 수집",
+  "strategyMighty": "마이티로 확실한 트릭 1개 보장",
+  "strategyJoker": "조커로 원하는 타이밍에 트릭 획득 가능",
+  "strategyGirudaDominant": "기루다 5장 이상으로 기루다 지배력 확보",
+  "strategyGirudaSupport": "기루다 3장 이상으로 기루다 지원 가능",
+  "strategyMultiAce": "여러 에이스 보유로 다수 트릭 획득 가능",
+  "strategySingleAce": "에이스 1장으로 추가 트릭 기회",
+  "strategyCut": "짧은 무늬로 기루다 컷 가능"
 }

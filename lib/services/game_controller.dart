@@ -413,10 +413,16 @@ class GameController extends ChangeNotifier {
     if (_isAutoPlayMode) {
       // 프렌드 선택 이유 생성
       final reason = _generateFriendReason(declaration, declarer, _state);
+      final firstTrickInfo = _analyzeFirstTrick(declarer, _state);
+      final strategyPoints = _generateStrategyPoints(declarer, _state);
+
       _friendExplanation = FriendExplanation(
         declaration: declaration,
         reason: reason,
         isFull: isFull,
+        firstTrickCard: firstTrickInfo.$1,
+        firstTrickStrategy: firstTrickInfo.$2,
+        strategyPoints: strategyPoints,
       );
 
       _state.declareFriend(declaration);
@@ -794,6 +800,107 @@ class GameController extends ChangeNotifier {
     return '';
   }
 
+  /// 초구 분석: (추천 카드, 전략 코드)
+  (PlayingCard?, String) _analyzeFirstTrick(Player declarer, GameState state) {
+    final hand = declarer.hand;
+    final giruda = state.giruda;
+
+    // 초구에서는 주공이 선공, 기루다 선공 불가
+    // 비기루다 중 가장 강한 카드 찾기
+    PlayingCard? bestFirstCard;
+    String strategy = '';
+
+    // 비기루다 에이스 찾기 (마이티 제외)
+    for (final card in hand) {
+      if (card.isJoker) continue;
+      if (card.suit == giruda) continue;
+      if (card.suit == state.mighty.suit && card.rank == state.mighty.rank) continue;
+
+      if (card.rank == Rank.ace) {
+        bestFirstCard = card;
+        strategy = 'FIRST_ACE';
+        break;
+      }
+    }
+
+    // 에이스 없으면 킹 찾기
+    if (bestFirstCard == null) {
+      for (final card in hand) {
+        if (card.isJoker) continue;
+        if (card.suit == giruda) continue;
+        if (card.rank == Rank.king) {
+          bestFirstCard = card;
+          strategy = 'FIRST_KING';
+          break;
+        }
+      }
+    }
+
+    // 킹도 없으면 적은 무늬의 낮은 카드 (초구 포기)
+    if (bestFirstCard == null) {
+      final nonGirudaCards = hand.where((c) => !c.isJoker && c.suit != giruda).toList();
+      if (nonGirudaCards.isNotEmpty) {
+        nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        bestFirstCard = nonGirudaCards.first;
+        strategy = 'FIRST_GIVE_UP';
+      }
+    }
+
+    return (bestFirstCard, strategy);
+  }
+
+  /// 점수 획득 전략 생성
+  List<String> _generateStrategyPoints(Player declarer, GameState state) {
+    final hand = declarer.hand;
+    final giruda = state.giruda;
+    final strategies = <String>[];
+
+    final hasMighty = hand.any((c) => c.suit == state.mighty.suit && c.rank == state.mighty.rank);
+    final hasJoker = hand.any((c) => c.isJoker);
+
+    // 기루다 장수
+    int girudaCount = 0;
+    if (giruda != null) {
+      girudaCount = hand.where((c) => !c.isJoker && c.suit == giruda).length;
+    }
+
+    // 비기루다 에이스 수
+    int nonGirudaAceCount = 0;
+    for (final suit in Suit.values) {
+      if (suit == giruda) continue;
+      if (state.mighty.suit == suit && state.mighty.rank == Rank.ace) continue;
+      if (hand.any((c) => c.suit == suit && c.rank == Rank.ace)) {
+        nonGirudaAceCount++;
+      }
+    }
+
+    // 컷 가능 무늬 (0장인 무늬)
+    int cutSuits = 0;
+    for (final suit in Suit.values) {
+      if (suit == giruda) continue;
+      if (!hand.any((c) => !c.isJoker && c.suit == suit)) {
+        cutSuits++;
+      }
+    }
+
+    // 전략 포인트 생성
+    if (hasMighty) strategies.add('STRATEGY_MIGHTY');
+    if (hasJoker) strategies.add('STRATEGY_JOKER');
+    if (girudaCount >= 5) {
+      strategies.add('STRATEGY_GIRUDA_DOMINANT');
+    } else if (girudaCount >= 3) {
+      strategies.add('STRATEGY_GIRUDA_SUPPORT');
+    }
+    if (nonGirudaAceCount >= 2) {
+      strategies.add('STRATEGY_MULTI_ACE');
+    } else if (nonGirudaAceCount == 1) {
+      strategies.add('STRATEGY_SINGLE_ACE');
+    }
+    if (cutSuits >= 1) strategies.add('STRATEGY_CUT');
+
+    return strategies;
+  }
+
   void reset() {
     _initializePlayers();
     notifyListeners();
@@ -802,13 +909,19 @@ class GameController extends ChangeNotifier {
 
 class FriendExplanation {
   final FriendDeclaration declaration;
-  final String reason;    // 'NO_FRIEND_STRONG', 'NEED_MIGHTY', 'NEED_JOKER', 'NEED_GIRUDA_ACE', 'NEED_GIRUDA_KING', 'NEED_ACE', 'NEED_GIRUDA_MID', 'NO_FRIEND_ALL'
-  final bool isFull;       // 풀 선언 여부
+  final String reason;
+  final bool isFull;
+  final PlayingCard? firstTrickCard;    // 초구 카드 추천
+  final String firstTrickStrategy;     // 초구 전략 설명 코드
+  final List<String> strategyPoints;   // 점수 획득 전략 목록
 
   FriendExplanation({
     required this.declaration,
     required this.reason,
     this.isFull = false,
+    this.firstTrickCard,
+    this.firstTrickStrategy = '',
+    this.strategyPoints = const [],
   });
 }
 

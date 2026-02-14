@@ -1679,4 +1679,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bidSummaryMultipliers => 'Declarer ×2, Friend ×1, Defender ×(-1)';
+
+  @override
+  String get firstTrickStrategy => 'First Trick Strategy';
+
+  @override
+  String get scoreStrategy => 'Scoring Strategy';
+
+  @override
+  String get firstTrickAce => 'Lead with non-trump Ace for a guaranteed trick';
+
+  @override
+  String get firstTrickKing =>
+      'Lead with non-trump King to attempt a trick win';
+
+  @override
+  String get firstTrickGiveUp => 'No strong lead card, play low to gather info';
+
+  @override
+  String get strategyMighty => 'Mighty guarantees one trick';
+
+  @override
+  String get strategyJoker => 'Joker allows winning a trick at any time';
+
+  @override
+  String get strategyGirudaDominant => '5+ trump cards ensure trump dominance';
+
+  @override
+  String get strategyGirudaSupport => '3+ trump cards provide trump support';
+
+  @override
+  String get strategyMultiAce => 'Multiple Aces enable winning several tricks';
+
+  @override
+  String get strategySingleAce => 'One Ace provides an extra trick opportunity';
+
+  @override
+  String get strategyCut => 'Short suit enables trump cut';
 }

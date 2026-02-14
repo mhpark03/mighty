@@ -3065,6 +3065,78 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'주공 ×2, 프렌드 ×1, 야당 ×(-1)'**
   String get bidSummaryMultipliers;
+
+  /// No description provided for @firstTrickStrategy.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구 전략'**
+  String get firstTrickStrategy;
+
+  /// No description provided for @scoreStrategy.
+  ///
+  /// In ko, this message translates to:
+  /// **'점수 획득 전략'**
+  String get scoreStrategy;
+
+  /// No description provided for @firstTrickAce.
+  ///
+  /// In ko, this message translates to:
+  /// **'비기루다 A로 선공하여 확실한 트릭 획득'**
+  String get firstTrickAce;
+
+  /// No description provided for @firstTrickKing.
+  ///
+  /// In ko, this message translates to:
+  /// **'비기루다 K로 선공하여 트릭 획득 시도'**
+  String get firstTrickKing;
+
+  /// No description provided for @firstTrickGiveUp.
+  ///
+  /// In ko, this message translates to:
+  /// **'강한 선공 카드 없음, 낮은 카드로 정보 수집'**
+  String get firstTrickGiveUp;
+
+  /// No description provided for @strategyMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티로 확실한 트릭 1개 보장'**
+  String get strategyMighty;
+
+  /// No description provided for @strategyJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커로 원하는 타이밍에 트릭 획득 가능'**
+  String get strategyJoker;
+
+  /// No description provided for @strategyGirudaDominant.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 5장 이상으로 기루다 지배력 확보'**
+  String get strategyGirudaDominant;
+
+  /// No description provided for @strategyGirudaSupport.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 3장 이상으로 기루다 지원 가능'**
+  String get strategyGirudaSupport;
+
+  /// No description provided for @strategyMultiAce.
+  ///
+  /// In ko, this message translates to:
+  /// **'여러 에이스 보유로 다수 트릭 획득 가능'**
+  String get strategyMultiAce;
+
+  /// No description provided for @strategySingleAce.
+  ///
+  /// In ko, this message translates to:
+  /// **'에이스 1장으로 추가 트릭 기회'**
+  String get strategySingleAce;
+
+  /// No description provided for @strategyCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'짧은 무늬로 기루다 컷 가능'**
+  String get strategyCut;
 }
 
 class _AppLocalizationsDelegate
