@@ -269,6 +269,10 @@ class _GameScreenState extends State<GameScreen> {
         // 모두 패스한 경우
         if (state.allPassed) {
           if (widget.isAutoPlay) {
+            // 마지막 플레이어 설명이 아직 표시 중이면 배팅 화면 유지
+            if (controller.lastBidExplanation != null) {
+              return _buildBiddingScreen(controller);
+            }
             return _buildAutoPlayAllPassedScreen(controller);
           }
           if (!_allPassedDialogShown) {

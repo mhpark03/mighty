@@ -327,7 +327,7 @@ class GameController extends ChangeNotifier {
           _processAIKittySelection();
         }
       } else if (_state.phase == GamePhase.waiting && _state.allPassed) {
-        // UI에서 "다음 게임" 버튼으로 처리
+        _lastBidExplanation = null; // 배팅 설명 클리어 → 모두 패스 화면 전환
         notifyListeners();
       }
     } else {
