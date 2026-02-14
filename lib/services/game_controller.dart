@@ -237,23 +237,66 @@ class GameController extends ChangeNotifier {
             }
           }
         } else {
-          // 둘 다 보유 → 없는 에이스 중 가장 강한 것을 프렌드로
-          friendType = 'ACE';
-          for (final s in Suit.values) {
-            if (s == effectiveSuit) continue; // 기루다 에이스 제외
-            final isMightySuit = (effectiveSuit == Suit.spade) ? s == Suit.diamond : s == Suit.spade;
-            if (isMightySuit) continue; // 마이티는 이미 보유
-            if (currentPlayer.hand.any((c) => !c.isJoker && c.suit == s && c.rank == Rank.ace)) continue; // 이미 보유한 에이스
-            // 이 에이스를 프렌드로 지명
-            friendSuit = s;
-            for (final p in _state.players) {
-              if (p.id == currentPlayer.id) continue;
-              if (p.hand.any((c) => !c.isJoker && c.suit == s && c.rank == Rank.ace)) {
-                friendHolderName = p.name;
-                break;
+          // 둘 다 보유 → AI declareFriend 로직과 동일 순서로 예측
+          // 1. 기루다 A 없으면 → 기루다 A 프렌드
+          // 2. 기루다 K 없으면 → 기루다 K 프렌드
+          // 3. 비기루다 A 중 없는 것 → 해당 A 프렌드
+          bool found = false;
+          if (effectiveSuit != null) {
+            // 기루다 A 체크 (마이티가 아닌 경우)
+            final mightyIsGirudaAce = mightySuit == effectiveSuit;
+            if (!mightyIsGirudaAce) {
+              bool hasGirudaAce = currentPlayer.hand.any((c) =>
+                  !c.isJoker && c.suit == effectiveSuit && c.rank == Rank.ace);
+              if (!hasGirudaAce) {
+                friendType = 'GIRUDA_ACE';
+                friendSuit = effectiveSuit;
+                for (final p in _state.players) {
+                  if (p.id == currentPlayer.id) continue;
+                  if (p.hand.any((c) => !c.isJoker && c.suit == effectiveSuit && c.rank == Rank.ace)) {
+                    friendHolderName = p.name;
+                    break;
+                  }
+                }
+                found = true;
               }
             }
-            break;
+            // 기루다 K 체크
+            if (!found) {
+              bool hasGirudaKing = currentPlayer.hand.any((c) =>
+                  !c.isJoker && c.suit == effectiveSuit && c.rank == Rank.king);
+              if (!hasGirudaKing) {
+                friendType = 'GIRUDA_KING';
+                friendSuit = effectiveSuit;
+                for (final p in _state.players) {
+                  if (p.id == currentPlayer.id) continue;
+                  if (p.hand.any((c) => !c.isJoker && c.suit == effectiveSuit && c.rank == Rank.king)) {
+                    friendHolderName = p.name;
+                    break;
+                  }
+                }
+                found = true;
+              }
+            }
+          }
+          // 비기루다 A 중 없는 것
+          if (!found) {
+            friendType = 'ACE';
+            for (final s in Suit.values) {
+              if (s == effectiveSuit) continue;
+              final isMightySuitHere = (effectiveSuit == Suit.spade) ? s == Suit.diamond : s == Suit.spade;
+              if (isMightySuitHere) continue;
+              if (currentPlayer.hand.any((c) => !c.isJoker && c.suit == s && c.rank == Rank.ace)) continue;
+              friendSuit = s;
+              for (final p in _state.players) {
+                if (p.id == currentPlayer.id) continue;
+                if (p.hand.any((c) => !c.isJoker && c.suit == s && c.rank == Rank.ace)) {
+                  friendHolderName = p.name;
+                  break;
+                }
+              }
+              break;
+            }
           }
         }
       }

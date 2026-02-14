@@ -1638,12 +1638,25 @@ class _GameScreenState extends State<GameScreen> {
 
   String _getFriendExpectedText(BidExplanation explanation, AppLocalizations l10n) {
     String cardName;
+    String note = '';
     switch (explanation.friendType) {
       case 'MIGHTY':
         cardName = '${l10n.friendCardMighty} (${_getSuitSymbol(explanation.friendSuit!)}A)';
         break;
       case 'JOKER':
         cardName = l10n.friendCardJoker;
+        note = ' (${l10n.friendJokerNote})';
+        break;
+      case 'GIRUDA_ACE':
+        cardName = explanation.friendSuit != null
+            ? '${_getSuitSymbol(explanation.friendSuit!)}A (${l10n.giruda})'
+            : 'A';
+        break;
+      case 'GIRUDA_KING':
+        cardName = explanation.friendSuit != null
+            ? '${_getSuitSymbol(explanation.friendSuit!)}K (${l10n.giruda})'
+            : 'K';
+        note = ' (A 보유)';
         break;
       case 'ACE':
         cardName = explanation.friendSuit != null ? '${_getSuitSymbol(explanation.friendSuit!)}A' : 'A';
@@ -1655,10 +1668,6 @@ class _GameScreenState extends State<GameScreen> {
     final holder = explanation.friendHolderName != null
         ? l10n.friendHeldBy(explanation.friendHolderName!)
         : l10n.friendInKitty;
-
-    final note = explanation.friendType == 'JOKER'
-        ? ' (${l10n.friendJokerNote})'
-        : '';
 
     return '${l10n.friendExpected}: $cardName - $holder$note';
   }
