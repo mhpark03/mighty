@@ -1182,7 +1182,46 @@ class _GameScreenState extends State<GameScreen> {
               declarerName,
               style: const TextStyle(fontSize: 16, color: Colors.white70),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+
+            // 주공 보유 카드
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white24),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.style, color: Colors.white70, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n.handCards,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 3,
+                    runSpacing: 3,
+                    children: state.players[state.declarerId!].hand
+                        .map((card) => _buildTinyCardFixed(card, state, 32.0))
+                        .toList(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
 
             // 프렌드 선언 내용
             Container(
