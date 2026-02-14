@@ -743,13 +743,24 @@ class _GameScreenState extends State<GameScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 자동 진행 타이머 표시
-            const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white38,
+            // 게임 시작 버튼
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () => controller.confirmBidSummary(),
+                icon: const Icon(Icons.play_arrow),
+                label: Text(
+                  l10n.startGame,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber,
+                  foregroundColor: Colors.black87,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ),
           ],

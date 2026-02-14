@@ -21,6 +21,7 @@ class GameController extends ChangeNotifier {
   bool _showKittySummary = false;
   FriendExplanation? _friendExplanation;
   bool _showFriendSummary = false;
+  FriendDeclaration? _pendingDeclaration;
 
   GameController() {
     _initializePlayers();
@@ -130,6 +131,7 @@ class GameController extends ChangeNotifier {
   void startNewGame() {
     _lastBidExplanation = null;
     _showBidSummary = false;
+    _pendingDeclaration = null;
     _kittyExplanation = null;
     _showKittySummary = false;
     _friendExplanation = null;
@@ -427,18 +429,11 @@ class GameController extends ChangeNotifier {
       _friendExplanation = null;
       notifyListeners();
 
-      // 배팅 결과 요약 화면 5초 표시
+      // 배팅 결과 요약 화면 표시 (버튼 클릭 시 진행)
+      _pendingDeclaration = declaration;
       _showBidSummary = true;
       _lastBidExplanation = null;
       notifyListeners();
-
-      await Future.delayed(const Duration(seconds: 5));
-      if (_isAutoPlayPaused) return;
-
-      _showBidSummary = false;
-      _state.declareFriend(declaration);
-      notifyListeners();
-      _processAIPlayIfNeeded();
     } else {
       _state.declareFriend(declaration);
       _isProcessing = false;
@@ -687,6 +682,7 @@ class GameController extends ChangeNotifier {
     _isProcessing = false;
     _waitingForTrickConfirm = false;
     _showBidSummary = false;
+    _pendingDeclaration = null;
     _kittyExplanation = null;
     _showKittySummary = false;
     _friendExplanation = null;
@@ -729,14 +725,9 @@ class GameController extends ChangeNotifier {
       _processAIPlayIfNeeded();
       return;
     }
-    // 배팅 요약 화면에서 일시정지 후 재개 시 플레이로 진행
-    if (_showBidSummary && _friendExplanation != null) {
-      _showBidSummary = false;
-      final declaration = _friendExplanation!.declaration;
-      _friendExplanation = null;
-      _state.declareFriend(declaration);
-      notifyListeners();
-      _processAIPlayIfNeeded();
+    // 배팅 요약 화면에서 일시정지 후 재개 시 버튼 대기 (자동 진행 안 함)
+    if (_showBidSummary && _pendingDeclaration != null) {
+      // 버튼 클릭으로 진행하므로 resume만 하고 화면 유지
       return;
     }
     _resumeAIIfNeeded();
@@ -746,6 +737,15 @@ class GameController extends ChangeNotifier {
     if (!_isAutoPlayMode) return;
     _isAutoPlayPaused = false;
     startNewGame();
+  }
+
+  void confirmBidSummary() {
+    if (!_showBidSummary || _pendingDeclaration == null) return;
+    _showBidSummary = false;
+    _state.declareFriend(_pendingDeclaration!);
+    _pendingDeclaration = null;
+    notifyListeners();
+    _processAIPlayIfNeeded();
   }
 
   /// 버릴 카드의 이유 생성
