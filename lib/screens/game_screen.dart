@@ -1709,8 +1709,18 @@ class _GameScreenState extends State<GameScreen> {
 
     if (keyRanks.isEmpty) return null;
 
-    // 마이티/조커 보유 여부
+    // 비기루다 A 추출 (초구 카드)
     final mighty = state.mighty;
+    final nonGirudaAces = <String>[];
+    for (final suit in Suit.values) {
+      if (suit == giruda) continue;
+      final hasAce = hand.any((c) =>
+          !c.isJoker && c.suit == suit && c.rank == Rank.ace &&
+          !(c.suit == mighty.suit && c.rank == mighty.rank)); // 마이티 제외
+      if (hasAce) nonGirudaAces.add('${_getSuitSymbol(suit)}A');
+    }
+
+    // 마이티/조커 보유 여부
     final hasMighty = hand.any((c) => !c.isJoker && c.suit == mighty.suit && c.rank == mighty.rank);
     final hasJoker = hand.any((c) => c.isJoker);
 
@@ -1718,6 +1728,9 @@ class _GameScreenState extends State<GameScreen> {
 
     // 기루다 핵심 카드
     parts.add(l10n.bidInfoGirudaKeys(keyRanks.join('·')));
+
+    // 비기루다 A (초구 선공 카드)
+    if (nonGirudaAces.isNotEmpty) parts.add(nonGirudaAces.join('·'));
 
     // 마이티/조커 + 프렌드 정보
     if (hasMighty && hasJoker) {
