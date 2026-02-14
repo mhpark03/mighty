@@ -332,7 +332,9 @@ class AIPlayer {
       if (suitCards.length < 3) continue;
 
       final (minPts, maxPts) = estimatePointRange(hand, suit);
-      final optimal = ((minPts + maxPts) / 2 + 1).round();
+      // 바닥패 기대값: 3장 중 평균 ~1점 카드 + 핸드 강화 (약한 카드 버리기) 효과
+      final kittyBonus = 1;
+      final optimal = ((minPts + maxPts) / 2 + 1).round() + kittyBonus;
 
       if (optimal > bestOptimal) {
         bestOptimal = optimal;
