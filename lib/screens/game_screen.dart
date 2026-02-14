@@ -285,11 +285,11 @@ class _GameScreenState extends State<GameScreen> {
       case GamePhase.bidding:
         return _buildBiddingScreen(controller);
       case GamePhase.selectingKitty:
+        return _buildKittyScreen(controller);
+      case GamePhase.declaringFriend:
         if (widget.isAutoPlay && controller.showBidSummary) {
           return _buildBidSummaryScreen(controller);
         }
-        return _buildKittyScreen(controller);
-      case GamePhase.declaringFriend:
         return _buildFriendScreen(controller);
       case GamePhase.playing:
       case GamePhase.roundEnd:

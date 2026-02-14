@@ -351,19 +351,8 @@ class GameController extends ChangeNotifier {
       await Future.delayed(const Duration(seconds: 5));
       if (_isAutoPlayPaused) return;
 
-      _showKittySummary = false;
-      notifyListeners();
-
-      // 배팅 결과 요약 화면 5초 표시
-      _showBidSummary = true;
-      _lastBidExplanation = null;
-      notifyListeners();
-
-      await Future.delayed(const Duration(seconds: 5));
-      if (_isAutoPlayPaused) return;
-
       // 키티 선택 실행
-      _showBidSummary = false;
+      _showKittySummary = false;
       _state.selectKitty(discardCards, newGiruda);
       _kittyExplanation = null;
       notifyListeners();
@@ -436,6 +425,17 @@ class GameController extends ChangeNotifier {
 
       _showFriendSummary = false;
       _friendExplanation = null;
+      notifyListeners();
+
+      // 배팅 결과 요약 화면 5초 표시
+      _showBidSummary = true;
+      _lastBidExplanation = null;
+      notifyListeners();
+
+      await Future.delayed(const Duration(seconds: 5));
+      if (_isAutoPlayPaused) return;
+
+      _showBidSummary = false;
       _state.declareFriend(declaration);
       notifyListeners();
       _processAIPlayIfNeeded();
@@ -719,20 +719,19 @@ class GameController extends ChangeNotifier {
       _processAIFriendDeclaration();
       return;
     }
-    // 배팅 요약 화면에서 일시정지 후 재개 시 프렌드 선언으로 진행
-    if (_showBidSummary) {
-      _showBidSummary = false;
-      if (_kittyExplanation != null) {
-        _state.selectKitty(_kittyExplanation!.discardCards, _kittyExplanation!.newGiruda);
-        _kittyExplanation = null;
-      }
-      notifyListeners();
-      _processAIFriendDeclaration();
-      return;
-    }
     // 프렌드 요약 화면에서 일시정지 후 재개 시 플레이로 진행
     if (_showFriendSummary && _friendExplanation != null) {
       _showFriendSummary = false;
+      final declaration = _friendExplanation!.declaration;
+      _friendExplanation = null;
+      _state.declareFriend(declaration);
+      notifyListeners();
+      _processAIPlayIfNeeded();
+      return;
+    }
+    // 배팅 요약 화면에서 일시정지 후 재개 시 플레이로 진행
+    if (_showBidSummary && _friendExplanation != null) {
+      _showBidSummary = false;
       final declaration = _friendExplanation!.declaration;
       _friendExplanation = null;
       _state.declareFriend(declaration);
