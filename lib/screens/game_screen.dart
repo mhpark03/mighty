@@ -1639,6 +1639,7 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildBidExplanationContent(BidExplanation explanation, GameState state, AppLocalizations l10n) {
     final keyCardInfo = _getKeyCardInfo(explanation, state, l10n);
+    final adjustedEstimate = !explanation.passed ? _getAdjustedEstimate(explanation, state, l10n) : null;
 
     if (explanation.passed) {
       return Column(
@@ -1718,6 +1719,14 @@ class _GameScreenState extends State<GameScreen> {
               ],
             ),
           ],
+          // 바닥패 + 프렌드 핸드 기반 조정 예상 점수
+          if (adjustedEstimate != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              adjustedEstimate,
+              style: const TextStyle(color: Colors.amber, fontSize: 10),
+            ),
+          ],
         ],
       );
     }
@@ -1787,6 +1796,90 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     return parts.join(', ');
+  }
+
+  /// 바닥패 + 프렌드 핸드를 고려한 조정 예상 점수
+  String? _getAdjustedEstimate(BidExplanation explanation, GameState state, AppLocalizations l10n) {
+    if (explanation.suit == null || explanation.passed) return null;
+
+    final giruda = explanation.suit!;
+    final declarerHand = state.players[explanation.playerId].hand;
+    final mightySuit = (giruda == Suit.spade) ? Suit.diamond : Suit.spade;
+
+    // === 바닥패 점수 ===
+    final kittyPoints = state.kitty.where((c) => c.isPointCard).length;
+
+    // === 프렌드 핸드 분석 ===
+    // 프렌드 보유자 찾기
+    Player? friendPlayer;
+    if (explanation.friendHolderName != null) {
+      for (final p in state.players) {
+        if (p.id == explanation.playerId) continue;
+        if (p.name == explanation.friendHolderName) {
+          friendPlayer = p;
+          break;
+        }
+      }
+    }
+
+    if (friendPlayer == null) {
+      // 프렌드가 바닥패에 있음
+      if (kittyPoints > 0) {
+        return '바닥패 $kittyPoints점 (프렌드 바닥패)';
+      }
+      return null;
+    }
+
+    final fHand = friendPlayer.hand;
+
+    // 프렌드의 핵심 카드 추출
+    final friendKeys = <String>[];
+    int friendTricks = 0;
+
+    // 마이티 보유?
+    final fHasMighty = fHand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace);
+    if (fHasMighty) { friendKeys.add(l10n.friendCardMighty); friendTricks++; }
+
+    // 조커 보유?
+    final fHasJoker = fHand.any((c) => c.isJoker);
+    if (fHasJoker) { friendKeys.add(l10n.friendCardJoker); friendTricks++; }
+
+    // 프렌드의 기루다 카드 (주공 기루다 기준)
+    final fGiruda = fHand.where((c) => !c.isJoker && c.suit == giruda).toList();
+    final fGirudaKeys = <String>[];
+    final declarerHasGirudaA = declarerHand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+    if (fGiruda.any((c) => c.rank == Rank.ace)) { fGirudaKeys.add('A'); friendTricks++; }
+    if (fGiruda.any((c) => c.rank == Rank.king)) {
+      fGirudaKeys.add('K');
+      if (declarerHasGirudaA || fGiruda.any((c) => c.rank == Rank.ace)) friendTricks++;
+    }
+    if (fGiruda.any((c) => c.rank == Rank.queen)) {
+      fGirudaKeys.add('Q');
+    }
+    if (fGirudaKeys.isNotEmpty) {
+      friendKeys.add('${_getSuitSymbol(giruda)}${fGirudaKeys.join('·')}');
+    }
+
+    // 프렌드의 비기루다 A (마이티 제외)
+    for (final suit in Suit.values) {
+      if (suit == giruda) continue;
+      final hasAce = fHand.any((c) =>
+          !c.isJoker && c.suit == suit && c.rank == Rank.ace &&
+          !(c.suit == mightySuit && c.rank == Rank.ace));
+      if (hasAce) { friendKeys.add('${_getSuitSymbol(suit)}A'); friendTricks++; }
+    }
+
+    if (friendKeys.isEmpty && kittyPoints == 0) return null;
+
+    // 조정 예상 점수: 기존 min/max + 바닥패 + 프렌드 트릭×2
+    final adjMin = (explanation.minPoints + kittyPoints).clamp(0, 20);
+    final adjMax = (explanation.maxPoints + kittyPoints + friendTricks * 2).clamp(0, 20);
+
+    final parts = <String>[];
+    if (kittyPoints > 0) parts.add('바닥패 $kittyPoints점');
+    if (friendKeys.isNotEmpty) parts.add('프렌드 ${friendKeys.join('·')}');
+
+    return '${parts.join(', ')} → 조정 $adjMin~$adjMax점';
   }
 
   String _getFriendExpectedText(BidExplanation explanation, AppLocalizations l10n) {
