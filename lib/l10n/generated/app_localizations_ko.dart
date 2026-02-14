@@ -1550,7 +1550,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get fullDeclarationWarning => '풀 선언 시 공약이 20으로 올라갑니다';
 
   @override
-  String get watchAiGame => 'AI 대전 관전';
+  String get watchAiGame => '마이티 배우기';
 
   @override
   String get demoMode => '데모 모드';

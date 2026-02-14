@@ -1535,7 +1535,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get fullDeclarationWarning => '宣布满分后合约将提升至20';
 
   @override
-  String get watchAiGame => 'AI对战观战';
+  String get watchAiGame => '学习Mighty';
 
   @override
   String get demoMode => '演示模式';

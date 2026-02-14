@@ -1563,7 +1563,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Declaring Full raises the contract to 20';
 
   @override
-  String get watchAiGame => 'Watch AI Game';
+  String get watchAiGame => 'Learn Mighty';
 
   @override
   String get demoMode => 'Demo Mode';

@@ -1544,7 +1544,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get fullDeclarationWarning => 'フル宣言で契約が20に上がります';
 
   @override
-  String get watchAiGame => 'AI対戦観戦';
+  String get watchAiGame => 'マイティを学ぶ';
 
   @override
   String get demoMode => 'デモモード';

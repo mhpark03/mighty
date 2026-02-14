@@ -2847,7 +2847,7 @@ abstract class AppLocalizations {
   /// No description provided for @watchAiGame.
   ///
   /// In ko, this message translates to:
-  /// **'AI 대전 관전'**
+  /// **'마이티 배우기'**
   String get watchAiGame;
 
   /// No description provided for @demoMode.
