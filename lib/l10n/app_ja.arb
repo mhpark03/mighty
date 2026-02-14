@@ -841,5 +841,11 @@
     "placeholders": {
       "card": {"type": "String"}
     }
+  },
+  "bidInfoFirstTrickAces": "初手 {aces}",
+  "@bidInfoFirstTrickAces": {
+    "placeholders": {
+      "aces": {"type": "String"}
+    }
   }
 }

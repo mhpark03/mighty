@@ -1810,4 +1810,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String bidInfoHasCard(String card) {
     return '持有 $card';
   }
+
+  @override
+  String bidInfoFirstTrickAces(String aces) {
+    return '首墩 $aces';
+  }
 }

@@ -1819,4 +1819,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String bidInfoHasCard(String card) {
     return '$card 所持';
   }
+
+  @override
+  String bidInfoFirstTrickAces(String aces) {
+    return '初手 $aces';
+  }
 }

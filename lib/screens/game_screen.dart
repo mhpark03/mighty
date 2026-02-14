@@ -286,6 +286,10 @@ class _GameScreenState extends State<GameScreen> {
       case GamePhase.bidding:
         return _buildBiddingScreen(controller);
       case GamePhase.selectingKitty:
+        // auto-play: 마지막 플레이어 설명이 아직 표시 중이면 배팅 화면 유지
+        if (widget.isAutoPlay && controller.lastBidExplanation != null) {
+          return _buildBiddingScreen(controller);
+        }
         return _buildKittyScreen(controller);
       case GamePhase.declaringFriend:
         if (widget.isAutoPlay && controller.showBidSummary) {
@@ -1730,7 +1734,7 @@ class _GameScreenState extends State<GameScreen> {
     parts.add(l10n.bidInfoGirudaKeys(keyRanks.join('·')));
 
     // 비기루다 A (초구 선공 카드)
-    if (nonGirudaAces.isNotEmpty) parts.add(nonGirudaAces.join('·'));
+    if (nonGirudaAces.isNotEmpty) parts.add(l10n.bidInfoFirstTrickAces(nonGirudaAces.join('·')));
 
     // 마이티/조커 + 프렌드 정보
     if (hasMighty && hasJoker) {

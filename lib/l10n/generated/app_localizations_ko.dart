@@ -1825,4 +1825,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String bidInfoHasCard(String card) {
     return '$card 보유';
   }
+
+  @override
+  String bidInfoFirstTrickAces(String aces) {
+    return '초구 $aces';
+  }
 }

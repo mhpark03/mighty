@@ -1001,5 +1001,11 @@
     "placeholders": {
       "card": {"type": "String"}
     }
+  },
+  "bidInfoFirstTrickAces": "초구 {aces}",
+  "@bidInfoFirstTrickAces": {
+    "placeholders": {
+      "aces": {"type": "String"}
+    }
   }
 }

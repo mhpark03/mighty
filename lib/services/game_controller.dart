@@ -423,6 +423,7 @@ class GameController extends ChangeNotifier {
   }
 
   void _processAIKittySelection() async {
+    _lastBidExplanation = null; // 배팅 설명 클리어 → 키티 화면 전환
     _isProcessing = true;
     notifyListeners();
 

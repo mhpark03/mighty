@@ -3329,6 +3329,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'{card} 보유'**
   String bidInfoHasCard(String card);
+
+  /// No description provided for @bidInfoFirstTrickAces.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구 {aces}'**
+  String bidInfoFirstTrickAces(String aces);
 }
 
 class _AppLocalizationsDelegate
