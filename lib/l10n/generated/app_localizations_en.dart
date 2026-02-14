@@ -1611,6 +1611,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kittyDiscardCards => 'Discarded Cards';
 
   @override
+  String get kittyFinalHand => 'Final Hand (10 cards)';
+
+  @override
   String get discardReasonCutSuit => 'Clear short suit → enable cut';
 
   @override

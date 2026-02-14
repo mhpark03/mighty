@@ -1598,6 +1598,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get kittyDiscardCards => '버릴 카드';
 
   @override
+  String get kittyFinalHand => '최종 보유 카드 (10장)';
+
+  @override
   String get discardReasonCutSuit => '적은 무늬 정리 → 컷 가능';
 
   @override

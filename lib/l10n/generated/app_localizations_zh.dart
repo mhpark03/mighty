@@ -1583,6 +1583,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get kittyDiscardCards => '丢弃的牌';
 
   @override
+  String get kittyFinalHand => '最终手牌 (10张)';
+
+  @override
   String get discardReasonCutSuit => '整理少花色 → 可切牌';
 
   @override

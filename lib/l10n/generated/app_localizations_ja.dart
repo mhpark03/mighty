@@ -1592,6 +1592,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get kittyDiscardCards => '捨てるカード';
 
   @override
+  String get kittyFinalHand => '最終手札 (10枚)';
+
+  @override
   String get discardReasonCutSuit => '少ないスート整理 → カット可能';
 
   @override

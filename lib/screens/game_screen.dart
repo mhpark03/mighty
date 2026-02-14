@@ -943,6 +943,47 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ],
 
+            const SizedBox(height: 14),
+
+            // 최종 보유 카드 10장
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.green.withValues(alpha: 0.5)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.back_hand, color: Colors.greenAccent, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n.kittyFinalHand,
+                        style: const TextStyle(
+                          color: Colors.greenAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 3,
+                    runSpacing: 4,
+                    alignment: WrapAlignment.center,
+                    children: explanation.finalHand
+                        .map((card) => _buildTinyCardFixed(card, state, 30.0))
+                        .toList(),
+                  ),
+                ],
+              ),
+            ),
+
             const SizedBox(height: 20),
             // 자동 진행 타이머
             const SizedBox(

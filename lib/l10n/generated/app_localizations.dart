@@ -2928,6 +2928,12 @@ abstract class AppLocalizations {
   /// **'버릴 카드'**
   String get kittyDiscardCards;
 
+  /// No description provided for @kittyFinalHand.
+  ///
+  /// In ko, this message translates to:
+  /// **'최종 보유 카드 (10장)'**
+  String get kittyFinalHand;
+
   /// No description provided for @discardReasonCutSuit.
   ///
   /// In ko, this message translates to:

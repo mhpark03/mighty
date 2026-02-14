@@ -326,9 +326,21 @@ class GameController extends ChangeNotifier {
       final reasons = _generateDiscardReasons(discardCards, newGiruda, declarer);
       final girudaChanged = newGiruda != originalGiruda;
 
+      // 최종 보유 카드 계산: (기존 10장 + 키티 3장) - 버릴 3장
+      final allCards = [...declarer.hand, ...kittyCards];
+      final finalHand = allCards.where((c) => !discardCards.contains(c)).toList();
+      // 무늬별 정렬
+      finalHand.sort((a, b) {
+        if (a.isJoker) return -1;
+        if (b.isJoker) return 1;
+        if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
+        return b.rankValue.compareTo(a.rankValue);
+      });
+
       _kittyExplanation = KittyExplanation(
         kittyCards: kittyCards,
         discardCards: discardCards,
+        finalHand: finalHand,
         originalGiruda: originalGiruda,
         newGiruda: newGiruda,
         girudaChanged: girudaChanged,
@@ -722,6 +734,7 @@ class GameController extends ChangeNotifier {
 class KittyExplanation {
   final List<PlayingCard> kittyCards;       // 바닥에서 받은 카드 3장
   final List<PlayingCard> discardCards;     // 버릴 카드 3장
+  final List<PlayingCard> finalHand;       // 최종 보유 카드 10장
   final Suit? originalGiruda;              // 원래 기루다
   final Suit? newGiruda;                   // 변경된 기루다 (변경 없으면 동일)
   final bool girudaChanged;                // 기루다 변경 여부
@@ -730,6 +743,7 @@ class KittyExplanation {
   KittyExplanation({
     required this.kittyCards,
     required this.discardCards,
+    required this.finalHand,
     required this.originalGiruda,
     required this.newGiruda,
     required this.girudaChanged,

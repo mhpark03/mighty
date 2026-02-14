@@ -702,6 +702,7 @@
   "kittySummaryTitle": "底牌选择结果",
   "kittyReceivedCards": "从底牌获得的牌",
   "kittyDiscardCards": "丢弃的牌",
+  "kittyFinalHand": "最终手牌 (10张)",
   "discardReasonCutSuit": "整理少花色 → 可切牌",
   "discardReasonNonGirudaLow": "非王牌低牌",
   "discardReasonLowValue": "低价值牌",
