@@ -2916,6 +2916,162 @@ abstract class AppLocalizations {
   /// **'파워 카드 부족 (마이티/조커/에이스 5개 미만)'**
   String get passReasonPowerWeak;
 
+  /// No description provided for @passReasonLowPoints.
+  ///
+  /// In ko, this message translates to:
+  /// **'적정 {optimal}점 < 최소 13점'**
+  String passReasonLowPoints(int optimal);
+
+  /// No description provided for @passReasonOutbid.
+  ///
+  /// In ko, this message translates to:
+  /// **'적정 {optimal}점 < 필요 {needed}점'**
+  String passReasonOutbid(int optimal, int needed);
+
+  /// No description provided for @estimatedRange.
+  ///
+  /// In ko, this message translates to:
+  /// **'예상 {min}~{max}점'**
+  String estimatedRange(int min, int max);
+
+  /// No description provided for @optimalScore.
+  ///
+  /// In ko, this message translates to:
+  /// **'적정 {optimal}점'**
+  String optimalScore(int optimal);
+
+  /// No description provided for @friendExpected.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 예상'**
+  String get friendExpected;
+
+  /// No description provided for @friendCardMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티'**
+  String get friendCardMighty;
+
+  /// No description provided for @friendCardJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커'**
+  String get friendCardJoker;
+
+  /// No description provided for @friendHeldBy.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} 보유'**
+  String friendHeldBy(String name);
+
+  /// No description provided for @friendInKitty.
+  ///
+  /// In ko, this message translates to:
+  /// **'키티에 있을 수 있음'**
+  String get friendInKitty;
+
+  /// No description provided for @friendJokerNote.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구 사용 불가'**
+  String get friendJokerNote;
+
+  /// No description provided for @trickLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'선공'**
+  String get trickLead;
+
+  /// No description provided for @trickIntentJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커로 확실한 트릭 확보'**
+  String get trickIntentJoker;
+
+  /// No description provided for @trickIntentMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티로 확실한 트릭 확보'**
+  String get trickIntentMighty;
+
+  /// No description provided for @trickIntentGiruda.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 선공으로 상대 기루다 소진 유도'**
+  String get trickIntentGiruda;
+
+  /// No description provided for @trickIntentAce.
+  ///
+  /// In ko, this message translates to:
+  /// **'에이스로 선 유지하며 트릭 확보'**
+  String get trickIntentAce;
+
+  /// No description provided for @trickIntentHighCard.
+  ///
+  /// In ko, this message translates to:
+  /// **'고위 카드로 트릭 도전'**
+  String get trickIntentHighCard;
+
+  /// No description provided for @trickIntentLowCard.
+  ///
+  /// In ko, this message translates to:
+  /// **'낮은 카드로 탐색/희생'**
+  String get trickIntentLowCard;
+
+  /// No description provided for @trickIntentMidCard.
+  ///
+  /// In ko, this message translates to:
+  /// **'중간 카드로 트릭 도전'**
+  String get trickIntentMidCard;
+
+  /// No description provided for @trickResultBigWin.
+  ///
+  /// In ko, this message translates to:
+  /// **'선공 승리! 점수 카드 {count}장 획득'**
+  String trickResultBigWin(int count);
+
+  /// No description provided for @trickResultWin.
+  ///
+  /// In ko, this message translates to:
+  /// **'선공 승리, 점수 카드 {count}장 획득'**
+  String trickResultWin(int count);
+
+  /// No description provided for @trickResultWinNoPoint.
+  ///
+  /// In ko, this message translates to:
+  /// **'선공 승리, 점수 카드 없음'**
+  String get trickResultWinNoPoint;
+
+  /// No description provided for @trickLostToJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커에 빼앗김'**
+  String get trickLostToJoker;
+
+  /// No description provided for @trickLostToMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티에 빼앗김'**
+  String get trickLostToMighty;
+
+  /// No description provided for @trickLostToCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 컷으로 빼앗김'**
+  String get trickLostToCut;
+
+  /// No description provided for @trickLostToHigher.
+  ///
+  /// In ko, this message translates to:
+  /// **'더 높은 카드에 빼앗김'**
+  String get trickLostToHigher;
+
+  /// No description provided for @trickPointCards.
+  ///
+  /// In ko, this message translates to:
+  /// **'점수 카드 {count}장'**
+  String trickPointCards(int count);
+
   /// No description provided for @kittySummaryTitle.
   ///
   /// In ko, this message translates to:
@@ -3042,29 +3198,35 @@ abstract class AppLocalizations {
   /// **'배팅 결과'**
   String get bidSummaryTitle;
 
-  /// No description provided for @bidSummaryScoreTitle.
+  /// No description provided for @bidSummaryEstimatedRange.
   ///
   /// In ko, this message translates to:
-  /// **'예상 점수 (주공 기준)'**
-  String get bidSummaryScoreTitle;
+  /// **'예상 득점 범위 (주공 기준)'**
+  String get bidSummaryEstimatedRange;
 
-  /// No description provided for @bidSummaryWinMin.
+  /// No description provided for @bidSummaryEstMax.
   ///
   /// In ko, this message translates to:
-  /// **'승리 시 (최소 득점)'**
-  String get bidSummaryWinMin;
+  /// **'최대 ({points}점)'**
+  String bidSummaryEstMax(int points);
 
-  /// No description provided for @bidSummaryWinMax.
+  /// No description provided for @bidSummaryEstMaxDesc.
   ///
   /// In ko, this message translates to:
-  /// **'승리 시 (풀 - 20점)'**
-  String get bidSummaryWinMax;
+  /// **'프렌드 포함, 선 유지 시'**
+  String get bidSummaryEstMaxDesc;
 
-  /// No description provided for @bidSummaryLose.
+  /// No description provided for @bidSummaryEstMin.
   ///
   /// In ko, this message translates to:
-  /// **'패배 시 (0점 획득)'**
-  String get bidSummaryLose;
+  /// **'최소 ({points}점)'**
+  String bidSummaryEstMin(int points);
+
+  /// No description provided for @bidSummaryEstMinDesc.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 도움 없이 (조커콜 등)'**
+  String get bidSummaryEstMinDesc;
 
   /// No description provided for @bidSummaryMultipliers.
   ///

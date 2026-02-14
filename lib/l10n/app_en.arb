@@ -701,6 +701,32 @@
     }
   },
   "passReasonPowerWeak": "Not enough power cards (Mighty/Joker/Aces < 5)",
+  "passReasonLowPoints": "Opt. {optimal}pts < min 13pts",
+  "@passReasonLowPoints": {
+    "placeholders": {
+      "optimal": {"type": "int"}
+    }
+  },
+  "passReasonOutbid": "Opt. {optimal}pts < need {needed}pts",
+  "@passReasonOutbid": {
+    "placeholders": {
+      "optimal": {"type": "int"},
+      "needed": {"type": "int"}
+    }
+  },
+  "estimatedRange": "Est. {min}~{max}pts",
+  "@estimatedRange": {
+    "placeholders": {
+      "min": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+  "optimalScore": "Opt. {optimal}pts",
+  "@optimalScore": {
+    "placeholders": {
+      "optimal": {"type": "int"}
+    }
+  },
   "friendExpected": "Expected friend",
   "friendCardMighty": "Mighty",
   "friendCardJoker": "Joker",

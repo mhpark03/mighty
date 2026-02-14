@@ -1590,7 +1590,7 @@ class _GameScreenState extends State<GameScreen> {
           if (explanation.suit != null) ...[
             const SizedBox(height: 2),
             Text(
-              '${_getSuitSymbol(explanation.suit!)} ${_getSuitName(explanation.suit, l10n)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.score} ${explanation.maxStrength}',
+              '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.estimatedRange(explanation.minPoints, explanation.maxPoints)} (${l10n.optimalScore(explanation.optimalPoints)})',
               style: const TextStyle(color: Colors.white54, fontSize: 10),
             ),
           ],
@@ -1613,7 +1613,7 @@ class _GameScreenState extends State<GameScreen> {
           ),
           const SizedBox(height: 3),
           Text(
-            '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.score} ${explanation.maxStrength}',
+            '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.estimatedRange(explanation.minPoints, explanation.maxPoints)} (${l10n.optimalScore(explanation.optimalPoints)})',
             style: const TextStyle(color: Colors.white70, fontSize: 11),
           ),
           if (explanation.friendType != null) ...[
@@ -1766,13 +1766,19 @@ class _GameScreenState extends State<GameScreen> {
 
   String _getPassReason(BidExplanation explanation, GameState state, AppLocalizations l10n) {
     switch (explanation.passReason) {
+      case 'LOW_POINTS':
+        return l10n.passReasonLowPoints(explanation.optimalPoints);
+      case 'OUTBID':
+        final needed = state.currentBid != null ? state.currentBid!.tricks + 1 : 13;
+        return l10n.passReasonOutbid(explanation.optimalPoints, needed);
+      // legacy pass reasons (deprecated)
       case 'NO_SUIT':
         return l10n.passReasonNoSuit;
       case 'NO_HIGH_CARD':
         return l10n.passReasonNoHighCard;
       case 'WEAK_HAND':
         final needed = state.currentBid != null ? state.currentBid!.tricks + 1 : 13;
-        return l10n.passReasonWeakHand(explanation.maxStrength, needed);
+        return l10n.passReasonWeakHand(explanation.optimalPoints, needed);
       case 'POWER_WEAK':
         return l10n.passReasonPowerWeak;
       default:

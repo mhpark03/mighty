@@ -1606,6 +1606,100 @@ class AppLocalizationsEn extends AppLocalizations {
       'Not enough power cards (Mighty/Joker/Aces < 5)';
 
   @override
+  String passReasonLowPoints(int optimal) {
+    return 'Opt. ${optimal}pts < min 13pts';
+  }
+
+  @override
+  String passReasonOutbid(int optimal, int needed) {
+    return 'Opt. ${optimal}pts < need ${needed}pts';
+  }
+
+  @override
+  String estimatedRange(int min, int max) {
+    return 'Est. $min~${max}pts';
+  }
+
+  @override
+  String optimalScore(int optimal) {
+    return 'Opt. ${optimal}pts';
+  }
+
+  @override
+  String get friendExpected => 'Expected friend';
+
+  @override
+  String get friendCardMighty => 'Mighty';
+
+  @override
+  String get friendCardJoker => 'Joker';
+
+  @override
+  String friendHeldBy(String name) {
+    return 'held by $name';
+  }
+
+  @override
+  String get friendInKitty => 'may be in kitty';
+
+  @override
+  String get friendJokerNote => 'cannot play 1st trick';
+
+  @override
+  String get trickLead => 'leads';
+
+  @override
+  String get trickIntentJoker => 'Secure trick with Joker';
+
+  @override
+  String get trickIntentMighty => 'Secure trick with Mighty';
+
+  @override
+  String get trickIntentGiruda => 'Lead trump to exhaust opponents\' trumps';
+
+  @override
+  String get trickIntentAce => 'Hold lead with Ace to secure trick';
+
+  @override
+  String get trickIntentHighCard => 'Challenge trick with high card';
+
+  @override
+  String get trickIntentLowCard => 'Probe/sacrifice with low card';
+
+  @override
+  String get trickIntentMidCard => 'Challenge trick with mid card';
+
+  @override
+  String trickResultBigWin(int count) {
+    return 'Lead wins! $count point cards taken';
+  }
+
+  @override
+  String trickResultWin(int count) {
+    return 'Lead wins, $count point card(s) taken';
+  }
+
+  @override
+  String get trickResultWinNoPoint => 'Lead wins, no point cards';
+
+  @override
+  String get trickLostToJoker => 'taken by Joker';
+
+  @override
+  String get trickLostToMighty => 'taken by Mighty';
+
+  @override
+  String get trickLostToCut => 'taken by trump cut';
+
+  @override
+  String get trickLostToHigher => 'taken by higher card';
+
+  @override
+  String trickPointCards(int count) {
+    return '$count point cards';
+  }
+
+  @override
   String get kittySummaryTitle => 'Kitty Selection Result';
 
   @override
@@ -1670,16 +1764,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bidSummaryTitle => 'Bidding Result';
 
   @override
-  String get bidSummaryScoreTitle => 'Expected Score (Declarer)';
+  String get bidSummaryEstimatedRange => 'Estimated Points (Declarer)';
 
   @override
-  String get bidSummaryWinMin => 'Win (minimum points)';
+  String bidSummaryEstMax(int points) {
+    return 'Max ($points pts)';
+  }
 
   @override
-  String get bidSummaryWinMax => 'Win (full - 20 pts)';
+  String get bidSummaryEstMaxDesc => 'With friend, maintaining lead';
 
   @override
-  String get bidSummaryLose => 'Lose (0 pts earned)';
+  String bidSummaryEstMin(int points) {
+    return 'Min ($points pts)';
+  }
+
+  @override
+  String get bidSummaryEstMinDesc => 'Without friend help (joker called, etc.)';
 
   @override
   String get bidSummaryMultipliers => 'Declarer ×2, Friend ×1, Defender ×(-1)';

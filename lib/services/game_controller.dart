@@ -171,16 +171,14 @@ class GameController extends ChangeNotifier {
       if (_isAutoPlayPaused) { _isProcessing = false; notifyListeners(); return; }
 
       final currentPlayer = _state.players[_state.currentBidder];
-      final bid = _aiPlayer.decideBid(currentPlayer, _state);
+      final (bid, evaluation) = _aiPlayer.decideBidWithEvaluation(currentPlayer, _state);
 
-      final bestSuit = _aiPlayer.findBestSuit(currentPlayer.hand);
-      // 실제 배팅에 사용된 무늬 기준으로 강도 계산
-      var effectiveSuit = bid.suit ?? bestSuit;
+      var effectiveSuit = evaluation.bestGiruda;
 
-      // bestSuit이 없어도 가장 긴 무늬 찾기 (패스 시 표시용)
-      Suit? longestSuit;
-      int longestCount = 0;
+      // bestGiruda가 없어도 가장 긴 무늬 찾기 (패스 시 표시용)
       if (effectiveSuit == null) {
+        Suit? longestSuit;
+        int longestCount = 0;
         for (final s in Suit.values) {
           final cnt = currentPlayer.hand.where((c) => !c.isJoker && c.suit == s).length;
           if (cnt > longestCount) {
@@ -191,41 +189,15 @@ class GameController extends ChangeNotifier {
         if (longestCount >= 4) effectiveSuit = longestSuit;
       }
 
-      final strength = effectiveSuit != null
-          ? _aiPlayer.evaluateHandStrength(currentPlayer.hand, effectiveSuit)
-          : 0;
-      final girudaCards = effectiveSuit != null
-          ? currentPlayer.hand.where((c) => !c.isJoker && c.suit == effectiveSuit).toList()
-          : <PlayingCard>[];
-
-      String passReason = '';
       final hasMighty = currentPlayer.hand.any((c) => c.suit == Suit.spade && c.rank == Rank.ace && !c.isJoker);
       final hasJoker = currentPlayer.hand.any((c) => c.isJoker);
 
+      String passReason = '';
       if (bid.passed) {
-        // 파워 카드 수 계산 (패스 이유 세분화)
-        int powerCards = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) +
-            currentPlayer.hand.where((c) => !c.isJoker && c.rank == Rank.ace && !(c.suit == Suit.spade && c.rank == Rank.ace)).length;
-
-        if (bestSuit == null) {
-          // 4장 이상 무늬가 있는지 체크 (A/K 없이 4장 이상인 경우 구분)
-          bool hasFourPlusSuit = Suit.values.any((s) =>
-              currentPlayer.hand.where((c) => !c.isJoker && c.suit == s).length >= 4);
-          if (hasFourPlusSuit) {
-            passReason = 'NO_HIGH_CARD'; // 4장+ 무늬 있지만 A/K 없음
-          } else if (powerCards < 5) {
-            passReason = 'NO_SUIT'; // 진짜 4장 이상 무늬 없음
-          } else {
-            passReason = 'POWER_WEAK';
-          }
+        if (evaluation.optimalPoints < 13) {
+          passReason = 'LOW_POINTS';
         } else {
-          final hasAce = girudaCards.any((c) => c.rank == Rank.ace);
-          final hasKing = girudaCards.any((c) => c.rank == Rank.king);
-          if (!hasAce && !hasKing) {
-            passReason = 'NO_HIGH_CARD';
-          } else {
-            passReason = 'WEAK_HAND';
-          }
+          passReason = 'OUTBID';
         }
       }
 
@@ -329,8 +301,10 @@ class GameController extends ChangeNotifier {
         passed: bid.passed,
         suit: effectiveSuit,
         tricks: bid.tricks,
-        maxStrength: strength,
-        girudaCount: girudaCards.length,
+        minPoints: evaluation.minPoints,
+        maxPoints: evaluation.maxPoints,
+        optimalPoints: evaluation.optimalPoints,
+        girudaCount: evaluation.girudaCount,
         passReason: passReason,
         friendType: friendType,
         friendSuit: friendSuit,
@@ -1215,9 +1189,11 @@ class BidExplanation {
   final bool passed;
   final Suit? suit;
   final int tricks;
-  final int maxStrength;
+  final int minPoints;
+  final int maxPoints;
+  final int optimalPoints;
   final int girudaCount;
-  final String passReason; // 'NO_SUIT', 'NO_HIGH_CARD', 'WEAK_HAND', ''
+  final String passReason; // 'LOW_POINTS', 'OUTBID', ''
   final String? friendType; // 'MIGHTY', 'JOKER', 'ACE' (배팅 시 예상 프렌드)
   final Suit? friendSuit;  // 프렌드 카드 무늬 (ACE일 때)
   final String? friendHolderName; // 프렌드 카드 보유자 (null이면 키티)
@@ -1228,7 +1204,9 @@ class BidExplanation {
     required this.passed,
     this.suit,
     required this.tricks,
-    required this.maxStrength,
+    required this.minPoints,
+    required this.maxPoints,
+    required this.optimalPoints,
     this.girudaCount = 0,
     this.passReason = '',
     this.friendType,

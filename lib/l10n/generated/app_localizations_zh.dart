@@ -1577,6 +1577,100 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passReasonPowerWeak => '力量牌不足（Mighty/Joker/A不到5张）';
 
   @override
+  String passReasonLowPoints(int optimal) {
+    return '适当 $optimal分 < 最低 13分';
+  }
+
+  @override
+  String passReasonOutbid(int optimal, int needed) {
+    return '适当 $optimal分 < 需要 $needed分';
+  }
+
+  @override
+  String estimatedRange(int min, int max) {
+    return '预计 $min~$max分';
+  }
+
+  @override
+  String optimalScore(int optimal) {
+    return '适当 $optimal分';
+  }
+
+  @override
+  String get friendExpected => '预计朋友';
+
+  @override
+  String get friendCardMighty => 'Mighty';
+
+  @override
+  String get friendCardJoker => 'Joker';
+
+  @override
+  String friendHeldBy(String name) {
+    return '$name 持有';
+  }
+
+  @override
+  String get friendInKitty => '可能在底牌中';
+
+  @override
+  String get friendJokerNote => '首轮不可使用';
+
+  @override
+  String get trickLead => '先攻';
+
+  @override
+  String get trickIntentJoker => '用Joker确保赢墩';
+
+  @override
+  String get trickIntentMighty => '用Mighty确保赢墩';
+
+  @override
+  String get trickIntentGiruda => '出王牌消耗对手王牌';
+
+  @override
+  String get trickIntentAce => '用A保持先手确保赢墩';
+
+  @override
+  String get trickIntentHighCard => '用高牌挑战赢墩';
+
+  @override
+  String get trickIntentLowCard => '用低牌试探/牺牲';
+
+  @override
+  String get trickIntentMidCard => '用中牌挑战赢墩';
+
+  @override
+  String trickResultBigWin(int count) {
+    return '先攻胜利！获得$count张分数牌';
+  }
+
+  @override
+  String trickResultWin(int count) {
+    return '先攻胜利，获得$count张分数牌';
+  }
+
+  @override
+  String get trickResultWinNoPoint => '先攻胜利，无分数牌';
+
+  @override
+  String get trickLostToJoker => '被Joker夺走';
+
+  @override
+  String get trickLostToMighty => '被Mighty夺走';
+
+  @override
+  String get trickLostToCut => '被王牌切走';
+
+  @override
+  String get trickLostToHigher => '被更高的牌夺走';
+
+  @override
+  String trickPointCards(int count) {
+    return '$count张分数牌';
+  }
+
+  @override
   String get kittySummaryTitle => '底牌选择结果';
 
   @override
@@ -1640,16 +1734,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bidSummaryTitle => '竞标结果';
 
   @override
-  String get bidSummaryScoreTitle => '预计分数 (庄家基准)';
+  String get bidSummaryEstimatedRange => '预计得分范围 (庄家基准)';
 
   @override
-  String get bidSummaryWinMin => '胜利时 (最低得分)';
+  String bidSummaryEstMax(int points) {
+    return '最大 ($points分)';
+  }
 
   @override
-  String get bidSummaryWinMax => '胜利时 (满分 - 20分)';
+  String get bidSummaryEstMaxDesc => '含朋友，保持先手时';
 
   @override
-  String get bidSummaryLose => '失败时 (0分获得)';
+  String bidSummaryEstMin(int points) {
+    return '最小 ($points分)';
+  }
+
+  @override
+  String get bidSummaryEstMinDesc => '无朋友帮助（Joker Call等）';
 
   @override
   String get bidSummaryMultipliers => '庄家 ×2、朋友 ×1、防守 ×(-1)';

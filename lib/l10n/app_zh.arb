@@ -700,6 +700,32 @@
     }
   },
   "passReasonPowerWeak": "力量牌不足（Mighty/Joker/A不到5张）",
+  "passReasonLowPoints": "适当 {optimal}分 < 最低 13分",
+  "@passReasonLowPoints": {
+    "placeholders": {
+      "optimal": {"type": "int"}
+    }
+  },
+  "passReasonOutbid": "适当 {optimal}分 < 需要 {needed}分",
+  "@passReasonOutbid": {
+    "placeholders": {
+      "optimal": {"type": "int"},
+      "needed": {"type": "int"}
+    }
+  },
+  "estimatedRange": "预计 {min}~{max}分",
+  "@estimatedRange": {
+    "placeholders": {
+      "min": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+  "optimalScore": "适当 {optimal}分",
+  "@optimalScore": {
+    "placeholders": {
+      "optimal": {"type": "int"}
+    }
+  },
   "friendExpected": "预计朋友",
   "friendCardMighty": "Mighty",
   "friendCardJoker": "Joker",

@@ -700,6 +700,32 @@
     }
   },
   "passReasonPowerWeak": "パワーカード不足（マイティ/ジョーカー/エース5枚未満）",
+  "passReasonLowPoints": "適正 {optimal}点 < 最低 13点",
+  "@passReasonLowPoints": {
+    "placeholders": {
+      "optimal": {"type": "int"}
+    }
+  },
+  "passReasonOutbid": "適正 {optimal}点 < 必要 {needed}点",
+  "@passReasonOutbid": {
+    "placeholders": {
+      "optimal": {"type": "int"},
+      "needed": {"type": "int"}
+    }
+  },
+  "estimatedRange": "予想 {min}~{max}点",
+  "@estimatedRange": {
+    "placeholders": {
+      "min": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+  "optimalScore": "適正 {optimal}点",
+  "@optimalScore": {
+    "placeholders": {
+      "optimal": {"type": "int"}
+    }
+  },
   "friendExpected": "フレンド予想",
   "friendCardMighty": "マイティ",
   "friendCardJoker": "ジョーカー",

@@ -860,6 +860,32 @@
     }
   },
   "passReasonPowerWeak": "파워 카드 부족 (마이티/조커/에이스 5개 미만)",
+  "passReasonLowPoints": "적정 {optimal}점 < 최소 13점",
+  "@passReasonLowPoints": {
+    "placeholders": {
+      "optimal": {"type": "int"}
+    }
+  },
+  "passReasonOutbid": "적정 {optimal}점 < 필요 {needed}점",
+  "@passReasonOutbid": {
+    "placeholders": {
+      "optimal": {"type": "int"},
+      "needed": {"type": "int"}
+    }
+  },
+  "estimatedRange": "예상 {min}~{max}점",
+  "@estimatedRange": {
+    "placeholders": {
+      "min": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+  "optimalScore": "적정 {optimal}점",
+  "@optimalScore": {
+    "placeholders": {
+      "optimal": {"type": "int"}
+    }
+  },
   "friendExpected": "프렌드 예상",
   "friendCardMighty": "마이티",
   "friendCardJoker": "조커",

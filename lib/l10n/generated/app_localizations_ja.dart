@@ -1586,6 +1586,100 @@ class AppLocalizationsJa extends AppLocalizations {
   String get passReasonPowerWeak => 'パワーカード不足（マイティ/ジョーカー/エース5枚未満）';
 
   @override
+  String passReasonLowPoints(int optimal) {
+    return '適正 $optimal点 < 最低 13点';
+  }
+
+  @override
+  String passReasonOutbid(int optimal, int needed) {
+    return '適正 $optimal点 < 必要 $needed点';
+  }
+
+  @override
+  String estimatedRange(int min, int max) {
+    return '予想 $min~$max点';
+  }
+
+  @override
+  String optimalScore(int optimal) {
+    return '適正 $optimal点';
+  }
+
+  @override
+  String get friendExpected => 'フレンド予想';
+
+  @override
+  String get friendCardMighty => 'マイティ';
+
+  @override
+  String get friendCardJoker => 'ジョーカー';
+
+  @override
+  String friendHeldBy(String name) {
+    return '$name が保有';
+  }
+
+  @override
+  String get friendInKitty => 'キティにある可能性';
+
+  @override
+  String get friendJokerNote => '初手使用不可';
+
+  @override
+  String get trickLead => 'リード';
+
+  @override
+  String get trickIntentJoker => 'ジョーカーで確実にトリック獲得';
+
+  @override
+  String get trickIntentMighty => 'マイティで確実にトリック獲得';
+
+  @override
+  String get trickIntentGiruda => '切り札リードで相手の切り札を消耗させる';
+
+  @override
+  String get trickIntentAce => 'エースでリードを維持しトリック獲得';
+
+  @override
+  String get trickIntentHighCard => '高位カードでトリック挑戦';
+
+  @override
+  String get trickIntentLowCard => '低いカードで探索/犠牲';
+
+  @override
+  String get trickIntentMidCard => '中位カードでトリック挑戦';
+
+  @override
+  String trickResultBigWin(int count) {
+    return 'リード勝利！得点カード$count枚獲得';
+  }
+
+  @override
+  String trickResultWin(int count) {
+    return 'リード勝利、得点カード$count枚獲得';
+  }
+
+  @override
+  String get trickResultWinNoPoint => 'リード勝利、得点カードなし';
+
+  @override
+  String get trickLostToJoker => 'ジョーカーに奪われた';
+
+  @override
+  String get trickLostToMighty => 'マイティに奪われた';
+
+  @override
+  String get trickLostToCut => '切り札カットで奪われた';
+
+  @override
+  String get trickLostToHigher => 'より高いカードに奪われた';
+
+  @override
+  String trickPointCards(int count) {
+    return '得点カード$count枚';
+  }
+
+  @override
   String get kittySummaryTitle => 'キティ選択結果';
 
   @override
@@ -1649,16 +1743,23 @@ class AppLocalizationsJa extends AppLocalizations {
   String get bidSummaryTitle => '入札結果';
 
   @override
-  String get bidSummaryScoreTitle => '予想スコア (宣言者基準)';
+  String get bidSummaryEstimatedRange => '予想得点範囲 (宣言者基準)';
 
   @override
-  String get bidSummaryWinMin => '勝利時 (最低得点)';
+  String bidSummaryEstMax(int points) {
+    return '最大 ($points点)';
+  }
 
   @override
-  String get bidSummaryWinMax => '勝利時 (フル - 20点)';
+  String get bidSummaryEstMaxDesc => 'フレンド含む、リード維持時';
 
   @override
-  String get bidSummaryLose => '敗北時 (0点獲得)';
+  String bidSummaryEstMin(int points) {
+    return '最小 ($points点)';
+  }
+
+  @override
+  String get bidSummaryEstMinDesc => 'フレンドの助けなし（ジョーカーコール等）';
 
   @override
   String get bidSummaryMultipliers => '宣言者 ×2、フレンド ×1、守備 ×(-1)';
