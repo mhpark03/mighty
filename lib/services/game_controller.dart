@@ -175,10 +175,25 @@ class GameController extends ChangeNotifier {
 
       final bestSuit = _aiPlayer.findBestSuit(currentPlayer.hand);
       // 실제 배팅에 사용된 무늬 기준으로 강도 계산
-      final effectiveSuit = bid.suit ?? bestSuit;
+      var effectiveSuit = bid.suit ?? bestSuit;
+
+      // bestSuit이 없어도 가장 긴 무늬 찾기 (패스 시 표시용)
+      Suit? longestSuit;
+      int longestCount = 0;
+      if (effectiveSuit == null) {
+        for (final s in Suit.values) {
+          final cnt = currentPlayer.hand.where((c) => !c.isJoker && c.suit == s).length;
+          if (cnt > longestCount) {
+            longestCount = cnt;
+            longestSuit = s;
+          }
+        }
+        if (longestCount >= 4) effectiveSuit = longestSuit;
+      }
+
       final strength = effectiveSuit != null
           ? _aiPlayer.evaluateHandStrength(currentPlayer.hand, effectiveSuit)
-          : (bestSuit != null ? _aiPlayer.evaluateHandStrength(currentPlayer.hand, bestSuit) : 0);
+          : 0;
       final girudaCards = effectiveSuit != null
           ? currentPlayer.hand.where((c) => !c.isJoker && c.suit == effectiveSuit).toList()
           : <PlayingCard>[];
@@ -192,10 +207,17 @@ class GameController extends ChangeNotifier {
         int powerCards = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) +
             currentPlayer.hand.where((c) => !c.isJoker && c.rank == Rank.ace && !(c.suit == Suit.spade && c.rank == Rank.ace)).length;
 
-        if (bestSuit == null && powerCards < 5) {
-          passReason = 'NO_SUIT';
-        } else if (bestSuit == null) {
-          passReason = 'POWER_WEAK';
+        if (bestSuit == null) {
+          // 4장 이상 무늬가 있는지 체크 (A/K 없이 4장 이상인 경우 구분)
+          bool hasFourPlusSuit = Suit.values.any((s) =>
+              currentPlayer.hand.where((c) => !c.isJoker && c.suit == s).length >= 4);
+          if (hasFourPlusSuit) {
+            passReason = 'NO_HIGH_CARD'; // 4장+ 무늬 있지만 A/K 없음
+          } else if (powerCards < 5) {
+            passReason = 'NO_SUIT'; // 진짜 4장 이상 무늬 없음
+          } else {
+            passReason = 'POWER_WEAK';
+          }
         } else {
           final hasAce = girudaCards.any((c) => c.rank == Rank.ace);
           final hasKing = girudaCards.any((c) => c.rank == Rank.king);
