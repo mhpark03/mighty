@@ -1443,6 +1443,22 @@ class _GameScreenState extends State<GameScreen> {
             ],
           ),
         ),
+        // 현재 배팅 중이거나 설명 대상인 플레이어의 카드를 크게 표시
+        if (hasExplanation || (isCurrentBidder && isProcessing))
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(left: 16, right: 16, top: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Wrap(
+              spacing: 3,
+              runSpacing: 3,
+              children: handCards.map((card) => _buildTinyCardFixed(card, state, 36.0)).toList(),
+            ),
+          ),
         // 설명을 해당 플레이어 카드 바로 아래에 표시
         if (hasExplanation)
           Container(
