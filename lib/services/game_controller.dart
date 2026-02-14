@@ -199,16 +199,6 @@ class GameController extends ChangeNotifier {
         _processBiddingIfNeeded();
       } else if (_state.phase == GamePhase.selectingKitty) {
         if (_state.declarerId != 0 || _isAutoPlayMode) {
-          // 배팅 결과 요약 화면 5초 표시
-          _showBidSummary = true;
-          _lastBidExplanation = null;
-          notifyListeners();
-
-          await Future.delayed(const Duration(seconds: 5));
-          if (_isAutoPlayPaused) return;
-
-          _showBidSummary = false;
-          notifyListeners();
           _processAIKittySelection();
         }
       } else if (_state.phase == GamePhase.waiting && _state.allPassed) {
@@ -361,8 +351,19 @@ class GameController extends ChangeNotifier {
       await Future.delayed(const Duration(seconds: 5));
       if (_isAutoPlayPaused) return;
 
-      // 키티 선택 실행
       _showKittySummary = false;
+      notifyListeners();
+
+      // 배팅 결과 요약 화면 5초 표시
+      _showBidSummary = true;
+      _lastBidExplanation = null;
+      notifyListeners();
+
+      await Future.delayed(const Duration(seconds: 5));
+      if (_isAutoPlayPaused) return;
+
+      // 키티 선택 실행
+      _showBidSummary = false;
       _state.selectKitty(discardCards, newGiruda);
       _kittyExplanation = null;
       notifyListeners();
@@ -708,18 +709,22 @@ class GameController extends ChangeNotifier {
       confirmTrick();
       return;
     }
-    // 배팅 요약 화면에서 일시정지 후 재개 시 키티 선택으로 진행
-    if (_showBidSummary) {
-      _showBidSummary = false;
-      notifyListeners();
-      _processAIKittySelection();
-      return;
-    }
     // 키티 요약 화면에서 일시정지 후 재개 시 프렌드 선언으로 진행
     if (_showKittySummary && _kittyExplanation != null) {
       _showKittySummary = false;
       _state.selectKitty(_kittyExplanation!.discardCards, _kittyExplanation!.newGiruda);
       _kittyExplanation = null;
+      notifyListeners();
+      _processAIFriendDeclaration();
+      return;
+    }
+    // 배팅 요약 화면에서 일시정지 후 재개 시 프렌드 선언으로 진행
+    if (_showBidSummary) {
+      _showBidSummary = false;
+      if (_kittyExplanation != null) {
+        _state.selectKitty(_kittyExplanation!.discardCards, _kittyExplanation!.newGiruda);
+        _kittyExplanation = null;
+      }
       notifyListeners();
       _processAIFriendDeclaration();
       return;
