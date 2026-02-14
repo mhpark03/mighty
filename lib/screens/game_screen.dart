@@ -533,7 +533,8 @@ class _GameScreenState extends State<GameScreen> {
             child: Column(
               children: [
                 for (int i = 0; i < state.players.length; i++)
-                  _buildBiddingPlayerWithCards(state, i, controller.isProcessing, l10n, explanation),
+                  _buildBiddingPlayerWithCards(state, i, controller.isProcessing, l10n, explanation,
+                    friendPlayerId: (explanation != null) ? _findExpectedFriend(explanation, state)?.id : null),
               ],
             ),
           ),
@@ -1489,13 +1490,15 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  Widget _buildBiddingPlayerWithCards(GameState state, int playerId, bool isProcessing, AppLocalizations l10n, BidExplanation? explanation) {
+  Widget _buildBiddingPlayerWithCards(GameState state, int playerId, bool isProcessing, AppLocalizations l10n, BidExplanation? explanation, {int? friendPlayerId}) {
     final player = state.players[playerId];
     final isPassed = state.passedPlayers[playerId];
     final isCurrentBidder = state.currentBidder == playerId;
     final hasBid = state.currentBid?.playerId == playerId;
     // 이 플레이어가 마지막 설명 대상인지
     final hasExplanation = explanation != null && explanation.playerId == playerId;
+    // 이 플레이어가 예상 프렌드인지
+    final isFriend = friendPlayerId != null && friendPlayerId == playerId;
 
     final handCards = List<PlayingCard>.from(player.hand);
     handCards.sort((a, b) {
@@ -1531,6 +1534,10 @@ class _GameScreenState extends State<GameScreen> {
     if (hasExplanation) {
       borderColor = explanation.passed ? Colors.grey[300]! : Colors.amber;
     }
+    // 프렌드 하이라이트 (설명 대상이 아닌 경우)
+    if (isFriend && !hasExplanation) {
+      borderColor = Colors.cyanAccent;
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1543,13 +1550,15 @@ class _GameScreenState extends State<GameScreen> {
                 ? (explanation.passed
                     ? Colors.grey.withValues(alpha: 0.25)
                     : Colors.amber.withValues(alpha: 0.2))
-                : (isCurrentBidder && isProcessing
-                    ? Colors.orange.withValues(alpha: 0.15)
-                    : Colors.black38),
+                : isFriend
+                    ? Colors.cyan.withValues(alpha: 0.15)
+                    : (isCurrentBidder && isProcessing
+                        ? Colors.orange.withValues(alpha: 0.15)
+                        : Colors.black38),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: borderColor,
-              width: hasExplanation || (isCurrentBidder && isProcessing) ? 2 : 1,
+              width: hasExplanation || isFriend || (isCurrentBidder && isProcessing) ? 2 : 1,
             ),
           ),
           child: Row(
@@ -1565,12 +1574,29 @@ class _GameScreenState extends State<GameScreen> {
                       style: TextStyle(
                         color: hasExplanation
                             ? (explanation.passed ? Colors.white : Colors.amber)
-                            : (isCurrentBidder ? Colors.orange : Colors.white),
+                            : isFriend
+                                ? Colors.cyanAccent
+                                : (isCurrentBidder ? Colors.orange : Colors.white),
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
                     ),
                     const SizedBox(height: 2),
+                    if (isFriend) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.cyanAccent.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          '프렌드',
+                          style: TextStyle(color: Colors.cyanAccent, fontSize: 9, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                    ],
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
@@ -1643,7 +1669,7 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildBidExplanationContent(BidExplanation explanation, GameState state, AppLocalizations l10n) {
     final keyCardInfo = _getKeyCardInfo(explanation, state, l10n);
-    final adjustedEstimate = (explanation.suit != null) ? _getAdjustedEstimate(explanation, state, l10n) : null;
+    final adjustedWidget = (explanation.suit != null) ? _getAdjustedEstimateWidget(explanation, state, l10n) : null;
 
     if (explanation.passed) {
       return Column(
@@ -1678,12 +1704,9 @@ class _GameScreenState extends State<GameScreen> {
                 style: const TextStyle(color: Colors.white54, fontSize: 10),
               ),
             ],
-            if (adjustedEstimate != null) ...[
-              const SizedBox(height: 1),
-              Text(
-                adjustedEstimate,
-                style: const TextStyle(color: Colors.amber, fontSize: 10),
-              ),
+            if (adjustedWidget != null) ...[
+              const SizedBox(height: 3),
+              adjustedWidget,
             ],
           ],
         ],
@@ -1731,12 +1754,9 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ],
           // 바닥패 + 프렌드 핸드 기반 조정 예상 점수
-          if (adjustedEstimate != null) ...[
-            const SizedBox(height: 2),
-            Text(
-              adjustedEstimate,
-              style: const TextStyle(color: Colors.amber, fontSize: 10),
-            ),
+          if (adjustedWidget != null) ...[
+            const SizedBox(height: 3),
+            adjustedWidget,
           ],
         ],
       );
@@ -1809,35 +1829,27 @@ class _GameScreenState extends State<GameScreen> {
     return parts.join(', ');
   }
 
-  /// 바닥패 + 프렌드 핸드를 고려한 조정 예상 점수
-  String? _getAdjustedEstimate(BidExplanation explanation, GameState state, AppLocalizations l10n) {
+  /// 예상 프렌드 플레이어 찾기 (바닥패 획득 고려 폴백 체인)
+  Player? _findExpectedFriend(BidExplanation explanation, GameState state) {
     if (explanation.suit == null) return null;
 
     final giruda = explanation.suit!;
     final declarerHand = state.players[explanation.playerId].hand;
     final mightySuit = (giruda == Suit.spade) ? Suit.diamond : Suit.spade;
 
-    // 자신이 마이티/조커 보유 여부
     final selfHasMighty = declarerHand.any((c) =>
         !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace);
     final selfHasJoker = declarerHand.any((c) => c.isJoker);
 
-    // === 바닥패 점수 ===
-    final kittyPoints = state.kitty.where((c) => c.isPointCard).length;
-
-    // === 바닥패에서 마이티/조커 획득 가능 여부 ===
     final mightyInKitty = state.kitty.any((c) =>
         !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace);
     final jokerInKitty = state.kitty.any((c) => c.isJoker);
 
-    // 바닥패에서 가져오면 자신이 보유하게 되므로 effective 계산
     final effectiveHasMighty = selfHasMighty || mightyInKitty;
     final effectiveHasJoker = selfHasJoker || jokerInKitty;
 
-    // === 프렌드 보유자 찾기 (바닥패 획득 고려 폴백 체인) ===
     Player? friendPlayer;
     if (!effectiveHasMighty) {
-      // 마이티가 다른 플레이어에게 있음 → 마이티 프렌드
       for (final p in state.players) {
         if (p.id == explanation.playerId) continue;
         if (p.hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace)) {
@@ -1847,7 +1859,6 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
     if (friendPlayer == null && !effectiveHasJoker && effectiveHasMighty) {
-      // 마이티 보유/획득 + 조커가 다른 플레이어에게 있음 → 조커 프렌드
       for (final p in state.players) {
         if (p.id == explanation.playerId) continue;
         if (p.hand.any((c) => c.isJoker)) {
@@ -1857,7 +1868,6 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
     if (friendPlayer == null && effectiveHasMighty && effectiveHasJoker) {
-      // 마이티+조커 보유/획득 → 기루다 A/K 프렌드
       final effectiveHasGirudaA = declarerHand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace)
           || state.kitty.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
       if (!effectiveHasGirudaA) {
@@ -1883,65 +1893,118 @@ class _GameScreenState extends State<GameScreen> {
         }
       }
     }
+    return friendPlayer;
+  }
+
+  /// 바닥패 + 프렌드 핸드를 고려한 조정 예상 점수 위젯
+  Widget? _getAdjustedEstimateWidget(BidExplanation explanation, GameState state, AppLocalizations l10n) {
+    if (explanation.suit == null) return null;
+
+    final giruda = explanation.suit!;
+    final declarerHand = state.players[explanation.playerId].hand;
+    final mightySuit = (giruda == Suit.spade) ? Suit.diamond : Suit.spade;
+    final kittyPoints = state.kitty.where((c) => c.isPointCard).length;
+
+    final friendPlayer = _findExpectedFriend(explanation, state);
 
     if (friendPlayer == null) {
-      // 프렌드가 바닥패에 있거나 찾을 수 없음
       if (kittyPoints > 0) {
-        return '바닥패 $kittyPoints점 (프렌드 바닥패)';
+        return Row(
+          children: [
+            const Text('바닥패 ', style: TextStyle(color: Colors.amber, fontSize: 10)),
+            ...state.kitty.map((c) => Padding(
+              padding: const EdgeInsets.only(right: 2),
+              child: _buildTinyCardFixed(c, state, 22.0),
+            )),
+            Text(' $kittyPoints점 (프렌드 바닥패)', style: const TextStyle(color: Colors.amber, fontSize: 10)),
+          ],
+        );
       }
       return null;
     }
 
     final fHand = friendPlayer.hand;
+    final friendName = _getLocalizedPlayerName(friendPlayer, l10n);
 
     // 프렌드의 핵심 카드 추출
-    final friendKeys = <String>[];
+    final friendKeyCards = <PlayingCard>[];
     int friendTricks = 0;
 
     // 마이티 보유?
-    final fHasMighty = fHand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace);
-    if (fHasMighty) { friendKeys.add(l10n.friendCardMighty); friendTricks++; }
+    final fMightyCard = fHand.where((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace).toList();
+    if (fMightyCard.isNotEmpty) { friendKeyCards.addAll(fMightyCard); friendTricks++; }
 
     // 조커 보유?
-    final fHasJoker = fHand.any((c) => c.isJoker);
-    if (fHasJoker) { friendKeys.add(l10n.friendCardJoker); friendTricks++; }
+    final fJokerCard = fHand.where((c) => c.isJoker).toList();
+    if (fJokerCard.isNotEmpty) { friendKeyCards.addAll(fJokerCard); friendTricks++; }
 
-    // 프렌드의 기루다 카드 (주공 기루다 기준)
+    // 프렌드의 기루다 카드
     final fGiruda = fHand.where((c) => !c.isJoker && c.suit == giruda).toList();
-    final fGirudaKeys = <String>[];
     final declarerHasGirudaA = declarerHand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
-    if (fGiruda.any((c) => c.rank == Rank.ace)) { fGirudaKeys.add('A'); friendTricks++; }
-    if (fGiruda.any((c) => c.rank == Rank.king)) {
-      fGirudaKeys.add('K');
-      if (declarerHasGirudaA || fGiruda.any((c) => c.rank == Rank.ace)) friendTricks++;
+    for (final c in fGiruda) {
+      if (c.rank == Rank.ace) { friendKeyCards.add(c); friendTricks++; }
     }
-    if (fGiruda.any((c) => c.rank == Rank.queen)) {
-      fGirudaKeys.add('Q');
+    for (final c in fGiruda) {
+      if (c.rank == Rank.king) {
+        friendKeyCards.add(c);
+        if (declarerHasGirudaA || fGiruda.any((c) => c.rank == Rank.ace)) friendTricks++;
+      }
     }
-    if (fGirudaKeys.isNotEmpty) {
-      friendKeys.add('${_getSuitSymbol(giruda)}${fGirudaKeys.join('·')}');
+    for (final c in fGiruda) {
+      if (c.rank == Rank.queen) friendKeyCards.add(c);
     }
 
     // 프렌드의 비기루다 A (마이티 제외)
     for (final suit in Suit.values) {
       if (suit == giruda) continue;
-      final hasAce = fHand.any((c) =>
+      final aces = fHand.where((c) =>
           !c.isJoker && c.suit == suit && c.rank == Rank.ace &&
-          !(c.suit == mightySuit && c.rank == Rank.ace));
-      if (hasAce) { friendKeys.add('${_getSuitSymbol(suit)}A'); friendTricks++; }
+          !(c.suit == mightySuit && c.rank == Rank.ace)).toList();
+      if (aces.isNotEmpty) { friendKeyCards.addAll(aces); friendTricks++; }
     }
 
-    if (friendKeys.isEmpty && kittyPoints == 0) return null;
+    if (friendKeyCards.isEmpty && kittyPoints == 0) return null;
 
-    // 조정 예상 점수: 기존 min/max + 바닥패 + 프렌드 트릭×2
+    // 조정 예상 점수
     final adjMin = (explanation.minPoints + kittyPoints).clamp(0, 20);
     final adjMax = (explanation.maxPoints + kittyPoints + friendTricks * 2).clamp(0, 20);
 
-    final parts = <String>[];
-    if (kittyPoints > 0) parts.add('바닥패 $kittyPoints점');
-    if (friendKeys.isNotEmpty) parts.add('프렌드 ${friendKeys.join('·')}');
-
-    return '${parts.join(', ')} → 조정 $adjMin~$adjMax점';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 바닥패 라인
+        Row(
+          children: [
+            const Text('바닥패 ', style: TextStyle(color: Colors.white60, fontSize: 10)),
+            ...state.kitty.map((c) => Padding(
+              padding: const EdgeInsets.only(right: 2),
+              child: _buildTinyCardFixed(c, state, 22.0),
+            )),
+            Text(' $kittyPoints점', style: const TextStyle(color: Colors.white60, fontSize: 10)),
+          ],
+        ),
+        const SizedBox(height: 2),
+        // 프렌드 라인
+        Row(
+          children: [
+            Text('프렌드 $friendName ', style: const TextStyle(color: Colors.cyanAccent, fontSize: 10)),
+            if (friendKeyCards.isNotEmpty) ...[
+              ...friendKeyCards.map((c) => Padding(
+                padding: const EdgeInsets.only(right: 2),
+                child: _buildTinyCardFixed(c, state, 22.0),
+              )),
+            ],
+          ],
+        ),
+        const SizedBox(height: 2),
+        // 조정 점수
+        Text(
+          '→ 조정 $adjMin~$adjMax점',
+          style: const TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
   }
 
   String _getFriendExpectedText(BidExplanation explanation, AppLocalizations l10n) {
