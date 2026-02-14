@@ -1639,7 +1639,7 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildBidExplanationContent(BidExplanation explanation, GameState state, AppLocalizations l10n) {
     final keyCardInfo = _getKeyCardInfo(explanation, state, l10n);
-    final adjustedEstimate = !explanation.passed ? _getAdjustedEstimate(explanation, state, l10n) : null;
+    final adjustedEstimate = (explanation.suit != null) ? _getAdjustedEstimate(explanation, state, l10n) : null;
 
     if (explanation.passed) {
       return Column(
@@ -1672,6 +1672,13 @@ class _GameScreenState extends State<GameScreen> {
               Text(
                 keyCardInfo,
                 style: const TextStyle(color: Colors.white54, fontSize: 10),
+              ),
+            ],
+            if (adjustedEstimate != null) ...[
+              const SizedBox(height: 1),
+              Text(
+                adjustedEstimate,
+                style: const TextStyle(color: Colors.amber, fontSize: 10),
               ),
             ],
           ],
@@ -1800,30 +1807,70 @@ class _GameScreenState extends State<GameScreen> {
 
   /// 바닥패 + 프렌드 핸드를 고려한 조정 예상 점수
   String? _getAdjustedEstimate(BidExplanation explanation, GameState state, AppLocalizations l10n) {
-    if (explanation.suit == null || explanation.passed) return null;
+    if (explanation.suit == null) return null;
 
     final giruda = explanation.suit!;
     final declarerHand = state.players[explanation.playerId].hand;
     final mightySuit = (giruda == Suit.spade) ? Suit.diamond : Suit.spade;
 
+    // 자신이 마이티 보유 시 → 프렌드는 조커 or 기루다 카드 보유자
+    final selfHasMighty = declarerHand.any((c) =>
+        !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace);
+    final selfHasJoker = declarerHand.any((c) => c.isJoker);
+
     // === 바닥패 점수 ===
     final kittyPoints = state.kitty.where((c) => c.isPointCard).length;
 
-    // === 프렌드 핸드 분석 ===
-    // 프렌드 보유자 찾기
+    // === 프렌드 보유자 찾기 (플레이어의 기루다 기준) ===
     Player? friendPlayer;
-    if (explanation.friendHolderName != null) {
+    if (!selfHasMighty) {
+      // 마이티 프렌드: 마이티 보유자 찾기
       for (final p in state.players) {
         if (p.id == explanation.playerId) continue;
-        if (p.name == explanation.friendHolderName) {
+        if (p.hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace)) {
           friendPlayer = p;
           break;
+        }
+      }
+    } else if (!selfHasJoker) {
+      // 조커 프렌드: 조커 보유자 찾기
+      for (final p in state.players) {
+        if (p.id == explanation.playerId) continue;
+        if (p.hand.any((c) => c.isJoker)) {
+          friendPlayer = p;
+          break;
+        }
+      }
+    } else {
+      // 마이티+조커 보유 → 기루다 A/K 없는 것 중 프렌드
+      // 기루다 A 없으면 기루다 A 보유자
+      final hasGirudaA = declarerHand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+      if (!hasGirudaA) {
+        for (final p in state.players) {
+          if (p.id == explanation.playerId) continue;
+          if (p.hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace)) {
+            friendPlayer = p;
+            break;
+          }
+        }
+      }
+      if (friendPlayer == null) {
+        // 기루다 K 없으면 기루다 K 보유자
+        final hasGirudaK = declarerHand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.king);
+        if (!hasGirudaK) {
+          for (final p in state.players) {
+            if (p.id == explanation.playerId) continue;
+            if (p.hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.king)) {
+              friendPlayer = p;
+              break;
+            }
+          }
         }
       }
     }
 
     if (friendPlayer == null) {
-      // 프렌드가 바닥패에 있음
+      // 프렌드가 바닥패에 있거나 찾을 수 없음
       if (kittyPoints > 0) {
         return '바닥패 $kittyPoints점 (프렌드 바닥패)';
       }
