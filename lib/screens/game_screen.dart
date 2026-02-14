@@ -1767,8 +1767,8 @@ class _GameScreenState extends State<GameScreen> {
 
     final parts = <String>[];
 
-    // 기루다 핵심 카드
-    parts.add(l10n.bidInfoGirudaKeys(keyRanks.join('·')));
+    // 기루다 핵심 카드 (무늬 포함)
+    parts.add(l10n.bidInfoGirudaKeys('${_getSuitSymbol(giruda)} ${keyRanks.join('·')}'));
 
     // 비기루다 초구 카드 (A 또는 K)
     if (firstTrickCards.isNotEmpty) parts.add(l10n.bidInfoFirstTrickAces(firstTrickCards.join('·')));
