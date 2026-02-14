@@ -641,6 +641,13 @@ class AIPlayer {
         }
         // 3장 Q: A,K 둘 다 소진되기 어려움 → 보너스 없음
       }
+
+      // === 마이티 + 기루다 시너지 ===
+      // 마이티로 선공 장악 → 기루다 고위 카드 연속 트릭 확보
+      if (hasMighty) {
+        if (gA) { minTricks++; maxTricks++; } // 마이티 선공 → 기루다A 안정 확보
+        if (gA && gK) { maxTricks++; } // 마이티→A→K 연속
+      }
     }
 
     // === 비기루다 에이스/킹 ===
