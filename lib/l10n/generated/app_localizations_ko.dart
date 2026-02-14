@@ -1589,6 +1589,27 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get kittySummaryTitle => '키티 선택 결과';
+
+  @override
+  String get kittyReceivedCards => '바닥에서 받은 카드';
+
+  @override
+  String get kittyDiscardCards => '버릴 카드';
+
+  @override
+  String get discardReasonCutSuit => '적은 무늬 정리 → 컷 가능';
+
+  @override
+  String get discardReasonNonGirudaLow => '비기루다 낮은 카드';
+
+  @override
+  String get discardReasonLowValue => '낮은 가치 카드';
+
+  @override
+  String get discardReasonLeastUseful => '가장 불필요한 카드';
+
+  @override
   String get bidSummaryTitle => '배팅 결과';
 
   @override

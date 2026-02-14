@@ -700,6 +700,13 @@
       "needed": {"type": "int"}
     }
   },
+  "kittySummaryTitle": "Kitty Selection Result",
+  "kittyReceivedCards": "Cards from Kitty",
+  "kittyDiscardCards": "Discarded Cards",
+  "discardReasonCutSuit": "Clear short suit → enable cut",
+  "discardReasonNonGirudaLow": "Non-trump low card",
+  "discardReasonLowValue": "Low value card",
+  "discardReasonLeastUseful": "Least useful card",
   "bidSummaryTitle": "Bidding Result",
   "bidSummaryScoreTitle": "Expected Score (Declarer)",
   "bidSummaryWinMin": "Win (minimum points)",

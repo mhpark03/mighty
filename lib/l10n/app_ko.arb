@@ -859,6 +859,13 @@
       "needed": {"type": "int"}
     }
   },
+  "kittySummaryTitle": "키티 선택 결과",
+  "kittyReceivedCards": "바닥에서 받은 카드",
+  "kittyDiscardCards": "버릴 카드",
+  "discardReasonCutSuit": "적은 무늬 정리 → 컷 가능",
+  "discardReasonNonGirudaLow": "비기루다 낮은 카드",
+  "discardReasonLowValue": "낮은 가치 카드",
+  "discardReasonLeastUseful": "가장 불필요한 카드",
   "bidSummaryTitle": "배팅 결과",
   "bidSummaryScoreTitle": "예상 점수 (주공 기준)",
   "bidSummaryWinMin": "승리 시 (최소 득점)",

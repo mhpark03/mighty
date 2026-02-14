@@ -2910,6 +2910,48 @@ abstract class AppLocalizations {
   /// **'핸드 강도 부족 (강도 {strength}, 필요 {needed})'**
   String passReasonWeakHand(int strength, int needed);
 
+  /// No description provided for @kittySummaryTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'키티 선택 결과'**
+  String get kittySummaryTitle;
+
+  /// No description provided for @kittyReceivedCards.
+  ///
+  /// In ko, this message translates to:
+  /// **'바닥에서 받은 카드'**
+  String get kittyReceivedCards;
+
+  /// No description provided for @kittyDiscardCards.
+  ///
+  /// In ko, this message translates to:
+  /// **'버릴 카드'**
+  String get kittyDiscardCards;
+
+  /// No description provided for @discardReasonCutSuit.
+  ///
+  /// In ko, this message translates to:
+  /// **'적은 무늬 정리 → 컷 가능'**
+  String get discardReasonCutSuit;
+
+  /// No description provided for @discardReasonNonGirudaLow.
+  ///
+  /// In ko, this message translates to:
+  /// **'비기루다 낮은 카드'**
+  String get discardReasonNonGirudaLow;
+
+  /// No description provided for @discardReasonLowValue.
+  ///
+  /// In ko, this message translates to:
+  /// **'낮은 가치 카드'**
+  String get discardReasonLowValue;
+
+  /// No description provided for @discardReasonLeastUseful.
+  ///
+  /// In ko, this message translates to:
+  /// **'가장 불필요한 카드'**
+  String get discardReasonLeastUseful;
+
   /// No description provided for @bidSummaryTitle.
   ///
   /// In ko, this message translates to:

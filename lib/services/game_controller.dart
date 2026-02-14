@@ -17,6 +17,8 @@ class GameController extends ChangeNotifier {
   bool _isAutoPlayPaused = false;
   BidExplanation? _lastBidExplanation;
   bool _showBidSummary = false;
+  KittyExplanation? _kittyExplanation;
+  bool _showKittySummary = false;
 
   GameController() {
     _initializePlayers();
@@ -26,6 +28,8 @@ class GameController extends ChangeNotifier {
   bool get isAutoPlayPaused => _isAutoPlayPaused;
   BidExplanation? get lastBidExplanation => _lastBidExplanation;
   bool get showBidSummary => _showBidSummary;
+  KittyExplanation? get kittyExplanation => _kittyExplanation;
+  bool get showKittySummary => _showKittySummary;
 
   // 저장된 게임이 있는지 확인
   static Future<bool> hasSavedGame() async {
@@ -122,6 +126,8 @@ class GameController extends ChangeNotifier {
   void startNewGame() {
     _lastBidExplanation = null;
     _showBidSummary = false;
+    _kittyExplanation = null;
+    _showKittySummary = false;
     _state.startNewGame();
     notifyListeners();
     if (!_isAutoPlayMode) saveGame(); // 자동 저장 (auto-play 시 스킵)
@@ -304,6 +310,10 @@ class GameController extends ChangeNotifier {
     if (_isAutoPlayPaused) { _isProcessing = false; notifyListeners(); return; }
 
     final declarer = _state.players[_state.declarerId!];
+    final originalGiruda = _state.giruda;
+
+    // 키티 카드 저장 (selectKitty 호출 전에)
+    final kittyCards = List<PlayingCard>.from(_state.kitty);
 
     // 1. 13장으로 기루다 변경 여부 결정
     final newGiruda = _aiPlayer.decideGirudaChange(declarer, _state, _state.kitty);
@@ -311,14 +321,44 @@ class GameController extends ChangeNotifier {
     // 2. 최종 기루다를 기준으로 버릴 카드 선택
     final discardCards = _aiPlayer.selectKittyCardsWithGiruda(declarer, _state, _state.kitty, newGiruda);
 
-    // 3. 키티 선택 완료 (기루다 변경 시 목표 +2 자동 적용)
-    _state.selectKitty(discardCards, newGiruda);
+    if (_isAutoPlayMode) {
+      // 각 버릴 카드의 이유 생성
+      final reasons = _generateDiscardReasons(discardCards, newGiruda, declarer);
+      final girudaChanged = newGiruda != originalGiruda;
 
-    _isProcessing = false;
-    notifyListeners();
-    if (!_isAutoPlayMode) saveGame(); // 자동 저장
+      _kittyExplanation = KittyExplanation(
+        kittyCards: kittyCards,
+        discardCards: discardCards,
+        originalGiruda: originalGiruda,
+        newGiruda: newGiruda,
+        girudaChanged: girudaChanged,
+        discardReasons: reasons,
+      );
 
-    _processAIFriendDeclaration();
+      // 요약 화면 표시 (selectKitty 호출 전)
+      _showKittySummary = true;
+      _isProcessing = false;
+      notifyListeners();
+
+      await Future.delayed(const Duration(seconds: 5));
+      if (_isAutoPlayPaused) return;
+
+      // 키티 선택 실행
+      _showKittySummary = false;
+      _state.selectKitty(discardCards, newGiruda);
+      _kittyExplanation = null;
+      notifyListeners();
+
+      _processAIFriendDeclaration();
+    } else {
+      // 일반 모드: 즉시 실행
+      _state.selectKitty(discardCards, newGiruda);
+      _isProcessing = false;
+      notifyListeners();
+      saveGame();
+
+      _processAIFriendDeclaration();
+    }
   }
 
   void humanSelectKitty(List<PlayingCard> discardCards, Suit? newGiruda, {bool isFull = false}) {
@@ -599,6 +639,8 @@ class GameController extends ChangeNotifier {
     _isProcessing = false;
     _waitingForTrickConfirm = false;
     _showBidSummary = false;
+    _kittyExplanation = null;
+    _showKittySummary = false;
     _lastCompletedTrick = null;
     _initializePlayers();
     notifyListeners();
@@ -625,6 +667,15 @@ class GameController extends ChangeNotifier {
       _processAIKittySelection();
       return;
     }
+    // 키티 요약 화면에서 일시정지 후 재개 시 프렌드 선언으로 진행
+    if (_showKittySummary && _kittyExplanation != null) {
+      _showKittySummary = false;
+      _state.selectKitty(_kittyExplanation!.discardCards, _kittyExplanation!.newGiruda);
+      _kittyExplanation = null;
+      notifyListeners();
+      _processAIFriendDeclaration();
+      return;
+    }
     _resumeAIIfNeeded();
   }
 
@@ -634,10 +685,56 @@ class GameController extends ChangeNotifier {
     startNewGame();
   }
 
+  /// 버릴 카드의 이유 생성
+  List<String> _generateDiscardReasons(List<PlayingCard> discardCards, Suit? finalGiruda, Player declarer) {
+    final hand = [...declarer.hand, ..._state.kitty];
+    // 각 무늬별 카드 수 (기루다 제외)
+    final suitCounts = <Suit, int>{};
+    for (final suit in Suit.values) {
+      suitCounts[suit] = hand.where((c) => !c.isJoker && c.suit == suit).length;
+    }
+
+    return discardCards.map((card) {
+      if (card.isJoker) return 'SPECIAL'; // 조커는 보통 버리지 않음
+
+      final isGiruda = card.suit == finalGiruda;
+      final suitCount = suitCounts[card.suit] ?? 0;
+      final isPointCard = card.isPointCard;
+
+      if (!isGiruda && suitCount <= 2) {
+        return 'CUT_SUIT'; // 무늬 정리 → 컷 가능
+      } else if (!isGiruda && !isPointCard) {
+        return 'NON_GIRUDA_LOW'; // 비기루다 낮은 카드
+      } else if (!isPointCard) {
+        return 'LOW_VALUE'; // 낮은 가치
+      } else {
+        return 'LEAST_USEFUL'; // 가장 불필요
+      }
+    }).toList();
+  }
+
   void reset() {
     _initializePlayers();
     notifyListeners();
   }
+}
+
+class KittyExplanation {
+  final List<PlayingCard> kittyCards;       // 바닥에서 받은 카드 3장
+  final List<PlayingCard> discardCards;     // 버릴 카드 3장
+  final Suit? originalGiruda;              // 원래 기루다
+  final Suit? newGiruda;                   // 변경된 기루다 (변경 없으면 동일)
+  final bool girudaChanged;                // 기루다 변경 여부
+  final List<String> discardReasons;       // 각 버릴 카드의 이유
+
+  KittyExplanation({
+    required this.kittyCards,
+    required this.discardCards,
+    required this.originalGiruda,
+    required this.newGiruda,
+    required this.girudaChanged,
+    required this.discardReasons,
+  });
 }
 
 class BidExplanation {

@@ -775,6 +775,205 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
+  Widget _buildKittySummaryScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+    final state = controller.state;
+    final explanation = controller.kittyExplanation!;
+    final declarerName = _getLocalizedPlayerName(state.players[state.declarerId!], l10n);
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 타이틀
+            Text(
+              l10n.kittySummaryTitle,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.amber,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              declarerName,
+              style: const TextStyle(fontSize: 16, color: Colors.white70),
+            ),
+            const SizedBox(height: 20),
+
+            // 바닥에서 받은 카드
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.blue.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.blue.withValues(alpha: 0.5)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.add_circle_outline, color: Colors.lightBlueAccent, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n.kittyReceivedCards,
+                        style: const TextStyle(
+                          color: Colors.lightBlueAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: explanation.kittyCards
+                        .map((card) => Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 3),
+                              child: _buildTinyCardFixed(card, state, 36.0),
+                            ))
+                        .toList(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // 버릴 카드
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.4)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.remove_circle_outline, color: Colors.redAccent, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n.kittyDiscardCards,
+                        style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  for (int i = 0; i < explanation.discardCards.length; i++)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Row(
+                        children: [
+                          _buildTinyCardFixed(explanation.discardCards[i], state, 36.0),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              _getDiscardReason(explanation.discardReasons[i], l10n),
+                              style: const TextStyle(color: Colors.white70, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // 기루다 변경 정보
+            if (explanation.girudaChanged) ...[
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.amber.withValues(alpha: 0.5)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.swap_horiz, color: Colors.amber, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${l10n.giruda}: ',
+                              style: const TextStyle(color: Colors.white70, fontSize: 14),
+                            ),
+                            TextSpan(
+                              text: _getSuitName(explanation.originalGiruda, l10n),
+                              style: const TextStyle(color: Colors.white54, fontSize: 14),
+                            ),
+                            const TextSpan(
+                              text: ' → ',
+                              style: TextStyle(color: Colors.amber, fontSize: 14),
+                            ),
+                            TextSpan(
+                              text: _getSuitName(explanation.newGiruda, l10n),
+                              style: const TextStyle(
+                                color: Colors.amber,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' ${l10n.goalPlus2}',
+                              style: const TextStyle(color: Colors.redAccent, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 20),
+            // 자동 진행 타이머
+            const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white38,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getDiscardReason(String reason, AppLocalizations l10n) {
+    switch (reason) {
+      case 'CUT_SUIT':
+        return l10n.discardReasonCutSuit;
+      case 'NON_GIRUDA_LOW':
+        return l10n.discardReasonNonGirudaLow;
+      case 'LOW_VALUE':
+        return l10n.discardReasonLowValue;
+      case 'LEAST_USEFUL':
+        return l10n.discardReasonLeastUseful;
+      default:
+        return '';
+    }
+  }
+
   Widget _buildBiddingPlayerWithCards(GameState state, int playerId, bool isProcessing, AppLocalizations l10n, BidExplanation? explanation) {
     final player = state.players[playerId];
     final isPassed = state.passedPlayers[playerId];
@@ -1492,6 +1691,11 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildKittyScreen(GameController controller) {
     final l10n = AppLocalizations.of(context)!;
+
+    // auto-play: 키티 요약 화면
+    if (widget.isAutoPlay && controller.showKittySummary && controller.kittyExplanation != null) {
+      return _buildKittySummaryScreen(controller);
+    }
 
     if (widget.isAutoPlay || controller.state.declarerId != 0) {
       return Column(

@@ -699,6 +699,13 @@
       "needed": {"type": "int"}
     }
   },
+  "kittySummaryTitle": "キティ選択結果",
+  "kittyReceivedCards": "キティから受け取ったカード",
+  "kittyDiscardCards": "捨てるカード",
+  "discardReasonCutSuit": "少ないスート整理 → カット可能",
+  "discardReasonNonGirudaLow": "非切り札の低いカード",
+  "discardReasonLowValue": "低い価値のカード",
+  "discardReasonLeastUseful": "最も不要なカード",
   "bidSummaryTitle": "入札結果",
   "bidSummaryScoreTitle": "予想スコア (宣言者基準)",
   "bidSummaryWinMin": "勝利時 (最低得点)",

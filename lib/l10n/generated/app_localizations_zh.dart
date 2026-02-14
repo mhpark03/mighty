@@ -1574,6 +1574,27 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get kittySummaryTitle => '底牌选择结果';
+
+  @override
+  String get kittyReceivedCards => '从底牌获得的牌';
+
+  @override
+  String get kittyDiscardCards => '丢弃的牌';
+
+  @override
+  String get discardReasonCutSuit => '整理少花色 → 可切牌';
+
+  @override
+  String get discardReasonNonGirudaLow => '非王牌低牌';
+
+  @override
+  String get discardReasonLowValue => '低价值牌';
+
+  @override
+  String get discardReasonLeastUseful => '最不需要的牌';
+
+  @override
   String get bidSummaryTitle => '竞标结果';
 
   @override

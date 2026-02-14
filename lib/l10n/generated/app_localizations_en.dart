@@ -1602,6 +1602,27 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get kittySummaryTitle => 'Kitty Selection Result';
+
+  @override
+  String get kittyReceivedCards => 'Cards from Kitty';
+
+  @override
+  String get kittyDiscardCards => 'Discarded Cards';
+
+  @override
+  String get discardReasonCutSuit => 'Clear short suit → enable cut';
+
+  @override
+  String get discardReasonNonGirudaLow => 'Non-trump low card';
+
+  @override
+  String get discardReasonLowValue => 'Low value card';
+
+  @override
+  String get discardReasonLeastUseful => 'Least useful card';
+
+  @override
   String get bidSummaryTitle => 'Bidding Result';
 
   @override

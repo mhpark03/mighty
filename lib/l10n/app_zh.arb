@@ -699,6 +699,13 @@
       "needed": {"type": "int"}
     }
   },
+  "kittySummaryTitle": "底牌选择结果",
+  "kittyReceivedCards": "从底牌获得的牌",
+  "kittyDiscardCards": "丢弃的牌",
+  "discardReasonCutSuit": "整理少花色 → 可切牌",
+  "discardReasonNonGirudaLow": "非王牌低牌",
+  "discardReasonLowValue": "低价值牌",
+  "discardReasonLeastUseful": "最不需要的牌",
   "bidSummaryTitle": "竞标结果",
   "bidSummaryScoreTitle": "预计分数 (庄家基准)",
   "bidSummaryWinMin": "胜利时 (最低得分)",

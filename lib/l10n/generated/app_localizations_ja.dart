@@ -1583,6 +1583,27 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get kittySummaryTitle => 'キティ選択結果';
+
+  @override
+  String get kittyReceivedCards => 'キティから受け取ったカード';
+
+  @override
+  String get kittyDiscardCards => '捨てるカード';
+
+  @override
+  String get discardReasonCutSuit => '少ないスート整理 → カット可能';
+
+  @override
+  String get discardReasonNonGirudaLow => '非切り札の低いカード';
+
+  @override
+  String get discardReasonLowValue => '低い価値のカード';
+
+  @override
+  String get discardReasonLeastUseful => '最も不要なカード';
+
+  @override
   String get bidSummaryTitle => '入札結果';
 
   @override
