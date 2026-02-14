@@ -159,21 +159,35 @@ class GameController extends ChangeNotifier {
       final bid = _aiPlayer.decideBid(currentPlayer, _state);
 
       final bestSuit = _aiPlayer.findBestSuit(currentPlayer.hand);
-      final strength = bestSuit != null ? _aiPlayer.evaluateHandStrength(currentPlayer.hand, bestSuit) : 0;
-      final girudaCards = bestSuit != null
-          ? currentPlayer.hand.where((c) => !c.isJoker && c.suit == bestSuit).toList()
+      // 실제 배팅에 사용된 무늬 기준으로 강도 계산
+      final effectiveSuit = bid.suit ?? bestSuit;
+      final strength = effectiveSuit != null
+          ? _aiPlayer.evaluateHandStrength(currentPlayer.hand, effectiveSuit)
+          : (bestSuit != null ? _aiPlayer.evaluateHandStrength(currentPlayer.hand, bestSuit) : 0);
+      final girudaCards = effectiveSuit != null
+          ? currentPlayer.hand.where((c) => !c.isJoker && c.suit == effectiveSuit).toList()
           : <PlayingCard>[];
-      final hasAce = girudaCards.any((c) => c.rank == Rank.ace);
-      final hasKing = girudaCards.any((c) => c.rank == Rank.king);
 
       String passReason = '';
       if (bid.passed) {
-        if (bestSuit == null) {
+        // 파워 카드 수 계산 (패스 이유 세분화)
+        final hasMighty = currentPlayer.hand.any((c) => c.suit == Suit.spade && c.rank == Rank.ace && !c.isJoker);
+        final hasJoker = currentPlayer.hand.any((c) => c.isJoker);
+        int powerCards = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) +
+            currentPlayer.hand.where((c) => !c.isJoker && c.rank == Rank.ace && !(c.suit == Suit.spade && c.rank == Rank.ace)).length;
+
+        if (bestSuit == null && powerCards < 5) {
           passReason = 'NO_SUIT';
-        } else if (!hasAce && !hasKing) {
-          passReason = 'NO_HIGH_CARD';
+        } else if (bestSuit == null) {
+          passReason = 'POWER_WEAK';
         } else {
-          passReason = 'WEAK_HAND';
+          final hasAce = girudaCards.any((c) => c.rank == Rank.ace);
+          final hasKing = girudaCards.any((c) => c.rank == Rank.king);
+          if (!hasAce && !hasKing) {
+            passReason = 'NO_HIGH_CARD';
+          } else {
+            passReason = 'WEAK_HAND';
+          }
         }
       }
 
@@ -181,7 +195,7 @@ class GameController extends ChangeNotifier {
         playerId: currentPlayer.id,
         playerName: currentPlayer.name,
         passed: bid.passed,
-        suit: bid.suit ?? bestSuit,
+        suit: effectiveSuit,
         tricks: bid.tricks,
         maxStrength: strength,
         girudaCount: girudaCards.length,

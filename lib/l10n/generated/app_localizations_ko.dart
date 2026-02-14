@@ -1589,6 +1589,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get passReasonPowerWeak => '파워 카드 부족 (마이티/조커/에이스 5개 미만)';
+
+  @override
   String get kittySummaryTitle => '키티 선택 결과';
 
   @override

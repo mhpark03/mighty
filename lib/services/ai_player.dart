@@ -308,8 +308,10 @@ class AIPlayer {
     // 1. 먼저 최적의 기루다를 선택
     Suit? bestSuit = findBestSuit(hand);
 
-    // 2. 기루다가 없거나, 기루다에 A/K가 없으면 패스
+    // 2. 기루다 후보가 없으면 파워 카드 기반 배팅 시도
     if (bestSuit == null) {
+      final powerBid = _tryPowerBid(player, state);
+      if (powerBid != null) return powerBid;
       return Bid.pass(player.id);
     }
 
@@ -317,8 +319,10 @@ class AIPlayer {
     bool hasGirudaAce = girudaCards.any((c) => c.rank == Rank.ace);
     bool hasGirudaKing = girudaCards.any((c) => c.rank == Rank.king);
 
-    // 기루다 A 또는 K 필수
+    // 기루다 A 또는 K 필수 - 없으면 파워 카드 기반 배팅 시도
     if (!hasGirudaAce && !hasGirudaKing) {
+      final powerBid = _tryPowerBid(player, state);
+      if (powerBid != null) return powerBid;
       return Bid.pass(player.id);
     }
 
@@ -348,6 +352,84 @@ class AIPlayer {
       suit: bestSuit,
       tricks: bidAmount,
     );
+  }
+
+  /// 파워 카드(마이티, 조커, 에이스) 기반 배팅 시도
+  /// 기루다 4장 이상 없어도 선을 유지하며 점수 카드를 획득할 수 있는 경우 배팅
+  Bid? _tryPowerBid(Player player, GameState state) {
+    final hand = player.hand;
+
+    // 마이티/조커 보유 확인
+    bool hasMighty = hand.any((c) => c.suit == Suit.spade && c.rank == Rank.ace && !c.isJoker);
+    bool hasJoker = hand.any((c) => c.isJoker);
+
+    // 선 유지 가능한 파워 트릭 수 계산
+    int powerTricks = 0;
+    if (hasMighty) powerTricks++;  // 마이티: 확실한 1트릭
+    if (hasJoker) powerTricks++;   // 조커: 확실한 1트릭
+
+    // 비기루다 에이스 (선공 시 거의 확실한 트릭)
+    final nonMightyAces = hand.where((c) =>
+        !c.isJoker && c.rank == Rank.ace &&
+        !(c.suit == Suit.spade && c.rank == Rank.ace) // 마이티 제외
+    ).toList();
+    powerTricks += nonMightyAces.length;
+
+    // 에이스와 같은 무늬의 킹 (선 유지 시 추가 트릭)
+    for (final ace in nonMightyAces) {
+      bool hasKing = hand.any((c) => !c.isJoker && c.suit == ace.suit && c.rank == Rank.king);
+      if (hasKing) powerTricks++;
+    }
+
+    // 파워 트릭이 5개 미만이면 배팅 불가
+    if (powerTricks < 5) return null;
+
+    // 가장 장수가 많은 무늬를 기루다로 선택 (3장도 허용)
+    Suit? powerSuit = _findBestPowerSuit(hand);
+
+    // 핸드 강도 계산
+    int strength = evaluateHandStrength(hand, powerSuit);
+
+    if (strength < 13) return null;
+
+    // 배팅 금액 결정
+    int bidAmount;
+    if (state.currentBid == null) {
+      bidAmount = 13;
+    } else {
+      bidAmount = state.currentBid!.tricks + 1;
+    }
+
+    if (bidAmount > strength) return null;
+
+    return Bid(
+      playerId: player.id,
+      suit: powerSuit,
+      tricks: min(bidAmount, 20),
+    );
+  }
+
+  /// 파워 배팅용 최적 기루다 선택 (3장도 허용, A/K 없어도 장수 기반)
+  Suit? _findBestPowerSuit(List<PlayingCard> hand) {
+    Suit? bestSuit;
+    int bestScore = 0;
+
+    for (final suit in Suit.values) {
+      final suitCards = hand.where((c) => !c.isJoker && c.suit == suit).toList();
+      if (suitCards.length < 2) continue; // 최소 2장
+
+      int score = suitCards.length * 3; // 장수 기본 점수
+      if (suitCards.any((c) => c.rank == Rank.ace)) score += 5;
+      if (suitCards.any((c) => c.rank == Rank.king)) score += 4;
+      if (suitCards.any((c) => c.rank == Rank.queen)) score += 3;
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestSuit = suit;
+      }
+    }
+
+    return bestSuit;
   }
 
   // Public method for debugging

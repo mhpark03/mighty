@@ -1583,6 +1583,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get passReasonPowerWeak => 'パワーカード不足（マイティ/ジョーカー/エース5枚未満）';
+
+  @override
   String get kittySummaryTitle => 'キティ選択結果';
 
   @override

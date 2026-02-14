@@ -2910,6 +2910,12 @@ abstract class AppLocalizations {
   /// **'핸드 강도 부족 (강도 {strength}, 필요 {needed})'**
   String passReasonWeakHand(int strength, int needed);
 
+  /// No description provided for @passReasonPowerWeak.
+  ///
+  /// In ko, this message translates to:
+  /// **'파워 카드 부족 (마이티/조커/에이스 5개 미만)'**
+  String get passReasonPowerWeak;
+
   /// No description provided for @kittySummaryTitle.
   ///
   /// In ko, this message translates to:

@@ -1574,6 +1574,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get passReasonPowerWeak => '力量牌不足（Mighty/Joker/A不到5张）';
+
+  @override
   String get kittySummaryTitle => '底牌选择结果';
 
   @override

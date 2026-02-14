@@ -1602,6 +1602,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get passReasonPowerWeak =>
+      'Not enough power cards (Mighty/Joker/Aces < 5)';
+
+  @override
   String get kittySummaryTitle => 'Kitty Selection Result';
 
   @override

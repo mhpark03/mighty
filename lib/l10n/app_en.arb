@@ -700,6 +700,7 @@
       "needed": {"type": "int"}
     }
   },
+  "passReasonPowerWeak": "Not enough power cards (Mighty/Joker/Aces < 5)",
   "kittySummaryTitle": "Kitty Selection Result",
   "kittyReceivedCards": "Cards from Kitty",
   "kittyDiscardCards": "Discarded Cards",

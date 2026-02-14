@@ -1550,6 +1550,8 @@ class _GameScreenState extends State<GameScreen> {
       case 'WEAK_HAND':
         final needed = state.currentBid != null ? state.currentBid!.tricks + 1 : 13;
         return l10n.passReasonWeakHand(explanation.maxStrength, needed);
+      case 'POWER_WEAK':
+        return l10n.passReasonPowerWeak;
       default:
         return '';
     }
