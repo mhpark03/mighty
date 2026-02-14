@@ -35,6 +35,7 @@ class GameController extends ChangeNotifier {
   bool get showKittySummary => _showKittySummary;
   FriendExplanation? get friendExplanation => _friendExplanation;
   bool get showFriendSummary => _showFriendSummary;
+  FriendDeclaration? get pendingDeclaration => _pendingDeclaration;
 
   /// 주공의 현재 핸드 강도 계산 (키티 선택 후 기준)
   int getDeclarerStrength() {

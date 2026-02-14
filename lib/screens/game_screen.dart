@@ -692,7 +692,11 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+
+            // 프렌드 정보
+            _buildFriendInfoRow(controller, l10n),
+            const SizedBox(height: 12),
 
             // 점수 설명
             Container(
@@ -779,6 +783,88 @@ class _GameScreenState extends State<GameScreen> {
             const BannerAdWidget(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFriendInfoRow(GameController controller, AppLocalizations l10n) {
+    final declaration = controller.pendingDeclaration;
+    if (declaration == null) return const SizedBox.shrink();
+
+    // 프렌드 카드/조건 텍스트
+    String friendText;
+    Widget? cardWidget;
+
+    if (declaration.isNoFriend) {
+      friendText = l10n.noFriend;
+    } else if (declaration.isFirstTrickWinner) {
+      friendText = l10n.firstTrickFriend;
+    } else if (declaration.card != null) {
+      final card = declaration.card!;
+      if (card.isJoker) {
+        friendText = '조커 소유자';
+        cardWidget = Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: const Text('🃏', style: TextStyle(fontSize: 20)),
+        );
+      } else {
+        friendText = '${card.suitSymbol}${card.rankSymbol} 소유자';
+        final isRed = card.suit == Suit.heart || card.suit == Suit.diamond;
+        cardWidget = Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            '${card.suitSymbol}${card.rankSymbol}',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isRed ? Colors.red : Colors.black,
+            ),
+          ),
+        );
+      }
+    } else {
+      friendText = '${declaration.trickNumber}트릭 승자';
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.cyan.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.cyan.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.people, color: Colors.cyan, size: 18),
+          const SizedBox(width: 8),
+          Text(
+            l10n.friend,
+            style: const TextStyle(color: Colors.cyan, fontSize: 14),
+          ),
+          const SizedBox(width: 12),
+          if (cardWidget != null) ...[
+            cardWidget,
+            const SizedBox(width: 8),
+          ],
+          Text(
+            friendText,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
     );
   }
