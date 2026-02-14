@@ -700,6 +700,17 @@
     }
   },
   "passReasonPowerWeak": "パワーカード不足（マイティ/ジョーカー/エース5枚未満）",
+  "friendExpected": "フレンド予想",
+  "friendCardMighty": "マイティ",
+  "friendCardJoker": "ジョーカー",
+  "friendHeldBy": "{name} が保有",
+  "@friendHeldBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "friendInKitty": "キティにある可能性",
+  "friendJokerNote": "初手使用不可",
   "kittySummaryTitle": "キティ選択結果",
   "kittyReceivedCards": "キティから受け取ったカード",
   "kittyDiscardCards": "捨てるカード",

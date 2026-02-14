@@ -701,6 +701,17 @@
     }
   },
   "passReasonPowerWeak": "Not enough power cards (Mighty/Joker/Aces < 5)",
+  "friendExpected": "Expected friend",
+  "friendCardMighty": "Mighty",
+  "friendCardJoker": "Joker",
+  "friendHeldBy": "held by {name}",
+  "@friendHeldBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "friendInKitty": "may be in kitty",
+  "friendJokerNote": "cannot play 1st trick",
   "kittySummaryTitle": "Kitty Selection Result",
   "kittyReceivedCards": "Cards from Kitty",
   "kittyDiscardCards": "Discarded Cards",

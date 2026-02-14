@@ -169,10 +169,11 @@ class GameController extends ChangeNotifier {
           : <PlayingCard>[];
 
       String passReason = '';
+      final hasMighty = currentPlayer.hand.any((c) => c.suit == Suit.spade && c.rank == Rank.ace && !c.isJoker);
+      final hasJoker = currentPlayer.hand.any((c) => c.isJoker);
+
       if (bid.passed) {
         // 파워 카드 수 계산 (패스 이유 세분화)
-        final hasMighty = currentPlayer.hand.any((c) => c.suit == Suit.spade && c.rank == Rank.ace && !c.isJoker);
-        final hasJoker = currentPlayer.hand.any((c) => c.isJoker);
         int powerCards = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) +
             currentPlayer.hand.where((c) => !c.isJoker && c.rank == Rank.ace && !(c.suit == Suit.spade && c.rank == Rank.ace)).length;
 
@@ -191,6 +192,57 @@ class GameController extends ChangeNotifier {
         }
       }
 
+      // 프렌드 예상 계산 (배팅한 경우)
+      String? friendType;
+      Suit? friendSuit;
+      String? friendHolderName;
+
+      if (!bid.passed) {
+        final mightySuit = (effectiveSuit == Suit.spade) ? Suit.diamond : Suit.spade;
+
+        if (!hasMighty) {
+          // 마이티를 프렌드로 지명할 가능성 높음
+          friendType = 'MIGHTY';
+          friendSuit = mightySuit;
+          for (final p in _state.players) {
+            if (p.id == currentPlayer.id) continue;
+            if (p.hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace)) {
+              friendHolderName = p.name;
+              break;
+            }
+          }
+        } else if (!hasJoker) {
+          // 조커를 프렌드로 지명할 가능성 높음
+          friendType = 'JOKER';
+          for (final p in _state.players) {
+            if (p.id == currentPlayer.id) continue;
+            if (p.hand.any((c) => c.isJoker)) {
+              friendHolderName = p.name;
+              break;
+            }
+          }
+        } else {
+          // 둘 다 보유 → 없는 에이스 중 가장 강한 것을 프렌드로
+          friendType = 'ACE';
+          for (final s in Suit.values) {
+            if (s == effectiveSuit) continue; // 기루다 에이스 제외
+            final isMightySuit = (effectiveSuit == Suit.spade) ? s == Suit.diamond : s == Suit.spade;
+            if (isMightySuit) continue; // 마이티는 이미 보유
+            if (currentPlayer.hand.any((c) => !c.isJoker && c.suit == s && c.rank == Rank.ace)) continue; // 이미 보유한 에이스
+            // 이 에이스를 프렌드로 지명
+            friendSuit = s;
+            for (final p in _state.players) {
+              if (p.id == currentPlayer.id) continue;
+              if (p.hand.any((c) => !c.isJoker && c.suit == s && c.rank == Rank.ace)) {
+                friendHolderName = p.name;
+                break;
+              }
+            }
+            break;
+          }
+        }
+      }
+
       _lastBidExplanation = BidExplanation(
         playerId: currentPlayer.id,
         playerName: currentPlayer.name,
@@ -200,6 +252,9 @@ class GameController extends ChangeNotifier {
         maxStrength: strength,
         girudaCount: girudaCards.length,
         passReason: passReason,
+        friendType: friendType,
+        friendSuit: friendSuit,
+        friendHolderName: friendHolderName,
       );
 
       _state.placeBid(bid);
@@ -975,6 +1030,9 @@ class BidExplanation {
   final int maxStrength;
   final int girudaCount;
   final String passReason; // 'NO_SUIT', 'NO_HIGH_CARD', 'WEAK_HAND', ''
+  final String? friendType; // 'MIGHTY', 'JOKER', 'ACE' (배팅 시 예상 프렌드)
+  final Suit? friendSuit;  // 프렌드 카드 무늬 (ACE일 때)
+  final String? friendHolderName; // 프렌드 카드 보유자 (null이면 키티)
 
   BidExplanation({
     required this.playerId,
@@ -985,5 +1043,8 @@ class BidExplanation {
     required this.maxStrength,
     this.girudaCount = 0,
     this.passReason = '',
+    this.friendType,
+    this.friendSuit,
+    this.friendHolderName,
   });
 }

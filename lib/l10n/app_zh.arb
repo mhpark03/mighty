@@ -700,6 +700,17 @@
     }
   },
   "passReasonPowerWeak": "力量牌不足（Mighty/Joker/A不到5张）",
+  "friendExpected": "预计朋友",
+  "friendCardMighty": "Mighty",
+  "friendCardJoker": "Joker",
+  "friendHeldBy": "{name} 持有",
+  "@friendHeldBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "friendInKitty": "可能在底牌中",
+  "friendJokerNote": "首轮不可使用",
   "kittySummaryTitle": "底牌选择结果",
   "kittyReceivedCards": "从底牌获得的牌",
   "kittyDiscardCards": "丢弃的牌",

@@ -1536,9 +1536,51 @@ class _GameScreenState extends State<GameScreen> {
             '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.score} ${explanation.maxStrength}',
             style: const TextStyle(color: Colors.white70, fontSize: 11),
           ),
+          if (explanation.friendType != null) ...[
+            const SizedBox(height: 3),
+            Row(
+              children: [
+                const Icon(Icons.people, color: Colors.cyan, size: 13),
+                const SizedBox(width: 3),
+                Expanded(
+                  child: Text(
+                    _getFriendExpectedText(explanation, l10n),
+                    style: const TextStyle(color: Colors.cyanAccent, fontSize: 10),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       );
     }
+  }
+
+  String _getFriendExpectedText(BidExplanation explanation, AppLocalizations l10n) {
+    String cardName;
+    switch (explanation.friendType) {
+      case 'MIGHTY':
+        cardName = '${l10n.friendCardMighty} (${_getSuitSymbol(explanation.friendSuit)}A)';
+        break;
+      case 'JOKER':
+        cardName = l10n.friendCardJoker;
+        break;
+      case 'ACE':
+        cardName = '${_getSuitSymbol(explanation.friendSuit)}A';
+        break;
+      default:
+        return '';
+    }
+
+    final holder = explanation.friendHolderName != null
+        ? l10n.friendHeldBy(explanation.friendHolderName!)
+        : l10n.friendInKitty;
+
+    final note = explanation.friendType == 'JOKER'
+        ? ' (${l10n.friendJokerNote})'
+        : '';
+
+    return '${l10n.friendExpected}: $cardName - $holder$note';
   }
 
   String _getPassReason(BidExplanation explanation, GameState state, AppLocalizations l10n) {
