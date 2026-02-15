@@ -96,7 +96,7 @@ class KittySnapshot {
 }
 
 class MightyTrackingService {
-  static const String _defaultUrl = 'http://10.0.2.2:8081';
+  static const String _defaultUrl = 'http://10.0.2.2:8082';
   static const String _prefsKeyUrl = 'mighty_tracking_server_url';
 
   static String generateUuid() {
