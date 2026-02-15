@@ -1867,4 +1867,81 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get hasAceNote => ' (A 보유)';
+
+  @override
+  String strategyFirstTrickAceLead(String card) {
+    return '초구: $card 선공으로 확실한 트릭 획득';
+  }
+
+  @override
+  String get strategyFirstTrickPassFriendWin =>
+      '초구: 짧은 무늬 낮은 카드로 선 넘기기 (프렌드가 트릭 획득)';
+
+  @override
+  String strategyFirstTrickKingLead(String card) {
+    return '초구: $card 선공으로 트릭 획득 시도';
+  }
+
+  @override
+  String get strategyFirstTrickPassFriend => '초구: 짧은 무늬 낮은 카드로 프렌드에게 선 넘기기';
+
+  @override
+  String get strategyPassToMightyFriend => '짧은 무늬 낮은 카드로 프렌드에게 선 넘기기 (마이티)';
+
+  @override
+  String get strategyPassToJokerFriend => '짧은 무늬 낮은 카드로 프렌드에게 선 넘기기 (조커)';
+
+  @override
+  String strategyPassTrumpToFriend(
+    String passCard,
+    String friendCard,
+    String rank,
+  ) {
+    return '$passCard 선공으로 프렌드($friendCard)에게 선 넘기기 → $rank 단독 방지';
+  }
+
+  @override
+  String strategyPassSuitToFriend(String card, String friendCard) {
+    return '$card 선공으로 프렌드($friendCard)에게 선 넘기기';
+  }
+
+  @override
+  String get strategySourceFriend => '프렌드 트릭 후,';
+
+  @override
+  String get strategySourceReclaim => '선 회수 후,';
+
+  @override
+  String strategyTrumpDominate(String source, String cards) {
+    return '$source $cards로 지배 → 수비 기루다 소진';
+  }
+
+  @override
+  String strategyTrumpExhaust(String source, String cards) {
+    return '$source $cards로 수비 기루다 소진';
+  }
+
+  @override
+  String strategyTrumpMidDraw(String suit) {
+    return '$suit 중간 기루다로 수비측 높은 기루다 유도';
+  }
+
+  @override
+  String strategyJokerCallSuits(String suits) {
+    return '수비 기루다 소진 후, 약한 무늬($suits)에 조커 콜';
+  }
+
+  @override
+  String get strategyJokerCallWeak => '수비 기루다 소진 후, 약한 무늬에 조커 콜';
+
+  @override
+  String get strategyJokerOptimal => '최적 타이밍에 조커로 트릭 획득';
+
+  @override
+  String get strategyMightyTiming => '9번째 트릭에 마이티 사용 → 10번째 트릭 선 확보';
+
+  @override
+  String strategyVoidTrumpCut(String suits) {
+    return '$suits 보이드 → 상대 선공 시 기루다 컷으로 트릭 회수';
+  }
 }

@@ -1883,4 +1883,87 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hasAceNote => ' (Has Ace)';
+
+  @override
+  String strategyFirstTrickAceLead(String card) {
+    return '1st trick: Lead $card for a guaranteed trick win';
+  }
+
+  @override
+  String get strategyFirstTrickPassFriendWin =>
+      '1st trick: Lead low in a short suit to pass lead to friend (friend wins trick)';
+
+  @override
+  String strategyFirstTrickKingLead(String card) {
+    return '1st trick: Lead $card to attempt a trick win';
+  }
+
+  @override
+  String get strategyFirstTrickPassFriend =>
+      '1st trick: Lead low in a short suit to pass lead to friend';
+
+  @override
+  String get strategyPassToMightyFriend =>
+      'Lead low in a short suit to pass lead to friend (Mighty)';
+
+  @override
+  String get strategyPassToJokerFriend =>
+      'Lead low in a short suit to pass lead to friend (Joker)';
+
+  @override
+  String strategyPassTrumpToFriend(
+    String passCard,
+    String friendCard,
+    String rank,
+  ) {
+    return 'Lead $passCard to pass to friend ($friendCard) → prevent $rank solo';
+  }
+
+  @override
+  String strategyPassSuitToFriend(String card, String friendCard) {
+    return 'Lead $card to pass to friend ($friendCard)';
+  }
+
+  @override
+  String get strategySourceFriend => 'After friend trick,';
+
+  @override
+  String get strategySourceReclaim => 'After reclaiming lead,';
+
+  @override
+  String strategyTrumpDominate(String source, String cards) {
+    return '$source dominate with $cards → exhaust defenders\' trumps';
+  }
+
+  @override
+  String strategyTrumpExhaust(String source, String cards) {
+    return '$source use $cards to exhaust defenders\' trumps';
+  }
+
+  @override
+  String strategyTrumpMidDraw(String suit) {
+    return 'Use $suit mid-trumps to draw out defenders\' high trumps';
+  }
+
+  @override
+  String strategyJokerCallSuits(String suits) {
+    return 'After exhausting defenders\' trumps, call Joker on weak suit ($suits)';
+  }
+
+  @override
+  String get strategyJokerCallWeak =>
+      'After exhausting defenders\' trumps, call Joker on a weak suit';
+
+  @override
+  String get strategyJokerOptimal =>
+      'Use Joker to win a trick at the optimal timing';
+
+  @override
+  String get strategyMightyTiming =>
+      'Play Mighty on trick 9 → secure lead for trick 10';
+
+  @override
+  String strategyVoidTrumpCut(String suits) {
+    return '$suits void → trump cut to reclaim tricks when opponents lead';
+  }
 }

@@ -1852,4 +1852,80 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get hasAceNote => ' (有A)';
+
+  @override
+  String strategyFirstTrickAceLead(String card) {
+    return '首墩: 出$card确保赢墩';
+  }
+
+  @override
+  String get strategyFirstTrickPassFriendWin => '首墩: 出短花色低牌让搭档赢墩（搭档获得首墩）';
+
+  @override
+  String strategyFirstTrickKingLead(String card) {
+    return '首墩: 出$card尝试赢墩';
+  }
+
+  @override
+  String get strategyFirstTrickPassFriend => '首墩: 出短花色低牌将首攻权交给搭档';
+
+  @override
+  String get strategyPassToMightyFriend => '出短花色低牌将首攻权交给搭档（Mighty）';
+
+  @override
+  String get strategyPassToJokerFriend => '出短花色低牌将首攻权交给搭档（Joker）';
+
+  @override
+  String strategyPassTrumpToFriend(
+    String passCard,
+    String friendCard,
+    String rank,
+  ) {
+    return '出$passCard将首攻权交给搭档($friendCard) → 防止$rank单打';
+  }
+
+  @override
+  String strategyPassSuitToFriend(String card, String friendCard) {
+    return '出$card将首攻权交给搭档($friendCard)';
+  }
+
+  @override
+  String get strategySourceFriend => '搭档赢墩后，';
+
+  @override
+  String get strategySourceReclaim => '夺回首攻权后，';
+
+  @override
+  String strategyTrumpDominate(String source, String cards) {
+    return '$source用$cards压制 → 消耗防守方将牌';
+  }
+
+  @override
+  String strategyTrumpExhaust(String source, String cards) {
+    return '$source用$cards消耗防守方将牌';
+  }
+
+  @override
+  String strategyTrumpMidDraw(String suit) {
+    return '用$suit中等将牌逼出防守方高将牌';
+  }
+
+  @override
+  String strategyJokerCallSuits(String suits) {
+    return '消耗防守方将牌后，对弱花色($suits)叫Joker';
+  }
+
+  @override
+  String get strategyJokerCallWeak => '消耗防守方将牌后，对弱花色叫Joker';
+
+  @override
+  String get strategyJokerOptimal => '在最佳时机使用Joker赢墩';
+
+  @override
+  String get strategyMightyTiming => '第9墩使用Mighty → 确保第10墩首攻权';
+
+  @override
+  String strategyVoidTrumpCut(String suits) {
+    return '$suits缺门 → 对手首攻时用将牌切入夺墩';
+  }
 }

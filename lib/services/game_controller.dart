@@ -1060,10 +1060,10 @@ class GameController extends ChangeNotifier {
   }
 
   /// 점수 획득 전략 생성 (손패 기반 구체적 전략)
-  List<String> _generateStrategyPoints(Player declarer, GameState state) {
+  List<(String, Map<String, String>)> _generateStrategyPoints(Player declarer, GameState state) {
     final hand = declarer.hand;
     final giruda = state.giruda;
-    final strategies = <String>[];
+    final strategies = <(String, Map<String, String>)>[];
 
     // 헬퍼: 카드 표시
     String ss(Suit? s) => switch (s) {
@@ -1077,7 +1077,7 @@ class GameController extends ChangeNotifier {
       Rank.five => '5', Rank.four => '4', Rank.three => '3',
       Rank.two => '2', _ => ''
     };
-    String cs(PlayingCard c) => c.isJoker ? '조커' : '${ss(c.suit)}${rs(c.rank)}';
+    String cs(PlayingCard c) => c.isJoker ? 'Joker' : '${ss(c.suit)}${rs(c.rank)}';
 
     final hasMighty = hand.any((c) => c.isMightyWith(giruda));
     final hasJoker = hand.any((c) => c.isJoker);
@@ -1096,11 +1096,11 @@ class GameController extends ChangeNotifier {
       }
     }
     if (firstTrickAce != null) {
-      strategies.add('초구: ${cs(firstTrickAce)}로 선공하여 확실한 트릭 획득');
+      strategies.add(('FIRST_TRICK_ACE_LEAD', {'card': cs(firstTrickAce)}));
     } else {
       // A 없으면 프렌드 타입에 따라 초구 설명
       if (friendCard != null && (friendCard.isMightyWith(giruda) || friendCard.isJoker)) {
-        strategies.add('초구: 적은 무늬 저액으로 프렌드에게 선 넘기기 (프렌드가 트릭 획득)');
+        strategies.add(('FIRST_TRICK_PASS_FRIEND_WIN', <String, String>{}));
       } else {
         // 비기루다 K 확인
         PlayingCard? firstTrickKing;
@@ -1110,9 +1110,9 @@ class GameController extends ChangeNotifier {
           if (card.rank == Rank.king) { firstTrickKing = card; break; }
         }
         if (firstTrickKing != null) {
-          strategies.add('초구: ${cs(firstTrickKing)}로 선공 (A가 나왔으면 승리)');
+          strategies.add(('FIRST_TRICK_KING_LEAD', {'card': cs(firstTrickKing)}));
         } else {
-          strategies.add('초구: 적은 무늬 저액으로 프렌드에게 선 넘기기');
+          strategies.add(('FIRST_TRICK_PASS_FRIEND', <String, String>{}));
         }
       }
     }
@@ -1146,9 +1146,9 @@ class GameController extends ChangeNotifier {
     bool friendIsGirudaCard = false;
     if (friendCard != null) {
       if (friendCard.isMightyWith(giruda)) {
-        strategies.add('적은 무늬 저액으로 프렌드(마이티)에게 선 넘기기');
+        strategies.add(('PASS_TO_MIGHTY_FRIEND', <String, String>{}));
       } else if (friendCard.isJoker) {
-        strategies.add('적은 무늬 저액으로 프렌드(조커)에게 선 넘기기');
+        strategies.add(('PASS_TO_JOKER_FRIEND', <String, String>{}));
       } else if (friendCard.suit == giruda && giruda != null) {
         // 기루다 프렌드 (예: ♦K) → 9이하 중간 기루다(높은 순)로 선 넘기기
         friendIsGirudaCard = true;
@@ -1164,7 +1164,7 @@ class GameController extends ChangeNotifier {
             lowerGiruda.sort((a, b) => a.rankValue.compareTo(b.rankValue));
             passCard = lowerGiruda.first;
           }
-          strategies.add('${cs(passCard)}로 프렌드(${cs(friendCard)})에게 선 넘기기 → ${rs(friendCard.rank)}딸랑 방지');
+          strategies.add(('PASS_TRUMP_TO_FRIEND', {'passCard': cs(passCard), 'friendCard': cs(friendCard), 'rank': rs(friendCard.rank)}));
         }
       } else if (friendCard.suit != null) {
         // 비기루다 프렌드 (예: ♥K)
@@ -1174,7 +1174,7 @@ class GameController extends ChangeNotifier {
             c.rankValue < friendCard.rankValue).toList();
         if (friendSuitCards.isNotEmpty) {
           friendSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-          strategies.add('${cs(friendSuitCards.first)}로 프렌드(${cs(friendCard)})에게 선 넘기기');
+          strategies.add(('PASS_SUIT_TO_FRIEND', {'card': cs(friendSuitCards.first), 'friendCard': cs(friendCard)}));
         }
       }
     }
@@ -1182,38 +1182,38 @@ class GameController extends ChangeNotifier {
     // === 2. 기루다 공격 전략 ===
     if (giruda != null && highGiruda.isNotEmpty) {
       final highNames = highGiruda.map((c) => rs(c.rank)).join('/');
-      // 기루다 프렌드 → "프렌드 트릭 후" / 그 외 → "선 탈환 후"
-      final leadSource = friendIsGirudaCard ? '프렌드 트릭 후' : '선 탈환 후';
+      final source = friendIsGirudaCard ? 'friend' : 'reclaim';
+      final cards = '${ss(giruda)}$highNames';
       if (girudaCards.length >= 5) {
-        strategies.add('$leadSource ${ss(giruda)}$highNames로 기루다 지배 → 수비팀 기루다 소진');
+        strategies.add(('TRUMP_DOMINATE', {'source': source, 'suit': ss(giruda), 'cards': cards}));
       } else {
-        strategies.add('$leadSource ${ss(giruda)}$highNames로 수비팀 기루다 소진');
+        strategies.add(('TRUMP_EXHAUST', {'source': source, 'suit': ss(giruda), 'cards': cards}));
       }
     } else if (giruda != null && girudaCards.length >= 3) {
-      strategies.add('${ss(giruda)}중간 기루다로 수비팀 고액 기루다 소진 유도');
+      strategies.add(('TRUMP_MID_DRAW', {'suit': ss(giruda)}));
     }
 
     // === 3. 조커 활용 전략 ===
     if (hasJoker && giruda != null) {
       final callSuits = weakSuits.map((s) => ss(s)).toList();
       if (callSuits.isNotEmpty && callSuits.length <= 3) {
-        strategies.add('수비팀 기루다 소진 후 조커로 물패 무늬(${callSuits.join("/")}) 호출');
+        strategies.add(('JOKER_CALL_SUITS', {'suits': callSuits.join('/')}));
       } else {
-        strategies.add('수비팀 기루다 소진 후 조커로 물패 무늬 호출');
+        strategies.add(('JOKER_CALL_WEAK', <String, String>{}));
       }
     } else if (hasJoker) {
-      strategies.add('조커로 원하는 타이밍에 트릭 획득');
+      strategies.add(('JOKER_OPTIMAL', <String, String>{}));
     }
 
     // === 4. 마이티 타이밍 ===
     if (hasMighty) {
-      strategies.add('마이티를 9트릭에서 사용 → 10트릭 선행 확보');
+      strategies.add(('MIGHTY_TIMING', <String, String>{}));
     }
 
     // === 5. 컷 전략 ===
     if (voidSuits.isNotEmpty && giruda != null && girudaCards.isNotEmpty) {
       final voidSymbols = voidSuits.map((s) => ss(s)).join("/");
-      strategies.add('$voidSymbols void → 상대 선공 시 기루다 컷으로 트릭 탈환');
+      strategies.add(('VOID_TRUMP_CUT', {'suits': voidSymbols}));
     }
 
     return strategies;
@@ -1241,7 +1241,7 @@ class FriendExplanation {
   final bool isFull;
   final PlayingCard? firstTrickCard;    // 초구 카드 추천
   final String firstTrickStrategy;     // 초구 전략 설명 코드
-  final List<String> strategyPoints;   // 점수 획득 전략 목록
+  final List<(String, Map<String, String>)> strategyPoints;   // 점수 획득 전략 목록
 
   FriendExplanation({
     required this.declaration,

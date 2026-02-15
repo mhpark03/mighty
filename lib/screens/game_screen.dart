@@ -1399,9 +1399,44 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  String _getStrategyText(String strategy, AppLocalizations l10n) {
-    // 구체적 전략 텍스트는 controller에서 직접 생성 → 그대로 반환
-    return strategy;
+  String _getStrategyText((String, Map<String, String>) strategy, AppLocalizations l10n) {
+    final (code, params) = strategy;
+    switch (code) {
+      case 'FIRST_TRICK_ACE_LEAD':
+        return l10n.strategyFirstTrickAceLead(params['card']!);
+      case 'FIRST_TRICK_PASS_FRIEND_WIN':
+        return l10n.strategyFirstTrickPassFriendWin;
+      case 'FIRST_TRICK_KING_LEAD':
+        return l10n.strategyFirstTrickKingLead(params['card']!);
+      case 'FIRST_TRICK_PASS_FRIEND':
+        return l10n.strategyFirstTrickPassFriend;
+      case 'PASS_TO_MIGHTY_FRIEND':
+        return l10n.strategyPassToMightyFriend;
+      case 'PASS_TO_JOKER_FRIEND':
+        return l10n.strategyPassToJokerFriend;
+      case 'PASS_TRUMP_TO_FRIEND':
+        return l10n.strategyPassTrumpToFriend(params['passCard']!, params['friendCard']!, params['rank']!);
+      case 'PASS_SUIT_TO_FRIEND':
+        return l10n.strategyPassSuitToFriend(params['card']!, params['friendCard']!);
+      case 'TRUMP_DOMINATE':
+        return l10n.strategyTrumpDominate(params['source'] == 'friend' ? l10n.strategySourceFriend : l10n.strategySourceReclaim, params['cards']!);
+      case 'TRUMP_EXHAUST':
+        return l10n.strategyTrumpExhaust(params['source'] == 'friend' ? l10n.strategySourceFriend : l10n.strategySourceReclaim, params['cards']!);
+      case 'TRUMP_MID_DRAW':
+        return l10n.strategyTrumpMidDraw(params['suit']!);
+      case 'JOKER_CALL_SUITS':
+        return l10n.strategyJokerCallSuits(params['suits']!);
+      case 'JOKER_CALL_WEAK':
+        return l10n.strategyJokerCallWeak;
+      case 'JOKER_OPTIMAL':
+        return l10n.strategyJokerOptimal;
+      case 'MIGHTY_TIMING':
+        return l10n.strategyMightyTiming;
+      case 'VOID_TRUMP_CUT':
+        return l10n.strategyVoidTrumpCut(params['suits']!);
+      default:
+        return code;
+    }
   }
 
   String _getFriendReason(String reason, AppLocalizations l10n) {

@@ -895,5 +895,73 @@
       "max": {"type": "int"}
     }
   },
-  "hasAceNote": " (Has Ace)"
+  "hasAceNote": " (Has Ace)",
+  "strategyFirstTrickAceLead": "1st trick: Lead {card} for a guaranteed trick win",
+  "@strategyFirstTrickAceLead": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "strategyFirstTrickPassFriendWin": "1st trick: Lead low in a short suit to pass lead to friend (friend wins trick)",
+  "strategyFirstTrickKingLead": "1st trick: Lead {card} to attempt a trick win",
+  "@strategyFirstTrickKingLead": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "strategyFirstTrickPassFriend": "1st trick: Lead low in a short suit to pass lead to friend",
+  "strategyPassToMightyFriend": "Lead low in a short suit to pass lead to friend (Mighty)",
+  "strategyPassToJokerFriend": "Lead low in a short suit to pass lead to friend (Joker)",
+  "strategyPassTrumpToFriend": "Lead {passCard} to pass to friend ({friendCard}) → prevent {rank} solo",
+  "@strategyPassTrumpToFriend": {
+    "placeholders": {
+      "passCard": {"type": "String"},
+      "friendCard": {"type": "String"},
+      "rank": {"type": "String"}
+    }
+  },
+  "strategyPassSuitToFriend": "Lead {card} to pass to friend ({friendCard})",
+  "@strategyPassSuitToFriend": {
+    "placeholders": {
+      "card": {"type": "String"},
+      "friendCard": {"type": "String"}
+    }
+  },
+  "strategySourceFriend": "After friend trick,",
+  "strategySourceReclaim": "After reclaiming lead,",
+  "strategyTrumpDominate": "{source} dominate with {cards} → exhaust defenders' trumps",
+  "@strategyTrumpDominate": {
+    "placeholders": {
+      "source": {"type": "String"},
+      "cards": {"type": "String"}
+    }
+  },
+  "strategyTrumpExhaust": "{source} use {cards} to exhaust defenders' trumps",
+  "@strategyTrumpExhaust": {
+    "placeholders": {
+      "source": {"type": "String"},
+      "cards": {"type": "String"}
+    }
+  },
+  "strategyTrumpMidDraw": "Use {suit} mid-trumps to draw out defenders' high trumps",
+  "@strategyTrumpMidDraw": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "strategyJokerCallSuits": "After exhausting defenders' trumps, call Joker on weak suit ({suits})",
+  "@strategyJokerCallSuits": {
+    "placeholders": {
+      "suits": {"type": "String"}
+    }
+  },
+  "strategyJokerCallWeak": "After exhausting defenders' trumps, call Joker on a weak suit",
+  "strategyJokerOptimal": "Use Joker to win a trick at the optimal timing",
+  "strategyMightyTiming": "Play Mighty on trick 9 → secure lead for trick 10",
+  "strategyVoidTrumpCut": "{suits} void → trump cut to reclaim tricks when opponents lead",
+  "@strategyVoidTrumpCut": {
+    "placeholders": {
+      "suits": {"type": "String"}
+    }
+  }
 }

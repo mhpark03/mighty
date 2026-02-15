@@ -894,5 +894,73 @@
       "max": {"type": "int"}
     }
   },
-  "hasAceNote": " (有A)"
+  "hasAceNote": " (有A)",
+  "strategyFirstTrickAceLead": "首墩: 出{card}确保赢墩",
+  "@strategyFirstTrickAceLead": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "strategyFirstTrickPassFriendWin": "首墩: 出短花色低牌让搭档赢墩（搭档获得首墩）",
+  "strategyFirstTrickKingLead": "首墩: 出{card}尝试赢墩",
+  "@strategyFirstTrickKingLead": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "strategyFirstTrickPassFriend": "首墩: 出短花色低牌将首攻权交给搭档",
+  "strategyPassToMightyFriend": "出短花色低牌将首攻权交给搭档（Mighty）",
+  "strategyPassToJokerFriend": "出短花色低牌将首攻权交给搭档（Joker）",
+  "strategyPassTrumpToFriend": "出{passCard}将首攻权交给搭档({friendCard}) → 防止{rank}单打",
+  "@strategyPassTrumpToFriend": {
+    "placeholders": {
+      "passCard": {"type": "String"},
+      "friendCard": {"type": "String"},
+      "rank": {"type": "String"}
+    }
+  },
+  "strategyPassSuitToFriend": "出{card}将首攻权交给搭档({friendCard})",
+  "@strategyPassSuitToFriend": {
+    "placeholders": {
+      "card": {"type": "String"},
+      "friendCard": {"type": "String"}
+    }
+  },
+  "strategySourceFriend": "搭档赢墩后，",
+  "strategySourceReclaim": "夺回首攻权后，",
+  "strategyTrumpDominate": "{source}用{cards}压制 → 消耗防守方将牌",
+  "@strategyTrumpDominate": {
+    "placeholders": {
+      "source": {"type": "String"},
+      "cards": {"type": "String"}
+    }
+  },
+  "strategyTrumpExhaust": "{source}用{cards}消耗防守方将牌",
+  "@strategyTrumpExhaust": {
+    "placeholders": {
+      "source": {"type": "String"},
+      "cards": {"type": "String"}
+    }
+  },
+  "strategyTrumpMidDraw": "用{suit}中等将牌逼出防守方高将牌",
+  "@strategyTrumpMidDraw": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "strategyJokerCallSuits": "消耗防守方将牌后，对弱花色({suits})叫Joker",
+  "@strategyJokerCallSuits": {
+    "placeholders": {
+      "suits": {"type": "String"}
+    }
+  },
+  "strategyJokerCallWeak": "消耗防守方将牌后，对弱花色叫Joker",
+  "strategyJokerOptimal": "在最佳时机使用Joker赢墩",
+  "strategyMightyTiming": "第9墩使用Mighty → 确保第10墩首攻权",
+  "strategyVoidTrumpCut": "{suits}缺门 → 对手首攻时用将牌切入夺墩",
+  "@strategyVoidTrumpCut": {
+    "placeholders": {
+      "suits": {"type": "String"}
+    }
+  }
 }

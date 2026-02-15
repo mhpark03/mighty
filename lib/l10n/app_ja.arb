@@ -894,5 +894,73 @@
       "max": {"type": "int"}
     }
   },
-  "hasAceNote": " (A所有)"
+  "hasAceNote": " (A所有)",
+  "strategyFirstTrickAceLead": "初手: {card}リードで確実なトリック獲得",
+  "@strategyFirstTrickAceLead": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "strategyFirstTrickPassFriendWin": "初手: 短いスートの低カードでフレンドにリード譲渡（フレンドがトリック獲得）",
+  "strategyFirstTrickKingLead": "初手: {card}リードでトリック獲得を試みる",
+  "@strategyFirstTrickKingLead": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "strategyFirstTrickPassFriend": "初手: 短いスートの低カードでフレンドにリード譲渡",
+  "strategyPassToMightyFriend": "短いスートの低カードでフレンドにリード譲渡（マイティ）",
+  "strategyPassToJokerFriend": "短いスートの低カードでフレンドにリード譲渡（ジョーカー）",
+  "strategyPassTrumpToFriend": "{passCard}リードでフレンド({friendCard})にリード譲渡 → {rank}単独を防止",
+  "@strategyPassTrumpToFriend": {
+    "placeholders": {
+      "passCard": {"type": "String"},
+      "friendCard": {"type": "String"},
+      "rank": {"type": "String"}
+    }
+  },
+  "strategyPassSuitToFriend": "{card}リードでフレンド({friendCard})にリード譲渡",
+  "@strategyPassSuitToFriend": {
+    "placeholders": {
+      "card": {"type": "String"},
+      "friendCard": {"type": "String"}
+    }
+  },
+  "strategySourceFriend": "フレンドトリック後、",
+  "strategySourceReclaim": "リード奪還後、",
+  "strategyTrumpDominate": "{source} {cards}で支配 → 守備側の切り札を消耗",
+  "@strategyTrumpDominate": {
+    "placeholders": {
+      "source": {"type": "String"},
+      "cards": {"type": "String"}
+    }
+  },
+  "strategyTrumpExhaust": "{source} {cards}で守備側の切り札を消耗",
+  "@strategyTrumpExhaust": {
+    "placeholders": {
+      "source": {"type": "String"},
+      "cards": {"type": "String"}
+    }
+  },
+  "strategyTrumpMidDraw": "{suit}中間切り札で守備側の高い切り札を引き出す",
+  "@strategyTrumpMidDraw": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "strategyJokerCallSuits": "守備側の切り札消耗後、弱いスート({suits})でジョーカーコール",
+  "@strategyJokerCallSuits": {
+    "placeholders": {
+      "suits": {"type": "String"}
+    }
+  },
+  "strategyJokerCallWeak": "守備側の切り札消耗後、弱いスートでジョーカーコール",
+  "strategyJokerOptimal": "最適なタイミングでジョーカーを使用してトリック獲得",
+  "strategyMightyTiming": "9トリック目にマイティ使用 → 10トリック目のリード確保",
+  "strategyVoidTrumpCut": "{suits}ボイド → 相手リード時に切り札カットでトリック回収",
+  "@strategyVoidTrumpCut": {
+    "placeholders": {
+      "suits": {"type": "String"}
+    }
+  }
 }

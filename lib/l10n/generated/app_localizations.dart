@@ -3389,6 +3389,118 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **' (A 보유)'**
   String get hasAceNote;
+
+  /// No description provided for @strategyFirstTrickAceLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구: {card} 선공으로 확실한 트릭 획득'**
+  String strategyFirstTrickAceLead(String card);
+
+  /// No description provided for @strategyFirstTrickPassFriendWin.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구: 짧은 무늬 낮은 카드로 선 넘기기 (프렌드가 트릭 획득)'**
+  String get strategyFirstTrickPassFriendWin;
+
+  /// No description provided for @strategyFirstTrickKingLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구: {card} 선공으로 트릭 획득 시도'**
+  String strategyFirstTrickKingLead(String card);
+
+  /// No description provided for @strategyFirstTrickPassFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구: 짧은 무늬 낮은 카드로 프렌드에게 선 넘기기'**
+  String get strategyFirstTrickPassFriend;
+
+  /// No description provided for @strategyPassToMightyFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'짧은 무늬 낮은 카드로 프렌드에게 선 넘기기 (마이티)'**
+  String get strategyPassToMightyFriend;
+
+  /// No description provided for @strategyPassToJokerFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'짧은 무늬 낮은 카드로 프렌드에게 선 넘기기 (조커)'**
+  String get strategyPassToJokerFriend;
+
+  /// No description provided for @strategyPassTrumpToFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'{passCard} 선공으로 프렌드({friendCard})에게 선 넘기기 → {rank} 단독 방지'**
+  String strategyPassTrumpToFriend(
+    String passCard,
+    String friendCard,
+    String rank,
+  );
+
+  /// No description provided for @strategyPassSuitToFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card} 선공으로 프렌드({friendCard})에게 선 넘기기'**
+  String strategyPassSuitToFriend(String card, String friendCard);
+
+  /// No description provided for @strategySourceFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 트릭 후,'**
+  String get strategySourceFriend;
+
+  /// No description provided for @strategySourceReclaim.
+  ///
+  /// In ko, this message translates to:
+  /// **'선 회수 후,'**
+  String get strategySourceReclaim;
+
+  /// No description provided for @strategyTrumpDominate.
+  ///
+  /// In ko, this message translates to:
+  /// **'{source} {cards}로 지배 → 수비 기루다 소진'**
+  String strategyTrumpDominate(String source, String cards);
+
+  /// No description provided for @strategyTrumpExhaust.
+  ///
+  /// In ko, this message translates to:
+  /// **'{source} {cards}로 수비 기루다 소진'**
+  String strategyTrumpExhaust(String source, String cards);
+
+  /// No description provided for @strategyTrumpMidDraw.
+  ///
+  /// In ko, this message translates to:
+  /// **'{suit} 중간 기루다로 수비측 높은 기루다 유도'**
+  String strategyTrumpMidDraw(String suit);
+
+  /// No description provided for @strategyJokerCallSuits.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 기루다 소진 후, 약한 무늬({suits})에 조커 콜'**
+  String strategyJokerCallSuits(String suits);
+
+  /// No description provided for @strategyJokerCallWeak.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 기루다 소진 후, 약한 무늬에 조커 콜'**
+  String get strategyJokerCallWeak;
+
+  /// No description provided for @strategyJokerOptimal.
+  ///
+  /// In ko, this message translates to:
+  /// **'최적 타이밍에 조커로 트릭 획득'**
+  String get strategyJokerOptimal;
+
+  /// No description provided for @strategyMightyTiming.
+  ///
+  /// In ko, this message translates to:
+  /// **'9번째 트릭에 마이티 사용 → 10번째 트릭 선 확보'**
+  String get strategyMightyTiming;
+
+  /// No description provided for @strategyVoidTrumpCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'{suits} 보이드 → 상대 선공 시 기루다 컷으로 트릭 회수'**
+  String strategyVoidTrumpCut(String suits);
 }
 
 class _AppLocalizationsDelegate

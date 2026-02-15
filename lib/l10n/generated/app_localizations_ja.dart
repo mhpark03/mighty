@@ -1861,4 +1861,81 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get hasAceNote => ' (A所有)';
+
+  @override
+  String strategyFirstTrickAceLead(String card) {
+    return '初手: $cardリードで確実なトリック獲得';
+  }
+
+  @override
+  String get strategyFirstTrickPassFriendWin =>
+      '初手: 短いスートの低カードでフレンドにリード譲渡（フレンドがトリック獲得）';
+
+  @override
+  String strategyFirstTrickKingLead(String card) {
+    return '初手: $cardリードでトリック獲得を試みる';
+  }
+
+  @override
+  String get strategyFirstTrickPassFriend => '初手: 短いスートの低カードでフレンドにリード譲渡';
+
+  @override
+  String get strategyPassToMightyFriend => '短いスートの低カードでフレンドにリード譲渡（マイティ）';
+
+  @override
+  String get strategyPassToJokerFriend => '短いスートの低カードでフレンドにリード譲渡（ジョーカー）';
+
+  @override
+  String strategyPassTrumpToFriend(
+    String passCard,
+    String friendCard,
+    String rank,
+  ) {
+    return '$passCardリードでフレンド($friendCard)にリード譲渡 → $rank単独を防止';
+  }
+
+  @override
+  String strategyPassSuitToFriend(String card, String friendCard) {
+    return '$cardリードでフレンド($friendCard)にリード譲渡';
+  }
+
+  @override
+  String get strategySourceFriend => 'フレンドトリック後、';
+
+  @override
+  String get strategySourceReclaim => 'リード奪還後、';
+
+  @override
+  String strategyTrumpDominate(String source, String cards) {
+    return '$source $cardsで支配 → 守備側の切り札を消耗';
+  }
+
+  @override
+  String strategyTrumpExhaust(String source, String cards) {
+    return '$source $cardsで守備側の切り札を消耗';
+  }
+
+  @override
+  String strategyTrumpMidDraw(String suit) {
+    return '$suit中間切り札で守備側の高い切り札を引き出す';
+  }
+
+  @override
+  String strategyJokerCallSuits(String suits) {
+    return '守備側の切り札消耗後、弱いスート($suits)でジョーカーコール';
+  }
+
+  @override
+  String get strategyJokerCallWeak => '守備側の切り札消耗後、弱いスートでジョーカーコール';
+
+  @override
+  String get strategyJokerOptimal => '最適なタイミングでジョーカーを使用してトリック獲得';
+
+  @override
+  String get strategyMightyTiming => '9トリック目にマイティ使用 → 10トリック目のリード確保';
+
+  @override
+  String strategyVoidTrumpCut(String suits) {
+    return '$suitsボイド → 相手リード時に切り札カットでトリック回収';
+  }
 }
