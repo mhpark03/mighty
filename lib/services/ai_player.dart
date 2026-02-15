@@ -670,6 +670,20 @@ class AIPlayer {
       if (hasKing && !hasAce) { maxTricks++; }
     }
 
+    // === 비기루다 취약 수트 감점 ===
+    // A도 K도 없는 비기루다 수트가 2개 이상이면 수비가 해당 수트로 점수 확보
+    int weakSuits = 0;
+    for (final suit in Suit.values) {
+      if (suit == giruda) continue;
+      final sc = hand.where((c) => !c.isJoker && c.suit == suit).toList();
+      if (sc.isEmpty) continue; // 보이드는 컷 가능하므로 약점 아님
+      bool hasAce = sc.any((c) =>
+          c.rank == Rank.ace && !(c.suit == mightySuit && c.rank == Rank.ace));
+      bool hasKing = sc.any((c) => c.rank == Rank.king);
+      if (!hasAce && !hasKing) weakSuits++;
+    }
+    if (weakSuits >= 2) minTricks -= 1;
+
     // === 보이드 컷 기회 (최대만) ===
     if (giruda != null) {
       final girudaCount = hand.where((c) => !c.isJoker && c.suit == giruda).length;
@@ -693,6 +707,12 @@ class AIPlayer {
     if (!hasJoker) {
       // 최대: 프렌드가 조커도 보유 가능 (조커콜 위험 → 최대에만)
       maxTricks++;
+      // 수비 조커가 트릭 탈취 가능 → 최소에서 감점
+      minTricks -= 1;
+    }
+    // 마이티+조커 둘 다 미보유: 수비가 양대 키카드 보유 → 최소 2트릭 탈취
+    if (!hasMighty && !hasJoker) {
+      minTricks -= 1;
     }
     // 최대: 프렌드가 비기루다 A를 추가로 보유 가능
     maxTricks++;
@@ -704,13 +724,23 @@ class AIPlayer {
 
     // 트릭당 평균 점수 카드: 약 2장 (20장 / 10트릭)
     // 최소는 보수적으로 1.8장, 최대는 2장
-    int minPoints = (minTricks * 1.8).round().clamp(0, 20);
+    int minPoints = (minTricks * 1.7).round().clamp(0, 20);
     int maxPoints = (maxTricks * 2).clamp(0, 20);
 
     // === 런 감지: 마이티+조커+기루다A+5장기루다 → 최대 18점 이상 ===
     if (hasMighty && hasJoker && giruda != null && girudaLen >= 5) {
       bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
       if (hasGirudaAce && maxPoints < 18) { maxPoints = 18; }
+    }
+    // === 런 감지 2단계: 키카드 2개+ & 기루다A & 기루다4장+ → 최대 16점 이상 ===
+    if (giruda != null && girudaLen >= 4) {
+      bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+      if (hasGirudaAce) {
+        bool hasGirudaKing = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.king);
+        int keyCards = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) +
+            (hasGirudaKing ? 1 : 0);
+        if (keyCards >= 2 && maxPoints < 16) { maxPoints = 16; }
+      }
     }
 
     if (minPoints > maxPoints) minPoints = maxPoints;
