@@ -235,7 +235,7 @@ class MightyTrackingService {
 
       final body = {
         'gameId': gameUuid,
-        'appVersion': '1.0.98',
+        'appVersion': '1.0.99',
         'allPassed': state.allPassed,
         'declarerId': state.declarerId,
         'giruda': _suitName(state.giruda),
