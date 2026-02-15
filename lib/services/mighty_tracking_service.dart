@@ -221,6 +221,7 @@ class MightyTrackingService {
           return {
             'trickNumber': trick.trickNumber,
             'winnerId': trick.winnerId,
+            'leadPlayerId': trick.leadPlayerId,
             'wonByDeclarer': wonByDeclarer,
             'pointCards': pointCards,
             'hasMighty': hasMighty,
@@ -228,6 +229,15 @@ class MightyTrackingService {
             'hasGiruda': hasGiruda,
             'jokerCalled': trick.jokerCall == JokerCallType.jokerCall,
             'leadSuit': _suitName(trick.leadSuit),
+            'cards': List.generate(trick.cards.length, (i) => {
+              final card = trick.cards[i];
+              return {
+                'playerId': trick.playerOrder[i],
+                'suit': card.isJoker ? null : card.suit?.index,
+                'rank': card.isJoker ? null : card.rank?.index,
+                'isJoker': card.isJoker,
+              };
+            }),
             if (event != null) 'event': event,
           };
         }).toList();
