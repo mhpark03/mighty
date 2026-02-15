@@ -17,7 +17,7 @@ import 'services/hearts/hearts_stats_service.dart';
 import 'services/ad_service.dart';
 import 'screens/game_selection_screen.dart';
 
-void main() {
+void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
@@ -27,10 +27,16 @@ void main() {
     overlays: [],
   );
 
-  // AdMob 초기화 (비동기로 진행하여 스플래시 화면 먼저 표시)
-  MobileAds.instance.initialize().then((_) {
-    AdService().loadRewardedAd();
-  });
+  // AdMob 초기화
+  await MobileAds.instance.initialize();
+
+  // 계정 정지 중에도 코드 레벨에서 테스트 기기를 강제 지정합니다.
+  RequestConfiguration configuration = RequestConfiguration(
+    testDeviceIds: ["7e423abc-74c5-4cb7-9e7b-578adadeb80d"],
+  );
+  await MobileAds.instance.updateRequestConfiguration(configuration);
+
+  AdService().loadRewardedAd();
 
   runApp(const MightyApp());
 }

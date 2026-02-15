@@ -1671,15 +1671,15 @@ class _GameScreenState extends State<GameScreen> {
           ),
           if (explanation.suit != null) ...[
             const SizedBox(height: 2),
-            Text(
+            _buildSuitColoredText(
               '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.estimatedRange(explanation.minPoints, explanation.maxPoints)} (${l10n.optimalScore(explanation.optimalPoints)})',
-              style: const TextStyle(color: Colors.white54, fontSize: 10),
+              const TextStyle(color: Colors.white54, fontSize: 10),
             ),
             if (keyCardInfo != null) ...[
               const SizedBox(height: 1),
-              Text(
+              _buildSuitColoredText(
                 keyCardInfo,
-                style: const TextStyle(color: Colors.white54, fontSize: 10),
+                const TextStyle(color: Colors.white54, fontSize: 10),
               ),
             ],
             if (adjustedWidget != null) ...[
@@ -1705,15 +1705,15 @@ class _GameScreenState extends State<GameScreen> {
             ],
           ),
           const SizedBox(height: 3),
-          Text(
+          _buildSuitColoredText(
             '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.estimatedRange(explanation.minPoints, explanation.maxPoints)} (${l10n.optimalScore(explanation.optimalPoints)})',
-            style: const TextStyle(color: Colors.white70, fontSize: 11),
+            const TextStyle(color: Colors.white70, fontSize: 11),
           ),
           if (keyCardInfo != null) ...[
             const SizedBox(height: 1),
-            Text(
+            _buildSuitColoredText(
               keyCardInfo,
-              style: const TextStyle(color: Colors.white70, fontSize: 10),
+              const TextStyle(color: Colors.white70, fontSize: 10),
             ),
           ],
           if (explanation.friendType != null) ...[
@@ -3381,6 +3381,45 @@ class _GameScreenState extends State<GameScreen> {
               ),
       ],
     );
+  }
+
+  // 어두운 배경용 무늬 색상 (스페이드/클로버는 흰색, 하트/다이아는 빨강)
+  Color _getSuitColorOnDark(Suit suit) {
+    switch (suit) {
+      case Suit.spade:
+      case Suit.club:
+        return Colors.white;
+      case Suit.heart:
+      case Suit.diamond:
+        return Colors.red[300]!;
+    }
+  }
+
+  // 무늬 기호가 포함된 텍스트를 색상 적용하여 렌더링 (어두운 배경용)
+  Widget _buildSuitColoredText(String text, TextStyle baseStyle) {
+    final suitPattern = RegExp('[♠♦♥♣]');
+    final spans = <TextSpan>[];
+    int lastEnd = 0;
+    for (final match in suitPattern.allMatches(text)) {
+      if (match.start > lastEnd) {
+        spans.add(TextSpan(text: text.substring(lastEnd, match.start)));
+      }
+      final symbol = match.group(0)!;
+      Color color;
+      switch (symbol) {
+        case '♠': color = Colors.white; break;
+        case '♣': color = Colors.white; break;
+        case '♥': color = Colors.red[300]!; break;
+        case '♦': color = Colors.red[300]!; break;
+        default: color = baseStyle.color ?? Colors.white;
+      }
+      spans.add(TextSpan(text: symbol, style: TextStyle(color: color)));
+      lastEnd = match.end;
+    }
+    if (lastEnd < text.length) {
+      spans.add(TextSpan(text: text.substring(lastEnd)));
+    }
+    return RichText(text: TextSpan(style: baseStyle, children: spans));
   }
 
   // 정보 표시용 무늬 색상 (스페이드/클로버는 검정, 하트/다이아는 빨강)
