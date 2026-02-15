@@ -929,12 +929,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String cardOwner(String card) {
-    return '$card持有者';
+    return '$card 持有者';
   }
 
   @override
   String trickWinner(int n) {
-    return '第$n轮获胜者';
+    return '第$n墩赢家';
   }
 
   @override
@@ -1820,4 +1820,36 @@ class AppLocalizationsZh extends AppLocalizations {
   String bidInfoFirstTrickAces(String aces) {
     return '首墩 $aces';
   }
+
+  @override
+  String get jokerOwner => '小丑持有者';
+
+  @override
+  String get friendBadge => '搭档';
+
+  @override
+  String get kittyLabel => '底牌 ';
+
+  @override
+  String kittyPointsWithFriend(int points) {
+    return ' $points分 (搭档底牌)';
+  }
+
+  @override
+  String kittyPoints(int points) {
+    return ' $points分';
+  }
+
+  @override
+  String friendWithName(String name) {
+    return '搭档 $name ';
+  }
+
+  @override
+  String adjustedPointsRange(int min, int max) {
+    return '→ 调整 $min~$max分';
+  }
+
+  @override
+  String get hasAceNote => ' (有A)';
 }

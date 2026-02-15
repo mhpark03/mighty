@@ -934,12 +934,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String cardOwner(String card) {
-    return '$card所有者';
+    return '$card 所有者';
   }
 
   @override
   String trickWinner(int n) {
-    return '$n番目のトリック獲得者';
+    return 'トリック$n 勝者';
   }
 
   @override
@@ -1829,4 +1829,36 @@ class AppLocalizationsJa extends AppLocalizations {
   String bidInfoFirstTrickAces(String aces) {
     return '初手 $aces';
   }
+
+  @override
+  String get jokerOwner => 'ジョーカー所有者';
+
+  @override
+  String get friendBadge => 'フレンド';
+
+  @override
+  String get kittyLabel => '場札 ';
+
+  @override
+  String kittyPointsWithFriend(int points) {
+    return ' $points点 (フレンド場札)';
+  }
+
+  @override
+  String kittyPoints(int points) {
+    return ' $points点';
+  }
+
+  @override
+  String friendWithName(String name) {
+    return 'フレンド $name ';
+  }
+
+  @override
+  String adjustedPointsRange(int min, int max) {
+    return '→ 調整 $min~$max点';
+  }
+
+  @override
+  String get hasAceNote => ' (A所有)';
 }

@@ -854,5 +854,46 @@
     "placeholders": {
       "aces": {"type": "String"}
     }
-  }
+  },
+  "jokerOwner": "Joker Owner",
+  "cardOwner": "{card} Owner",
+  "@cardOwner": {
+    "placeholders": {
+      "card": {"type": "String"}
+    }
+  },
+  "trickWinner": "Trick {n} Winner",
+  "@trickWinner": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "friendBadge": "Friend",
+  "kittyLabel": "Kitty ",
+  "kittyPointsWithFriend": " {points}pts (friend kitty)",
+  "@kittyPointsWithFriend": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "kittyPoints": " {points}pts",
+  "@kittyPoints": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "friendWithName": "Friend {name} ",
+  "@friendWithName": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "adjustedPointsRange": "→ Adj. {min}~{max}pts",
+  "@adjustedPointsRange": {
+    "placeholders": {
+      "min": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+  "hasAceNote": " (Has Ace)"
 }

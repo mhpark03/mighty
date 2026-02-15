@@ -1851,4 +1851,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String bidInfoFirstTrickAces(String aces) {
     return '1st trick $aces';
   }
+
+  @override
+  String get jokerOwner => 'Joker Owner';
+
+  @override
+  String get friendBadge => 'Friend';
+
+  @override
+  String get kittyLabel => 'Kitty ';
+
+  @override
+  String kittyPointsWithFriend(int points) {
+    return ' ${points}pts (friend kitty)';
+  }
+
+  @override
+  String kittyPoints(int points) {
+    return ' ${points}pts';
+  }
+
+  @override
+  String friendWithName(String name) {
+    return 'Friend $name ';
+  }
+
+  @override
+  String adjustedPointsRange(int min, int max) {
+    return '→ Adj. $min~${max}pts';
+  }
+
+  @override
+  String get hasAceNote => ' (Has Ace)';
 }

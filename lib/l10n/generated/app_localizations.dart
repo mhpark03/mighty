@@ -1815,7 +1815,7 @@ abstract class AppLocalizations {
   /// No description provided for @trickWinner.
   ///
   /// In ko, this message translates to:
-  /// **'{n}번째 트릭 획득자'**
+  /// **'{n}트릭 승자'**
   String trickWinner(int n);
 
   /// No description provided for @hint.
@@ -3341,6 +3341,54 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'초구 {aces}'**
   String bidInfoFirstTrickAces(String aces);
+
+  /// No description provided for @jokerOwner.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 소유자'**
+  String get jokerOwner;
+
+  /// No description provided for @friendBadge.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드'**
+  String get friendBadge;
+
+  /// No description provided for @kittyLabel.
+  ///
+  /// In ko, this message translates to:
+  /// **'바닥패 '**
+  String get kittyLabel;
+
+  /// No description provided for @kittyPointsWithFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **' {points}점 (프렌드 바닥패)'**
+  String kittyPointsWithFriend(int points);
+
+  /// No description provided for @kittyPoints.
+  ///
+  /// In ko, this message translates to:
+  /// **' {points}점'**
+  String kittyPoints(int points);
+
+  /// No description provided for @friendWithName.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 {name} '**
+  String friendWithName(String name);
+
+  /// No description provided for @adjustedPointsRange.
+  ///
+  /// In ko, this message translates to:
+  /// **'→ 조정 {min}~{max}점'**
+  String adjustedPointsRange(int min, int max);
+
+  /// No description provided for @hasAceNote.
+  ///
+  /// In ko, this message translates to:
+  /// **' (A 보유)'**
+  String get hasAceNote;
 }
 
 class _AppLocalizationsDelegate

@@ -5,6 +5,7 @@ import '../models/player.dart';
 import '../models/game_state.dart';
 import 'ai_player.dart';
 import 'game_save_service.dart';
+import 'mighty_tracking_service.dart';
 
 class GameController extends ChangeNotifier {
   late GameState _state;
@@ -22,6 +23,9 @@ class GameController extends ChangeNotifier {
   FriendExplanation? _friendExplanation;
   bool _showFriendSummary = false;
   FriendDeclaration? _pendingDeclaration;
+  final List<BidEvaluationSnapshot> _bidSnapshots = [];
+  KittySnapshot? _kittySnapshot;
+  String _gameUuid = '';
 
   GameController() {
     _initializePlayers();
@@ -151,6 +155,9 @@ class GameController extends ChangeNotifier {
     _showKittySummary = false;
     _friendExplanation = null;
     _showFriendSummary = false;
+    _bidSnapshots.clear();
+    _kittySnapshot = null;
+    _gameUuid = MightyTrackingService.generateUuid();
     _state.startNewGame();
     notifyListeners();
     if (!_isAutoPlayMode) saveGame(); // 자동 저장 (auto-play 시 스킵)
@@ -172,6 +179,23 @@ class GameController extends ChangeNotifier {
 
       final currentPlayer = _state.players[_state.currentBidder];
       final (bid, evaluation) = _aiPlayer.decideBidWithEvaluation(currentPlayer, _state);
+
+      // Tracking: collect bid evaluation snapshot
+      _bidSnapshots.add(BidEvaluationSnapshot(
+        playerId: currentPlayer.id,
+        hand: currentPlayer.hand.map((c) => c.toJson()).toList(),
+        bestGiruda: evaluation.bestGiruda?.name,
+        girudaCount: evaluation.girudaCount,
+        hasMighty: currentPlayer.hand.any((c) => c.suit == Suit.spade && c.rank == Rank.ace && !c.isJoker),
+        hasJoker: currentPlayer.hand.any((c) => c.isJoker),
+        hasGirudaAce: evaluation.bestGiruda != null && currentPlayer.hand.any((c) => !c.isJoker && c.suit == evaluation.bestGiruda && c.rank == Rank.ace),
+        hasGirudaKing: evaluation.bestGiruda != null && currentPlayer.hand.any((c) => !c.isJoker && c.suit == evaluation.bestGiruda && c.rank == Rank.king),
+        predictedMin: evaluation.minPoints,
+        predictedMax: evaluation.maxPoints,
+        predictedOptimal: evaluation.optimalPoints,
+        bidAction: bid.passed ? 'PASS' : 'BID',
+        bidAmount: bid.tricks,
+      ));
 
       var effectiveSuit = evaluation.bestGiruda;
 
@@ -315,8 +339,8 @@ class GameController extends ChangeNotifier {
       _isProcessing = false;
       notifyListeners();
 
-      // 설명을 5초간 표시 후 다음 진행
-      await Future.delayed(const Duration(seconds: 5));
+      // 설명을 표시 후 다음 진행
+      await Future.delayed(const Duration(seconds: 3));
       if (_state.phase != GamePhase.bidding && !(_state.phase == GamePhase.waiting && _state.allPassed) && _state.phase != GamePhase.selectingKitty) return;
       if (_isAutoPlayPaused) return;
 
@@ -327,6 +351,7 @@ class GameController extends ChangeNotifier {
           _processAIKittySelection();
         }
       } else if (_state.phase == GamePhase.waiting && _state.allPassed) {
+        _sendTrackingData();
         _lastBidExplanation = null; // 배팅 설명 클리어 → 모두 패스 화면 전환
         notifyListeners();
       }
@@ -336,7 +361,25 @@ class GameController extends ChangeNotifier {
       if (_state.phase != GamePhase.bidding) return;
 
       final currentPlayer = _state.players[_state.currentBidder];
-      final bid = _aiPlayer.decideBid(currentPlayer, _state);
+      final (bid, evaluation) = _aiPlayer.decideBidWithEvaluation(currentPlayer, _state);
+
+      // Tracking: collect bid evaluation snapshot
+      _bidSnapshots.add(BidEvaluationSnapshot(
+        playerId: currentPlayer.id,
+        hand: currentPlayer.hand.map((c) => c.toJson()).toList(),
+        bestGiruda: evaluation.bestGiruda?.name,
+        girudaCount: evaluation.girudaCount,
+        hasMighty: currentPlayer.hand.any((c) => c.suit == Suit.spade && c.rank == Rank.ace && !c.isJoker),
+        hasJoker: currentPlayer.hand.any((c) => c.isJoker),
+        hasGirudaAce: evaluation.bestGiruda != null && currentPlayer.hand.any((c) => !c.isJoker && c.suit == evaluation.bestGiruda && c.rank == Rank.ace),
+        hasGirudaKing: evaluation.bestGiruda != null && currentPlayer.hand.any((c) => !c.isJoker && c.suit == evaluation.bestGiruda && c.rank == Rank.king),
+        predictedMin: evaluation.minPoints,
+        predictedMax: evaluation.maxPoints,
+        predictedOptimal: evaluation.optimalPoints,
+        bidAction: bid.passed ? 'PASS' : 'BID',
+        bidAmount: bid.tricks,
+      ));
+
       _state.placeBid(bid);
 
       _isProcessing = false;
@@ -428,7 +471,7 @@ class GameController extends ChangeNotifier {
     notifyListeners();
 
     await Future.delayed(Duration(milliseconds: _isAutoPlayMode ? 600 : 1000));
-    if (_isAutoPlayMode && _state.phase != GamePhase.selectingKitty) return;
+    if (_state.phase != GamePhase.selectingKitty || _state.declarerId == null) return;
     if (_isAutoPlayPaused) { _isProcessing = false; notifyListeners(); return; }
 
     final declarer = _state.players[_state.declarerId!];
@@ -443,21 +486,40 @@ class GameController extends ChangeNotifier {
     // 2. 최종 기루다를 기준으로 버릴 카드 선택
     final discardCards = _aiPlayer.selectKittyCardsWithGiruda(declarer, _state, _state.kitty, newGiruda);
 
+    // Compute finalHand (shared by tracking + auto-play explanation)
+    final girudaChanged = newGiruda != originalGiruda;
+    final allCards = [...declarer.hand, ...kittyCards];
+    final finalHand = allCards.where((c) => !discardCards.contains(c)).toList();
+    finalHand.sort((a, b) {
+      if (a.isJoker) return -1;
+      if (b.isJoker) return 1;
+      if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
+      return b.rankValue.compareTo(a.rankValue);
+    });
+
+    // Tracking: kitty snapshot + mark declarer in bid snapshots
+    final kittyPointCards = kittyCards.where((c) => c.isPointCard).length;
+    final (postMin, postMax) = _aiPlayer.estimatePointRange(finalHand, newGiruda);
+    final postOptimal = ((postMin + postMax) / 2 + 1).round() + 1;
+    _kittySnapshot = KittySnapshot(
+      kittyCards: kittyCards.map((c) => c.toJson()).toList(),
+      kittyPointCards: kittyPointCards,
+      discardCards: discardCards.map((c) => c.toJson()).toList(),
+      finalHand: finalHand.map((c) => c.toJson()).toList(),
+      girudaChanged: girudaChanged,
+      originalGiruda: originalGiruda?.name,
+      newGiruda: newGiruda?.name,
+      postKittyMin: postMin,
+      postKittyMax: postMax,
+      postKittyOptimal: postOptimal,
+    );
+    for (var snap in _bidSnapshots) {
+      if (snap.playerId == _state.declarerId) snap.isDeclarer = true;
+    }
+
     if (_isAutoPlayMode) {
       // 각 버릴 카드의 이유 생성
       final reasons = _generateDiscardReasons(discardCards, newGiruda, declarer);
-      final girudaChanged = newGiruda != originalGiruda;
-
-      // 최종 보유 카드 계산: (기존 10장 + 키티 3장) - 버릴 3장
-      final allCards = [...declarer.hand, ...kittyCards];
-      final finalHand = allCards.where((c) => !discardCards.contains(c)).toList();
-      // 무늬별 정렬
-      finalHand.sort((a, b) {
-        if (a.isJoker) return -1;
-        if (b.isJoker) return 1;
-        if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
-        return b.rankValue.compareTo(a.rankValue);
-      });
 
       _kittyExplanation = KittyExplanation(
         kittyCards: kittyCards,
@@ -474,8 +536,9 @@ class GameController extends ChangeNotifier {
       _isProcessing = false;
       notifyListeners();
 
-      await Future.delayed(const Duration(seconds: 5));
+      await Future.delayed(const Duration(seconds: 3));
       if (_isAutoPlayPaused) return;
+      if (_state.phase != GamePhase.selectingKitty || _state.declarerId == null) return;
 
       // 키티 선택 실행
       _showKittySummary = false;
@@ -546,18 +609,25 @@ class GameController extends ChangeNotifier {
       _isProcessing = false;
       notifyListeners();
 
-      await Future.delayed(const Duration(seconds: 5));
+      await Future.delayed(const Duration(seconds: 3));
       if (_isAutoPlayPaused) return;
 
       _showFriendSummary = false;
       _friendExplanation = null;
       notifyListeners();
 
-      // 배팅 결과 요약 화면 표시 (버튼 클릭 시 진행)
+      // 배팅 결과 요약 화면 표시
       _pendingDeclaration = declaration;
       _showBidSummary = true;
       _lastBidExplanation = null;
       notifyListeners();
+
+      // auto-play: 3초 후 자동 진행
+      await Future.delayed(const Duration(seconds: 3));
+      if (_isAutoPlayPaused) return;
+      if (_showBidSummary && _pendingDeclaration != null) {
+        confirmBidSummary();
+      }
     } else {
       _state.declareFriend(declaration);
       _isProcessing = false;
@@ -665,6 +735,7 @@ class GameController extends ChangeNotifier {
 
     // 게임 종료
     if (_state.phase == GamePhase.gameEnd) {
+      _sendTrackingData();
       if (_isAutoPlayMode) {
         notifyListeners();
         return;
@@ -716,6 +787,7 @@ class GameController extends ChangeNotifier {
 
     // 게임 종료 시 저장 삭제
     if (_state.phase == GamePhase.gameEnd) {
+      _sendTrackingData();
       clearSavedGame();
     }
 
@@ -852,6 +924,13 @@ class GameController extends ChangeNotifier {
     // 배팅 요약 화면에서 일시정지 후 재개 시 버튼 대기 (자동 진행 안 함)
     if (_showBidSummary && _pendingDeclaration != null) {
       // 버튼 클릭으로 진행하므로 resume만 하고 화면 유지
+      return;
+    }
+    // 모두 패스 상태에서 일시정지 후 재개
+    if (_state.phase == GamePhase.waiting && _state.allPassed) {
+      _sendTrackingData();
+      _lastBidExplanation = null;
+      notifyListeners();
       return;
     }
     _resumeAIIfNeeded();
@@ -1138,6 +1217,16 @@ class GameController extends ChangeNotifier {
     }
 
     return strategies;
+  }
+
+  void _sendTrackingData() {
+    MightyTrackingService.sendGameResult(
+      gameUuid: _gameUuid,
+      state: _state,
+      bidSnapshots: _bidSnapshots,
+      kittySnapshot: _kittySnapshot,
+      isAutoPlay: _isAutoPlayMode,
+    );
   }
 
   void reset() {

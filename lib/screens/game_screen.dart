@@ -557,10 +557,8 @@ class _GameScreenState extends State<GameScreen> {
     // 점수 계산: 득점 >= 목표이면 승리, 미만이면 패배
     int _calcScore(int points) {
       if (points >= targetTricks) {
-        // 승리: (득점-공약+1 + (득점-최소)×2) × 주공배수2
         return ((points - targetTricks + 1) + (points - 13) * 2) * 2;
       } else {
-        // 패배: (득점-목표) × 주공배수2
         return (points - targetTricks) * 2;
       }
     }
@@ -570,59 +568,51 @@ class _GameScreenState extends State<GameScreen> {
     // 노기루다 여부
     final isNoGiruda = giruda == null;
 
+    // 반응형 스케일: 화면 높이 기준 (기준: 800dp)
+    final screenHeight = MediaQuery.of(context).size.height;
+    final compact = screenHeight < 700;
+    final s = compact ? 0.82 : 1.0; // 스케일 팩터
+
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: (12 * s)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 타이틀
-            Text(
-              l10n.bidSummaryTitle,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.amber,
-              ),
-            ),
-            const SizedBox(height: 24),
-
             // 주공 정보
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: compact ? 8 : 14),
               decoration: BoxDecoration(
                 color: Colors.amber.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.amber, width: 2),
               ),
-              child: Column(
-                children: [
-                  Text(
-                    l10n.declarer,
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+              child: compact
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(l10n.declarer, style: TextStyle(color: Colors.white70, fontSize: 13 * s)),
+                      const SizedBox(width: 10),
+                      Text(declarerName, style: TextStyle(fontSize: 20 * s, fontWeight: FontWeight.bold, color: Colors.amber)),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Text(l10n.declarer, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+                      const SizedBox(height: 4),
+                      Text(declarerName, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.amber)),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    declarerName,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.amber,
-                    ),
-                  ),
-                ],
-              ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 10 * s),
 
             // 기루다 + 목표
             Row(
               children: [
-                // 기루다
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10 * s),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -630,20 +620,10 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     child: Column(
                       children: [
-                        Text(
-                          l10n.giruda,
-                          style: const TextStyle(color: Colors.white70, fontSize: 14),
-                        ),
-                        const SizedBox(height: 8),
+                        Text(l10n.giruda, style: TextStyle(color: Colors.white70, fontSize: 13 * s)),
+                        SizedBox(height: 4 * s),
                         if (isNoGiruda)
-                          Text(
-                            l10n.noGiruda,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          )
+                          Text(l10n.noGiruda, style: TextStyle(fontSize: 18 * s, fontWeight: FontWeight.bold, color: Colors.white))
                         else
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -651,32 +631,22 @@ class _GameScreenState extends State<GameScreen> {
                               Text(
                                 _getSuitSymbol(giruda),
                                 style: TextStyle(
-                                  fontSize: 32,
-                                  color: (giruda == Suit.heart || giruda == Suit.diamond)
-                                      ? Colors.red[300]
-                                      : Colors.white,
+                                  fontSize: 28 * s,
+                                  color: (giruda == Suit.heart || giruda == Suit.diamond) ? Colors.red[300] : Colors.white,
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Text(
-                                _getSuitName(giruda, l10n),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              SizedBox(width: 6 * s),
+                              Text(_getSuitName(giruda, l10n), style: TextStyle(fontSize: 18 * s, fontWeight: FontWeight.bold, color: Colors.white)),
                             ],
                           ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
-                // 목표
+                SizedBox(width: 10 * s),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10 * s),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -684,35 +654,25 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     child: Column(
                       children: [
-                        Text(
-                          l10n.tricks,
-                          style: const TextStyle(color: Colors.white70, fontSize: 14),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '$targetTricks',
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                        Text(l10n.tricks, style: TextStyle(color: Colors.white70, fontSize: 13 * s)),
+                        SizedBox(height: 4 * s),
+                        Text('$targetTricks', style: TextStyle(fontSize: 30 * s, fontWeight: FontWeight.bold, color: Colors.white)),
                       ],
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 8 * s),
 
             // 프렌드 정보
             _buildFriendInfoRow(controller, l10n),
-            const SizedBox(height: 12),
+            SizedBox(height: 8 * s),
 
             // 점수 설명
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(compact ? 10 : 16),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
@@ -723,62 +683,41 @@ class _GameScreenState extends State<GameScreen> {
                 children: [
                   Text(
                     l10n.bidSummaryEstimatedRange,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                    style: TextStyle(fontSize: 14 * s, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
-                  const SizedBox(height: 12),
-                  // 최대 (프렌드 포함)
+                  SizedBox(height: 8 * s),
                   _buildScoreRow(
                     l10n.bidSummaryEstMax(estMaxPoints),
                     '${maxScore >= 0 ? '+' : ''}$maxScore',
                     maxScore >= 0 ? Colors.green : Colors.red[300]!,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    l10n.bidSummaryEstMaxDesc,
-                    style: const TextStyle(color: Colors.white38, fontSize: 10),
-                  ),
-                  const SizedBox(height: 8),
-                  // 최소 (프렌드 없이)
+                  Text(l10n.bidSummaryEstMaxDesc, style: TextStyle(color: Colors.white38, fontSize: 10 * s)),
+                  SizedBox(height: 4 * s),
                   _buildScoreRow(
                     l10n.bidSummaryEstMin(estMinPoints),
                     '${minScore >= 0 ? '+' : ''}$minScore',
                     minScore >= 0 ? Colors.green[300]! : Colors.red[300]!,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _getBidMinDesc(controller, l10n),
-                    style: const TextStyle(color: Colors.white38, fontSize: 10),
-                  ),
-                  const SizedBox(height: 10),
-                  // 배수 정보
-                  Text(
-                    l10n.bidSummaryMultipliers,
-                    style: const TextStyle(color: Colors.white54, fontSize: 12),
-                  ),
+                  Text(_getBidMinDesc(controller, l10n), style: TextStyle(color: Colors.white38, fontSize: 10 * s)),
+                  SizedBox(height: 6 * s),
+                  Text(l10n.bidSummaryMultipliers, style: TextStyle(color: Colors.white54, fontSize: 11 * s)),
                   if (isNoGiruda)
-                    Text(
-                      l10n.multiplierNoGiruda,
-                      style: const TextStyle(color: Colors.amber, fontSize: 12),
-                    ),
+                    Text(l10n.multiplierNoGiruda, style: TextStyle(color: Colors.amber, fontSize: 11 * s)),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: compact ? 10 : 20),
 
             // 게임 시작 버튼
             SizedBox(
               width: double.infinity,
-              height: 48,
+              height: compact ? 40 : 48,
               child: ElevatedButton.icon(
                 onPressed: () => controller.confirmBidSummary(),
-                icon: const Icon(Icons.play_arrow),
+                icon: Icon(Icons.play_arrow, size: compact ? 18 : 24),
                 label: Text(
                   l10n.startGame,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16 * s, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.amber,
@@ -789,7 +728,7 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: compact ? 8 : 16),
             // 배너 광고
             const BannerAdWidget(),
           ],
@@ -813,7 +752,7 @@ class _GameScreenState extends State<GameScreen> {
     } else if (declaration.card != null) {
       final card = declaration.card!;
       if (card.isJoker) {
-        friendText = '조커 소유자';
+        friendText = l10n.jokerOwner;
         cardWidget = Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
@@ -823,7 +762,7 @@ class _GameScreenState extends State<GameScreen> {
           child: const Text('🃏', style: TextStyle(fontSize: 20)),
         );
       } else {
-        friendText = '${card.suitSymbol}${card.rankSymbol} 소유자';
+        friendText = l10n.cardOwner('${card.suitSymbol}${card.rankSymbol}');
         final isRed = card.suit == Suit.heart || card.suit == Suit.diamond;
         cardWidget = Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -842,7 +781,7 @@ class _GameScreenState extends State<GameScreen> {
         );
       }
     } else {
-      friendText = '${declaration.trickNumber}트릭 승자';
+      friendText = l10n.trickWinner(declaration.trickNumber!);
     }
 
     return Container(
@@ -1593,9 +1532,9 @@ class _GameScreenState extends State<GameScreen> {
                           color: Colors.cyanAccent.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
-                          '프렌드',
-                          style: TextStyle(color: Colors.cyanAccent, fontSize: 9, fontWeight: FontWeight.bold),
+                        child: Text(
+                          l10n.friendBadge,
+                          style: const TextStyle(color: Colors.cyanAccent, fontSize: 9, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -1915,12 +1854,12 @@ class _GameScreenState extends State<GameScreen> {
       if (kittyPoints > 0) {
         return Row(
           children: [
-            const Text('바닥패 ', style: TextStyle(color: Colors.amber, fontSize: 10)),
+            Text(l10n.kittyLabel, style: const TextStyle(color: Colors.amber, fontSize: 10)),
             ...state.kitty.map((c) => Padding(
               padding: const EdgeInsets.only(right: 2),
               child: _buildTinyCardFixed(c, state, 22.0),
             )),
-            Text(' $kittyPoints점 (프렌드 바닥패)', style: const TextStyle(color: Colors.amber, fontSize: 10)),
+            Text(l10n.kittyPointsWithFriend(kittyPoints), style: const TextStyle(color: Colors.amber, fontSize: 10)),
           ],
         );
       }
@@ -1980,19 +1919,19 @@ class _GameScreenState extends State<GameScreen> {
         // 바닥패 라인
         Row(
           children: [
-            const Text('바닥패 ', style: TextStyle(color: Colors.white60, fontSize: 10)),
+            Text(l10n.kittyLabel, style: const TextStyle(color: Colors.white60, fontSize: 10)),
             ...state.kitty.map((c) => Padding(
               padding: const EdgeInsets.only(right: 2),
               child: _buildTinyCardFixed(c, state, 22.0),
             )),
-            Text(' $kittyPoints점', style: const TextStyle(color: Colors.white60, fontSize: 10)),
+            Text(l10n.kittyPoints(kittyPoints), style: const TextStyle(color: Colors.white60, fontSize: 10)),
           ],
         ),
         const SizedBox(height: 2),
         // 프렌드 라인
         Row(
           children: [
-            Text('프렌드 $friendName ', style: const TextStyle(color: Colors.cyanAccent, fontSize: 10)),
+            Text(l10n.friendWithName(friendName), style: const TextStyle(color: Colors.cyanAccent, fontSize: 10)),
             if (friendKeyCards.isNotEmpty) ...[
               ...friendKeyCards.map((c) => Padding(
                 padding: const EdgeInsets.only(right: 2),
@@ -2004,7 +1943,7 @@ class _GameScreenState extends State<GameScreen> {
         const SizedBox(height: 2),
         // 조정 점수
         Text(
-          '→ 조정 $adjMin~$adjMax점',
+          l10n.adjustedPointsRange(adjMin, adjMax),
           style: const TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold),
         ),
       ],
@@ -2031,7 +1970,7 @@ class _GameScreenState extends State<GameScreen> {
         cardName = explanation.friendSuit != null
             ? '${_getSuitSymbol(explanation.friendSuit!)}K (${l10n.giruda})'
             : 'K';
-        note = ' (A 보유)';
+        note = l10n.hasAceNote;
         break;
       case 'ACE':
         cardName = explanation.friendSuit != null ? '${_getSuitSymbol(explanation.friendSuit!)}A' : 'A';
@@ -2263,11 +2202,12 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     final screenHeight = MediaQuery.of(context).size.height;
-    final maxBiddingHeight = screenHeight * 0.45; // 화면 높이의 45%로 제한
+    final compact = screenHeight < 700;
+    final maxBiddingHeight = compact ? screenHeight * 0.52 : screenHeight * 0.45;
 
     return Container(
       constraints: BoxConstraints(maxHeight: maxBiddingHeight),
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(compact ? 8 : 12),
       decoration: BoxDecoration(
         color: Colors.green[800],
         borderRadius: BorderRadius.circular(16),
@@ -2316,41 +2256,41 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ),
           ],
-          const SizedBox(height: 8),
+          SizedBox(height: compact ? 4 : 8),
           if (isHumanTurn) ...[
             // 트릭 수 선택
             Text(
               l10n.tricks,
-              style: TextStyle(color: Colors.white70, fontSize: 11),
+              style: TextStyle(color: Colors.white70, fontSize: compact ? 10 : 11),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: compact ? 2 : 4),
             Wrap(
-              spacing: 4,
-              runSpacing: 4,
+              spacing: compact ? 2 : 4,
+              runSpacing: compact ? 2 : 4,
               children: [
                 for (int i = 13; i <= 20; i++)
-                  _buildBidChip(i, state, l10n),
+                  _buildBidChip(i, state, l10n, compact: compact),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: compact ? 4 : 8),
             // 기루다 선택
             Text(
               l10n.giruda,
-              style: TextStyle(color: Colors.white70, fontSize: 11),
+              style: TextStyle(color: Colors.white70, fontSize: compact ? 10 : 11),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: compact ? 2 : 4),
             Wrap(
-              spacing: 6,
-              runSpacing: 4,
+              spacing: compact ? 4 : 6,
+              runSpacing: compact ? 2 : 4,
               children: [
-                _buildSuitChip(Suit.spade, '♠', l10n.spadeName),
-                _buildSuitChip(Suit.diamond, '♦', l10n.diamondName),
-                _buildSuitChip(Suit.heart, '♥', l10n.heartName),
-                _buildSuitChip(Suit.club, '♣', l10n.clubName),
-                _buildSuitChip(null, '✕', l10n.noGiruda),
+                _buildSuitChip(Suit.spade, '♠', l10n.spadeName, compact: compact),
+                _buildSuitChip(Suit.diamond, '♦', l10n.diamondName, compact: compact),
+                _buildSuitChip(Suit.heart, '♥', l10n.heartName, compact: compact),
+                _buildSuitChip(Suit.club, '♣', l10n.clubName, compact: compact),
+                _buildSuitChip(null, '✕', l10n.noGiruda, compact: compact),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: compact ? 6 : 10),
             // 버튼들
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -2359,7 +2299,7 @@ class _GameScreenState extends State<GameScreen> {
                   onPressed: () => controller.humanPass(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 24, vertical: compact ? 4 : 8),
                   ),
                   child: Text(l10n.pass, style: const TextStyle(color: Colors.white)),
                 ),
@@ -2368,7 +2308,7 @@ class _GameScreenState extends State<GameScreen> {
                   onPressed: _canBid(state) ? () => _submitBid(controller) : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 24, vertical: compact ? 4 : 8),
                   ),
                   child: Text(
                     l10n.bidWithAmount(_selectedBidAmount),
@@ -2379,12 +2319,12 @@ class _GameScreenState extends State<GameScreen> {
             ),
             // 딜 미스 버튼
             if (controller.canHumanDeclareDealMiss) ...[
-              const SizedBox(height: 12),
+              SizedBox(height: compact ? 6 : 12),
               ElevatedButton(
                 onPressed: () => _showDealMissDialog(controller),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 24, vertical: compact ? 4 : 8),
                 ),
                 child: Text(
                   l10n.dealMiss,
@@ -2411,7 +2351,7 @@ class _GameScreenState extends State<GameScreen> {
   Suit? _selectedBidSuit = Suit.spade;
   bool _suitManuallySelected = false;  // 사용자가 직접 기루다를 선택했는지
 
-  Widget _buildBidChip(int amount, GameState state, AppLocalizations l10n) {
+  Widget _buildBidChip(int amount, GameState state, AppLocalizations l10n, {bool compact = false}) {
     final minBid = (state.currentBid?.tricks ?? 12) + 1;
     final isEnabled = amount >= minBid;
     final isSelected = _selectedBidAmount == amount;
@@ -2423,7 +2363,7 @@ class _GameScreenState extends State<GameScreen> {
       child: Opacity(
         opacity: isEnabled ? 1.0 : 0.4,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: compact ? 9 : 12, vertical: compact ? 5 : 8),
           decoration: BoxDecoration(
             color: isSelected
                 ? Colors.amber
@@ -2439,7 +2379,7 @@ class _GameScreenState extends State<GameScreen> {
               color: isSelected
                   ? Colors.black
                   : (isEnabled ? Colors.white : Colors.grey[600]),
-              fontSize: 16,
+              fontSize: compact ? 14 : 16,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               decoration: isEnabled ? null : TextDecoration.lineThrough,
               decorationColor: Colors.grey[500],
@@ -2450,7 +2390,7 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _buildSuitChip(Suit? suit, String symbol, String name) {
+  Widget _buildSuitChip(Suit? suit, String symbol, String name, {bool compact = false}) {
     // 사용자가 직접 선택했거나 AI가 배팅을 추천한 경우에만 선택 표시
     final isSelected = _suitManuallySelected && _selectedBidSuit == suit;
     final isRed = suit == Suit.diamond || suit == Suit.heart;
@@ -2470,7 +2410,7 @@ class _GameScreenState extends State<GameScreen> {
         _suitManuallySelected = true;
       }),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12, vertical: compact ? 5 : 8),
         decoration: BoxDecoration(
           color: isSelected ? Colors.amber : Colors.white54,
           borderRadius: BorderRadius.circular(8),
@@ -2484,17 +2424,17 @@ class _GameScreenState extends State<GameScreen> {
                 symbol,
                 style: TextStyle(
                   color: symbolColor,
-                  fontSize: 20,
+                  fontSize: compact ? 16 : 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 4),
+              SizedBox(width: compact ? 2 : 4),
             ],
             Text(
               name,
               style: TextStyle(
                 color: isSelected ? Colors.black : Colors.white,
-                fontSize: 12,
+                fontSize: compact ? 11 : 12,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -2531,8 +2471,10 @@ class _GameScreenState extends State<GameScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     // 세로 모드에서 카드 크기와 배치 계산
+    final screenHeight = MediaQuery.of(context).size.height;
+    final compact = screenHeight < 700;
     final cardWidth = isPortrait ? (screenWidth - 32) / 6 - 4 : 55.0;
-    final cardHeight = cardWidth * 1.4;
+    final cardHeight = cardWidth * (compact ? 1.2 : 1.4);
 
     return Container(
       padding: const EdgeInsets.all(8),
@@ -2555,9 +2497,10 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               Text(
                 l10n.yourCards,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                  fontSize: compact ? 13 : 14,
                 ),
               ),
               if (isPassed) ...[
@@ -2589,7 +2532,7 @@ class _GameScreenState extends State<GameScreen> {
               ],
             ],
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: compact ? 3 : 6),
           // 세로 모드: 2줄 배치, 가로 모드: 1줄 스크롤
           if (isPortrait)
             _buildTwoRowCards(hand, cardWidth, cardHeight)
@@ -4498,7 +4441,7 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _buildBaseScoreExplanation(GameState state) {
+  Widget _buildBaseScoreExplanation(GameState state, {bool compact = false}) {
     final l10n = AppLocalizations.of(context)!;
     final targetTricks = state.currentBid?.tricks ?? 13;
     const int minContract = 13;
@@ -4549,7 +4492,7 @@ class _GameScreenState extends State<GameScreen> {
     final finalBaseScore = baseScore * specialMultiplier;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(compact ? 8 : 12),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(8),
@@ -4561,44 +4504,44 @@ class _GameScreenState extends State<GameScreen> {
           Text(
             declarerWon ? l10n.scoreCalcWin : l10n.scoreCalcLose,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: compact ? 12 : 14,
               fontWeight: FontWeight.bold,
               color: declarerWon ? Colors.blue[700] : Colors.red[700],
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: compact ? 4 : 8),
           Text(
             formula,
-            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            style: TextStyle(fontSize: compact ? 10 : 12, color: Colors.grey[600]),
           ),
           Text(
             calculation,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: compact ? 11 : 13, fontWeight: FontWeight.w500),
           ),
           if (multipliers.isNotEmpty) ...[
-            const SizedBox(height: 4),
+            SizedBox(height: compact ? 2 : 4),
             Text(
               '${l10n.multiplierLabel}: ${multipliers.join(', ')}',
-              style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+              style: TextStyle(fontSize: compact ? 10 : 12, color: Colors.blue[700]),
             ),
             Text(
               '$baseScore × $specialMultiplier = $finalBaseScore',
-              style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+              style: TextStyle(fontSize: compact ? 10 : 12, color: Colors.blue[700]),
             ),
           ],
-          const SizedBox(height: 8),
+          SizedBox(height: compact ? 4 : 8),
           Text(
             'Base Score = $finalBaseScore',
-            style: const TextStyle(
-              fontSize: 16,
+            style: TextStyle(
+              fontSize: compact ? 14 : 16,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: compact ? 4 : 8),
           Text(
             isNoFriend ? l10n.scoreMultipliersNoFriend : l10n.scoreMultipliers,
-            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+            style: TextStyle(fontSize: compact ? 10 : 11, color: Colors.grey[600]),
           ),
         ],
       ),
@@ -4638,13 +4581,14 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     final screenHeight = MediaQuery.of(context).size.height;
-    final maxDialogHeight = screenHeight * 0.85;
+    final compact = screenHeight < 700;
+    final maxDialogHeight = screenHeight * (compact ? 0.92 : 0.85);
 
     return Center(
       child: Container(
         constraints: BoxConstraints(maxHeight: maxDialogHeight),
-        padding: const EdgeInsets.all(20),
-        margin: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(compact ? 12 : 20),
+        margin: EdgeInsets.all(compact ? 8 : 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -4660,45 +4604,39 @@ class _GameScreenState extends State<GameScreen> {
                     Text(
                       isPlayerWinner ? l10n.victory : l10n.defeat,
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: compact ? 22 : 28,
                         fontWeight: FontWeight.bold,
                         color: isPlayerWinner ? Colors.green : Colors.red,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: compact ? 2 : 4),
                     Text(
                       state.declarerWon ? l10n.declarerTeamWins : l10n.defenderTeamWins,
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      style: TextStyle(fontSize: compact ? 13 : 16, color: Colors.grey[600]),
                     ),
                   ],
                 );
               }(),
-            const SizedBox(height: 16),
+            SizedBox(height: compact ? 8 : 16),
             Text(
               state.declarerTeamPoints == 20
                   ? '${l10n.declarerTeam}: ${l10n.fullPoints}'
                   : l10n.declarerTeamPoints(state.declarerTeamPoints),
-              style: const TextStyle(fontSize: 18),
-            ),
-            Text(
-              state.defenderTeamPoints == 20
-                  ? '${l10n.defenderTeam}: ${l10n.fullPoints}'
-                  : l10n.defenderTeamPoints(state.defenderTeamPoints),
-              style: const TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: compact ? 15 : 18),
             ),
             Text(
               l10n.targetPoints(state.currentBid?.tricks ?? 0),
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: compact ? 13 : 16, color: Colors.grey),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: compact ? 8 : 16),
             // baseScore 계산 설명
-            _buildBaseScoreExplanation(state),
-            const SizedBox(height: 16),
+            _buildBaseScoreExplanation(state, compact: compact),
+            SizedBox(height: compact ? 8 : 16),
             Text(
               l10n.score,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: compact ? 16 : 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: compact ? 4 : 8),
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey[300]!),
@@ -4708,7 +4646,7 @@ class _GameScreenState extends State<GameScreen> {
                 children: [
                   for (int i = 0; i < state.players.length; i++)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12, vertical: compact ? 5 : 8),
                       decoration: BoxDecoration(
                         color: i % 2 == 0 ? Colors.grey[100] : Colors.white,
                         borderRadius: BorderRadius.vertical(
@@ -4725,39 +4663,39 @@ class _GameScreenState extends State<GameScreen> {
                           if (state.players[i].isDeclarer)
                             Container(
                               margin: const EdgeInsets.only(right: 6),
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              padding: EdgeInsets.symmetric(horizontal: compact ? 3 : 4, vertical: compact ? 1 : 2),
                               decoration: BoxDecoration(
                                 color: Colors.red[100],
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 l10n.declarer,
-                                style: TextStyle(fontSize: 10, color: Colors.red[700], fontWeight: FontWeight.bold),
+                                style: TextStyle(fontSize: compact ? 9 : 10, color: Colors.red[700], fontWeight: FontWeight.bold),
                               ),
                             )
                           else if (state.players[i].isFriend)
                             Container(
                               margin: const EdgeInsets.only(right: 6),
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              padding: EdgeInsets.symmetric(horizontal: compact ? 3 : 4, vertical: compact ? 1 : 2),
                               decoration: BoxDecoration(
                                 color: Colors.blue[100],
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 l10n.friend,
-                                style: TextStyle(fontSize: 10, color: Colors.blue[700], fontWeight: FontWeight.bold),
+                                style: TextStyle(fontSize: compact ? 9 : 10, color: Colors.blue[700], fontWeight: FontWeight.bold),
                               ),
                             ),
                           // 이름
                           Expanded(
                             child: Text(
                               _getLocalizedPlayerName(state.players[i], l10n),
-                              style: const TextStyle(fontSize: 14),
+                              style: TextStyle(fontSize: compact ? 12 : 14),
                             ),
                           ),
                           // 점수
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: EdgeInsets.symmetric(horizontal: compact ? 7 : 10, vertical: compact ? 2 : 4),
                             decoration: BoxDecoration(
                               color: state.getPlayerScore(state.players[i].id) >= 0
                                   ? Colors.green[50]
@@ -4772,7 +4710,7 @@ class _GameScreenState extends State<GameScreen> {
                             child: Text(
                               l10n.points(state.getPlayerScore(state.players[i].id)),
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: compact ? 12 : 14,
                                 color: state.getPlayerScore(state.players[i].id) >= 0
                                     ? Colors.green[700]
                                     : Colors.red[700],
@@ -4786,11 +4724,11 @@ class _GameScreenState extends State<GameScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: compact ? 10 : 20),
             if (widget.isAutoPlay)
               // auto-play: 다음 게임 버튼
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(compact ? 4 : 8),
                 child: ElevatedButton.icon(
                   onPressed: () {
                     setState(() {
@@ -4799,14 +4737,14 @@ class _GameScreenState extends State<GameScreen> {
                     });
                     controller.startNextAutoGame();
                   },
-                  icon: const Icon(Icons.skip_next, color: Colors.white),
+                  icon: Icon(Icons.skip_next, color: Colors.white, size: compact ? 18 : 24),
                   label: Text(
                     l10n.nextGameAuto,
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(fontSize: compact ? 14 : 16, color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: EdgeInsets.symmetric(horizontal: compact ? 16 : 24, vertical: compact ? 8 : 12),
                   ),
                 ),
               )
@@ -4822,15 +4760,14 @@ class _GameScreenState extends State<GameScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[300],
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: EdgeInsets.symmetric(horizontal: compact ? 14 : 20, vertical: compact ? 7 : 10),
                     ),
                     child: Text(
                       l10n.confirm,
-                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                      style: TextStyle(fontSize: compact ? 14 : 16, color: Colors.black),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: compact ? 8 : 12),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -4843,12 +4780,11 @@ class _GameScreenState extends State<GameScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.amber,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: EdgeInsets.symmetric(horizontal: compact ? 14 : 20, vertical: compact ? 7 : 10),
                     ),
                     child: Text(
                       l10n.newGame,
-                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                      style: TextStyle(fontSize: compact ? 14 : 16, color: Colors.black),
                     ),
                   ),
                 ],

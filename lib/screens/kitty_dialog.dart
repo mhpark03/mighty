@@ -169,12 +169,14 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
     final l10n = AppLocalizations.of(context)!;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final compact = screenHeight < 700;
 
     // 5장씩 3줄 (5+5+3)
     // 화면 너비 기준 카드 크기
     final cardWidthByWidth = (screenWidth - 48) / 5;
     // 화면 높이 기준 카드 크기 (상단바, 하단 컨트롤 영역 제외)
-    final availableHeight = screenHeight - 280; // 앱바, 안내문, 하단 버튼 영역 제외
+    final bottomAreaHeight = compact ? 200 : 280;
+    final availableHeight = screenHeight - bottomAreaHeight; // 앱바, 안내문, 하단 버튼 영역 제외
     final cardHeightByHeight = (availableHeight - 24) / 3; // 3줄, 간격 제외
     final cardWidthByHeight = cardHeightByHeight / 1.4;
 
@@ -195,14 +197,14 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
             // 받은 키티 노티 (작게 표시, 반응 없음)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: compact ? 4 : 8),
               color: Colors.black26,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     '${l10n.receivedKitty} ',
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    style: TextStyle(color: Colors.white70, fontSize: compact ? 12 : 13),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -216,18 +218,18 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
               ),
             ),
 
-            const SizedBox(height: 8),
+            SizedBox(height: compact ? 4 : 8),
 
             // 선택 안내
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 l10n.selectKittyDesc(_selectedDiscards.length),
-                style: const TextStyle(fontSize: 14, color: Colors.white70),
+                style: TextStyle(fontSize: compact ? 12 : 14, color: Colors.white70),
               ),
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(height: compact ? 6 : 12),
 
             // 13장 카드 (3줄: 5+5+3)
             Expanded(
@@ -237,162 +239,168 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
               ),
             ),
 
-            // 하단 영역: 기루다 변경 + 확인 버튼
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.black26,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 기루다 변경
-                  Text(
-                    l10n.changeGiruda,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 4,
-                    alignment: WrapAlignment.center,
+            // 하단 영역: 기루다 변경 + 확인 버튼 (스크롤 가능)
+            Flexible(
+              flex: 0,
+              child: Container(
+                constraints: BoxConstraints(maxHeight: compact ? screenHeight * 0.38 : screenHeight * 0.42),
+                padding: EdgeInsets.all(compact ? 8 : 12),
+                decoration: BoxDecoration(
+                  color: Colors.black26,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      _buildGirudaChip(Suit.spade, '♠', false),
-                      _buildGirudaChip(Suit.diamond, '♦', true),
-                      _buildGirudaChip(Suit.heart, '♥', true),
-                      _buildGirudaChip(Suit.club, '♣', false),
-                      ChoiceChip(
-                        label: Text(l10n.noGiruda, style: const TextStyle(fontSize: 12)),
-                        selected: _noGiruda,
-                        onSelected: (_) => setState(() {
-                          _noGiruda = true;
-                          _selectedGiruda = null;
-                        }),
+                      // 기루다 변경
+                      Text(
+                        l10n.changeGiruda,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: compact ? 11 : 13,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: compact ? 4 : 8),
+                      Wrap(
+                        spacing: compact ? 4 : 8,
+                        runSpacing: compact ? 2 : 4,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          _buildGirudaChip(Suit.spade, '♠', false),
+                          _buildGirudaChip(Suit.diamond, '♦', true),
+                          _buildGirudaChip(Suit.heart, '♥', true),
+                          _buildGirudaChip(Suit.club, '♣', false),
+                          ChoiceChip(
+                            label: Text(l10n.noGiruda, style: TextStyle(fontSize: compact ? 11 : 12)),
+                            selected: _noGiruda,
+                            onSelected: (_) => setState(() {
+                              _noGiruda = true;
+                              _selectedGiruda = null;
+                            }),
+                          ),
+                        ],
+                      ),
+                      // 기루다 변경 경고
+                      if (_isGirudaChanged) ...[
+                        SizedBox(height: compact ? 4 : 8),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 10, vertical: compact ? 2 : 4),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.warning_amber, color: Colors.orange, size: compact ? 14 : 16),
+                              SizedBox(width: compact ? 4 : 6),
+                              Text(
+                                l10n.girudaChangeWarning,
+                                style: TextStyle(
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: compact ? 10 : 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      SizedBox(height: compact ? 4 : 8),
+                      // 풀 선언 체크박스
+                      GestureDetector(
+                        onTap: () => setState(() { _isFull = !_isFull; }),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12, vertical: compact ? 4 : 6),
+                          decoration: BoxDecoration(
+                            color: _isFull ? Colors.red.withValues(alpha: 0.3) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: _isFull ? Colors.red : Colors.white30,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _isFull ? Icons.check_box : Icons.check_box_outline_blank,
+                                color: _isFull ? Colors.red : Colors.white70,
+                                size: compact ? 16 : 20,
+                              ),
+                              SizedBox(width: compact ? 6 : 8),
+                              Text(
+                                l10n.fullPoints,
+                                style: TextStyle(
+                                  color: _isFull ? Colors.red : Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: compact ? 12 : 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (_isFull) ...[
+                        SizedBox(height: compact ? 4 : 6),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 10, vertical: compact ? 2 : 4),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.warning_amber, color: Colors.red, size: compact ? 14 : 16),
+                              SizedBox(width: compact ? 4 : 6),
+                              Text(
+                                l10n.fullDeclarationWarning,
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: compact ? 10 : 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      SizedBox(height: compact ? 6 : 12),
+                      // 확인 버튼
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _selectedDiscards.length == 3
+                              ? () {
+                                  widget.onConfirm(
+                                    _selectedDiscards.toList(),
+                                    _noGiruda ? null : _selectedGiruda,
+                                    _isFull,
+                                  );
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber,
+                            padding: EdgeInsets.symmetric(vertical: compact ? 8 : 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text(
+                            l10n.confirm,
+                            style: TextStyle(
+                              fontSize: compact ? 15 : 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  // 기루다 변경 경고
-                  if (_isGirudaChanged) ...[
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.warning_amber, color: Colors.orange, size: 16),
-                          const SizedBox(width: 6),
-                          Text(
-                            l10n.girudaChangeWarning,
-                            style: const TextStyle(
-                              color: Colors.orange,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-                  // 풀 선언 체크박스
-                  GestureDetector(
-                    onTap: () => setState(() { _isFull = !_isFull; }),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: _isFull ? Colors.red.withValues(alpha: 0.3) : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: _isFull ? Colors.red : Colors.white30,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _isFull ? Icons.check_box : Icons.check_box_outline_blank,
-                            color: _isFull ? Colors.red : Colors.white70,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n.fullPoints,
-                            style: TextStyle(
-                              color: _isFull ? Colors.red : Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (_isFull) ...[
-                    const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.warning_amber, color: Colors.red, size: 16),
-                          const SizedBox(width: 6),
-                          Text(
-                            l10n.fullDeclarationWarning,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 12),
-                  // 확인 버튼
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _selectedDiscards.length == 3
-                          ? () {
-                              widget.onConfirm(
-                                _selectedDiscards.toList(),
-                                _noGiruda ? null : _selectedGiruda,
-                                _isFull,
-                              );
-                            }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        l10n.confirm,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ],

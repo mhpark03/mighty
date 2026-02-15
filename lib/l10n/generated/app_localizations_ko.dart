@@ -939,7 +939,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String trickWinner(int n) {
-    return '$n번째 트릭 획득자';
+    return '$n트릭 승자';
   }
 
   @override
@@ -1835,4 +1835,36 @@ class AppLocalizationsKo extends AppLocalizations {
   String bidInfoFirstTrickAces(String aces) {
     return '초구 $aces';
   }
+
+  @override
+  String get jokerOwner => '조커 소유자';
+
+  @override
+  String get friendBadge => '프렌드';
+
+  @override
+  String get kittyLabel => '바닥패 ';
+
+  @override
+  String kittyPointsWithFriend(int points) {
+    return ' $points점 (프렌드 바닥패)';
+  }
+
+  @override
+  String kittyPoints(int points) {
+    return ' $points점';
+  }
+
+  @override
+  String friendWithName(String name) {
+    return '프렌드 $name ';
+  }
+
+  @override
+  String adjustedPointsRange(int min, int max) {
+    return '→ 조정 $min~$max점';
+  }
+
+  @override
+  String get hasAceNote => ' (A 보유)';
 }
