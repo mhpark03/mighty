@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/generated/app_localizations.dart';
 import '../models/card.dart';
 
 class CardWidget extends StatelessWidget {
@@ -51,7 +52,7 @@ class CardWidget extends StatelessWidget {
                   width: isSelected ? 3 : (isRecommended ? 3 : 1),
                 ),
               ),
-              child: faceDown ? _buildCardBack() : _buildCardFront(),
+              child: faceDown ? _buildCardBack() : _buildCardFront(context),
             ),
             // 낼 수 없는 카드 어둡게 표시
             if (!isPlayable && !faceDown)
@@ -116,9 +117,9 @@ class CardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildCardFront() {
+  Widget _buildCardFront(BuildContext context) {
     if (card.isJoker) {
-      return _buildJokerCard();
+      return _buildJokerCard(context);
     }
 
     final color = card.isRed ? Colors.red : Colors.black;
@@ -197,7 +198,7 @@ class CardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildJokerCard() {
+  Widget _buildJokerCard(BuildContext context) {
     // 카드 크기에 따라 폰트 크기 조절
     final isSmall = height < 60;
     final emojiSize = isSmall ? 16.0 : 24.0;
@@ -223,7 +224,7 @@ class CardWidget extends StatelessWidget {
             ),
             if (!isSmall)
               Text(
-                'JOKER',
+                AppLocalizations.of(context)!.joker.toUpperCase(),
                 style: TextStyle(
                   fontSize: textSize,
                   fontWeight: FontWeight.bold,
