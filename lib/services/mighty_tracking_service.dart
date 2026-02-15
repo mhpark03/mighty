@@ -96,7 +96,7 @@ class KittySnapshot {
 }
 
 class MightyTrackingService {
-  static const String _defaultUrl = 'http://10.0.2.2:8082';
+  static const String _defaultUrl = 'https://center.kaistory.net';
   static const String _prefsKeyUrl = 'mighty_tracking_server_url';
 
   static String generateUuid() {
@@ -160,6 +160,79 @@ class MightyTrackingService {
       final serverUrl = await _getServerUrl();
       final url = Uri.parse('$serverUrl/api/mighty/games');
 
+      // Calculate trick-level stats and details
+      int? tricksWonByDeclarerTeam;
+      int? tricksWonByDefenderTeam;
+      bool jokerCalled = false;
+      List<Map<String, dynamic>>? trickDetails;
+
+      if (!state.allPassed && state.declarerId != null) {
+        final declarer = state.declarerId!;
+        final friend = state.friendId;
+        final giruda = state.giruda;
+        tricksWonByDeclarerTeam = state.tricks.where((t) =>
+            t.winnerId == declarer || (friend != null && t.winnerId == friend)
+        ).length;
+        tricksWonByDefenderTeam = state.tricks.length - tricksWonByDeclarerTeam;
+        jokerCalled = state.tricks.any((t) =>
+            t.jokerCall == JokerCallType.jokerCall
+        );
+
+        trickDetails = state.tricks.map((trick) {
+          final pointCards = trick.cards.where((c) => c.isPointCard).length;
+          final hasMighty = trick.cards.any((c) => c.isMightyWith(giruda));
+          final hasJoker = trick.cards.any((c) => c.isJoker);
+          final hasGiruda = giruda != null && trick.cards.any((c) => !c.isJoker && c.suit == giruda);
+          final wonByDeclarer = trick.winnerId == declarer ||
+              (friend != null && trick.winnerId == friend);
+
+          // Detect special interactions
+          String? event;
+          if (hasMighty && hasGiruda) {
+            // Giruda card was played but Mighty also appeared
+            final mightyPlayer = trick.playerOrder[
+              trick.cards.indexWhere((c) => c.isMightyWith(giruda))
+            ];
+            final wonByMighty = trick.winnerId == mightyPlayer;
+            if (wonByMighty && !wonByDeclarer) {
+              event = 'MIGHTY_BEAT_GIRUDA';
+            } else if (wonByMighty && wonByDeclarer) {
+              event = 'DECLARER_MIGHTY_WIN';
+            }
+          }
+          if (hasJoker && hasGiruda && trick.jokerCall != JokerCallType.jokerCall) {
+            final jokerIdx = trick.cards.indexWhere((c) => c.isJoker);
+            if (jokerIdx >= 0) {
+              final jokerPlayer = trick.playerOrder[jokerIdx];
+              if (trick.winnerId == jokerPlayer) {
+                if (!wonByDeclarer) {
+                  event = 'JOKER_BEAT_GIRUDA';
+                }
+              }
+            }
+          }
+          if (trick.jokerCall == JokerCallType.jokerCall) {
+            event = 'JOKER_CALLED';
+          }
+          if (trick.trickNumber == 1 && hasMighty) {
+            event = 'FIRST_TRICK_MIGHTY';
+          }
+
+          return {
+            'trickNumber': trick.trickNumber,
+            'winnerId': trick.winnerId,
+            'wonByDeclarer': wonByDeclarer,
+            'pointCards': pointCards,
+            'hasMighty': hasMighty,
+            'hasJoker': hasJoker,
+            'hasGiruda': hasGiruda,
+            'jokerCalled': trick.jokerCall == JokerCallType.jokerCall,
+            'leadSuit': _suitName(trick.leadSuit),
+            if (event != null) 'event': event,
+          };
+        }).toList();
+      }
+
       final body = {
         'gameId': gameUuid,
         'allPassed': state.allPassed,
@@ -175,6 +248,10 @@ class MightyTrackingService {
             ? state.declarerWon
             : null,
         'isAutoPlay': isAutoPlay,
+        'tricksWonByDeclarerTeam': tricksWonByDeclarerTeam,
+        'tricksWonByDefenderTeam': tricksWonByDefenderTeam,
+        'jokerCalled': jokerCalled,
+        'trickDetails': trickDetails,
         'bidEvaluations': bidSnapshots.map((s) => s.toJson()).toList(),
         'kittyResult': kittySnapshot?.toJson(),
       };
