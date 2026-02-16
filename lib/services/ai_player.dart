@@ -2081,6 +2081,8 @@ class AIPlayer {
       // 기루다를 아끼고, 다른 무늬의 높은 카드를 낸다
       // (주공이 높은 기루다를 많이 가지고 있을 가능성이 높으므로)
       // 오픈된 카드를 고려하여 현재 가장 높은 카드를 선택
+      // ★ 주공 무늬 보유 추론: 주공이 보유한 무늬로 선공해야 기루다 컷 방지
+      final declarerHoldings = _inferDeclarerSuitHoldings(state);
 
       // 기루다가 아닌 카드들
       final nonGirudaCards = playableCards.where((c) =>
@@ -2092,10 +2094,16 @@ class AIPlayer {
             _isHighestRemainingCard(c, state, player.hand)).toList();
 
         if (highestRemainingCards.isNotEmpty) {
-          // 가장 높은 실효 가치 카드 선택
-          highestRemainingCards.sort((a, b) =>
-              _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
-          return highestRemainingCards.first;
+          // ★ 주공이 보유할 가능성 높은 무늬 우선 (기루다 컷 방지)
+          // 주공이 void일 가능성 높은 무늬의 최상위 카드는 컷당해 낭비될 수 있음
+          final safeHighCards = highestRemainingCards.where((c) =>
+              c.suit != null && (declarerHoldings[c.suit!] ?? 0.5) >= 0.4).toList();
+          if (safeHighCards.isNotEmpty) {
+            safeHighCards.sort((a, b) =>
+                _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+            return safeHighCards.first;
+          }
+          // 안전한 무늬가 없으면 최상위 카드 낭비 방지 → 아래 저가 카드 전략으로
         }
 
         // 높은 실효 가치 순으로 정렬 (오픈된 카드 고려)
@@ -2103,8 +2111,10 @@ class AIPlayer {
             _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
 
         // 실효 가치가 A(14) 이상인 카드가 있으면 선택 (= 현재 가장 높은 카드)
+        // ★ 주공이 보유할 가능성 높은 무늬만 사용 (컷 방지)
         final effectiveHighCards = nonGirudaCards.where((c) =>
-            _getEffectiveCardValue(c, state) >= 14).toList();
+            _getEffectiveCardValue(c, state) >= 14 &&
+            (declarerHoldings[c.suit] ?? 0.5) >= 0.4).toList();
         if (effectiveHighCards.isNotEmpty) {
           return effectiveHighCards.first;
         }
@@ -2113,9 +2123,17 @@ class AIPlayer {
         // 대신 낮은 카드를 버리거나, 이길 확률이 낮은 점수카드를 버림
 
         // 1. 비점수카드 중 낮은 카드로 리드 (안전한 선택)
+        // ★ 주공 보유 확률 높은 무늬 우선 (기루다 컷 방지)
         final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
         if (nonPointCards.isNotEmpty) {
-          nonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          nonPointCards.sort((a, b) {
+            double probA = declarerHoldings[a.suit] ?? 0.5;
+            double probB = declarerHoldings[b.suit] ?? 0.5;
+            int binA = (probA / 0.2).floor();
+            int binB = (probB / 0.2).floor();
+            if (binA != binB) return binB.compareTo(binA);
+            return a.rankValue.compareTo(b.rankValue);
+          });
           return nonPointCards.first;
         }
 
