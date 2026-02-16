@@ -44,6 +44,22 @@ class AIPlayer {
         .toList();
   }
 
+  // 특정 무늬의 잔여 점수카드 수 (내 손과 이미 플레이된 카드 제외)
+  // 마이티 미출 시 해당 무늬 리드의 점수카드 노출 위험도를 측정
+  int _countRemainingPointCardsInSuit(Suit suit, GameState state, List<PlayingCard> myHand) {
+    final playedCards = _getPlayedCards(state);
+    const pointRanks = [Rank.ace, Rank.king, Rank.queen, Rank.jack, Rank.ten];
+    int count = 0;
+    for (final rank in pointRanks) {
+      bool played = playedCards.any((c) => !c.isJoker && c.suit == suit && c.rank == rank);
+      bool inMyHand = myHand.any((c) => !c.isJoker && c.suit == suit && c.rank == rank);
+      if (!played && !inMyHand) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   // 오픈된 기루다 수 계산
   int _getPlayedGirudaCount(GameState state) {
     if (state.giruda == null) return 0;
@@ -2122,11 +2138,21 @@ class AIPlayer {
         // 이길 확률이 낮으면 높은 카드로 리드하지 않음
         // 대신 낮은 카드를 버리거나, 이길 확률이 낮은 점수카드를 버림
 
+        // ★ 마이티 미출 여부 확인: 미출 시 리드 무늬의 점수카드 노출 최소화
+        final bool mightyStillInPlay = !_getPlayedCards(state).any((c) => c.isMightyWith(state.giruda));
+
         // 1. 비점수카드 중 낮은 카드로 리드 (안전한 선택)
+        // ★ 마이티 미출 시: 잔여 점수카드가 적은 무늬 우선 (마이티 캡처 피해 최소화)
         // ★ 주공 보유 확률 높은 무늬 우선 (기루다 컷 방지)
         final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
         if (nonPointCards.isNotEmpty) {
           nonPointCards.sort((a, b) {
+            // 마이티 미출 시 해당 무늬의 잔여 점수카드 수로 1차 정렬
+            if (mightyStillInPlay) {
+              int exposureA = _countRemainingPointCardsInSuit(a.suit!, state, player.hand);
+              int exposureB = _countRemainingPointCardsInSuit(b.suit!, state, player.hand);
+              if (exposureA != exposureB) return exposureA.compareTo(exposureB);
+            }
             double probA = declarerHoldings[a.suit] ?? 0.5;
             double probB = declarerHoldings[b.suit] ?? 0.5;
             int binA = (probA / 0.2).floor();
@@ -2138,15 +2164,31 @@ class AIPlayer {
         }
 
         // 2. 이길 확률이 낮은 점수카드 리드 (A/K가 오픈된 J/Q/10)
+        // ★ 마이티 미출 시: 잔여 점수카드가 적은 무늬 우선
         final lowProbPointCards = nonGirudaCards.where((c) =>
             c.isPointCard && _isLowWinProbabilityPointCard(c, player, state)).toList();
         if (lowProbPointCards.isNotEmpty) {
-          lowProbPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          lowProbPointCards.sort((a, b) {
+            if (mightyStillInPlay) {
+              int exposureA = _countRemainingPointCardsInSuit(a.suit!, state, player.hand);
+              int exposureB = _countRemainingPointCardsInSuit(b.suit!, state, player.hand);
+              if (exposureA != exposureB) return exposureA.compareTo(exposureB);
+            }
+            return a.rankValue.compareTo(b.rankValue);
+          });
           return lowProbPointCards.first;
         }
 
         // 3. 이길 가능성 있는 점수카드는 보존하고 싶지만 다른 카드가 없으면 낮은 것
-        nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        // ★ 마이티 미출 시: 잔여 점수카드가 적은 무늬 우선
+        nonGirudaCards.sort((a, b) {
+          if (mightyStillInPlay) {
+            int exposureA = _countRemainingPointCardsInSuit(a.suit!, state, player.hand);
+            int exposureB = _countRemainingPointCardsInSuit(b.suit!, state, player.hand);
+            if (exposureA != exposureB) return exposureA.compareTo(exposureB);
+          }
+          return a.rankValue.compareTo(b.rankValue);
+        });
         return nonGirudaCards.first;
       }
 
