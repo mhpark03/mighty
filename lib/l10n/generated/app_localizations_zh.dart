@@ -1928,4 +1928,69 @@ class AppLocalizationsZh extends AppLocalizations {
   String strategyVoidTrumpCut(String suits) {
     return '$suits缺门 → 对手首攻时用将牌切入夺墩';
   }
+
+  @override
+  String get trickDetails => '墩详情';
+
+  @override
+  String get trickColumnGainLoss => '得失';
+
+  @override
+  String get trickColumnGiruda => '将牌';
+
+  @override
+  String get trickColumnEvent => '事件';
+
+  @override
+  String get trickEventLastCard => '最后一张牌';
+
+  @override
+  String get trickEventJokerLead => 'Joker首攻';
+
+  @override
+  String trickEventJokerLeadSuit(String suit) {
+    return 'Joker首攻 ($suit)';
+  }
+
+  @override
+  String get trickEventJokerGirudaExhaust => '诱导守方消耗将牌';
+
+  @override
+  String get trickEventMightyLead => 'Mighty首攻';
+
+  @override
+  String get trickEventTopGirudaLead => '将牌最高首攻';
+
+  @override
+  String get trickEventMidGirudaMightyBait => '中位将牌诱导Mighty';
+
+  @override
+  String get trickEventMidGirudaPassLead => '中位将牌让先';
+
+  @override
+  String get trickEventDefenderGirudaWin => '守方将牌胜';
+
+  @override
+  String get trickEventMidGirudaLead => '中位将牌首攻';
+
+  @override
+  String get trickEventTopNonGirudaLead => '非将牌最高首攻';
+
+  @override
+  String get trickEventFirstTrickFriendBait => '首墩缺牌 / 诱导Friend';
+
+  @override
+  String get trickEventFirstTrickWaste => '首墩缺牌 / 弃牌';
+
+  @override
+  String get trickEventWaste => '弃牌';
+
+  @override
+  String get trickEventAttackGirudaCut => '攻方将牌切入';
+
+  @override
+  String get trickEventDefenseGirudaCut => '守方将牌切入';
+
+  @override
+  String get trickEventNonGirudaExhaust => '非将牌消耗';
 }

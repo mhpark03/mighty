@@ -1944,4 +1944,69 @@ class AppLocalizationsKo extends AppLocalizations {
   String strategyVoidTrumpCut(String suits) {
     return '$suits 보이드 → 상대 선공 시 기루다 컷으로 트릭 회수';
   }
+
+  @override
+  String get trickDetails => '트릭 상세';
+
+  @override
+  String get trickColumnGainLoss => '득실';
+
+  @override
+  String get trickColumnGiruda => '기루다';
+
+  @override
+  String get trickColumnEvent => '이벤트';
+
+  @override
+  String get trickEventLastCard => '마지막 카드';
+
+  @override
+  String get trickEventJokerLead => '조커 선공';
+
+  @override
+  String trickEventJokerLeadSuit(String suit) {
+    return '조커 선공 ($suit)';
+  }
+
+  @override
+  String get trickEventJokerGirudaExhaust => '수비팀 기루다 소진 유도';
+
+  @override
+  String get trickEventMightyLead => '마이티 선공';
+
+  @override
+  String get trickEventTopGirudaLead => '기루다 최상위 선공';
+
+  @override
+  String get trickEventMidGirudaMightyBait => '기루다 중간으로 마이티 유도';
+
+  @override
+  String get trickEventMidGirudaPassLead => '기루다 중간으로 선 넘김';
+
+  @override
+  String get trickEventDefenderGirudaWin => '수비팀 기루다 승리';
+
+  @override
+  String get trickEventMidGirudaLead => '기루다 중간 선공';
+
+  @override
+  String get trickEventTopNonGirudaLead => '비기루다 최상위 선공';
+
+  @override
+  String get trickEventFirstTrickFriendBait => '초구 부재 / 물패로 프렌드 유도';
+
+  @override
+  String get trickEventFirstTrickWaste => '초구 부재 / 물패 처리';
+
+  @override
+  String get trickEventWaste => '물패 처리';
+
+  @override
+  String get trickEventAttackGirudaCut => '공격 기루다 컷';
+
+  @override
+  String get trickEventDefenseGirudaCut => '수비 기루다 컷';
+
+  @override
+  String get trickEventNonGirudaExhaust => '비기루다 소진';
 }

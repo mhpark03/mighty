@@ -1966,4 +1966,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String strategyVoidTrumpCut(String suits) {
     return '$suits void → trump cut to reclaim tricks when opponents lead';
   }
+
+  @override
+  String get trickDetails => 'Trick Details';
+
+  @override
+  String get trickColumnGainLoss => 'Gain/Loss';
+
+  @override
+  String get trickColumnGiruda => 'Trump';
+
+  @override
+  String get trickColumnEvent => 'Event';
+
+  @override
+  String get trickEventLastCard => 'Last card';
+
+  @override
+  String get trickEventJokerLead => 'Joker lead';
+
+  @override
+  String trickEventJokerLeadSuit(String suit) {
+    return 'Joker lead ($suit)';
+  }
+
+  @override
+  String get trickEventJokerGirudaExhaust => 'Forcing defenders to spend trump';
+
+  @override
+  String get trickEventMightyLead => 'Mighty lead';
+
+  @override
+  String get trickEventTopGirudaLead => 'Top trump lead';
+
+  @override
+  String get trickEventMidGirudaMightyBait => 'Mid trump to bait Mighty';
+
+  @override
+  String get trickEventMidGirudaPassLead => 'Mid trump to pass lead';
+
+  @override
+  String get trickEventDefenderGirudaWin => 'Defender trump win';
+
+  @override
+  String get trickEventMidGirudaLead => 'Mid trump lead';
+
+  @override
+  String get trickEventTopNonGirudaLead => 'Top non-trump lead';
+
+  @override
+  String get trickEventFirstTrickFriendBait =>
+      'No lead in 1st trick / Friend bait';
+
+  @override
+  String get trickEventFirstTrickWaste => 'No lead in 1st trick / Waste';
+
+  @override
+  String get trickEventWaste => 'Waste play';
+
+  @override
+  String get trickEventAttackGirudaCut => 'Attack trump cut';
+
+  @override
+  String get trickEventDefenseGirudaCut => 'Defense trump cut';
+
+  @override
+  String get trickEventNonGirudaExhaust => 'Non-trump exhausted';
 }

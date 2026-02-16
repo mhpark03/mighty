@@ -4704,101 +4704,105 @@ class _GameScreenState extends State<GameScreen> {
               style: TextStyle(fontSize: compact ? 13 : 16, color: Colors.grey),
             ),
             SizedBox(height: compact ? 8 : 16),
-            // baseScore 계산 설명
-            _buildBaseScoreExplanation(state, compact: compact),
-            SizedBox(height: compact ? 8 : 16),
-            Text(
-              l10n.score,
-              style: TextStyle(fontSize: compact ? 16 : 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: compact ? 4 : 8),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey[300]!),
-                borderRadius: BorderRadius.circular(8),
+            if (widget.isAutoPlay)
+              _buildTrickDetailsTable(state, compact: compact, l10n: l10n)
+            else ...[
+              // baseScore 계산 설명
+              _buildBaseScoreExplanation(state, compact: compact),
+              SizedBox(height: compact ? 8 : 16),
+              Text(
+                l10n.score,
+                style: TextStyle(fontSize: compact ? 16 : 20, fontWeight: FontWeight.bold),
               ),
-              child: Column(
-                children: [
-                  for (int i = 0; i < state.players.length; i++)
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12, vertical: compact ? 5 : 8),
-                      decoration: BoxDecoration(
-                        color: i % 2 == 0 ? Colors.grey[100] : Colors.white,
-                        borderRadius: BorderRadius.vertical(
-                          top: i == 0 ? const Radius.circular(7) : Radius.zero,
-                          bottom: i == state.players.length - 1 ? const Radius.circular(7) : Radius.zero,
+              SizedBox(height: compact ? 4 : 8),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey[300]!),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    for (int i = 0; i < state.players.length; i++)
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12, vertical: compact ? 5 : 8),
+                        decoration: BoxDecoration(
+                          color: i % 2 == 0 ? Colors.grey[100] : Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                            top: i == 0 ? const Radius.circular(7) : Radius.zero,
+                            bottom: i == state.players.length - 1 ? const Radius.circular(7) : Radius.zero,
+                          ),
+                          border: i < state.players.length - 1
+                              ? Border(bottom: BorderSide(color: Colors.grey[300]!))
+                              : null,
                         ),
-                        border: i < state.players.length - 1
-                            ? Border(bottom: BorderSide(color: Colors.grey[300]!))
-                            : null,
-                      ),
-                      child: Row(
-                        children: [
-                          // 역할 아이콘
-                          if (state.players[i].isDeclarer)
+                        child: Row(
+                          children: [
+                            // 역할 아이콘
+                            if (state.players[i].isDeclarer)
+                              Container(
+                                margin: const EdgeInsets.only(right: 6),
+                                padding: EdgeInsets.symmetric(horizontal: compact ? 3 : 4, vertical: compact ? 1 : 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.red[100],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  l10n.declarer,
+                                  style: TextStyle(fontSize: compact ? 9 : 10, color: Colors.red[700], fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            else if (state.players[i].isFriend)
+                              Container(
+                                margin: const EdgeInsets.only(right: 6),
+                                padding: EdgeInsets.symmetric(horizontal: compact ? 3 : 4, vertical: compact ? 1 : 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue[100],
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  l10n.friend,
+                                  style: TextStyle(fontSize: compact ? 9 : 10, color: Colors.blue[700], fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            // 이름
+                            Expanded(
+                              child: Text(
+                                _getLocalizedPlayerName(state.players[i], l10n),
+                                style: TextStyle(fontSize: compact ? 12 : 14),
+                              ),
+                            ),
+                            // 점수
                             Container(
-                              margin: const EdgeInsets.only(right: 6),
-                              padding: EdgeInsets.symmetric(horizontal: compact ? 3 : 4, vertical: compact ? 1 : 2),
+                              padding: EdgeInsets.symmetric(horizontal: compact ? 7 : 10, vertical: compact ? 2 : 4),
                               decoration: BoxDecoration(
-                                color: Colors.red[100],
-                                borderRadius: BorderRadius.circular(4),
+                                color: state.getPlayerScore(state.players[i].id) >= 0
+                                    ? Colors.green[50]
+                                    : Colors.red[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: state.getPlayerScore(state.players[i].id) >= 0
+                                      ? Colors.green[300]!
+                                      : Colors.red[300]!,
+                                ),
                               ),
                               child: Text(
-                                l10n.declarer,
-                                style: TextStyle(fontSize: compact ? 9 : 10, color: Colors.red[700], fontWeight: FontWeight.bold),
-                              ),
-                            )
-                          else if (state.players[i].isFriend)
-                            Container(
-                              margin: const EdgeInsets.only(right: 6),
-                              padding: EdgeInsets.symmetric(horizontal: compact ? 3 : 4, vertical: compact ? 1 : 2),
-                              decoration: BoxDecoration(
-                                color: Colors.blue[100],
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                l10n.friend,
-                                style: TextStyle(fontSize: compact ? 9 : 10, color: Colors.blue[700], fontWeight: FontWeight.bold),
+                                l10n.points(state.getPlayerScore(state.players[i].id)),
+                                style: TextStyle(
+                                  fontSize: compact ? 12 : 14,
+                                  color: state.getPlayerScore(state.players[i].id) >= 0
+                                      ? Colors.green[700]
+                                      : Colors.red[700],
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          // 이름
-                          Expanded(
-                            child: Text(
-                              _getLocalizedPlayerName(state.players[i], l10n),
-                              style: TextStyle(fontSize: compact ? 12 : 14),
-                            ),
-                          ),
-                          // 점수
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: compact ? 7 : 10, vertical: compact ? 2 : 4),
-                            decoration: BoxDecoration(
-                              color: state.getPlayerScore(state.players[i].id) >= 0
-                                  ? Colors.green[50]
-                                  : Colors.red[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: state.getPlayerScore(state.players[i].id) >= 0
-                                    ? Colors.green[300]!
-                                    : Colors.red[300]!,
-                              ),
-                            ),
-                            child: Text(
-                              l10n.points(state.getPlayerScore(state.players[i].id)),
-                              style: TextStyle(
-                                fontSize: compact ? 12 : 14,
-                                color: state.getPlayerScore(state.players[i].id) >= 0
-                                    ? Colors.green[700]
-                                    : Colors.red[700],
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
+            ],
             SizedBox(height: compact ? 10 : 20),
             if (widget.isAutoPlay)
               // auto-play: 다음 게임 버튼
@@ -4870,4 +4874,328 @@ class _GameScreenState extends State<GameScreen> {
       ),
     );
   }
+
+  /// describeTrick: 서버 GameDetailPage.tsx의 로직을 Dart로 포팅
+  String? _describeTrick(Trick trick, GameState state, AppLocalizations l10n, Set<String> playedCards) {
+    if (trick.cards.isEmpty) return null;
+    if (trick.trickNumber == 10) return l10n.trickEventLastCard;
+
+    final giruda = state.giruda;
+    final leadId = trick.leadPlayerId;
+    final leadIdx = trick.playerOrder.indexOf(leadId);
+    if (leadIdx < 0 || leadIdx >= trick.cards.length) return null;
+    final leadCard = trick.cards[leadIdx];
+
+    final mighty = state.mighty;
+    bool isMighty(PlayingCard c) => !c.isJoker && c.suit == mighty.suit && c.rank == mighty.rank;
+    bool isGiruda(PlayingCard c) => !c.isJoker && giruda != null && c.suit == giruda;
+    bool isAttack(int id) => id == state.declarerId || id == state.friendId;
+    bool isTeammate(int winnerId) => isAttack(leadId) == isAttack(winnerId);
+    final hasMightyInTrick = trick.cards.any((c) => isMighty(c));
+
+    bool isTopOfSuit(Suit suit, int rankValue) {
+      final mightySuit = mighty.suit;
+      final mightyRankValue = mighty.rankValue;
+      for (int r = 14; r > rankValue; r--) {
+        if (suit == mightySuit && r == mightyRankValue) continue;
+        if (!playedCards.contains('${suit.index}-$r')) return false;
+      }
+      return true;
+    }
+
+    final parts = <String>[];
+
+    // Lead card description
+    if (leadCard.isJoker) {
+      final suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
+      final declaredSuit = trick.leadSuit;
+      final suitStr = declaredSuit != null ? suitSymbols[declaredSuit] ?? '' : '';
+      String jokerDesc = suitStr.isNotEmpty
+          ? l10n.trickEventJokerLeadSuit(suitStr)
+          : l10n.trickEventJokerLead;
+      if (declaredSuit != null && declaredSuit == giruda) {
+        jokerDesc += ' / ${l10n.trickEventJokerGirudaExhaust}';
+      }
+      parts.add(jokerDesc);
+    } else if (isMighty(leadCard)) {
+      parts.add(l10n.trickEventMightyLead);
+    } else if (isGiruda(leadCard)) {
+      final isTop = leadCard.rankValue >= 14 || isTopOfSuit(leadCard.suit!, leadCard.rankValue);
+      if (isTop) {
+        parts.add(l10n.trickEventTopGirudaLead);
+      } else {
+        if (hasMightyInTrick) {
+          parts.add(l10n.trickEventMidGirudaMightyBait);
+        } else if (trick.winnerId != leadId && isTeammate(trick.winnerId!)) {
+          parts.add(l10n.trickEventMidGirudaPassLead);
+        } else if (trick.winnerId != leadId && !isTeammate(trick.winnerId!)) {
+          parts.add(l10n.trickEventDefenderGirudaWin);
+        } else {
+          parts.add(l10n.trickEventMidGirudaLead);
+        }
+      }
+    } else {
+      final isTop = leadCard.rankValue >= 14 || isTopOfSuit(leadCard.suit!, leadCard.rankValue);
+      if (isTop) {
+        parts.add(l10n.trickEventTopNonGirudaLead);
+      } else if (trick.trickNumber == 1) {
+        if (trick.winnerId != null && isAttack(trick.winnerId!)) {
+          parts.add(l10n.trickEventFirstTrickFriendBait);
+        } else {
+          parts.add(l10n.trickEventFirstTrickWaste);
+        }
+      } else {
+        parts.add(l10n.trickEventWaste);
+      }
+    }
+
+    // Outcome: 기루다 컷
+    if (trick.leadSuit != giruda && giruda != null) {
+      final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
+      if (winIdx >= 0 && winIdx < trick.cards.length) {
+        final winCard = trick.cards[winIdx];
+        if (isGiruda(winCard) && trick.winnerId != leadId) {
+          if (isAttack(trick.winnerId!)) {
+            parts.add(l10n.trickEventAttackGirudaCut);
+          } else {
+            parts.add(l10n.trickEventDefenseGirudaCut);
+          }
+        }
+      }
+    }
+
+    return parts.isNotEmpty ? parts.join(' / ') : null;
+  }
+
+  Widget _buildTrickDetailsTable(GameState state, {required bool compact, required AppLocalizations l10n}) {
+    final tricks = state.tricks;
+    if (tricks.isEmpty) return const SizedBox.shrink();
+
+    final giruda = state.giruda;
+    final fontSize = compact ? 10.0 : 12.0;
+
+    // 플레이어 이름 + 역할
+    final playerNames = <int, String>{};
+    final playerRoles = <int, String>{};
+    for (int i = 0; i < state.players.length; i++) {
+      playerNames[i] = _getLocalizedPlayerName(state.players[i], l10n);
+      if (state.players[i].isDeclarer) {
+        playerRoles[i] = l10n.declarer;
+      } else if (state.players[i].isFriend) {
+        playerRoles[i] = l10n.friend;
+      }
+    }
+
+    // 트릭별 데이터 계산
+    final playedCards = <String>{};
+    final rows = <_TrickRowData>[];
+    int girudaRemaining = giruda != null ? 13 : 0;
+
+    for (final trick in tricks) {
+      // describeTrick
+      final description = _describeTrick(trick, state, l10n, playedCards);
+
+      // 카드 → playedCards에 추가, 기루다 카운트 감소
+      int girudaInTrick = 0;
+      final cardsByPlayer = <int, PlayingCard>{};
+      for (int i = 0; i < trick.cards.length; i++) {
+        final card = trick.cards[i];
+        final playerId = trick.playerOrder[i];
+        cardsByPlayer[playerId] = card;
+        if (!card.isJoker && card.suit != null) {
+          playedCards.add('${card.suit!.index}-${card.rankValue}');
+          if (card.suit == giruda) girudaInTrick++;
+        }
+      }
+      girudaRemaining -= girudaInTrick;
+
+      // 득실 계산: 공격팀 기준 점수카드 수
+      int trickDelta = 0;
+      if (trick.winnerId != null) {
+        final pointCount = trick.cards.where((c) => c.isPointCard).length;
+        final isAttackWin = trick.winnerId == state.declarerId || trick.winnerId == state.friendId;
+        trickDelta = isAttackWin ? pointCount : -pointCount;
+      }
+
+      rows.add(_TrickRowData(
+        trickNumber: trick.trickNumber,
+        cardsByPlayer: cardsByPlayer,
+        leadPlayerId: trick.leadPlayerId,
+        winnerId: trick.winnerId,
+        trickDelta: trickDelta,
+        girudaRemaining: girudaRemaining,
+        description: description,
+      ));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.trickDetails,
+          style: TextStyle(fontSize: compact ? 14 : 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: compact ? 4 : 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Table(
+            defaultColumnWidth: const IntrinsicColumnWidth(),
+            border: TableBorder(
+              horizontalInside: BorderSide(color: Colors.grey[200]!, width: 0.5),
+            ),
+            children: [
+              // 헤더 행
+              TableRow(
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Colors.grey[300]!, width: 1)),
+                ),
+                children: [
+                  _trickHeaderCell('#', fontSize),
+                  for (int i = 0; i < 5; i++)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                      child: Column(
+                        children: [
+                          Text(
+                            playerNames[i] ?? '',
+                            style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: Colors.grey[700]),
+                          ),
+                          if (playerRoles[i] != null)
+                            Text(
+                              playerRoles[i]!,
+                              style: TextStyle(
+                                fontSize: fontSize - 2,
+                                color: state.players[i].isDeclarer ? Colors.red[600] : Colors.blue[600],
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  _trickHeaderCell(l10n.trickColumnGainLoss, fontSize),
+                  _trickHeaderCell(l10n.trickColumnGiruda, fontSize),
+                  _trickHeaderCell(l10n.trickColumnEvent, fontSize),
+                ],
+              ),
+              // 데이터 행
+              for (final row in rows)
+                TableRow(
+                  children: [
+                    // 트릭 번호
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                      child: Text(
+                        '${row.trickNumber}',
+                        style: TextStyle(fontSize: fontSize, color: Colors.grey[500], fontFamily: 'monospace'),
+                      ),
+                    ),
+                    // 5명의 플레이어 카드
+                    for (int i = 0; i < 5; i++)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                        color: row.winnerId == i ? Colors.blue[50] : null,
+                        child: row.cardsByPlayer[i] != null
+                            ? _buildTrickCardCell(row.cardsByPlayer[i]!, i == row.leadPlayerId, fontSize)
+                            : Text('-', textAlign: TextAlign.center, style: TextStyle(fontSize: fontSize, color: Colors.grey[300])),
+                      ),
+                    // 득실
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                      child: Text(
+                        row.trickDelta > 0 ? '+${row.trickDelta}' : row.trickDelta < 0 ? '${row.trickDelta}' : '-',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: fontSize,
+                          fontFamily: 'monospace',
+                          fontWeight: row.trickDelta != 0 ? FontWeight.bold : FontWeight.normal,
+                          color: row.trickDelta > 0 ? Colors.blue[600] : row.trickDelta < 0 ? Colors.red[500] : Colors.grey[300],
+                        ),
+                      ),
+                    ),
+                    // 기루다 남은 수
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                      child: Text(
+                        '${row.girudaRemaining}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: fontSize, fontFamily: 'monospace', color: Colors.grey[400]),
+                      ),
+                    ),
+                    // 이벤트
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                      child: Text(
+                        row.description ?? '',
+                        style: TextStyle(fontSize: fontSize, color: Colors.grey[500]),
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _trickHeaderCell(String text, double fontSize) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: Colors.grey[700]),
+      ),
+    );
+  }
+
+  Widget _buildTrickCardCell(PlayingCard card, bool isLead, double fontSize) {
+    final text = card.toString();
+    Color textColor;
+    if (card.isJoker) {
+      textColor = Colors.green[700]!;
+    } else if (card.isRed) {
+      textColor = Colors.red[600]!;
+    } else {
+      textColor = Colors.grey[900]!;
+    }
+
+    Widget child = Text(
+      text,
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: fontSize, color: textColor, fontWeight: FontWeight.w500),
+    );
+
+    if (isLead) {
+      child = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey[400]!, width: 1),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: child,
+      );
+    }
+
+    return child;
+  }
+}
+
+class _TrickRowData {
+  final int trickNumber;
+  final Map<int, PlayingCard> cardsByPlayer;
+  final int leadPlayerId;
+  final int? winnerId;
+  final int trickDelta;
+  final int girudaRemaining;
+  final String? description;
+
+  _TrickRowData({
+    required this.trickNumber,
+    required this.cardsByPlayer,
+    required this.leadPlayerId,
+    required this.winnerId,
+    required this.trickDelta,
+    required this.girudaRemaining,
+    required this.description,
+  });
 }

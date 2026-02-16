@@ -1938,4 +1938,69 @@ class AppLocalizationsJa extends AppLocalizations {
   String strategyVoidTrumpCut(String suits) {
     return '$suitsボイド → 相手リード時に切り札カットでトリック回収';
   }
+
+  @override
+  String get trickDetails => 'トリック詳細';
+
+  @override
+  String get trickColumnGainLoss => '得失';
+
+  @override
+  String get trickColumnGiruda => '切り札';
+
+  @override
+  String get trickColumnEvent => 'イベント';
+
+  @override
+  String get trickEventLastCard => '最後のカード';
+
+  @override
+  String get trickEventJokerLead => 'ジョーカーリード';
+
+  @override
+  String trickEventJokerLeadSuit(String suit) {
+    return 'ジョーカーリード ($suit)';
+  }
+
+  @override
+  String get trickEventJokerGirudaExhaust => '守備側の切り札消耗を誘導';
+
+  @override
+  String get trickEventMightyLead => 'マイティリード';
+
+  @override
+  String get trickEventTopGirudaLead => '切り札最上位リード';
+
+  @override
+  String get trickEventMidGirudaMightyBait => '切り札中位でマイティ誘導';
+
+  @override
+  String get trickEventMidGirudaPassLead => '切り札中位でリード譲渡';
+
+  @override
+  String get trickEventDefenderGirudaWin => '守備側切り札勝利';
+
+  @override
+  String get trickEventMidGirudaLead => '切り札中位リード';
+
+  @override
+  String get trickEventTopNonGirudaLead => '非切り札最上位リード';
+
+  @override
+  String get trickEventFirstTrickFriendBait => '初トリック不在 / フレンド誘導';
+
+  @override
+  String get trickEventFirstTrickWaste => '初トリック不在 / 捨て札';
+
+  @override
+  String get trickEventWaste => '捨て札';
+
+  @override
+  String get trickEventAttackGirudaCut => '攻撃切り札カット';
+
+  @override
+  String get trickEventDefenseGirudaCut => '守備切り札カット';
+
+  @override
+  String get trickEventNonGirudaExhaust => '非切り札消耗';
 }

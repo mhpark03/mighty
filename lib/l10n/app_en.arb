@@ -963,5 +963,32 @@
     "placeholders": {
       "suits": {"type": "String"}
     }
-  }
+  },
+
+  "trickDetails": "Trick Details",
+  "trickColumnGainLoss": "Gain/Loss",
+  "trickColumnGiruda": "Trump",
+  "trickColumnEvent": "Event",
+  "trickEventLastCard": "Last card",
+  "trickEventJokerLead": "Joker lead",
+  "trickEventJokerLeadSuit": "Joker lead ({suit})",
+  "@trickEventJokerLeadSuit": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "trickEventJokerGirudaExhaust": "Forcing defenders to spend trump",
+  "trickEventMightyLead": "Mighty lead",
+  "trickEventTopGirudaLead": "Top trump lead",
+  "trickEventMidGirudaMightyBait": "Mid trump to bait Mighty",
+  "trickEventMidGirudaPassLead": "Mid trump to pass lead",
+  "trickEventDefenderGirudaWin": "Defender trump win",
+  "trickEventMidGirudaLead": "Mid trump lead",
+  "trickEventTopNonGirudaLead": "Top non-trump lead",
+  "trickEventFirstTrickFriendBait": "No lead in 1st trick / Friend bait",
+  "trickEventFirstTrickWaste": "No lead in 1st trick / Waste",
+  "trickEventWaste": "Waste play",
+  "trickEventAttackGirudaCut": "Attack trump cut",
+  "trickEventDefenseGirudaCut": "Defense trump cut",
+  "trickEventNonGirudaExhaust": "Non-trump exhausted"
 }

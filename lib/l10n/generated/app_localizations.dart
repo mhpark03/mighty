@@ -3501,6 +3501,132 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'{suits} 보이드 → 상대 선공 시 기루다 컷으로 트릭 회수'**
   String strategyVoidTrumpCut(String suits);
+
+  /// No description provided for @trickDetails.
+  ///
+  /// In ko, this message translates to:
+  /// **'트릭 상세'**
+  String get trickDetails;
+
+  /// No description provided for @trickColumnGainLoss.
+  ///
+  /// In ko, this message translates to:
+  /// **'득실'**
+  String get trickColumnGainLoss;
+
+  /// No description provided for @trickColumnGiruda.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다'**
+  String get trickColumnGiruda;
+
+  /// No description provided for @trickColumnEvent.
+  ///
+  /// In ko, this message translates to:
+  /// **'이벤트'**
+  String get trickColumnEvent;
+
+  /// No description provided for @trickEventLastCard.
+  ///
+  /// In ko, this message translates to:
+  /// **'마지막 카드'**
+  String get trickEventLastCard;
+
+  /// No description provided for @trickEventJokerLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 선공'**
+  String get trickEventJokerLead;
+
+  /// No description provided for @trickEventJokerLeadSuit.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 선공 ({suit})'**
+  String trickEventJokerLeadSuit(String suit);
+
+  /// No description provided for @trickEventJokerGirudaExhaust.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비팀 기루다 소진 유도'**
+  String get trickEventJokerGirudaExhaust;
+
+  /// No description provided for @trickEventMightyLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 선공'**
+  String get trickEventMightyLead;
+
+  /// No description provided for @trickEventTopGirudaLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 최상위 선공'**
+  String get trickEventTopGirudaLead;
+
+  /// No description provided for @trickEventMidGirudaMightyBait.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 중간으로 마이티 유도'**
+  String get trickEventMidGirudaMightyBait;
+
+  /// No description provided for @trickEventMidGirudaPassLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 중간으로 선 넘김'**
+  String get trickEventMidGirudaPassLead;
+
+  /// No description provided for @trickEventDefenderGirudaWin.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비팀 기루다 승리'**
+  String get trickEventDefenderGirudaWin;
+
+  /// No description provided for @trickEventMidGirudaLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 중간 선공'**
+  String get trickEventMidGirudaLead;
+
+  /// No description provided for @trickEventTopNonGirudaLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'비기루다 최상위 선공'**
+  String get trickEventTopNonGirudaLead;
+
+  /// No description provided for @trickEventFirstTrickFriendBait.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구 부재 / 물패로 프렌드 유도'**
+  String get trickEventFirstTrickFriendBait;
+
+  /// No description provided for @trickEventFirstTrickWaste.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구 부재 / 물패 처리'**
+  String get trickEventFirstTrickWaste;
+
+  /// No description provided for @trickEventWaste.
+  ///
+  /// In ko, this message translates to:
+  /// **'물패 처리'**
+  String get trickEventWaste;
+
+  /// No description provided for @trickEventAttackGirudaCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격 기루다 컷'**
+  String get trickEventAttackGirudaCut;
+
+  /// No description provided for @trickEventDefenseGirudaCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 기루다 컷'**
+  String get trickEventDefenseGirudaCut;
+
+  /// No description provided for @trickEventNonGirudaExhaust.
+  ///
+  /// In ko, this message translates to:
+  /// **'비기루다 소진'**
+  String get trickEventNonGirudaExhaust;
 }
 
 class _AppLocalizationsDelegate

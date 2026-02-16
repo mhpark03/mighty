@@ -1122,5 +1122,32 @@
     "placeholders": {
       "suits": {"type": "String"}
     }
-  }
+  },
+
+  "trickDetails": "트릭 상세",
+  "trickColumnGainLoss": "득실",
+  "trickColumnGiruda": "기루다",
+  "trickColumnEvent": "이벤트",
+  "trickEventLastCard": "마지막 카드",
+  "trickEventJokerLead": "조커 선공",
+  "trickEventJokerLeadSuit": "조커 선공 ({suit})",
+  "@trickEventJokerLeadSuit": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "trickEventJokerGirudaExhaust": "수비팀 기루다 소진 유도",
+  "trickEventMightyLead": "마이티 선공",
+  "trickEventTopGirudaLead": "기루다 최상위 선공",
+  "trickEventMidGirudaMightyBait": "기루다 중간으로 마이티 유도",
+  "trickEventMidGirudaPassLead": "기루다 중간으로 선 넘김",
+  "trickEventDefenderGirudaWin": "수비팀 기루다 승리",
+  "trickEventMidGirudaLead": "기루다 중간 선공",
+  "trickEventTopNonGirudaLead": "비기루다 최상위 선공",
+  "trickEventFirstTrickFriendBait": "초구 부재 / 물패로 프렌드 유도",
+  "trickEventFirstTrickWaste": "초구 부재 / 물패 처리",
+  "trickEventWaste": "물패 처리",
+  "trickEventAttackGirudaCut": "공격 기루다 컷",
+  "trickEventDefenseGirudaCut": "수비 기루다 컷",
+  "trickEventNonGirudaExhaust": "비기루다 소진"
 }

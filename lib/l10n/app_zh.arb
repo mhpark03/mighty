@@ -962,5 +962,32 @@
     "placeholders": {
       "suits": {"type": "String"}
     }
-  }
+  },
+
+  "trickDetails": "墩详情",
+  "trickColumnGainLoss": "得失",
+  "trickColumnGiruda": "将牌",
+  "trickColumnEvent": "事件",
+  "trickEventLastCard": "最后一张牌",
+  "trickEventJokerLead": "Joker首攻",
+  "trickEventJokerLeadSuit": "Joker首攻 ({suit})",
+  "@trickEventJokerLeadSuit": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "trickEventJokerGirudaExhaust": "诱导守方消耗将牌",
+  "trickEventMightyLead": "Mighty首攻",
+  "trickEventTopGirudaLead": "将牌最高首攻",
+  "trickEventMidGirudaMightyBait": "中位将牌诱导Mighty",
+  "trickEventMidGirudaPassLead": "中位将牌让先",
+  "trickEventDefenderGirudaWin": "守方将牌胜",
+  "trickEventMidGirudaLead": "中位将牌首攻",
+  "trickEventTopNonGirudaLead": "非将牌最高首攻",
+  "trickEventFirstTrickFriendBait": "首墩缺牌 / 诱导Friend",
+  "trickEventFirstTrickWaste": "首墩缺牌 / 弃牌",
+  "trickEventWaste": "弃牌",
+  "trickEventAttackGirudaCut": "攻方将牌切入",
+  "trickEventDefenseGirudaCut": "守方将牌切入",
+  "trickEventNonGirudaExhaust": "非将牌消耗"
 }
