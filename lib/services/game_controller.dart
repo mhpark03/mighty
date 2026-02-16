@@ -1220,6 +1220,9 @@ class GameController extends ChangeNotifier {
   }
 
   void _sendTrackingData() {
+    // 올패스 게임은 서버로 보내지 않음
+    if (_state.allPassed) return;
+
     MightyTrackingService.sendGameResult(
       gameUuid: _gameUuid,
       state: _state,
