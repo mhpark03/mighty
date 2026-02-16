@@ -318,6 +318,34 @@ class AIPlayer {
     return true;
   }
 
+  /// 기루다 강도 점수: 카드 쌍별 연결성 가중치 적용
+  /// A/K → 2.0, A/Q → 1.7, A/J → 1.5, A/Q/J → 2.7, A/K/Q → 3.0
+  /// 3.0 이상이면 기루다 후보로 검토
+  double _calcGirudaStrengthScore(List<PlayingCard> suitCards) {
+    if (suitCards.isEmpty) return 0;
+    final ranks = suitCards.map((c) => c.rank!.index).toList()
+      ..sort((a, b) => b.compareTo(a)); // 내림차순 (A=12, K=11, ...)
+    double score = 0;
+    int i = 0;
+    while (i < ranks.length) {
+      score += 1; // 쌍의 첫 번째 카드
+      if (i + 1 < ranks.length) {
+        final gap = ranks[i] - ranks[i + 1] - 1;
+        if (gap == 0) {
+          score += 1;   // 인접 (A-K, K-Q 등)
+        } else if (gap == 1) {
+          score += 0.7;  // 한 칸 건너뜀 (A-Q, K-J 등)
+        } else {
+          score += 0.5;  // 두 칸 이상 건너뜀
+        }
+        i += 2;
+      } else {
+        i += 1; // 홀수 마지막 카드
+      }
+    }
+    return score;
+  }
+
   /// 모든 suit에 대해 예상 점수 범위를 계산하여 최적 기루다 선택
   BidEvaluation evaluateForBidding(List<PlayingCard> hand) {
     Suit? bestGiruda;
@@ -328,8 +356,8 @@ class AIPlayer {
 
     for (final suit in Suit.values) {
       final suitCards = hand.where((c) => !c.isJoker && c.suit == suit).toList();
-      // 최소 3장은 있어야 기루다 후보 (2장은 상대 기루다에 압도됨)
-      if (suitCards.length < 3) continue;
+      // 기루다 강도 점수 기반 후보 필터링 (연결성 가중치 적용)
+      if (_calcGirudaStrengthScore(suitCards) < 3.0) continue;
 
       final (minPts, maxPts) = estimatePointRange(hand, suit);
       // 바닥패 기대값: 키카드 보유 시 약한 카드 제거 효과 증가
@@ -584,6 +612,7 @@ class AIPlayer {
 
     int minTricks = 0; // 프렌드 도움 없이 확실한 트릭
     int maxTricks = 0; // 프렌드 포함 최대 트릭
+    double maxAdj = 0; // 불확실한 트릭의 소수점 보정
 
     // === 마이티: 확실한 1트릭 ===
     if (hasMighty) { minTricks++; maxTricks++; }
@@ -648,12 +677,7 @@ class AIPlayer {
         // 3장 Q: A,K 둘 다 소진되기 어려움 → 보너스 없음
       }
 
-      // === 마이티 + 기루다 시너지 ===
-      // 마이티로 선공 장악 → 기루다 고위 카드 연속 트릭 확보
-      if (hasMighty) {
-        if (gA) { minTricks++; maxTricks++; } // 마이티 선공 → 기루다A 안정 확보
-        if (gA && gK) { maxTricks++; } // 마이티→A→K 연속
-      }
+      // 마이티+기루다A 시너지 제거: 각각 이미 +1씩 반영되어 중복
     }
 
     // === 비기루다 에이스/킹 ===
@@ -670,8 +694,8 @@ class AIPlayer {
       if (hasAce) { minTricks++; maxTricks++; }
       // A-K 연속: 선 유지하여 K도 확보 (최대)
       if (hasAce && hasKing) { maxTricks++; }
-      // K만 있고 A 없으면: 후반에 A가 나간 후 K가 이김 (최대)
-      if (hasKing && !hasAce) { maxTricks++; }
+      // K만 있고 A 없으면: 후반에 A가 나간 후 K가 이김 (불확실하므로 0.6)
+      if (hasKing && !hasAce) { maxAdj += 0.6; }
     }
 
     // === 비기루다 취약 수트 감점 ===
@@ -729,7 +753,7 @@ class AIPlayer {
     // 트릭당 평균 점수 카드: 약 2장 (20장 / 10트릭)
     // 강한 핸드는 점수카드 밀집 트릭을 먹어 ppt 2.0~2.5 분포
     int minPoints = (minTricks * 1.5).round().clamp(0, 20);
-    int maxPoints = (maxTricks * 2.2).round().clamp(0, 20);
+    int maxPoints = ((maxTricks + maxAdj) * 2.2).round().clamp(0, 20);
 
     // === 런 감지: 마이티+조커+기루다A+5장기루다 → 올런 가능 ===
     if (hasMighty && hasJoker && giruda != null && girudaLen >= 5) {
@@ -760,8 +784,8 @@ class AIPlayer {
       int strength = 0;
       final suitCards = hand.where((c) => !c.isJoker && c.suit == suit).toList();
 
-      // 같은 무늬가 4장 이상이어야 기루다 후보 (3장 이하는 제외)
-      if (suitCards.length <= 3) {
+      // 기루다 강도 점수 기반 후보 필터링 (연결성 가중치 적용)
+      if (_calcGirudaStrengthScore(suitCards) < 3.0) {
         suitStrength[suit] = 0;
         continue;
       }
@@ -771,12 +795,6 @@ class AIPlayer {
       bool hasKing = suitCards.any((c) => c.rank == Rank.king);
       bool hasQueen = suitCards.any((c) => c.rank == Rank.queen);
       bool hasJack = suitCards.any((c) => c.rank == Rank.jack);
-
-      // 기루다 A 또는 K 필수 - 없으면 후보에서 제외
-      if (!hasAce && !hasKing) {
-        suitStrength[suit] = 0;
-        continue;
-      }
 
       // 고위 카드에 높은 가중치
       if (hasAce) strength += 10;
