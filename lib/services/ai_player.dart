@@ -2085,9 +2085,11 @@ class AIPlayer {
       final bool isJokerFriend = state.friendDeclaration?.card?.isJoker ?? false;
       final Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
 
-      // === 프렌드 트릭 2~3 기루다 선공 전략 ===
+      // === 프렌드 초반 기루다 선공 전략 ===
       // 비기루다로 선공하면 수비팀에게 컷당할 위험이 있으므로 기루다 우선
-      if (state.currentTrickNumber == 2 || state.currentTrickNumber == 3) {
+      // 트릭 2~6: 상대 기루다가 남아있으면 기루다 선공으로 소진 유도
+      if (state.currentTrickNumber >= 2 && state.currentTrickNumber <= 6 &&
+          _getRemainingGirudaCount(state, player) > 0) {
         final myGirudaCards = playableCards.where((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
 
@@ -2280,11 +2282,14 @@ class AIPlayer {
         if (myGirudaCards.isNotEmpty) {
           // 내 기루다 중 가장 낮은 것
           myGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-          // 10 이하의 낮은 기루다만 사용 (높은 기루다는 아낌)
+          // 10 이하의 낮은 기루다 우선 사용 (높은 기루다는 아낌)
           final lowGiruda = myGirudaCards.where((c) => c.rankValue <= 10).toList();
           if (lowGiruda.isNotEmpty) {
             return lowGiruda.first;
           }
+          // 낮은 기루다가 없어도 (J 이상만 남은 경우) 가장 낮은 기루다 사용
+          // 상대 기루다 소진이 비기루다 void 만들기보다 우선
+          return myGirudaCards.first;
         }
       }
 

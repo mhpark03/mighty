@@ -500,7 +500,7 @@ class GameController extends ChangeNotifier {
     // Tracking: kitty snapshot + mark declarer in bid snapshots
     final kittyPointCards = kittyCards.where((c) => c.isPointCard).length;
     final (postMin, postMax) = _aiPlayer.estimatePointRange(finalHand, newGiruda);
-    final postOptimal = ((postMin + postMax) / 2 + 1).round() + 1;
+    final postOptimal = (postMin * 0.3 + postMax * 0.7 + 1).round();
     _kittySnapshot = KittySnapshot(
       kittyCards: kittyCards.map((c) => c.toJson()).toList(),
       kittyPointCards: kittyPointCards,
