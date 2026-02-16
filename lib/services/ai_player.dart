@@ -1016,6 +1016,12 @@ class AIPlayer {
     // 최상위 카드가 있는 무늬 (버리기 우선순위 낮춤)
     final topSuits = _getSuitsWithTopCards(hand, state);
 
+    // 마이티 무늬 시너지: Mighty + Q 보유 시 해당 무늬 보호
+    final mightySuit = state.mighty.suit;
+    final hasMightyInHand = hand.any((c) => c.isMightyWith(state.giruda));
+    final hasMightyQ = hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.queen);
+    final mightySuitSynergy = hasMightyInHand && hasMightyQ;
+
     hand.sort((a, b) {
       // 1. 조커/마이티는 절대 버리지 않음
       if (a.isJoker || a.isMightyWith(state.giruda)) return 1;
@@ -1056,7 +1062,15 @@ class AIPlayer {
       if (aProtected && !bProtected) return 1;
       if (!aProtected && bProtected) return -1;
 
-      // 6. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
+      // 6. 마이티 무늬 시너지: Mighty+Q 보유 시 해당 무늬 카드 보호 (K 추출용)
+      if (mightySuitSynergy) {
+        bool aIsMightySuit = a.suit == mightySuit;
+        bool bIsMightySuit = b.suit == mightySuit;
+        if (aIsMightySuit && !bIsMightySuit) return 1;
+        if (!aIsMightySuit && bIsMightySuit) return -1;
+      }
+
+      // 7. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
       int aCount = suitCount[a.suit] ?? 0;
       int bCount = suitCount[b.suit] ?? 0;
       if (aCount != bCount) {
@@ -1158,6 +1172,12 @@ class AIPlayer {
       return c.suit == mightyCard.suit && c.rank == mightyCard.rank;
     }
 
+    // 마이티 무늬 시너지: Mighty + Q 보유 시 해당 무늬 보호
+    final mightySuit = state.mighty.suit;
+    final hasMightyInHand = hand.any((c) => isMightyCard(c));
+    final hasMightyQ = hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.queen);
+    final mightySuitSynergy = hasMightyInHand && hasMightyQ;
+
     hand.sort((a, b) {
       // 1. 조커/마이티는 절대 버리지 않음
       if (a.isJoker || isMightyCard(a)) return 1;
@@ -1198,7 +1218,15 @@ class AIPlayer {
       if (aProtected && !bProtected) return 1;
       if (!aProtected && bProtected) return -1;
 
-      // 6. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
+      // 6. 마이티 무늬 시너지: Mighty+Q 보유 시 해당 무늬 카드 보호 (K 추출용)
+      if (mightySuitSynergy) {
+        bool aIsMightySuit = a.suit == mightySuit;
+        bool bIsMightySuit = b.suit == mightySuit;
+        if (aIsMightySuit && !bIsMightySuit) return 1;
+        if (!aIsMightySuit && bIsMightySuit) return -1;
+      }
+
+      // 7. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
       int aCount = suitCount[a.suit] ?? 0;
       int bCount = suitCount[b.suit] ?? 0;
       if (aCount != bCount) {
@@ -3189,6 +3217,23 @@ class AIPlayer {
           final jokerForGirudaCall = playableCards.where((c) => c.isJoker).toList();
           if (jokerForGirudaCall.isNotEmpty && state.currentTrickNumber >= 2) {
             return jokerForGirudaCall.first;
+          }
+          // ★ 마이티 무늬 공격: Mighty+Q 보유 & K 미출현 시
+          // 낮은 mighty suit 카드로 K를 추출 → Q가 해당 무늬 최상위가 됨
+          final mightySuit = state.mighty.suit;
+          final hasMighty = playableCards.any((c) => c.isMightyWith(state.giruda));
+          final hasMightyQ = playableCards.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.queen);
+          final mightyKPlayed = _getPlayedCards(state).any((c) => c.suit == mightySuit && c.rank == Rank.king);
+          if (hasMighty && hasMightyQ && !mightyKPlayed) {
+            // mighty suit에서 Mighty/Q 제외한 가장 낮은 카드
+            final mightySuitLow = playableCards.where((c) =>
+                !c.isJoker && !c.isMightyWith(state.giruda) &&
+                c.suit == mightySuit && c.rank != Rank.queen
+            ).toList();
+            if (mightySuitLow.isNotEmpty) {
+              mightySuitLow.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return mightySuitLow.first;
+            }
           }
           // 조커 없으면 중간 기루다(비점수)로 상대 고액 유도
           // 너무 낮은 카드를 내면 상대가 A/K 대신 중간 카드로 이길 수 있음
