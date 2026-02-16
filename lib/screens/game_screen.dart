@@ -5025,6 +5025,7 @@ class _GameScreenState extends State<GameScreen> {
         trickDelta: trickDelta,
         girudaRemaining: girudaRemaining,
         description: description,
+        jokerLeadSuit: trick.jokerLeadSuit,
       ));
     }
 
@@ -5095,7 +5096,8 @@ class _GameScreenState extends State<GameScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                         color: row.winnerId == i ? Colors.blue[50] : null,
                         child: row.cardsByPlayer[i] != null
-                            ? _buildTrickCardCell(row.cardsByPlayer[i]!, i == row.leadPlayerId, fontSize)
+                            ? _buildTrickCardCell(row.cardsByPlayer[i]!, i == row.leadPlayerId, fontSize,
+                                jokerLeadSuit: i == row.leadPlayerId ? row.jokerLeadSuit : null)
                             : Text('-', textAlign: TextAlign.center, style: TextStyle(fontSize: fontSize, color: Colors.grey[300])),
                       ),
                     // 득실
@@ -5148,11 +5150,15 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _buildTrickCardCell(PlayingCard card, bool isLead, double fontSize) {
-    final text = card.toString();
+  Widget _buildTrickCardCell(PlayingCard card, bool isLead, double fontSize, {Suit? jokerLeadSuit}) {
+    String text = card.toString();
     Color textColor;
     if (card.isJoker) {
       textColor = Colors.green[700]!;
+      if (jokerLeadSuit != null) {
+        const suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
+        text = 'JK${suitSymbols[jokerLeadSuit] ?? ''}';
+      }
     } else if (card.isRed) {
       textColor = Colors.red[600]!;
     } else {
@@ -5188,6 +5194,7 @@ class _TrickRowData {
   final int trickDelta;
   final int girudaRemaining;
   final String? description;
+  final Suit? jokerLeadSuit;
 
   _TrickRowData({
     required this.trickNumber,
@@ -5197,5 +5204,6 @@ class _TrickRowData {
     required this.trickDelta,
     required this.girudaRemaining,
     required this.description,
+    this.jokerLeadSuit,
   });
 }
