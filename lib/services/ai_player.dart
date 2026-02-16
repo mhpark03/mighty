@@ -1013,8 +1013,45 @@ class AIPlayer {
       suitCount[suit] = hand.where((c) => !c.isJoker && c.suit == suit).length;
     }
 
-    // 최상위 카드가 있는 무늬 (버리기 우선순위 낮춤)
-    final topSuits = _getSuitsWithTopCards(hand, state);
+    // 초구 카드 결정: 비기루다 A 또는 마이티 무늬 K (초구 승리 → 보이드 계획)
+    PlayingCard? firstTrickCard;
+    {
+      final List<PlayingCard> firstTrickCandidates = [];
+      for (final c in hand) {
+        if (c.isJoker) continue;
+        if (c.isMightyWith(state.giruda)) continue;
+        if (c.suit == state.giruda) continue;
+        // 비기루다 A
+        if (c.rank == Rank.ace) firstTrickCandidates.add(c);
+        // 마이티 무늬 K (마이티가 A일 때)
+        if (c.suit == state.mighty.suit && state.mighty.rank == Rank.ace && c.rank == Rank.king) {
+          firstTrickCandidates.add(c);
+        }
+      }
+      if (firstTrickCandidates.isNotEmpty) {
+        // 해당 무늬 카드 수가 적은 것 우선 (초구 후 보이드에 가까움)
+        firstTrickCandidates.sort((a, b) {
+          int aCount = suitCount[a.suit] ?? 0;
+          int bCount = suitCount[b.suit] ?? 0;
+          if (aCount != bCount) return aCount.compareTo(bCount);
+          return b.rankValue.compareTo(a.rankValue); // A(14) > K(13) 우선
+        });
+        firstTrickCard = firstTrickCandidates.first;
+      }
+    }
+
+    // 초구 카드를 제외한 실효 데이터 (초구 후 보이드 계획)
+    final effectiveHand = firstTrickCard != null
+        ? hand.where((c) => !identical(c, firstTrickCard)).toList()
+        : hand;
+    Map<Suit, int> effectiveSuitCount = Map.from(suitCount);
+    if (firstTrickCard != null && effectiveSuitCount.containsKey(firstTrickCard.suit)) {
+      effectiveSuitCount[firstTrickCard.suit!] =
+          (effectiveSuitCount[firstTrickCard.suit!] ?? 1) - 1;
+    }
+
+    // 최상위 카드가 있는 무늬 (버리기 우선순위 낮춤) - 초구 카드 제외 후 평가
+    final topSuits = _getSuitsWithTopCards(effectiveHand, state);
 
     // 마이티 무늬 시너지: Mighty + Q 보유 시 해당 무늬 보호
     final mightySuit = state.mighty.suit;
@@ -1070,20 +1107,20 @@ class AIPlayer {
         if (!aIsMightySuit && bIsMightySuit) return -1;
       }
 
-      // 7. 보이드 생성 우선: 1~2장 남은 비기루다 무늬(A 없음)를 우선 버림
+      // 7. 보이드 생성 우선: 초구 카드 제외 후 1~2장 남은 비기루다 무늬(A 없음)를 우선 버림
       // 보이드 2개+ → 기루다 컷 기회 극대화, 무늬 집중으로 유리
       bool aVoidCandidate = !a.isJoker && a.suit != null &&
-          (suitCount[a.suit] ?? 0) > 0 && (suitCount[a.suit] ?? 0) <= 2 &&
-          !hand.any((c) => !c.isJoker && c.suit == a.suit && c.rank == Rank.ace);
+          (effectiveSuitCount[a.suit] ?? 0) > 0 && (effectiveSuitCount[a.suit] ?? 0) <= 2 &&
+          !effectiveHand.any((c) => !c.isJoker && c.suit == a.suit && c.rank == Rank.ace);
       bool bVoidCandidate = !b.isJoker && b.suit != null &&
-          (suitCount[b.suit] ?? 0) > 0 && (suitCount[b.suit] ?? 0) <= 2 &&
-          !hand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace);
+          (effectiveSuitCount[b.suit] ?? 0) > 0 && (effectiveSuitCount[b.suit] ?? 0) <= 2 &&
+          !effectiveHand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace);
       if (aVoidCandidate && !bVoidCandidate) return -1;
       if (!aVoidCandidate && bVoidCandidate) return 1;
 
       // 8. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
-      int aCount = suitCount[a.suit] ?? 0;
-      int bCount = suitCount[b.suit] ?? 0;
+      int aCount = effectiveSuitCount[a.suit] ?? 0;
+      int bCount = effectiveSuitCount[b.suit] ?? 0;
       if (aCount != bCount) {
         return aCount.compareTo(bCount); // 적은 쪽이 앞으로
       }
@@ -1174,8 +1211,45 @@ class AIPlayer {
       suitCount[suit] = hand.where((c) => !c.isJoker && c.suit == suit).length;
     }
 
-    // 최상위 카드가 있는 무늬 (버리기 우선순위 낮춤)
-    final topSuits = _getSuitsWithTopCards(hand, state);
+    // 초구 카드 결정: 비기루다 A 또는 마이티 무늬 K (초구 승리 → 보이드 계획)
+    PlayingCard? firstTrickCard;
+    {
+      final List<PlayingCard> firstTrickCandidates = [];
+      for (final c in hand) {
+        if (c.isJoker) continue;
+        if (c.suit == state.mighty.suit && c.rank == state.mighty.rank) continue;
+        if (c.suit == finalGiruda) continue;
+        // 비기루다 A
+        if (c.rank == Rank.ace) firstTrickCandidates.add(c);
+        // 마이티 무늬 K (마이티가 A일 때)
+        if (c.suit == state.mighty.suit && state.mighty.rank == Rank.ace && c.rank == Rank.king) {
+          firstTrickCandidates.add(c);
+        }
+      }
+      if (firstTrickCandidates.isNotEmpty) {
+        // 해당 무늬 카드 수가 적은 것 우선 (초구 후 보이드에 가까움)
+        firstTrickCandidates.sort((a, b) {
+          int aCount = suitCount[a.suit] ?? 0;
+          int bCount = suitCount[b.suit] ?? 0;
+          if (aCount != bCount) return aCount.compareTo(bCount);
+          return b.rankValue.compareTo(a.rankValue); // A(14) > K(13) 우선
+        });
+        firstTrickCard = firstTrickCandidates.first;
+      }
+    }
+
+    // 초구 카드를 제외한 실효 데이터 (초구 후 보이드 계획)
+    final effectiveHand = firstTrickCard != null
+        ? hand.where((c) => !identical(c, firstTrickCard)).toList()
+        : hand;
+    Map<Suit, int> effectiveSuitCount = Map.from(suitCount);
+    if (firstTrickCard != null && effectiveSuitCount.containsKey(firstTrickCard.suit)) {
+      effectiveSuitCount[firstTrickCard.suit!] =
+          (effectiveSuitCount[firstTrickCard.suit!] ?? 1) - 1;
+    }
+
+    // 최상위 카드가 있는 무늬 (버리기 우선순위 낮춤) - 초구 카드 제외 후 평가
+    final topSuits = _getSuitsWithTopCards(effectiveHand, state);
 
     // 마이티 카드 확인 (기루다에 따라 다름)
     final mightyCard = state.mighty;
@@ -1237,20 +1311,20 @@ class AIPlayer {
         if (!aIsMightySuit && bIsMightySuit) return -1;
       }
 
-      // 7. 보이드 생성 우선: 1~2장 남은 비기루다 무늬(A 없음)를 우선 버림
+      // 7. 보이드 생성 우선: 초구 카드 제외 후 1~2장 남은 비기루다 무늬(A 없음)를 우선 버림
       // 보이드 2개+ → 기루다 컷 기회 극대화, 무늬 집중으로 유리
       bool aVoidCandidate = !a.isJoker && a.suit != null &&
-          (suitCount[a.suit] ?? 0) > 0 && (suitCount[a.suit] ?? 0) <= 2 &&
-          !hand.any((c) => !c.isJoker && c.suit == a.suit && c.rank == Rank.ace);
+          (effectiveSuitCount[a.suit] ?? 0) > 0 && (effectiveSuitCount[a.suit] ?? 0) <= 2 &&
+          !effectiveHand.any((c) => !c.isJoker && c.suit == a.suit && c.rank == Rank.ace);
       bool bVoidCandidate = !b.isJoker && b.suit != null &&
-          (suitCount[b.suit] ?? 0) > 0 && (suitCount[b.suit] ?? 0) <= 2 &&
-          !hand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace);
+          (effectiveSuitCount[b.suit] ?? 0) > 0 && (effectiveSuitCount[b.suit] ?? 0) <= 2 &&
+          !effectiveHand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace);
       if (aVoidCandidate && !bVoidCandidate) return -1;
       if (!aVoidCandidate && bVoidCandidate) return 1;
 
       // 8. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
-      int aCount = suitCount[a.suit] ?? 0;
-      int bCount = suitCount[b.suit] ?? 0;
+      int aCount = effectiveSuitCount[a.suit] ?? 0;
+      int bCount = effectiveSuitCount[b.suit] ?? 0;
       if (aCount != bCount) {
         return aCount.compareTo(bCount); // 적은 쪽이 앞으로
       }
