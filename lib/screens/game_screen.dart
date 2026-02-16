@@ -33,6 +33,7 @@ class _GameScreenState extends State<GameScreen> {
   bool _statsRecorded = false;
   bool _bidInitialized = false;
   bool _showGameResult = true;
+  bool _showTrickDetails = false;
 
   /// 배팅을 무늬 기호로 포맷
   String _formatBid(Bid bid) {
@@ -167,6 +168,7 @@ class _GameScreenState extends State<GameScreen> {
                   _allPassedDialogShown = false;
                   _bidInitialized = false;
                   _showGameResult = true;
+                  _showTrickDetails = false;
                   _showHint = false;
                   controller.startNewGame();
                 },
@@ -175,6 +177,7 @@ class _GameScreenState extends State<GameScreen> {
                   _allPassedDialogShown = false;
                   _bidInitialized = false;
                   _showGameResult = true;
+                  _showTrickDetails = false;
                   _showHint = false;
                   controller.startNewGame();
                 },
@@ -310,6 +313,8 @@ class _GameScreenState extends State<GameScreen> {
         }
         if (_showGameResult) {
           return _buildGameEndScreen(controller);
+        } else if (_showTrickDetails) {
+          return _buildTrickDetailsScreen(controller);
         } else {
           return _buildPlayingScreen(controller);
         }
@@ -2828,7 +2833,7 @@ class _GameScreenState extends State<GameScreen> {
         if (controller.waitingForTrickConfirm)
           _buildTrickConfirmOverlay(controller),
         // 게임 종료 후 팀별 점수 및 버튼 표시
-        if (state.phase == GamePhase.gameEnd && !_showGameResult)
+        if (state.phase == GamePhase.gameEnd && !_showGameResult && !_showTrickDetails)
           Positioned(
             bottom: 180,
             left: 0,
@@ -2938,6 +2943,7 @@ class _GameScreenState extends State<GameScreen> {
                         onPressed: () {
                           setState(() {
                             _showGameResult = true;
+                            _showTrickDetails = false;
                           });
                         },
                         icon: const Icon(Icons.emoji_events, color: Colors.black),
@@ -2956,6 +2962,7 @@ class _GameScreenState extends State<GameScreen> {
                           setState(() {
                             _statsRecorded = false;
                             _showGameResult = true;
+                            _showTrickDetails = false;
                             _showHint = false;
                           });
                           controller.reset();
@@ -4835,6 +4842,7 @@ class _GameScreenState extends State<GameScreen> {
                     onPressed: () {
                       setState(() {
                         _showGameResult = false;
+                        _showTrickDetails = true;
                       });
                     },
                     style: ElevatedButton.styleFrom(
@@ -4842,7 +4850,7 @@ class _GameScreenState extends State<GameScreen> {
                       padding: EdgeInsets.symmetric(horizontal: compact ? 14 : 20, vertical: compact ? 7 : 10),
                     ),
                     child: Text(
-                      l10n.confirm,
+                      l10n.trickDetails,
                       style: TextStyle(fontSize: compact ? 14 : 16, color: Colors.black),
                     ),
                   ),
@@ -4852,6 +4860,7 @@ class _GameScreenState extends State<GameScreen> {
                       setState(() {
                         _statsRecorded = false;
                         _showGameResult = true;
+                        _showTrickDetails = false;
                         _showHint = false;
                       });
                       controller.reset();
@@ -4965,6 +4974,92 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     return parts.isNotEmpty ? parts.join(' / ') : null;
+  }
+
+  Widget _buildTrickDetailsScreen(GameController controller) {
+    final l10n = AppLocalizations.of(context)!;
+    final state = controller.state;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final compact = screenHeight < 700;
+
+    return Center(
+      child: Container(
+        constraints: BoxConstraints(maxHeight: screenHeight * (compact ? 0.92 : 0.85)),
+        padding: EdgeInsets.all(compact ? 12 : 20),
+        margin: EdgeInsets.all(compact ? 8 : 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildTrickDetailsTable(state, compact: compact, l10n: l10n),
+              SizedBox(height: compact ? 10 : 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _showTrickDetails = false;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[300],
+                      padding: EdgeInsets.symmetric(horizontal: compact ? 14 : 20, vertical: compact ? 7 : 10),
+                    ),
+                    child: Text(
+                      l10n.confirm,
+                      style: TextStyle(fontSize: compact ? 14 : 16, color: Colors.black),
+                    ),
+                  ),
+                  SizedBox(width: compact ? 8 : 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _showGameResult = true;
+                        _showTrickDetails = false;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber,
+                      padding: EdgeInsets.symmetric(horizontal: compact ? 14 : 20, vertical: compact ? 7 : 10),
+                    ),
+                    child: Text(
+                      l10n.score,
+                      style: TextStyle(fontSize: compact ? 14 : 16, color: Colors.black),
+                    ),
+                  ),
+                  SizedBox(width: compact ? 8 : 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _statsRecorded = false;
+                        _showGameResult = true;
+                        _showTrickDetails = false;
+                        _showHint = false;
+                      });
+                      controller.reset();
+                      controller.startNewGame();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      padding: EdgeInsets.symmetric(horizontal: compact ? 14 : 20, vertical: compact ? 7 : 10),
+                    ),
+                    child: Text(
+                      l10n.newGame,
+                      style: TextStyle(fontSize: compact ? 14 : 16, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildTrickDetailsTable(GameState state, {required bool compact, required AppLocalizations l10n}) {
