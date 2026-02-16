@@ -1952,6 +1952,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickColumnEvent => 'イベント';
 
   @override
+  String get trickLegendLead => '先攻';
+
+  @override
+  String get trickLegendWinner => '勝者';
+
+  @override
   String get trickEventLastCard => '最後のカード';
 
   @override

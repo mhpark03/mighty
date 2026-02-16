@@ -1128,6 +1128,8 @@
   "trickColumnGainLoss": "득실",
   "trickColumnGiruda": "기루다",
   "trickColumnEvent": "이벤트",
+  "trickLegendLead": "선공",
+  "trickLegendWinner": "승자",
   "trickEventLastCard": "마지막 카드",
   "trickEventJokerLead": "조커 선공",
   "trickEventJokerLeadSuit": "조커 선공 ({suit})",

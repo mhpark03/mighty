@@ -968,6 +968,8 @@
   "trickColumnGainLoss": "得失",
   "trickColumnGiruda": "将牌",
   "trickColumnEvent": "事件",
+  "trickLegendLead": "首攻",
+  "trickLegendWinner": "赢家",
   "trickEventLastCard": "最后一张牌",
   "trickEventJokerLead": "Joker首攻",
   "trickEventJokerLeadSuit": "Joker首攻 ({suit})",

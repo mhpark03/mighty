@@ -1958,6 +1958,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickColumnEvent => '이벤트';
 
   @override
+  String get trickLegendLead => '선공';
+
+  @override
+  String get trickLegendWinner => '승자';
+
+  @override
   String get trickEventLastCard => '마지막 카드';
 
   @override

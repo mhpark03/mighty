@@ -1942,6 +1942,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickColumnEvent => '事件';
 
   @override
+  String get trickLegendLead => '首攻';
+
+  @override
+  String get trickLegendWinner => '赢家';
+
+  @override
   String get trickEventLastCard => '最后一张牌';
 
   @override

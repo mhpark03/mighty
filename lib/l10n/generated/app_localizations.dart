@@ -3526,6 +3526,18 @@ abstract class AppLocalizations {
   /// **'이벤트'**
   String get trickColumnEvent;
 
+  /// No description provided for @trickLegendLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'선공'**
+  String get trickLegendLead;
+
+  /// No description provided for @trickLegendWinner.
+  ///
+  /// In ko, this message translates to:
+  /// **'승자'**
+  String get trickLegendWinner;
+
   /// No description provided for @trickEventLastCard.
   ///
   /// In ko, this message translates to:

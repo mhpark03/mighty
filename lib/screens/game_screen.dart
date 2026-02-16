@@ -5156,12 +5156,113 @@ class _GameScreenState extends State<GameScreen> {
       ));
     }
 
+    // 기루다/마이티 정보 및 범례
+    final girudaSymbol = giruda != null ? _getSuitSymbol(giruda) : null;
+    final girudaColor = giruda != null
+        ? (giruda == Suit.diamond || giruda == Suit.heart ? Colors.red[600]! : Colors.grey[900]!)
+        : null;
+    final mighty = state.mighty;
+    final mightyText = '${_getSuitSymbol(mighty.suit!)}${mighty.rankSymbol}';
+    final mightyColor = mighty.isRed ? Colors.red[600]! : Colors.grey[900]!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.trickDetails,
           style: TextStyle(fontSize: compact ? 14 : 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: compact ? 2 : 4),
+        // 범례
+        Wrap(
+          spacing: compact ? 8 : 12,
+          runSpacing: 4,
+          children: [
+            // 기루다
+            if (giruda != null)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${l10n.giruda}: ',
+                    style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
+                  ),
+                  Text(
+                    girudaSymbol!,
+                    style: TextStyle(fontSize: fontSize + 2, color: girudaColor, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              )
+            else
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${l10n.giruda}: ',
+                    style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
+                  ),
+                  Text(
+                    l10n.noGiruda,
+                    style: TextStyle(fontSize: fontSize, color: Colors.grey[600], fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            // 마이티
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${l10n.mighty}: ',
+                  style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
+                ),
+                Text(
+                  mightyText,
+                  style: TextStyle(fontSize: fontSize, color: mightyColor, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            // 선공 범례
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[400]!, width: 1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'A',
+                    style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
+                  ),
+                ),
+                const SizedBox(width: 2),
+                Text(
+                  l10n.trickLegendLead,
+                  style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+            // 승자 범례
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: fontSize + 6,
+                  height: fontSize + 4,
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 2),
+                Text(
+                  l10n.trickLegendWinner,
+                  style: TextStyle(fontSize: fontSize, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ],
         ),
         SizedBox(height: compact ? 4 : 8),
         SingleChildScrollView(

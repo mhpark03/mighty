@@ -1971,13 +1971,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickDetails => 'Trick Details';
 
   @override
-  String get trickColumnGainLoss => 'Gain/Loss';
+  String get trickColumnGainLoss => 'Gain/\nLoss';
 
   @override
   String get trickColumnGiruda => 'Trump';
 
   @override
   String get trickColumnEvent => 'Event';
+
+  @override
+  String get trickLegendLead => 'Lead';
+
+  @override
+  String get trickLegendWinner => 'Winner';
 
   @override
   String get trickEventLastCard => 'Last card';
