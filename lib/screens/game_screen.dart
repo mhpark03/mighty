@@ -4995,6 +4995,38 @@ class _GameScreenState extends State<GameScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              () {
+                final isPlayerWinner = state.getPlayerScore(state.players[0].id) >= 0;
+                return Column(
+                  children: [
+                    Text(
+                      isPlayerWinner ? l10n.victory : l10n.defeat,
+                      style: TextStyle(
+                        fontSize: compact ? 22 : 28,
+                        fontWeight: FontWeight.bold,
+                        color: isPlayerWinner ? Colors.green : Colors.red,
+                      ),
+                    ),
+                    SizedBox(height: compact ? 2 : 4),
+                    Text(
+                      state.declarerWon ? l10n.declarerTeamWins : l10n.defenderTeamWins,
+                      style: TextStyle(fontSize: compact ? 13 : 16, color: Colors.grey[600]),
+                    ),
+                  ],
+                );
+              }(),
+              SizedBox(height: compact ? 4 : 8),
+              Text(
+                state.declarerTeamPoints == 20
+                    ? '${l10n.declarerTeam}: ${l10n.fullPoints}'
+                    : l10n.declarerTeamPoints(state.declarerTeamPoints),
+                style: TextStyle(fontSize: compact ? 15 : 18),
+              ),
+              Text(
+                l10n.targetPoints(state.currentBid?.tricks ?? 0),
+                style: TextStyle(fontSize: compact ? 13 : 16, color: Colors.grey),
+              ),
+              SizedBox(height: compact ? 8 : 16),
               _buildTrickDetailsTable(state, compact: compact, l10n: l10n),
               SizedBox(height: compact ? 10 : 20),
               Row(
