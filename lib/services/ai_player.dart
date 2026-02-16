@@ -151,6 +151,59 @@ class AIPlayer {
     return voidSuits;
   }
 
+  /// 주공의 비기루다 무늬별 보유 확률 추론
+  /// 확정 void 외에도 플레이 패턴(기루다/비기루다 사용량)으로 추정
+  /// 반환: 비기루다 무늬 → 보유 확률 (0.0 = void 확정, 낮을수록 void 가능성)
+  Map<Suit, double> _inferDeclarerSuitHoldings(GameState state) {
+    Map<Suit, double> holdings = {};
+    if (state.declarerId == null || state.giruda == null) return holdings;
+
+    final Set<Suit> confirmedVoid = _getDeclarerVoidSuits(state);
+
+    // 주공이 플레이한 카드 분석
+    Map<Suit, int> suitPlayCount = {};
+    int nonGirudaPlayed = 0;
+
+    for (final trick in state.tricks) {
+      int idx = trick.playerOrder.indexOf(state.declarerId!);
+      if (idx >= 0 && idx < trick.cards.length) {
+        PlayingCard card = trick.cards[idx];
+        if (!card.isJoker && card.suit != null) {
+          suitPlayCount[card.suit!] = (suitPlayCount[card.suit!] ?? 0) + 1;
+          if (card.suit != state.giruda) {
+            nonGirudaPlayed++;
+          }
+        }
+      }
+    }
+
+    // 기루다를 많이 냈으면 비기루다 보유량이 적을 가능성
+    // (10장 중 기루다 비중이 높을수록 비기루다 슬롯 감소)
+    int girudaPlayed = suitPlayCount[state.giruda!] ?? 0;
+    double girudaFactor = girudaPlayed >= 4 ? 0.15
+        : girudaPlayed >= 3 ? 0.1
+        : girudaPlayed >= 2 ? 0.05 : 0.0;
+
+    for (Suit suit in Suit.values) {
+      if (suit == state.giruda) continue;
+
+      if (confirmedVoid.contains(suit)) {
+        holdings[suit] = 0.0;
+      } else if ((suitPlayCount[suit] ?? 0) > 0) {
+        // 해당 무늬를 낸 적 있음 → 보유 확인됨, 남아있을 확률
+        int played = suitPlayCount[suit]!;
+        holdings[suit] = played >= 3 ? 0.3 : played >= 2 ? 0.5 : 0.7;
+      } else {
+        // 한 번도 해당 무늬를 내지 않음
+        // 다른 비기루다를 많이 냈을수록 이 무늬가 없을 확률 증가
+        // 기루다를 많이 가진 주공은 비기루다가 적어 void 가능성 추가 증가
+        holdings[suit] = (0.6 - nonGirudaPlayed * 0.12 - girudaFactor).clamp(0.1, 0.6);
+      }
+    }
+
+    return holdings;
+  }
+
   // 수비팀 동료가 기루다를 가지고 있는지 추정 (조커 선공용)
   // 수비팀 동료만 확인 (본인, 주공, 프렌드 제외)
   bool _estimateDefenseTeammatesHaveGiruda(Player player, GameState state) {
@@ -2292,6 +2345,25 @@ class AIPlayer {
         }
       }
 
+      // 전략 1-2: 확정 void가 없으면 추론으로 주공 void 가능성 높은 무늬 선택
+      // 주공이 한 번도 내지 않고 + 다른 비기루다/기루다를 많이 냈으면 void 가능성 높음
+      if ((isDeclarerLastOrFourth || hasNoLeadKeepingCards) && declarerVoidSuits.isEmpty) {
+        final suitHoldings = _inferDeclarerSuitHoldings(state);
+        final inferredCandidates = suitHoldings.entries
+            .where((e) => e.value > 0 && e.value <= 0.3)
+            .where((e) => !(isJokerFriend && e.key == mightySuit))
+            .toList()
+          ..sort((a, b) => a.value.compareTo(b.value));
+        for (final entry in inferredCandidates) {
+          final suitCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == entry.key).toList();
+          if (suitCards.isNotEmpty) {
+            suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return suitCards.first;
+          }
+        }
+      }
+
       // 전략 2: 낮은 기루다로 선공 (주공이 높은 기루다로 이김)
       // ★ 상대에게 기루다가 있을 때만 사용 (기루다가 없으면 비기루다 우선)
       if (remainingGiruda > 0) {
@@ -2338,9 +2410,19 @@ class AIPlayer {
           }
         }
         if (suitGroups.isNotEmpty) {
-          // 가장 짧은 무늬 선택
-          final shortestSuit = suitGroups.entries
-              .reduce((a, b) => a.value.length <= b.value.length ? a : b);
+          // 주공 보유 확률 낮은 무늬 우선 (주공이 컷 가능), 같으면 짧은 무늬 우선
+          final suitHoldings3 = _inferDeclarerSuitHoldings(state);
+          final sortedSuitEntries = suitGroups.entries.toList()
+            ..sort((a, b) {
+              double probA = suitHoldings3[a.key] ?? 0.5;
+              double probB = suitHoldings3[b.key] ?? 0.5;
+              // 보유 확률을 0.2 단위로 그룹화 (큰 차이만 반영)
+              int binA = (probA / 0.2).floor();
+              int binB = (probB / 0.2).floor();
+              if (binA != binB) return binA.compareTo(binB);
+              return a.value.length.compareTo(b.value.length);
+            });
+          final shortestSuit = sortedSuitEntries.first;
           final suitCards = shortestSuit.value;
           // 비점수 카드 우선, 없으면 가장 낮은 카드
           final nonPoint = suitCards.where((c) => !c.isPointCard).toList();
