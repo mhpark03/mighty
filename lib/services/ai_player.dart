@@ -1070,7 +1070,18 @@ class AIPlayer {
         if (!aIsMightySuit && bIsMightySuit) return -1;
       }
 
-      // 7. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
+      // 7. 보이드 생성 우선: 1~2장 남은 비기루다 무늬(A 없음)를 우선 버림
+      // 보이드 2개+ → 기루다 컷 기회 극대화, 무늬 집중으로 유리
+      bool aVoidCandidate = !a.isJoker && a.suit != null &&
+          (suitCount[a.suit] ?? 0) > 0 && (suitCount[a.suit] ?? 0) <= 2 &&
+          !hand.any((c) => !c.isJoker && c.suit == a.suit && c.rank == Rank.ace);
+      bool bVoidCandidate = !b.isJoker && b.suit != null &&
+          (suitCount[b.suit] ?? 0) > 0 && (suitCount[b.suit] ?? 0) <= 2 &&
+          !hand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace);
+      if (aVoidCandidate && !bVoidCandidate) return -1;
+      if (!aVoidCandidate && bVoidCandidate) return 1;
+
+      // 8. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
       int aCount = suitCount[a.suit] ?? 0;
       int bCount = suitCount[b.suit] ?? 0;
       if (aCount != bCount) {
@@ -1226,7 +1237,18 @@ class AIPlayer {
         if (!aIsMightySuit && bIsMightySuit) return -1;
       }
 
-      // 7. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
+      // 7. 보이드 생성 우선: 1~2장 남은 비기루다 무늬(A 없음)를 우선 버림
+      // 보이드 2개+ → 기루다 컷 기회 극대화, 무늬 집중으로 유리
+      bool aVoidCandidate = !a.isJoker && a.suit != null &&
+          (suitCount[a.suit] ?? 0) > 0 && (suitCount[a.suit] ?? 0) <= 2 &&
+          !hand.any((c) => !c.isJoker && c.suit == a.suit && c.rank == Rank.ace);
+      bool bVoidCandidate = !b.isJoker && b.suit != null &&
+          (suitCount[b.suit] ?? 0) > 0 && (suitCount[b.suit] ?? 0) <= 2 &&
+          !hand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace);
+      if (aVoidCandidate && !bVoidCandidate) return -1;
+      if (!aVoidCandidate && bVoidCandidate) return 1;
+
+      // 8. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
       int aCount = suitCount[a.suit] ?? 0;
       int bCount = suitCount[b.suit] ?? 0;
       if (aCount != bCount) {
