@@ -332,9 +332,13 @@ class AIPlayer {
       if (suitCards.length < 3) continue;
 
       final (minPts, maxPts) = estimatePointRange(hand, suit);
-      // 바닥패 기대값: 3장 중 평균 ~1점 카드 + 핸드 강화 (약한 카드 버리기) 효과
-      final kittyBonus = 1;
-      final optimal = ((minPts + maxPts) / 2 + 1).round() + kittyBonus;
+      // 바닥패 기대값: 키카드 보유 시 약한 카드 제거 효과 증가
+      final hasMighty = hand.any((c) => !c.isJoker && c.suit == ((suit == Suit.spade) ? Suit.diamond : Suit.spade) && c.rank == Rank.ace);
+      final hasJoker = hand.any((c) => c.isJoker);
+      final hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace);
+      final keyCardCount = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) + (hasGirudaAce ? 1 : 0);
+      final kittyBonus = keyCardCount >= 2 ? 2 : (keyCardCount >= 1 ? 1 : 0);
+      final optimal = (minPts * 0.3 + maxPts * 0.7 + 1).round() + kittyBonus;
 
       if (optimal > bestOptimal) {
         bestOptimal = optimal;
@@ -723,23 +727,23 @@ class AIPlayer {
     }
 
     // 트릭당 평균 점수 카드: 약 2장 (20장 / 10트릭)
-    // 최소는 보수적으로 1.8장, 최대는 2장
-    int minPoints = (minTricks * 1.7).round().clamp(0, 20);
-    int maxPoints = (maxTricks * 2).clamp(0, 20);
+    // 강한 핸드는 점수카드 밀집 트릭을 먹어 ppt 2.0~2.5 분포
+    int minPoints = (minTricks * 1.5).round().clamp(0, 20);
+    int maxPoints = (maxTricks * 2.2).round().clamp(0, 20);
 
-    // === 런 감지: 마이티+조커+기루다A+5장기루다 → 최대 18점 이상 ===
+    // === 런 감지: 마이티+조커+기루다A+5장기루다 → 올런 가능 ===
     if (hasMighty && hasJoker && giruda != null && girudaLen >= 5) {
       bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
-      if (hasGirudaAce && maxPoints < 18) { maxPoints = 18; }
+      if (hasGirudaAce && maxPoints < 20) { maxPoints = 20; }
     }
-    // === 런 감지 2단계: 키카드 2개+ & 기루다A & 기루다4장+ → 최대 16점 이상 ===
+    // === 런 감지 2단계: 키카드 2개+ & 기루다A & 기루다4장+ → 최대 18점 이상 ===
     if (giruda != null && girudaLen >= 4) {
       bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
       if (hasGirudaAce) {
         bool hasGirudaKing = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.king);
         int keyCards = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) +
             (hasGirudaKing ? 1 : 0);
-        if (keyCards >= 2 && maxPoints < 16) { maxPoints = 16; }
+        if (keyCards >= 2 && maxPoints < 18) { maxPoints = 18; }
       }
     }
 

@@ -3831,8 +3831,9 @@ class _GameScreenState extends State<GameScreen> {
           rank = '${card.rankValue}';
       }
 
+      final effectiveWidth = rank == '10' ? width * 1.25 : width;
       cardWidget = Container(
-        width: width,
+        width: effectiveWidth,
         padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 1),
         decoration: BoxDecoration(
           color: dimmed ? Colors.grey[400] : (isMighty ? Colors.amber[700] : Colors.white),

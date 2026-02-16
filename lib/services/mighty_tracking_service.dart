@@ -229,7 +229,7 @@ class MightyTrackingService {
             'hasGiruda': hasGiruda,
             'jokerCalled': trick.jokerCall == JokerCallType.jokerCall,
             'leadSuit': _suitName(trick.leadSuit),
-            'cards': List.generate(trick.cards.length, (i) => {
+            'cards': List.generate(trick.cards.length, (i) {
               final card = trick.cards[i];
               return {
                 'playerId': trick.playerOrder[i],
