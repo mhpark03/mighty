@@ -2951,9 +2951,22 @@ class AIPlayer {
         }
 
         // 상대에게 기루다가 없거나 내 기루다가 없으면 → 비기루다 낮은 카드
+        // 단, 비기루다가 모두 약하면(실효가치 < 12) 기루다로 확실히 이기기
         final nonGirudaLowCards = nonMightyPlayable.where((c) =>
             !c.isJoker && c.suit != state.giruda).toList();
         if (nonGirudaLowCards.isNotEmpty) {
+          final bestNonGirudaValue = nonGirudaLowCards
+              .map((c) => _getEffectiveCardValue(c, state))
+              .reduce((a, b) => a > b ? a : b);
+          final hasGiruda = nonMightyPlayable.any((c) =>
+              !c.isJoker && c.suit == state.giruda);
+          if (bestNonGirudaValue < 12 && hasGiruda) {
+            // 비기루다가 약하고 기루다가 있으면 → 기루다로 승리 유지
+            final girudaCards = nonMightyPlayable.where((c) =>
+                !c.isJoker && c.suit == state.giruda).toList();
+            girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return girudaCards.first;
+          }
           nonGirudaLowCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
           return nonGirudaLowCards.first;
         }
@@ -3008,20 +3021,21 @@ class AIPlayer {
         final myHighestGiruda = myGirudaCards.first;
 
         if (highestOpponentGiruda == null) {
-          // 상대에게 기루다가 없음 → 비기루다 우선 (기루다 보존)
-          // 기루다로 선공해도 상대가 컷할 수 없지만, 비기루다로 이겨도 되므로 기루다 보존
+          // 상대에게 기루다가 없음 → 비기루다 중 이길 수 있는 카드가 있으면 사용
+          // 비기루다가 약하면(실효가치 < 12) 기루다로 확실히 이기는 것이 나음
           final nonGirudaCards = cardsToConsider.where((c) =>
               !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
 
           if (nonGirudaCards.isNotEmpty) {
-            // 비기루다가 있으면 무조건 비기루다 사용 (기루다 컷 필요 없음)
-            // 비기루다 중 실효가치가 높은 카드 선택
             nonGirudaCards.sort((a, b) =>
                 _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
-            return nonGirudaCards.first;
+            // 비기루다 최고 카드가 이길 가능성이 있을 때만 사용
+            if (_getEffectiveCardValue(nonGirudaCards.first, state) >= 12) {
+              return nonGirudaCards.first;
+            }
           }
 
-          // 비기루다가 없으면 기루다 사용
+          // 비기루다가 없거나 약하면 기루다 사용 (확실한 승리)
           return myHighestGiruda;
         } else if (myHighestGiruda.rankValue > highestOpponentGiruda.rankValue) {
           // 내 기루다가 상대 최상위보다 높음 → 확실히 이김 → 가장 높은 기루다 사용
