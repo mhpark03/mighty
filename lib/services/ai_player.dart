@@ -2979,6 +2979,127 @@ class AIPlayer {
       }
     }
 
+    // ★ 선 교환(Win-Lose Alternation) 전략
+    // 주공이 보증 승리 카드를 연속 소진하면 후반에 선공권을 잃고
+    // 고점수 트릭을 상대에 헌납함. 승리/버림을 교대하여 마지막까지 선 유지.
+    if (state.giruda != null && player.isDeclarer &&
+        state.currentTrickNumber >= 4 && state.currentTrickNumber <= 9) {
+      final int remainingTricks = 10 - state.currentTrickNumber + 1;
+      final giruda = state.giruda!;
+
+      // 상대가 보유한 최고 기루다 rankValue 추정
+      final playedGirudaCards = _getPlayedCardsOfSuit(state, giruda);
+      final myGirudaCards = playableCards.where((c) =>
+          !c.isJoker && !c.isMightyWith(giruda) && c.suit == giruda).toList();
+      // 상대가 가질 수 있는 기루다: 전체 13장 - 나온 것 - 내 것
+      final Set<int> goneGirudaRanks = {
+        ...playedGirudaCards.map((c) => c.rankValue),
+        ...myGirudaCards.map((c) => c.rankValue),
+      };
+      // 마이티는 기루다 무늬 A이므로 제외 (별도 처리)
+      final mightyRankInGiruda = 14; // Ace
+      int opponentHighestGiruda = 0;
+      for (int rv = 13; rv >= 2; rv--) { // K(13)부터 2까지
+        if (!goneGirudaRanks.contains(rv)) {
+          opponentHighestGiruda = rv;
+          break;
+        }
+      }
+      // 마이티가 아직 안 나왔고 내가 안 갖고 있으면 상대 최고는 마이티(100급)
+      if (!goneGirudaRanks.contains(mightyRankInGiruda) &&
+          !playableCards.any((c) => c.isMightyWith(giruda))) {
+        // 상대가 마이티를 가지고 있을 수 있음 → 내 기루다 A도 마이티에 짐
+        opponentHighestGiruda = 100;
+      }
+
+      // 보증 승리 카드 목록
+      List<PlayingCard> guaranteedWinCards = [];
+      // (1) 기루다 중 상대 최고보다 높은 것 (마이티 제외)
+      for (final c in myGirudaCards) {
+        if (c.rankValue > opponentHighestGiruda) {
+          guaranteedWinCards.add(c);
+        }
+      }
+      // (2) 조커 (트릭 10 이전이면 항상 승리)
+      if (state.currentTrickNumber < 10) {
+        final joker = playableCards.where((c) => c.isJoker).toList();
+        guaranteedWinCards.addAll(joker);
+      }
+      // (3) 마이티 (트릭 7 이상일 때만 — shouldAvoidMighty와 일치)
+      if (state.currentTrickNumber >= 7) {
+        final mighty = playableCards.where((c) => c.isMightyWith(giruda)).toList();
+        guaranteedWinCards.addAll(mighty);
+      }
+
+      final int neededWins = remainingTricks ~/ 2; // 교대에 필요한 승리 수
+
+      // 비기루다 버림 카드
+      final nonGirudaDumpCards = playableCards.where((c) =>
+          !c.isJoker && !c.isMightyWith(giruda) && c.suit != giruda).toList();
+
+      // 선 탈환 수단: 조커 보유 OR (기루다 카드 + void 무늬 ≥ 1)
+      final hasJokerForRecapture = playableCards.any((c) => c.isJoker);
+      Set<Suit> myNonGirudaSuits = {};
+      for (final c in player.hand) {
+        if (!c.isJoker && c.suit != null && c.suit != giruda) {
+          myNonGirudaSuits.add(c.suit!);
+        }
+      }
+      final int nonGirudaSuitTotal = Suit.values.where((s) => s != giruda).length;
+      final int voidSuitCount = nonGirudaSuitTotal - myNonGirudaSuits.length;
+      final hasGirudaCutRecapture = myGirudaCards.isNotEmpty && voidSuitCount >= 1;
+      final hasRecaptureMeans = hasJokerForRecapture || hasGirudaCutRecapture;
+
+      // 발동 조건 검증
+      if (guaranteedWinCards.length >= neededWins &&
+          guaranteedWinCards.length >= 2 &&
+          guaranteedWinCards.length < remainingTricks &&
+          nonGirudaDumpCards.isNotEmpty &&
+          hasRecaptureMeans) {
+
+        final bool shouldDump = remainingTricks % 2 == 1; // 홀수 남음 → 버림
+
+        if (shouldDump) {
+          // ★ 버림: 비기루다 카드 중 void 생성 우선 → 비점수 → 저랭크
+          // 무늬별 카드 수 계산 (적은 무늬 우선 → void 생성)
+          Map<Suit, List<PlayingCard>> suitGroups = {};
+          for (final c in nonGirudaDumpCards) {
+            suitGroups.putIfAbsent(c.suit!, () => []).add(c);
+          }
+          // 카드 수가 적은 무늬 순으로 정렬
+          final sortedSuits = suitGroups.entries.toList()
+            ..sort((a, b) => a.value.length.compareTo(b.value.length));
+
+          final bestSuitCards = sortedSuits.first.value;
+          // 비점수 우선
+          final nonPointDump = bestSuitCards.where((c) => !c.isPointCard).toList();
+          if (nonPointDump.isNotEmpty) {
+            nonPointDump.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return nonPointDump.first;
+          }
+          // 비점수 없으면 가장 낮은 카드
+          bestSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return bestSuitCards.first;
+        } else {
+          // ★ 승리: 가장 약한 기루다 승리 카드 우선, 조커는 후순위 (트릭 9 탈환용 보존)
+          final girudaWinCards = guaranteedWinCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(giruda)).toList();
+          if (girudaWinCards.isNotEmpty) {
+            girudaWinCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return girudaWinCards.first;
+          }
+          // 기루다 승리 카드 없으면 마이티
+          final mightyWin = guaranteedWinCards.where((c) =>
+              c.isMightyWith(giruda)).toList();
+          if (mightyWin.isNotEmpty) {
+            return mightyWin.first;
+          }
+          // 최후: 조커
+          return guaranteedWinCards.first;
+        }
+      }
+    }
+
     // 상대에게 남은 기루다가 없으면 최상위 카드 우선 (컷 당할 위험 없음)
     // 마이티/조커는 점수 카드가 많을 때 사용하는 것이 유리하므로 나중에 사용
     if (state.giruda != null) {
