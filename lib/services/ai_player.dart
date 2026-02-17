@@ -2386,6 +2386,21 @@ class AIPlayer {
         }
       }
 
+      // === 프렌드 조커 기루다 호출 (초중반, 기루다 없을 때) ===
+      // 프렌드가 기루다를 가지고 있지 않지만 조커가 있으면
+      // 조커로 기루다 호출 → 상대 기루다 강제 소진 → 주공의 기루다 우위 강화
+      if (state.currentTrickNumber >= 2 && state.currentTrickNumber <= 6 &&
+          remainingGiruda >= 3) {
+        final myGirudaCount = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).length;
+        if (myGirudaCount == 0) {
+          final joker = playableCards.where((c) => c.isJoker).toList();
+          if (joker.isNotEmpty && _estimateDefenseTeamHasGiruda(player, state)) {
+            return joker.first;
+          }
+        }
+      }
+
       // 실효가치 14+ 최상위 카드가 있으면 우선 사용 (마이티/조커보다 먼저)
       // 마이티/조커는 점수 카드가 많을 때 사용하는 것이 유리
       // 조커 프렌드일 때는 마이티 무늬 제외
