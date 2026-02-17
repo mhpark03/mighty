@@ -3234,22 +3234,65 @@ class AIPlayer {
       final opponentGiruda = _getRemainingGirudaCount(state, player);
 
       if (opponentGiruda == 0) {
-        // ★ 주공: 상대 기루다 소진 + 조커 보유 → 조커로 비기루다 호출 우선
-        // 기루다 리드는 상대에게 기루다가 없어 낭비
-        // 조커 리드 → 호출 무늬로 프렌드(마이티) 오판 방지 + 기루다 후반 컷용 보존
-        // 예: 주공 ♦J,8,7,3 + JK → 조커로 ♥ 호출 → 상대 ♥ 점수카드 추출
-        if (player.isDeclarer && state.currentTrickNumber >= 2 && state.currentTrickNumber < 10) {
+        // ★ 주공: 상대 기루다 소진 → 기루다 연속 리드 후 조커, 물패는 후반으로
+        // 기루다 리드는 상대에게 기루다 없어 모두 승리 → 기루다 먼저 사용
+        // 물패를 조기(4~6트릭)에 사용하면 손해 → 후반(9~10트릭)에 배치
+        // 조커는 기루다 수 ≤ 물패 수 시점에 삽입하여 비기루다 호출로 점수 추출
+        // 예: 4기루다 + JK + 2물패 → ♦♦ → JK(♥호출) → ♦♦ → ♥♥(후반 물패)
+        if (player.isDeclarer && state.currentTrickNumber >= 2) {
+          final myGirudaForLead = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
+          final nonGirudaDump = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
           final jokerForLead = playableCards.where((c) => c.isJoker).toList();
+
+          // 마이티 안전 여부 (내가 보유, 프렌드 카드, 또는 이미 플레이됨)
+          bool mightySafe = false;
           if (jokerForLead.isNotEmpty) {
-            // 마이티가 조커에 대항하지 않음을 확인
-            // (내가 보유, 프렌드 카드, 또는 이미 플레이됨)
             final allPlayed = _getPlayedCards(state);
-            bool mightySafe = allPlayed.any((c) => c.isMightyWith(state.giruda)) ||
+            mightySafe = allPlayed.any((c) => c.isMightyWith(state.giruda)) ||
                 player.hand.any((c) => c.isMightyWith(state.giruda)) ||
                 (state.friendDeclaration?.card?.isMightyWith(state.giruda) ?? false);
-            if (mightySafe) {
+          }
+
+          // 1. 기루다 + 물패 모두 있음 → 기루다 우선, 조커/물패는 중간에
+          if (myGirudaForLead.isNotEmpty && nonGirudaDump.isNotEmpty) {
+            // 조커 중간 삽입: 기루다 수 ≤ 물패 수 시점에 비기루다 호출
+            // 예: 4기루다+2물패 → 기루다 2장 리드 후 기루다(2)≤물패(2) → 조커
+            if (jokerForLead.isNotEmpty && mightySafe && state.currentTrickNumber < 10 &&
+                myGirudaForLead.length <= nonGirudaDump.length) {
               return jokerForLead.first;
             }
+            // ★ 물패 중간 삽입: 조커 소진 후, 기루다≤물패 + 기루다≥2 + 물패≥2
+            // 물패 1장으로 마이티 유도 → 다음 트릭 기루다 컷으로 선 탈환
+            // 마지막 물패는 트릭 10용으로 보존 (1장씩이라 이길 확률 있음)
+            // 트릭 9에서 물패하면 수비가 이길 시 T10 선행 무늬가 달라져 불리
+            if (jokerForLead.isEmpty &&
+                myGirudaForLead.length <= nonGirudaDump.length &&
+                myGirudaForLead.length >= 2 &&
+                nonGirudaDump.length >= 2) {
+              // 비점수 물패 우선 (♥8 > ♥10), 점수카드는 트릭10용 보존
+              final nonPointDump = nonGirudaDump.where((c) => !c.isPointCard).toList();
+              if (nonPointDump.isNotEmpty) {
+                nonPointDump.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return nonPointDump.first;
+              }
+              nonGirudaDump.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return nonGirudaDump.first;
+            }
+            myGirudaForLead.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return myGirudaForLead.first;
+          }
+
+          // 2. 기루다 소진 → 조커로 비기루다 호출
+          if (jokerForLead.isNotEmpty && mightySafe && state.currentTrickNumber < 10) {
+            return jokerForLead.first;
+          }
+
+          // 3. 기루다만 남음 (물패 없음)
+          if (myGirudaForLead.isNotEmpty) {
+            myGirudaForLead.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return myGirudaForLead.first;
           }
         }
 
