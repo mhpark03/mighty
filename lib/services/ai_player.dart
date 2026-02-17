@@ -3167,9 +3167,13 @@ class AIPlayer {
       final hasRecaptureMeans = hasJokerForRecapture || hasGirudaCutRecapture;
 
       // 발동 조건 검증
+      // ★ 보증 승리가 충분하면 (물패 3장 미만) 교대 불필요 → 연속 승리 후 물패
+      // 예: 7트릭 남고 5승 보유 → 5연승 후 2물패가 교대보다 유리
+      final int dumpGap = remainingTricks - guaranteedWinCards.length;
       if (guaranteedWinCards.length >= neededWins &&
           guaranteedWinCards.length >= 2 &&
           guaranteedWinCards.length < remainingTricks &&
+          dumpGap >= 3 &&
           nonGirudaDumpCards.isNotEmpty &&
           hasRecaptureMeans) {
 
@@ -3230,6 +3234,25 @@ class AIPlayer {
       final opponentGiruda = _getRemainingGirudaCount(state, player);
 
       if (opponentGiruda == 0) {
+        // ★ 주공: 상대 기루다 소진 + 조커 보유 → 조커로 비기루다 호출 우선
+        // 기루다 리드는 상대에게 기루다가 없어 낭비
+        // 조커 리드 → 호출 무늬로 프렌드(마이티) 오판 방지 + 기루다 후반 컷용 보존
+        // 예: 주공 ♦J,8,7,3 + JK → 조커로 ♥ 호출 → 상대 ♥ 점수카드 추출
+        if (player.isDeclarer && state.currentTrickNumber >= 2 && state.currentTrickNumber < 10) {
+          final jokerForLead = playableCards.where((c) => c.isJoker).toList();
+          if (jokerForLead.isNotEmpty) {
+            // 마이티가 조커에 대항하지 않음을 확인
+            // (내가 보유, 프렌드 카드, 또는 이미 플레이됨)
+            final allPlayed = _getPlayedCards(state);
+            bool mightySafe = allPlayed.any((c) => c.isMightyWith(state.giruda)) ||
+                player.hand.any((c) => c.isMightyWith(state.giruda)) ||
+                (state.friendDeclaration?.card?.isMightyWith(state.giruda) ?? false);
+            if (mightySafe) {
+              return jokerForLead.first;
+            }
+          }
+        }
+
         // 상대 기루다 없음 → 최상위 카드 우선, 마이티/조커는 나중에
         // 최상위 카드 (실효 가치 14 이상) 우선 사용
         final highestCards = playableCards.where((c) =>
@@ -3584,6 +3607,35 @@ class AIPlayer {
               return mightySuitLow.first;
             }
           }
+          // ★ 부분 승리 기루다: 상대 최상위는 못 이기지만 2번째는 이기는 카드
+          // 예: 상대 K,J → 내 Q는 J 이김. K 보유자가 기루다 void이면 승리
+          // 비점수 기루다를 무작정 내는 것보다 승리 가능성 있는 카드 우선
+          if (state.currentTrickNumber >= 4) {
+            final opponentGirudaRanks = <int>[];
+            for (int rv = 13; rv >= 2; rv--) {
+              final rank = Rank.values[rv - 2];
+              bool inMyHand = player.hand.any((c) =>
+                  !c.isJoker && !c.isMightyWith(state.giruda) &&
+                  c.suit == state.giruda && c.rank == rank);
+              bool alreadyPlayed = playedCards.any((c) =>
+                  !c.isJoker && c.suit == state.giruda && c.rank == rank);
+              if (!inMyHand && !alreadyPlayed) {
+                opponentGirudaRanks.add(rv);
+              }
+            }
+
+            if (opponentGirudaRanks.length >= 2) {
+              final secondHighestRank = opponentGirudaRanks[1];
+              final partialWinCards = myGirudaCards.where((c) =>
+                  c.rankValue > secondHighestRank &&
+                  c.rankValue < highestOpponentGiruda!.rankValue).toList();
+
+              if (partialWinCards.isNotEmpty) {
+                partialWinCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+                return partialWinCards.first;
+              }
+            }
+          }
           // 조커 없으면 중간 기루다(비점수)로 상대 고액 유도
           // 너무 낮은 카드를 내면 상대가 A/K 대신 중간 카드로 이길 수 있음
           // 점수 카드가 아닌 중간 카드(9~2)로 선공하여 상대 고액 유도
@@ -3881,6 +3933,45 @@ class AIPlayer {
       }
     }
 
+    // ★ 공격팀 프렌드: 마이티/조커 보유 시 미래 리드용 최상위 카드 보존
+    // 마이티/조커로 선을 잡을 확률이 높으므로, 리드에 활용할 카드 보존
+    // 예: 주공 ♣A 리드 → ♣K는 이후 실질 최상위 → 프렌드가 선 잡은 후 리드에 활용
+    if (myTeamWinning && isAttackTeam && !player.isDeclarer && leadSuit != null) {
+      bool hasLeadCaptureCard = player.hand.any((c) =>
+          c.isJoker || c.isMightyWith(state.giruda));
+      if (hasLeadCaptureCard) {
+        final suitCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == leadSuit).toList();
+        if (suitCards.length >= 2) {
+          suitCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+          final highestMyCard = suitCards.first;
+          // 현재 트릭 카드 포함하여 더 높은 카드가 모두 소진되었는지 확인
+          final playedAll = _getPlayedCards(state);
+          final trickCards = state.currentTrick?.cards ?? [];
+          bool willBeTop = true;
+          for (int rv = highestMyCard.rankValue + 1; rv <= 14; rv++) {
+            final rank = Rank.values[rv - 2];
+            bool accounted =
+                playedAll.any((c) => c.suit == leadSuit && c.rank == rank) ||
+                trickCards.any((c) => !c.isJoker && c.suit == leadSuit && c.rank == rank) ||
+                player.hand.any((c) => c.suit == leadSuit && c.rank == rank);
+            if (!accounted) {
+              willBeTop = false;
+              break;
+            }
+          }
+          if (willBeTop) {
+            // 최상위 카드 보존, 나머지 중 가장 낮은 카드 반환
+            final lowerCards = suitCards.sublist(1);
+            lowerCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            final nonPointLower = lowerCards.where((c) => !c.isPointCard).toList();
+            if (nonPointLower.isNotEmpty) return nonPointLower.first;
+            return lowerCards.first;
+          }
+        }
+      }
+    }
+
     if (myTeamWinning && currentWinningCard != null) {
       // 이기고 있는 카드가 최상위 카드인지 확인
       bool winningCardIsTop = false;
@@ -3970,7 +4061,8 @@ class AIPlayer {
         }
 
         // 2. 조커 체크 (조커가 남아있으면 뒤집힐 수 있음)
-        if (!canBeBeaten) {
+        // ★ 트릭 1에서는 조커 사용 불가 → 위협 없음
+        if (!canBeBeaten && state.currentTrickNumber > 1) {
           bool jokerInMyHand = player.hand.any((c) => c.isJoker);
           bool jokerPlayed = playedCards.any((c) => c.isJoker);
           if (!jokerInMyHand && !jokerPlayed) {
