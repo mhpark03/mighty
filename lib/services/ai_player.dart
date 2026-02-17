@@ -2429,6 +2429,24 @@ class AIPlayer {
           }
         }
 
+        // ★ 초반(트릭 2-5) 비기루다 A/K 적극 리드
+        // 마이티/조커가 살아있어 상대가 점수카드를 아끼는 경향 → 기루다 컷 확률 낮음
+        // → 프렌드의 비기루다 최상위(A/K) 리드로 주공 물패 소진(void 생성) 지원
+        if (state.currentTrickNumber <= 5 && remainingGiruda > 0) {
+          final nonGirudaTopCards = topCards.where((c) => c.suit != state.giruda).toList();
+          if (nonGirudaTopCards.isNotEmpty) {
+            // 마이티/조커가 아직 소진되지 않았는지 확인
+            final jokerPlayed = _getPlayedCards(state).any((c) => c.isJoker);
+            final mightyPlayed = _getPlayedCards(state).any((c) => c.isMightyWith(state.giruda));
+            if (!jokerPlayed || !mightyPlayed) {
+              // 마이티/조커 잔존 → 상대가 기루다 컷을 꺼림 → 비기루다 A/K 안전
+              nonGirudaTopCards.sort((a, b) =>
+                  _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+              return nonGirudaTopCards.first;
+            }
+          }
+        }
+
         // ★ 상대 기루다 없음 + 최상위가 전부 기루다 → 물패 전략 검토
         // 기루다 보존 후 void 무늬에서 컷으로 선 탈환하는 것이 유리
         if (remainingGiruda == 0) {
@@ -2690,13 +2708,33 @@ class AIPlayer {
       bool friendIsJokerHere = state.friendDeclaration?.card?.isJoker ?? false;
 
       if (friendIsMighty || friendIsJokerHere) {
-        // 초구 승리 가능한 카드 확인 (비기루다 A, 마이티 무늬 A 제외)
+        // 초구 승리 가능한 카드 확인 (각 무늬 최상위 카드)
+        // - 비기루다 A (마이티 무늬 제외): 해당 무늬 최상위
+        // - 마이티 무늬 K: A가 마이티로 빠졌으므로 해당 무늬 실질 최상위
         final mightySuit = state.mighty.suit!;
         bool hasFirstTrickWinner = playableCards.any((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) &&
             c.suit != state.giruda &&
-            c.rank == Rank.ace &&
-            c.suit != mightySuit);
+            ((c.rank == Rank.ace && c.suit != mightySuit) ||
+             (c.rank == Rank.king && c.suit == mightySuit)));
+
+        if (hasFirstTrickWinner) {
+          // 초구 승리 카드를 선택하여 선공권 확보
+          final firstTrickWinners = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) &&
+              c.suit != state.giruda &&
+              ((c.rank == Rank.ace && c.suit != mightySuit) ||
+               (c.rank == Rank.king && c.suit == mightySuit))).toList();
+          if (firstTrickWinners.isNotEmpty) {
+            // Ace 우선, 같으면 낮은 랭크 (K는 Ace보다 후순위)
+            firstTrickWinners.sort((a, b) {
+              if (a.rank == Rank.ace && b.rank != Rank.ace) return -1;
+              if (a.rank != Rank.ace && b.rank == Rank.ace) return 1;
+              return a.rankValue.compareTo(b.rankValue);
+            });
+            return firstTrickWinners.first;
+          }
+        }
 
         if (!hasFirstTrickWinner) {
           // ★ 기루다가 많은데 기루다 A가 없으면 마이티로 초구 선공
@@ -2734,12 +2772,22 @@ class AIPlayer {
               return a.rankValue.compareTo(b.rankValue);
             });
 
-            // 10 이하 낮은 카드만 (점수 카드 보존)
-            final lowCards = nonGirudaCards.where((c) => c.rankValue <= 10).toList();
-            if (lowCards.isNotEmpty) {
-              return lowCards.first;
+            // 1순위: 9 이하 비점수 카드 (안전)
+            final safeCards = nonGirudaCards.where((c) => c.rankValue <= 9).toList();
+            if (safeCards.isNotEmpty) {
+              return safeCards.first;
             }
-            // 낮은 카드 없으면 최저 카드
+            // 2순위: 10 (점수카드 중 최저 랭크)
+            final tenCards = nonGirudaCards.where((c) => c.rank == Rank.ten).toList();
+            if (tenCards.isNotEmpty) {
+              return tenCards.first;
+            }
+            // 3순위: J
+            final jackCards = nonGirudaCards.where((c) => c.rank == Rank.jack).toList();
+            if (jackCards.isNotEmpty) {
+              return jackCards.first;
+            }
+            // 나머지: 최저 카드
             return nonGirudaCards.first;
           }
         }
@@ -3128,7 +3176,7 @@ class AIPlayer {
         final bool shouldDump = remainingTricks % 2 == 1; // 홀수 남음 → 버림
 
         if (shouldDump) {
-          // ★ 버림: 비기루다 카드 중 void 생성 우선 → 비점수 → 저랭크
+          // ★ 버림: 비기루다 카드 중 void 생성 우선
           // 무늬별 카드 수 계산 (적은 무늬 우선 → void 생성)
           Map<Suit, List<PlayingCard>> suitGroups = {};
           for (final c in nonGirudaDumpCards) {
@@ -3139,15 +3187,23 @@ class AIPlayer {
             ..sort((a, b) => a.value.length.compareTo(b.value.length));
 
           final bestSuitCards = sortedSuits.first.value;
-          // 비점수 우선
-          final nonPointDump = bestSuitCards.where((c) => !c.isPointCard).toList();
-          if (nonPointDump.isNotEmpty) {
-            nonPointDump.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-            return nonPointDump.first;
-          }
-          // 비점수 없으면 가장 낮은 카드
           bestSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-          return bestSuitCards.first;
+
+          if (!state.friendRevealed) {
+            // 프렌드 미공개: 마이티/조커로 트릭 승리 가능 → 9이하 → 10 → J 순
+            final safeCards = bestSuitCards.where((c) => c.rankValue <= 9).toList();
+            if (safeCards.isNotEmpty) return safeCards.first;
+            final tenCards = bestSuitCards.where((c) => c.rank == Rank.ten).toList();
+            if (tenCards.isNotEmpty) return tenCards.first;
+            final jackCards = bestSuitCards.where((c) => c.rank == Rank.jack).toList();
+            if (jackCards.isNotEmpty) return jackCards.first;
+            return bestSuitCards.first;
+          } else {
+            // 프렌드 공개 후: 수비 견제 → 비점수 최저 우선
+            final nonPointDump = bestSuitCards.where((c) => !c.isPointCard).toList();
+            if (nonPointDump.isNotEmpty) return nonPointDump.first;
+            return bestSuitCards.first;
+          }
         } else {
           // ★ 승리: 가장 약한 기루다 승리 카드 우선, 조커는 후순위 (트릭 9 탈환용 보존)
           final girudaWinCards = guaranteedWinCards.where((c) =>
@@ -3214,15 +3270,23 @@ class AIPlayer {
 
             // 기루다만으로 끝까지 선 유지 불가 + void 무늬 있음 → 물패 전략
             if (myGirudaCount < remainingTricks && voidSuitCount > 0) {
-              // 비점수 카드 우선 (점수 유출 최소화)
-              final nonPointCards = nonGirudaAll.where((c) => !c.isPointCard).toList();
-              if (nonPointCards.isNotEmpty) {
-                nonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-                return nonPointCards.first;
-              }
-              // 비점수가 없으면 가장 낮은 점수 카드
               nonGirudaAll.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-              return nonGirudaAll.first;
+
+              if (!state.friendRevealed) {
+                // 프렌드 미공개: 9이하 → 10 → J 순
+                final safeCards = nonGirudaAll.where((c) => c.rankValue <= 9).toList();
+                if (safeCards.isNotEmpty) return safeCards.first;
+                final tenCards = nonGirudaAll.where((c) => c.rank == Rank.ten).toList();
+                if (tenCards.isNotEmpty) return tenCards.first;
+                final jackCards = nonGirudaAll.where((c) => c.rank == Rank.jack).toList();
+                if (jackCards.isNotEmpty) return jackCards.first;
+                return nonGirudaAll.first;
+              } else {
+                // 프렌드 공개 후: 비점수 최저 우선
+                final nonPointCards = nonGirudaAll.where((c) => !c.isPointCard).toList();
+                if (nonPointCards.isNotEmpty) return nonPointCards.first;
+                return nonGirudaAll.first;
+              }
             }
           }
 
