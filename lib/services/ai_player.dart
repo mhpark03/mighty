@@ -2514,6 +2514,7 @@ class AIPlayer {
       // 전략 1: 주공이 없는 무늬로 선공 (주공이 기루다로 컷 가능)
       // ★ 주공이 4번째 이후이거나, 프렌드에게 선 유지 수단이 없을 때 사용
       // 조커 프렌드일 때는 마이티 무늬 제외
+      // ★ 주공이 기루다 컷할 것이 확실하면 점수카드를 실어서 득점 극대화
       Set<Suit> declarerVoidSuits = _getDeclarerVoidSuits(state);
       if ((isDeclarerLastOrFourth || hasNoLeadKeepingCards) && declarerVoidSuits.isNotEmpty) {
         for (Suit voidSuit in declarerVoidSuits) {
@@ -2522,7 +2523,17 @@ class AIPlayer {
           final voidSuitCards = playableCards.where((c) =>
               !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == voidSuit).toList();
           if (voidSuitCards.isNotEmpty) {
-            // 낮은 카드로 선공하여 주공이 기루다로 컷하게 함
+            // ★ 주공이 기루다 컷 가능 + 주공이 후순위(4,5번째)이면 점수카드 실어주기
+            // 주공이 마지막에 가까울수록 수비 기루다 컷에 뒤집힐 위험 낮음
+            if (isDeclarerLastOrFourth) {
+              final pointCards = voidSuitCards.where((c) => c.isPointCard).toList();
+              if (pointCards.isNotEmpty) {
+                // 점수카드 중 가장 높은 것 (Q > J > 10 > K > A 순으로 가치 동일하지만 높은 카드 우선)
+                pointCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+                return pointCards.first;
+              }
+            }
+            // 점수카드 없거나 주공 순서가 빠르면 낮은 카드로 선공
             voidSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
             return voidSuitCards.first;
           }
@@ -2542,6 +2553,14 @@ class AIPlayer {
           final suitCards = playableCards.where((c) =>
               !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == entry.key).toList();
           if (suitCards.isNotEmpty) {
+            // ★ 추론 void도 주공 후순위이면 점수카드 우선
+            if (isDeclarerLastOrFourth) {
+              final pointCards = suitCards.where((c) => c.isPointCard).toList();
+              if (pointCards.isNotEmpty) {
+                pointCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+                return pointCards.first;
+              }
+            }
             suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
             return suitCards.first;
           }
