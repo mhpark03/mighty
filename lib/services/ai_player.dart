@@ -2478,11 +2478,42 @@ class AIPlayer {
         // ★ 마이티 미출 여부 확인: 미출 시 리드 무늬의 점수카드 노출 최소화
         final bool mightyStillInPlay = !_getPlayedCards(state).any((c) => c.isMightyWith(state.giruda));
 
-        // 1. 비점수카드 중 낮은 카드로 리드 (안전한 선택)
-        // ★ 마이티 미출 시: 잔여 점수카드가 적은 무늬 우선 (마이티 캡처 피해 최소화)
-        // ★ 주공 보유 확률 높은 무늬 우선 (기루다 컷 방지)
+        // 1. 비점수카드 중 리드
         final nonPointCards = defLeadCards.where((c) => !c.isPointCard).toList();
         if (nonPointCards.isNotEmpty) {
+          // === 초반 (트릭 1~5): 주공 보유 확률 높은 무늬로 공격 ===
+          // 초반에는 주공이 대부분의 비기루다를 가지고 있을 확률이 높으므로
+          // 주공이 보유할 확률이 높은 무늬 + 내 카드가 많은 무늬로 공격
+          if (state.currentTrickNumber <= 5) {
+            // 무늬별 그룹화
+            Map<Suit, List<PlayingCard>> suitGroups = {};
+            for (final c in nonPointCards) {
+              if (c.suit != null) {
+                suitGroups.putIfAbsent(c.suit!, () => []).add(c);
+              }
+            }
+            // 최적 공격 무늬: 주공 보유 확률 + 내 카드 수 기반 점수
+            Suit? bestSuit;
+            double bestScore = -1;
+            for (final entry in suitGroups.entries) {
+              double declarerProb = declarerHoldings[entry.key] ?? 0.5;
+              if (declarerProb < 0.3) continue; // 주공 void 가능성 → 기루다 컷 위험
+              double score = declarerProb + entry.value.length * 0.1;
+              if (score > bestScore) {
+                bestScore = score;
+                bestSuit = entry.key;
+              }
+            }
+            if (bestSuit != null && suitGroups[bestSuit]!.isNotEmpty) {
+              final suitCards = suitGroups[bestSuit]!;
+              suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return suitCards.first;
+            }
+          }
+
+          // 후반 또는 초반 공격 무늬 없는 경우: 기존 안전 전략
+          // ★ 마이티 미출 시: 잔여 점수카드가 적은 무늬 우선 (마이티 캡처 피해 최소화)
+          // ★ 주공 보유 확률 높은 무늬 우선 (기루다 컷 방지)
           nonPointCards.sort((a, b) {
             // 마이티 미출 시 해당 무늬의 잔여 점수카드 수로 1차 정렬
             if (mightyStillInPlay) {
