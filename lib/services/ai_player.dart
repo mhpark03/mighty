@@ -2506,7 +2506,9 @@ class AIPlayer {
             }
             if (bestSuit != null && suitGroups[bestSuit]!.isNotEmpty) {
               final suitCards = suitGroups[bestSuit]!;
-              suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              // 주공이 물패를 가지고 있을 확률이 높으므로 상위 카드로 공격
+              // → 다른 수비팀 플레이어가 이길 수도 있음
+              suitCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
               return suitCards.first;
             }
           }
