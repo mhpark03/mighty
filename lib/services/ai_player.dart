@@ -4274,6 +4274,99 @@ class AIPlayer {
     bool defenseWinning = _isDefenseTeamWinning(state, currentWinnerId, player);
     bool isAttackTeam = !isDefenseTeam;
 
+    // === 수비팀: 마이티 프렌드 유도 감지 시 물패 ===
+    // 프렌드가 마이티이고 마이티 무늬가 리드되면 마이티가 트릭을 이길 것이 확실
+    // → 수비팀은 점수카드/기루다를 아끼고 최하위 카드를 버림
+    if (isDefenseTeam && leadSuit != null && state.giruda != null) {
+      bool friendIsMighty = state.friendDeclaration?.card != null &&
+          state.friendDeclaration!.card!.isMightyWith(state.giruda);
+      bool playerHasMighty = player.hand.any((c) => c.isMightyWith(state.giruda));
+
+      if (friendIsMighty && !playerHasMighty) {
+        final mightySuit = state.mighty.suit!;
+        bool mightyInCurrentTrick = state.currentTrick!.cards
+            .any((c) => c.isMightyWith(state.giruda));
+
+        // 마이티 무늬 리드 + 마이티 미출현 → 프렌드가 마이티를 낼 것이 확실
+        if (leadSuit == mightySuit && !state.isMightyPlayed && !mightyInCurrentTrick) {
+          // 리드 무늬 카드가 있으면 최하위 비점수 카드
+          final leadSuitCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == leadSuit).toList();
+
+          if (leadSuitCards.isNotEmpty) {
+            final nonPointCards = leadSuitCards.where((c) => !c.isPointCard).toList();
+            if (nonPointCards.isNotEmpty) {
+              nonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return nonPointCards.first;
+            }
+            // 점수카드만 있으면 가장 낮은 점수카드
+            leadSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return leadSuitCards.first;
+          }
+
+          // void: 비기루다 비점수 최하위 버리기
+          final dumpCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) &&
+              c.suit != state.giruda && !c.isPointCard).toList();
+          if (dumpCards.isNotEmpty) {
+            dumpCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return dumpCards.first;
+          }
+        }
+      }
+    }
+
+    // === 수비팀: 조커 프렌드 유도 감지 시 점수 최소화 ===
+    // 프렌드가 조커이고 조커 미출현 + 주공이 선공 → 조커 프렌드를 유도하려는 의도
+    // 공격팀이 이기고 있으면 조커가 안 나올 테니 이기는 카드로 뺏고,
+    // 수비팀이 이기고 있으면 조커가 나올 테니 물패를 버림
+    if (isDefenseTeam && leadSuit != null && state.giruda != null) {
+      bool friendIsJoker = state.friendDeclaration?.card?.isJoker ?? false;
+      bool playerHasJoker = player.hand.any((c) => c.isJoker);
+
+      if (friendIsJoker && !playerHasJoker && !state.isJokerPlayed) {
+        // 선공자가 주공인지 확인
+        final leaderId = state.currentTrick!.playerOrder.first;
+        final leader = state.players.firstWhere((p) => p.id == leaderId);
+
+        if (leader.isDeclarer) {
+          bool jokerInCurrentTrick = state.currentTrick!.cards
+              .any((c) => c.isJoker);
+
+          if (!jokerInCurrentTrick) {
+            if (!defenseWinning) {
+              // 공격팀이 이기고 있음 → 조커는 안 나올 것 → 이기는 카드가 있으면 냄
+              final winningCards = playableCards.where((c) =>
+                  !c.isJoker && !c.isMightyWith(state.giruda) &&
+                  currentWinningCard != null &&
+                  state.isCardStronger(c, currentWinningCard, leadSuit, false)).toList();
+              if (winningCards.isNotEmpty) {
+                // 이기는 카드 중 가장 낮은 것 (자원 절약)
+                winningCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return winningCards.first;
+              }
+            }
+            // 수비팀이 이기고 있음 → 조커가 나올 것 → 물패 우선
+            // 또는 공격팀이 이기는데 이기는 카드가 없는 경우도 물패
+            final dumpCards = playableCards.where((c) =>
+                !c.isJoker && !c.isMightyWith(state.giruda) &&
+                !c.isPointCard).toList();
+            if (dumpCards.isNotEmpty) {
+              dumpCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return dumpCards.first;
+            }
+            // 물패가 없으면 가장 낮은 점수카드
+            final lowCards = playableCards.where((c) =>
+                !c.isJoker && !c.isMightyWith(state.giruda)).toList();
+            if (lowCards.isNotEmpty) {
+              lowCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              return lowCards.first;
+            }
+          }
+        }
+      }
+    }
+
     // === 주공이 프렌드의 낮은 기루다 선공을 받아야 할 때 ===
     // 프렌드가 낮은 기루다로 선공하면, 주공은 높은 기루다로 받아서 선을 가져가야 함
     if (player.isDeclarer &&
