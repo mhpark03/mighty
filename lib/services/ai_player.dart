@@ -1218,6 +1218,13 @@ class AIPlayer {
       if (aVoidCandidate && !bVoidCandidate) return -1;
       if (!aVoidCandidate && bVoidCandidate) return 1;
 
+      // 7.5. 보이드 무늬의 점수카드 우선 버리기
+      // 적은 장수 무늬에서는 선을 유지하기 어려우므로, 점수카드를 키티에 묻어 보호
+      if (aVoidCandidate && bVoidCandidate) {
+        if (a.isPointCard && !b.isPointCard) return -1;
+        if (!a.isPointCard && b.isPointCard) return 1;
+      }
+
       // 8. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
       int aCount = effectiveSuitCount[a.suit] ?? 0;
       int bCount = effectiveSuitCount[b.suit] ?? 0;
@@ -1445,6 +1452,13 @@ class AIPlayer {
           !effectiveHand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace);
       if (aVoidCandidate && !bVoidCandidate) return -1;
       if (!aVoidCandidate && bVoidCandidate) return 1;
+
+      // 7.5. 보이드 무늬의 점수카드 우선 버리기
+      // 적은 장수 무늬에서는 선을 유지하기 어려우므로, 점수카드를 키티에 묻어 보호
+      if (aVoidCandidate && bVoidCandidate) {
+        if (a.isPointCard && !b.isPointCard) return -1;
+        if (!a.isPointCard && b.isPointCard) return 1;
+      }
 
       // 8. 카드 수가 적은 무늬 우선 버림 (컷 가능성 높임)
       int aCount = effectiveSuitCount[a.suit] ?? 0;
@@ -2064,6 +2078,12 @@ class AIPlayer {
       }
 
       if (state.giruda != null) {
+        // ★ 수비팀에 기루다가 없으면 기루다 콜은 무의미
+        // → 비기루다 무늬 호출로 수비팀 고액 카드 소진
+        if (player.isDeclarer && !_estimateDefenseTeamHasGiruda(player, state)) {
+          return _selectSuitWithSecondHighestCard(player, state, playedCards);
+        }
+
         // ★ 주공 조커 선공 전략 (2025.01 개선)
         // 1. 기루다 최상위 카드를 가지고 있으면 → 그 카드로 직접 공격, 조커는 선 탈환용
         // 2. 기루다 최상위가 없고, 상대에게 있으면 (오픈 안 됨 + 프렌드 아님) → 조커로 기루다 호출
@@ -2916,60 +2936,57 @@ class AIPlayer {
       }
     }
 
-    // === 주공 초구 프렌드 호출 전략 ===
-    // === 주공 초구 전략: 마이티/조커 프렌드 ===
-    // 초구 승리 카드(비기루다 A)가 없으면, 적은 무늬의 낮은 카드로 선공
-    // → 마이티/조커 프렌드가 트릭 승리 (둘 다 무늬 무관하게 낼 수 있음)
-    // → 적은 무늬를 소진하여 void 생성 (향후 기루다 컷 가능)
-    // → 프렌드가 해당 무늬 최상위 카드를 갖고 있으면 마이티/조커를 아낄 수 있음
+    // === 주공 초구 전략 ===
+    // 1. 확실한 최상위(비기루다 A / 마이티 무늬 K) → 해당 카드로 선공
+    // 2. 확실한 최상위 없음 + 마이티 보유 + 마지막 순서 아님 → 마이티 선공
+    // 3. 위 모두 없음 + 프렌드가 마이티/조커 → 적은 무늬 물패 (프렌드 승리 기대)
     if (state.currentTrickNumber == 1 && player.isDeclarer && state.giruda != null) {
       bool friendIsMighty = state.friendDeclaration?.card != null &&
           state.friendDeclaration!.card == state.mighty;
       bool friendIsJokerHere = state.friendDeclaration?.card?.isJoker ?? false;
 
-      if (friendIsMighty || friendIsJokerHere) {
-        // 초구 승리 가능한 카드 확인 (각 무늬 최상위 카드)
-        // - 비기루다 A (마이티 무늬 제외): 해당 무늬 최상위
-        // - 마이티 무늬 K: A가 마이티로 빠졌으므로 해당 무늬 실질 최상위
-        final mightySuit = state.mighty.suit!;
-        bool hasFirstTrickWinner = playableCards.any((c) =>
+      // 초구 승리 가능한 카드 확인 (각 무늬 최상위 카드)
+      // - 비기루다 A (마이티 무늬 제외): 해당 무늬 최상위
+      // - 마이티 무늬 K: A가 마이티로 빠졌으므로 해당 무늬 실질 최상위
+      final mightySuit = state.mighty.suit!;
+      bool hasFirstTrickWinner = playableCards.any((c) =>
+          !c.isJoker && !c.isMightyWith(state.giruda) &&
+          c.suit != state.giruda &&
+          ((c.rank == Rank.ace && c.suit != mightySuit) ||
+           (c.rank == Rank.king && c.suit == mightySuit)));
+
+      if (hasFirstTrickWinner) {
+        // 초구 승리 카드를 선택하여 선공권 확보
+        final firstTrickWinners = playableCards.where((c) =>
             !c.isJoker && !c.isMightyWith(state.giruda) &&
             c.suit != state.giruda &&
             ((c.rank == Rank.ace && c.suit != mightySuit) ||
-             (c.rank == Rank.king && c.suit == mightySuit)));
-
-        if (hasFirstTrickWinner) {
-          // 초구 승리 카드를 선택하여 선공권 확보
-          final firstTrickWinners = playableCards.where((c) =>
-              !c.isJoker && !c.isMightyWith(state.giruda) &&
-              c.suit != state.giruda &&
-              ((c.rank == Rank.ace && c.suit != mightySuit) ||
-               (c.rank == Rank.king && c.suit == mightySuit))).toList();
-          if (firstTrickWinners.isNotEmpty) {
-            // Ace 우선, 같으면 낮은 랭크 (K는 Ace보다 후순위)
-            firstTrickWinners.sort((a, b) {
-              if (a.rank == Rank.ace && b.rank != Rank.ace) return -1;
-              if (a.rank != Rank.ace && b.rank == Rank.ace) return 1;
-              return a.rankValue.compareTo(b.rankValue);
-            });
-            return firstTrickWinners.first;
-          }
+             (c.rank == Rank.king && c.suit == mightySuit))).toList();
+        if (firstTrickWinners.isNotEmpty) {
+          // Ace 우선, 같으면 낮은 랭크 (K는 Ace보다 후순위)
+          firstTrickWinners.sort((a, b) {
+            if (a.rank == Rank.ace && b.rank != Rank.ace) return -1;
+            if (a.rank != Rank.ace && b.rank == Rank.ace) return 1;
+            return a.rankValue.compareTo(b.rankValue);
+          });
+          return firstTrickWinners.first;
         }
+      }
 
+      // ★ 확실한 최상위가 없고 마지막 순서가 아니면 → 마이티로 초구 선공
+      // 주공은 초구에 항상 선공(1번째)이므로 마지막 순서가 아님
+      // 마이티로 선을 잡고 T2부터 기루다/비기루다 최상위 전략 수행
+      if (!hasFirstTrickWinner) {
+        final hasMighty = playableCards.any((c) => c.isMightyWith(state.giruda));
+        if (hasMighty) {
+          return playableCards.firstWhere((c) => c.isMightyWith(state.giruda));
+        }
+      }
+
+      // ★ 마이티/확실한 최상위 모두 없으면 → 프렌드가 마이티/조커일 때 물패 전략
+      // 프렌드(마이티/조커 보유)가 트릭 승리 → 적은 무늬 물패로 void 생성
+      if (friendIsMighty || friendIsJokerHere) {
         if (!hasFirstTrickWinner) {
-          // ★ 기루다가 많은데 기루다 A가 없으면 마이티로 초구 선공
-          // 마이티로 선을 잡고 트릭 2부터 기루다 최상위(K)를 선공하여
-          // 상대 기루다 A를 강제 소진 → 이후 기루다 우위 확보
-          final myGirudaCount = playableCards.where((c) =>
-              !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).length;
-          final hasGirudaAce = playableCards.any((c) =>
-              !c.isJoker && c.suit == state.giruda && c.rank == Rank.ace);
-          final hasMighty = playableCards.any((c) => c.isMightyWith(state.giruda));
-          if (myGirudaCount >= 4 && !hasGirudaAce && hasMighty) {
-            final mighty = playableCards.where((c) => c.isMightyWith(state.giruda)).toList();
-            return mighty.first;
-          }
-
           // 비기루다 카드 (조커/마이티 제외)
           final nonGirudaCards = playableCards.where((c) =>
               !c.isJoker && !c.isMightyWith(state.giruda) &&
@@ -3110,6 +3127,20 @@ class AIPlayer {
         }
 
         // 3. 위 조건 해당 안 됨 → 아래 일반 선공 정책으로 진행
+      }
+    }
+
+    // === 주공 조커 선공: 수비팀 기루다 소진 시 확정 승리 ===
+    // 수비팀에 기루다가 없으면 조커 + 기루다 콜 → 아무도 기루다를 낼 수 없어 확정 승리
+    // 기루다와 한 무늬만 남아 비기루다로 이길 수 없을 때 특히 유리
+    // (기루다 카드를 아끼면서 선공권 유지)
+    if (state.giruda != null && state.currentTrickNumber >= 2) {
+      bool isAttackTeam = !_isPlayerOnDefenseTeam(player, state);
+      if (isAttackTeam && player.isDeclarer) {
+        final hasJoker = playableCards.any((c) => c.isJoker);
+        if (hasJoker && !_estimateDefenseTeamHasGiruda(player, state)) {
+          return playableCards.firstWhere((c) => c.isJoker);
+        }
       }
     }
 
@@ -3413,12 +3444,20 @@ class AIPlayer {
           //        → 트릭 10 선행 무늬 확보
           shouldDump = state.currentTrickNumber == 8;
         } else {
-          // gap≥3: 교대 전략 (기루다 실효 최상위 보유 시 기루다 선공 우선)
+          // gap≥3: 교대 전략
           final int remainingOpponentGiruda = _getRemainingGirudaCount(state, player);
-          final bool hasTopGirudaWin = remainingOpponentGiruda > 0 &&
-              guaranteedWinCards.any((c) =>
-                  !c.isJoker && !c.isMightyWith(giruda) && c.suit == giruda);
-          shouldDump = !hasTopGirudaWin && remainingTricks % 2 == 1;
+          if (remainingOpponentGiruda == 0 && hasGirudaCutRecapture) {
+            // 상대 기루다 소진 + void 보유: 물패 우선(dump-first) 교대
+            // 기루다 선공 → 상대 저가 카드 follow (점수 적음)
+            // 물패 → 상대 선공 → 기루다 컷 (상대 고가 카드 획득, 점수 많음)
+            shouldDump = remainingTricks % 2 == 0;
+          } else {
+            // 상대 기루다 존재: 기루다 실효 최상위 보유 시 기루다 선공 우선
+            final bool hasTopGirudaWin = remainingOpponentGiruda > 0 &&
+                guaranteedWinCards.any((c) =>
+                    !c.isJoker && !c.isMightyWith(giruda) && c.suit == giruda);
+            shouldDump = !hasTopGirudaWin && remainingTricks % 2 == 1;
+          }
         }
 
         if (shouldDump) {

@@ -5113,6 +5113,8 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
 
+    final friendCard = state.friendDeclaration?.card;
+
     // 트릭별 데이터 계산
     final playedCards = <String>{};
     final rows = <_TrickRowData>[];
@@ -5325,7 +5327,8 @@ class _GameScreenState extends State<GameScreen> {
                         color: row.winnerId == i ? Colors.blue[50] : null,
                         child: row.cardsByPlayer[i] != null
                             ? _buildTrickCardCell(row.cardsByPlayer[i]!, i == row.leadPlayerId, fontSize,
-                                jokerLeadSuit: i == row.leadPlayerId ? row.jokerLeadSuit : null)
+                                jokerLeadSuit: i == row.leadPlayerId ? row.jokerLeadSuit : null,
+                                isFriendCard: friendCard != null && row.cardsByPlayer[i] == friendCard)
                             : Text('-', textAlign: TextAlign.center, style: TextStyle(fontSize: fontSize, color: Colors.grey[300])),
                       ),
                     // 득실
@@ -5378,7 +5381,7 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _buildTrickCardCell(PlayingCard card, bool isLead, double fontSize, {Suit? jokerLeadSuit}) {
+  Widget _buildTrickCardCell(PlayingCard card, bool isLead, double fontSize, {Suit? jokerLeadSuit, bool isFriendCard = false}) {
     String text = card.toString();
     Color textColor;
     if (card.isJoker) {
@@ -5405,6 +5408,15 @@ class _GameScreenState extends State<GameScreen> {
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey[400]!, width: 1),
           borderRadius: BorderRadius.circular(4),
+        ),
+        child: child,
+      );
+    }
+
+    if (isFriendCard) {
+      child = Container(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.blue[400]!, width: 2)),
         ),
         child: child,
       );
