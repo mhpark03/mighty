@@ -4367,6 +4367,34 @@ class AIPlayer {
       }
     }
 
+    // === 트릭 9: 조커 미출현 시 기루다 보존 (트릭 10 승리용) ===
+    // 트릭 9에서 조커가 아직 안 나왔으면 트릭 9 or 10에 반드시 나옴
+    // 조커가 이 트릭을 이길 것이 확실하므로 기루다를 낭비하지 않고 트릭 10용으로 보존
+    if (state.currentTrickNumber == 9 && state.giruda != null && !state.isJokerPlayed) {
+      bool playerHasJoker = player.hand.any((c) => c.isJoker);
+
+      if (!playerHasJoker) {
+        // 조커가 이미 이 트릭에 나왔거나, 아직 안 나왔지만 뒤에 나올 가능성 높음
+        // → 기루다를 내지 않고 비기루다 물패로 대응
+        final hasGirudaCards = playableCards.any((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda);
+        final nonGirudaCards = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
+
+        if (hasGirudaCards && nonGirudaCards.isNotEmpty) {
+          // 비기루다 카드 중 비점수 최하위 우선
+          final nonPointDump = nonGirudaCards.where((c) => !c.isPointCard).toList();
+          if (nonPointDump.isNotEmpty) {
+            nonPointDump.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return nonPointDump.first;
+          }
+          // 비점수가 없으면 가장 낮은 비기루다 카드
+          nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return nonGirudaCards.first;
+        }
+      }
+    }
+
     // === 주공이 프렌드의 낮은 기루다 선공을 받아야 할 때 ===
     // 프렌드가 낮은 기루다로 선공하면, 주공은 높은 기루다로 받아서 선을 가져가야 함
     if (player.isDeclarer &&
