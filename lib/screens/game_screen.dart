@@ -5035,22 +5035,6 @@ class _GameScreenState extends State<GameScreen> {
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
-                        _showTrickDetails = false;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[300],
-                      padding: EdgeInsets.symmetric(horizontal: compact ? 14 : 20, vertical: compact ? 7 : 10),
-                    ),
-                    child: Text(
-                      l10n.confirm,
-                      style: TextStyle(fontSize: compact ? 14 : 16, color: Colors.black),
-                    ),
-                  ),
-                  SizedBox(width: compact ? 8 : 12),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
                         _showGameResult = true;
                         _showTrickDetails = false;
                       });

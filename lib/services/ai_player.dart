@@ -2744,10 +2744,22 @@ class AIPlayer {
           }
         }
 
-        // 가장 높은 실효가치 카드 선택
-        topCards.sort((a, b) =>
-            _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
-        return topCards.first;
+        // ★ 수비팀 기루다 소진: 프렌드 기루다 선공 회피
+        // 기루다 선공 → 주공도 기루다 따라냄 → 공격팀 기루다만 소진
+        if (!_estimateDefenseTeamHasGiruda(player, state)) {
+          final nonGirudaTopCards = topCards.where((c) => c.suit != state.giruda).toList();
+          if (nonGirudaTopCards.isNotEmpty) {
+            nonGirudaTopCards.sort((a, b) =>
+                _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+            return nonGirudaTopCards.first;
+          }
+          // 비기루다 최상위 없으면 기루다 보존 → 아래 물패 전략으로 fall through
+        } else {
+          // 가장 높은 실효가치 카드 선택
+          topCards.sort((a, b) =>
+              _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+          return topCards.first;
+        }
       }
 
       // 최상위 카드가 없을 때만 마이티/조커 사용 (후반전, 점수 카드 확보용)
