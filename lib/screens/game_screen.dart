@@ -32,8 +32,8 @@ class _GameScreenState extends State<GameScreen> {
   bool _showHint = false;
   bool _statsRecorded = false;
   bool _bidInitialized = false;
-  bool _showGameResult = true;
-  bool _showTrickDetails = false;
+  bool _showGameResult = false;
+  bool _showTrickDetails = true;
   final ScrollController _trickTableScrollController = ScrollController();
 
   /// 배팅을 무늬 기호로 포맷
