@@ -821,15 +821,104 @@ class AIPlayer {
     }
     // 최대: 프렌드가 비기루다 A를 추가로 보유 가능
     maxTricks++;
-    // 마이티+조커 모두 보유 시 기루다 프렌드(K/Q)의 안정성
+    // 마이티+조커 모두 보유 시 프렌드 카드 예측
     if (hasMighty && hasJoker && giruda != null) {
       bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
-      if (hasGirudaAce) { minTricks++; } // 기루다A 보유 → 프렌드 K/Q 거의 확실
+      bool hasGirudaKing = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.king);
+      if (hasGirudaAce) {
+        minTricks++; // 기루다A 보유 → 프렌드 K/Q 선언, A-K 체인 확실
+      } else if (hasGirudaKing) {
+        minTricks++; // 기루다A 미보유 → 프렌드 기루다A 선언, A-K 체인 확실
+      }
+    }
+
+    // === 선공 확정 트릭 하한 (Initiative Floor) ===
+    // 핵심 카드 조합으로 보장되는 선공 트릭 수를 별도로 계산하여
+    // 개별 합산+감점 방식보다 높으면 하한으로 적용
+    // 선공권이 보장되면 조커콜 위험/약점 수트 등의 감점이 상쇄됨
+    if (giruda != null) {
+      int initTricks = 0;
+      bool gA = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+      bool gK = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.king);
+      bool gQ = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.queen);
+
+      // 마이티: 확실한 1트릭
+      if (hasMighty) initTricks++;
+      // 기루다A: 확실한 1트릭
+      if (gA) initTricks++;
+      // 기루다 A-K 체인: A 이후 K도 확실
+      if (gA && gK) initTricks++;
+      // 기루다 A-K-Q 체인: Q도 확실
+      if (gA && gK && gQ) initTricks++;
+
+      // 비기루다 에이스: 초구/선공 가능
+      for (final suit in Suit.values) {
+        if (suit == giruda) continue;
+        if (hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace &&
+            !(c.suit == mightySuit && c.rank == Rank.ace))) {
+          initTricks++;
+        }
+      }
+
+      // 마이티 수트 킹: 마이티(에이스)를 보유하므로 킹이 해당 수트 최상위
+      // 기루다 3장+ 보유 시 상대 기루다 컷 위험이 낮아 확실한 선공 트릭
+      if (hasMighty && girudaLen >= 3) {
+        bool hasMightySuitKing = hand.any((c) =>
+            !c.isJoker && c.suit == mightySuit && c.rank == Rank.king);
+        if (hasMightySuitKing) initTricks++;
+      }
+
+      // 조커: 선공 카드가 3개 이상이면 조커콜 회피 가능하여 안전
+      if (hasJoker && initTricks >= 3) {
+        initTricks++;
+      }
+
+      // 프렌드 기루다 체인 확장: 마이티+조커 보유 시 프렌드 카드 예측
+      // Case 1: 기루다A 보유 → 프렌드 K 선언 → A-K(-(Q)) 체인
+      bool friendChainActive = hasMighty && hasJoker && gA && !gK;
+      if (friendChainActive) {
+        initTricks++; // 프렌드 K로 기루다 체인 확장
+        if (gQ) initTricks++; // A-K-Q 체인
+      }
+      // Case 2: 기루다A 미보유, K 보유 → 프렌드 기루다A 선언 → A-K(-(Q)) 체인
+      bool friendAceChainActive = hasMighty && hasJoker && !gA && gK;
+      if (friendAceChainActive) {
+        initTricks++; // 프렌드 A 트릭
+        initTricks++; // K가 A 이후 확실
+        if (gQ) initTricks++; // A-K-Q 체인
+      }
+
+      // 기루다 후반 지배: A/K/Q 체인 카드 이외 남은 기루다로 후반 선공
+      int girudaTopCount = (gA ? 1 : 0) + (gA && gK ? 1 : 0) + (gA && gK && gQ ? 1 : 0);
+      if (friendChainActive && gQ) girudaTopCount++; // 프렌드 K 체인으로 Q도 체인 카드
+      if (friendAceChainActive) {
+        girudaTopCount++; // K가 체인 카드
+        if (gQ) girudaTopCount++; // Q도 체인 카드
+      }
+      int extraGiruda = girudaLen - girudaTopCount;
+      bool hasFriendChain = friendChainActive || friendAceChainActive;
+      int netExtra = extraGiruda - (hasFriendChain ? 1 : 0); // 프렌드 호출에 1장 사용
+      if (netExtra >= 2) {
+        initTricks += 2;
+      } else if (netExtra >= 1) {
+        initTricks++;
+      }
+
+      // 초간/조커콜 위험: 선공 트릭이 매우 많을 때 일부 손실 가능
+      if (hasJoker && initTricks >= 8) {
+        initTricks--; // 조커콜로 인한 트릭 손실 감안
+      }
+
+      if (initTricks > minTricks) {
+        minTricks = initTricks;
+      }
     }
 
     // 트릭당 평균 점수 카드: 약 2장 (20장 / 10트릭)
     // 강한 핸드는 점수카드 밀집 트릭을 먹어 ppt 2.0~2.5 분포
-    int minPoints = (minTricks * 1.5).round().clamp(0, 20);
+    // 선공 확정 트릭이 많으면 고점수 트릭을 선택적으로 확보 → 1.8배
+    final double minPpt = minTricks >= 5 ? 1.8 : 1.5;
+    int minPoints = (minTricks * minPpt).round().clamp(0, 20);
     int maxPoints = ((maxTricks + maxAdj) * 2.2).round().clamp(0, 20);
 
     // === 런 감지: 마이티+조커+기루다A+5장기루다 → 올런 가능 ===
@@ -1784,7 +1873,7 @@ class AIPlayer {
       final eAdditionalWins = (eNonChainGiruda).clamp(0, 10 - eLeadKeeping);
       final kittyPoints = state.kitty.where((c) => c.isPointCard).length;
       final expectedPoints = eLeadKeeping * 2.0 + eAdditionalWins * 1.5 + kittyPoints;
-      if (expectedPoints >= 20) return true;
+      if (expectedPoints > 18) return true;
     }
 
     return false;
@@ -3269,20 +3358,21 @@ class AIPlayer {
     }
 
     // === 조커로 기루다 콜하여 수비팀 기루다 소진 (트릭 4 이후) ===
-    // ★ 프렌드가 일반 카드(마이티/조커 아님)인 경우 조커 선공 스킵
+    // ★ 프렌드가 일반 카드(마이티/조커 아님)이고 미공개인 경우 조커 선공 스킵
     // → 프렌드에게 선을 넘기는 전략 우선
+    // ★ 프렌드가 이미 공개되었으면 조커 선공 허용 (선 넘기기보다 트릭 승리 우선)
     // ★ 기루다 최상위(A)가 있거나 마이티가 없는 경우에만 조커 콜
     if (state.giruda != null && state.currentTrickNumber >= 4 && state.currentTrickNumber <= 8) {
       bool isAttackTeam = !_isPlayerOnDefenseTeam(player, state);
 
       if (isAttackTeam && player.isDeclarer) {
-        // ★ 프렌드가 일반 카드(마이티/조커 아님)인 경우 조커 선공 스킵
         final friendCard = state.friendDeclaration?.card;
         bool friendIsSpecialCard = friendCard == null ||
             friendCard.isJoker || friendCard.isMightyWith(state.giruda);
 
-        // 프렌드가 마이티/조커인 경우에만 조커로 기루다 콜
-        if (friendIsSpecialCard) {
+        // 프렌드가 마이티/조커이거나 이미 공개된 경우 조커로 기루다 콜
+        // (프렌드 공개 후에는 선 넘기기보다 기루다 최상위가 아닐 때 조커로 승리가 유리)
+        if (friendIsSpecialCard || state.friendRevealed) {
           final joker = playableCards.where((c) => c.isJoker).toList();
 
           if (joker.isNotEmpty) {
@@ -5187,6 +5277,24 @@ class AIPlayer {
                       return girudaFollowCards.first;
                     }
                     // 이길 수 없으면 → 높은 카드 낭비 방지, 아래 폴백(최저 카드)으로
+                  }
+                }
+                // ★ 선공 무늬가 없고 기루다 컷이 가능하면 마이티/조커 대신 기루다로 컷
+                // 마이티/조커를 후반 트릭에서 활용하기 위해 온존
+                if (state.giruda != null && leadSuit != state.giruda) {
+                  final hasLeadSuit = playableCards.any((c) =>
+                      !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == leadSuit);
+                  if (!hasLeadSuit) {
+                    final girudaCutCards = playableCards.where((c) =>
+                        !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
+                    if (girudaCutCards.isNotEmpty && currentWinningCard != null) {
+                      final winningGiruda = girudaCutCards.where((c) =>
+                          state.isCardStronger(c, currentWinningCard, leadSuit, false)).toList();
+                      if (winningGiruda.isNotEmpty) {
+                        winningGiruda.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                        return winningGiruda.first;
+                      }
+                    }
                   }
                 }
                 // 마이티가 있으면 사용 (조커보다 강함)
