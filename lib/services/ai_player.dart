@@ -431,10 +431,22 @@ class AIPlayer {
     int bestMax = 0;
     int bestGirudaCount = 0;
 
+    // 강도 점수 3.0 미만이라도 가장 높은 무늬는 평가 (0~0 방지)
+    Suit? fallbackSuit;
+    double fallbackScore = 0;
+
     for (final suit in Suit.values) {
       final suitCards = hand.where((c) => !c.isJoker && c.suit == suit).toList();
+      final score = _calcGirudaStrengthScore(suitCards);
       // 기루다 강도 점수 기반 후보 필터링 (연결성 가중치 적용)
-      if (_calcGirudaStrengthScore(suitCards) < 3.0) continue;
+      if (score < 3.0) {
+        // 3.0 미만 중 가장 높은 무늬를 폴백으로 저장
+        if (suitCards.length >= 2 && score > fallbackScore) {
+          fallbackScore = score;
+          fallbackSuit = suit;
+        }
+        continue;
+      }
 
       final (minPts, maxPts) = estimatePointRange(hand, suit);
       // 바닥패 기대값: 키카드 보유 시 약한 카드 제거 효과 증가
@@ -443,15 +455,36 @@ class AIPlayer {
       final hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace);
       final keyCardCount = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) + (hasGirudaAce ? 1 : 0);
       final kittyBonus = keyCardCount >= 2 ? 2 : (keyCardCount >= 1 ? 1 : 0);
-      final optimal = (minPts * 0.3 + maxPts * 0.7 + 1).round() + kittyBonus;
+      // kittyBonus를 최대에도 반영하여 적정이 범위를 초과하지 않도록 함
+      final adjustedMax = (maxPts + kittyBonus).clamp(0, 20);
+      final optimal = (minPts * 0.3 + adjustedMax * 0.7 + 1).round();
 
       if (optimal > bestOptimal) {
         bestOptimal = optimal;
         bestMin = minPts;
-        bestMax = maxPts;
+        bestMax = adjustedMax;
         bestGiruda = suit;
         bestGirudaCount = suitCards.length;
       }
+    }
+
+    // 3.0 이상 후보가 없으면 폴백 무늬로 평가 (마이티 프렌드 등 고려)
+    if (bestGiruda == null && fallbackSuit != null) {
+      final (minPts, maxPts) = estimatePointRange(hand, fallbackSuit);
+      final fbSuitCards = hand.where((c) => !c.isJoker && c.suit == fallbackSuit).toList();
+      final hasMighty = hand.any((c) => !c.isJoker && c.suit == ((fallbackSuit == Suit.spade) ? Suit.diamond : Suit.spade) && c.rank == Rank.ace);
+      final hasJoker = hand.any((c) => c.isJoker);
+      final hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == fallbackSuit && c.rank == Rank.ace);
+      final keyCardCount = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) + (hasGirudaAce ? 1 : 0);
+      final kittyBonus = keyCardCount >= 2 ? 2 : (keyCardCount >= 1 ? 1 : 0);
+      final adjustedMax = (maxPts + kittyBonus).clamp(0, 20);
+      final optimal = (minPts * 0.3 + adjustedMax * 0.7 + 1).round();
+
+      bestOptimal = optimal;
+      bestMin = minPts;
+      bestMax = adjustedMax;
+      bestGiruda = fallbackSuit;
+      bestGirudaCount = fbSuitCards.length;
     }
 
     return BidEvaluation(
@@ -3622,8 +3655,9 @@ class AIPlayer {
       final nonGirudaDumpCards = playableCards.where((c) =>
           !c.isJoker && !c.isMightyWith(giruda) && c.suit != giruda).toList();
 
-      // 선 탈환 수단: 조커 보유 OR (기루다 카드 + void 무늬 ≥ 1)
+      // 선 탈환 수단: 조커 보유 OR (기루다 카드 + void 무늬 ≥ 1) OR 마이티 보유
       final hasJokerForRecapture = playableCards.any((c) => c.isJoker);
+      final hasMightyForRecapture = playableCards.any((c) => c.isMightyWith(giruda));
       Set<Suit> myNonGirudaSuits = {};
       for (final c in player.hand) {
         if (!c.isJoker && c.suit != null && c.suit != giruda) {
@@ -3633,7 +3667,7 @@ class AIPlayer {
       final int nonGirudaSuitTotal = Suit.values.where((s) => s != giruda).length;
       final int voidSuitCount = nonGirudaSuitTotal - myNonGirudaSuits.length;
       final hasGirudaCutRecapture = myGirudaCards.isNotEmpty && voidSuitCount >= 1;
-      final hasRecaptureMeans = hasJokerForRecapture || hasGirudaCutRecapture;
+      final hasRecaptureMeans = hasJokerForRecapture || hasGirudaCutRecapture || hasMightyForRecapture;
 
       // ★ 보증 승리 카드 수 기반 물패 타이밍 결정
       // gap=0: 연속 승리 (물패 없음)
@@ -5833,6 +5867,42 @@ class AIPlayer {
         if (girudaForMighty.isNotEmpty) {
           girudaForMighty.sort((a, b) => a.rankValue.compareTo(b.rankValue));
           return girudaForMighty.first;
+        }
+      } else {
+        // === 아군 마이티가 이기고 있음 → 점수카드 기여 ===
+        // 마이티 유도 트릭에서 이길 수 없는 물패 중 점수카드를 우선하여
+        // 아군이 획득하는 점수를 최대화
+        final suitCardsForTeam = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == leadSuit).toList();
+        if (suitCardsForTeam.isNotEmpty) {
+          // 선공 무늬 점수카드 우선 (높은 순: A > K > Q > J > 10)
+          final pointCards = suitCardsForTeam.where((c) => c.isPointCard).toList();
+          if (pointCards.isNotEmpty) {
+            pointCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+            return pointCards.first;
+          }
+          // 점수카드 없으면 최하위 비점수
+          suitCardsForTeam.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return suitCardsForTeam.first;
+        }
+        // void: 비기루다 점수카드 우선
+        final nonGirudaForTeam = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
+        if (nonGirudaForTeam.isNotEmpty) {
+          final pointCards = nonGirudaForTeam.where((c) => c.isPointCard).toList();
+          if (pointCards.isNotEmpty) {
+            pointCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+            return pointCards.first;
+          }
+          nonGirudaForTeam.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return nonGirudaForTeam.first;
+        }
+        // 기루다만 있으면 가장 낮은 기루다
+        final girudaForTeam = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
+        if (girudaForTeam.isNotEmpty) {
+          girudaForTeam.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          return girudaForTeam.first;
         }
       }
     }
