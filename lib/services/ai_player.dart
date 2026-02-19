@@ -854,6 +854,26 @@ class AIPlayer {
       maxPoints = (maxPoints - 1).clamp(0, 20);
     }
 
+    // ★ 마이티 프렌드 + 초구 카드 없음: 초구에 마이티 유도 필요 → 선공 불안정 -2점
+    // 조커/마이티 모두 없어 마이티 프렌드 호출 필수인데 비기루다 A도 없으면
+    // 초구를 확실히 잡을 수 없어 마이티를 유도해야 하므로 점수 감점
+    if (!hasMighty && !hasJoker) {
+      bool hasFirstTrickCard = false;
+      for (final suit in Suit.values) {
+        if (suit == giruda) continue;
+        final sc = hand.where((c) => !c.isJoker && c.suit == suit).toList();
+        if (sc.any((c) =>
+            c.rank == Rank.ace && !(c.suit == mightySuit && c.rank == Rank.ace))) {
+          hasFirstTrickCard = true;
+          break;
+        }
+      }
+      if (!hasFirstTrickCard) {
+        minPoints = (minPoints - 2).clamp(0, 20);
+        maxPoints = (maxPoints - 2).clamp(0, 20);
+      }
+    }
+
     if (minPoints > maxPoints) minPoints = maxPoints;
 
     return (minPoints, maxPoints);
@@ -2442,13 +2462,44 @@ class AIPlayer {
       final defLeadCards = safeNonGirudaCards.isNotEmpty ? safeNonGirudaCards : nonGirudaCards;
 
       if (defLeadCards.isNotEmpty) {
+        // ★ 컷 이력 확인: 이전에 간을 치지 않은 무늬는 컷 위험 낮음
+        final cutSuitsForLead = _getCutSuits(state);
+
+        // ★ 기루다 + 프렌드 카드 소진 여부: 컷 불가 + 팀 확정 → 적극 공격
+        final opponentGiruda = _getRemainingGirudaCount(state, player);
+        final friendCard = state.friendDeclaration?.card;
+        final playedCardsAll = _getPlayedCards(state);
+        final friendCardGone = friendCard == null ||
+            (friendCard.isJoker
+                ? (playedCardsAll.any((c) => c.isJoker) || player.hand.any((c) => c.isJoker))
+                : (playedCardsAll.any((c) => c.suit == friendCard.suit && c.rank == friendCard.rank) ||
+                   player.hand.any((c) => c.suit == friendCard.suit && c.rank == friendCard.rank)));
+        final noGirudaThreat = opponentGiruda == 0 && friendCardGone;
+
         // 현재 가장 높은 카드인 것들을 찾기 (오픈된 카드 고려)
         final highestRemainingCards = defLeadCards.where((c) =>
             _isHighestRemainingCard(c, state, player.hand)).toList();
 
         if (highestRemainingCards.isNotEmpty) {
-          // ★ 주공이 보유할 가능성 높은 무늬 우선 (기루다 컷 방지)
-          // 주공이 void일 가능성 높은 무늬의 최상위 카드는 컷당해 낭비될 수 있음
+          // ★ 기루다 + 프렌드 카드 모두 소진: 컷 불가 → 무늬 무관 최상위 카드 선공
+          if (noGirudaThreat) {
+            highestRemainingCards.sort((a, b) =>
+                _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+            return highestRemainingCards.first;
+          }
+
+          // ★ 컷 당한 적 없는 무늬: 선 유지를 위해 최상위 카드 선공
+          // 주공 확정 void 무늬는 이미 defLeadCards에서 제외됨
+          // 이전에 컷 당하지 않은 무늬/처음 나오는 무늬는 컷 위험 낮음 → 선 유지 우선
+          final uncutHighCards = highestRemainingCards.where((c) =>
+              c.suit != null && !cutSuitsForLead.contains(c.suit!)).toList();
+          if (uncutHighCards.isNotEmpty) {
+            uncutHighCards.sort((a, b) =>
+                _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+            return uncutHighCards.first;
+          }
+
+          // 컷 당한 무늬만 남은 경우: 주공 보유 확률 높은 무늬 우선 (기루다 컷 방지)
           final safeHighCards = highestRemainingCards.where((c) =>
               c.suit != null && (declarerHoldings[c.suit!] ?? 0.5) >= 0.4).toList();
           if (safeHighCards.isNotEmpty) {
@@ -2463,8 +2514,24 @@ class AIPlayer {
         defLeadCards.sort((a, b) =>
             _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
 
-        // 실효 가치가 A(14) 이상인 카드가 있으면 선택 (= 현재 가장 높은 카드)
-        // ★ 주공이 보유할 가능성 높은 무늬만 사용 (컷 방지)
+        // ★ 기루다 + 프렌드 카드 모두 소진: 실효 최상위 카드로 적극 공격
+        if (noGirudaThreat) {
+          final allEffectiveHighCards = defLeadCards.where((c) =>
+              _getEffectiveCardValue(c, state) >= 14).toList();
+          if (allEffectiveHighCards.isNotEmpty) {
+            return allEffectiveHighCards.first;
+          }
+        }
+
+        // 실효 가치가 A(14) 이상인 카드: 컷 당한 적 없는 무늬 우선
+        final uncutEffectiveHighCards = defLeadCards.where((c) =>
+            _getEffectiveCardValue(c, state) >= 14 &&
+            c.suit != null && !cutSuitsForLead.contains(c.suit!)).toList();
+        if (uncutEffectiveHighCards.isNotEmpty) {
+          return uncutEffectiveHighCards.first;
+        }
+
+        // 컷 이력 있는 무늬: 주공 보유 확률 높은 무늬만 사용 (컷 방지)
         final effectiveHighCards = defLeadCards.where((c) =>
             _getEffectiveCardValue(c, state) >= 14 &&
             (declarerHoldings[c.suit] ?? 0.5) >= 0.4).toList();
@@ -3032,10 +3099,22 @@ class AIPlayer {
       // 프렌드(마이티/조커 보유)가 트릭 승리 → 적은 무늬 물패로 void 생성
       if (friendIsMighty || friendIsJokerHere) {
         if (!hasFirstTrickWinner) {
-          // 비기루다 카드 (조커/마이티 제외)
-          final nonGirudaCards = playableCards.where((c) =>
+          // ★ 조커콜 카드 보존: 초구에 조커콜 카드를 낭비하지 않음
+          final jokerCallCard = state.jokerCall;
+          final hasJokerInHand = playableCards.any((c) => c.isJoker);
+          final preserveJokerCall = !hasJokerInHand && !state.isJokerPlayed;
+
+          // 비기루다 카드 (조커/마이티/조커콜 카드 제외)
+          var nonGirudaCards = playableCards.where((c) =>
               !c.isJoker && !c.isMightyWith(state.giruda) &&
-              c.suit != state.giruda).toList();
+              c.suit != state.giruda &&
+              !(preserveJokerCall && c.suit == jokerCallCard.suit && c.rank == jokerCallCard.rank)).toList();
+          // 조커콜 카드 제외 후 빈 경우 → 조커콜 카드 포함하여 재선택
+          if (nonGirudaCards.isEmpty) {
+            nonGirudaCards = playableCards.where((c) =>
+                !c.isJoker && !c.isMightyWith(state.giruda) &&
+                c.suit != state.giruda).toList();
+          }
 
           if (nonGirudaCards.isNotEmpty) {
             // 무늬별 카드 수 계산 (적은 무늬 우선 → void 생성)
@@ -4205,10 +4284,11 @@ class AIPlayer {
         // 조건 3: 주공 선공 + 프렌드 카드가 마이티/조커 → 선 확보 필수
         // 비프렌드 카드로 확실히 이기면 프렌드 카드 온존, 못 이기면 프렌드 카드 사용
         // 마이티/조커는 무늬 무관 강력 → 확실한 대안 없을 때의 최종 보장
+        // ★ 마이티는 트릭 1에서도 사용 가능, 조커만 트릭 1 제한
         if (state.currentTrick!.playerOrder.isNotEmpty &&
             state.currentTrick!.playerOrder[0] == state.declarerId &&
             (friendCard.isJoker || friendCard.isMightyWith(state.giruda)) &&
-            state.currentTrickNumber > 1) {
+            (friendCard.isMightyWith(state.giruda) || state.currentTrickNumber > 1)) {
           final isLastInTrick =
               state.currentTrick!.cards.length == state.players.length - 1;
           final nonFriendCards = playableCards.where((c) => c != friendCard).toList();
