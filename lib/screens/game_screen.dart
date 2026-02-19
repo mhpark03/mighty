@@ -34,6 +34,7 @@ class _GameScreenState extends State<GameScreen> {
   bool _bidInitialized = false;
   bool _showGameResult = true;
   bool _showTrickDetails = false;
+  final ScrollController _trickTableScrollController = ScrollController();
 
   /// 배팅을 무늬 기호로 포맷
   String _formatBid(Bid bid) {
@@ -63,6 +64,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     _trickTimer?.cancel();
+    _trickTableScrollController.dispose();
     super.dispose();
   }
 
@@ -5251,13 +5253,17 @@ class _GameScreenState extends State<GameScreen> {
           ],
         ),
         SizedBox(height: compact ? 4 : 8),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Table(
-            defaultColumnWidth: const IntrinsicColumnWidth(),
-            border: TableBorder(
-              horizontalInside: BorderSide(color: Colors.grey[200]!, width: 0.5),
-            ),
+        Scrollbar(
+          controller: _trickTableScrollController,
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            controller: _trickTableScrollController,
+            scrollDirection: Axis.horizontal,
+            child: Table(
+              defaultColumnWidth: const IntrinsicColumnWidth(),
+              border: TableBorder(
+                horizontalInside: BorderSide(color: Colors.grey[200]!, width: 0.5),
+              ),
             children: [
               // 헤더 행
               TableRow(
@@ -5349,6 +5355,7 @@ class _GameScreenState extends State<GameScreen> {
                   ],
                 ),
             ],
+            ),
           ),
         ),
       ],
