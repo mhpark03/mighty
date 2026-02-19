@@ -27,18 +27,19 @@ void main() async {
     overlays: [],
   );
 
-  // AdMob 초기화
-  await MobileAds.instance.initialize();
+  // AdMob 초기화 (비동기 — 앱 시작을 차단하지 않음)
+  _initAds();
 
-  // 계정 정지 중에도 코드 레벨에서 테스트 기기를 강제 지정합니다.
+  runApp(const MightyApp());
+}
+
+Future<void> _initAds() async {
+  await MobileAds.instance.initialize();
   RequestConfiguration configuration = RequestConfiguration(
     testDeviceIds: ["7e423abc-74c5-4cb7-9e7b-578adadeb80d"],
   );
   await MobileAds.instance.updateRequestConfiguration(configuration);
-
   AdService().loadRewardedAd();
-
-  runApp(const MightyApp());
 }
 
 class MightyApp extends StatelessWidget {

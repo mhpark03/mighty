@@ -24,10 +24,8 @@ class _GameSelectionScreenState extends State<GameSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    // 스플래시 화면 제거 (1초 후)
-    Future.delayed(const Duration(seconds: 1), () {
-      FlutterNativeSplash.remove();
-    });
+    // 스플래시 화면 즉시 제거
+    FlutterNativeSplash.remove();
   }
 
   @override

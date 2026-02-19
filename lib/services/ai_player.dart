@@ -3614,11 +3614,11 @@ class AIPlayer {
             return bestSuitCards.first;
           }
         } else {
-          // ★ 승리: 기루다 승리 카드 우선, 조커는 후순위 (트릭 9 탈환용 보존)
+          // ★ 승리: 기루다 승리 카드 우선 (상위 카드부터), 조커는 후순위 (트릭 9 탈환용 보존)
           final girudaWinCards = guaranteedWinCards.where((c) =>
               !c.isJoker && !c.isMightyWith(giruda)).toList();
           if (girudaWinCards.isNotEmpty) {
-            girudaWinCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            girudaWinCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
             return girudaWinCards.first;
           }
           // 기루다 승리 카드 없으면 마이티
