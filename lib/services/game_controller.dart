@@ -522,14 +522,14 @@ class GameController extends ChangeNotifier {
       // 각 버릴 카드의 이유 생성
       final reasons = _generateDiscardReasons(discardCards, newGiruda, declarer);
 
-      // 기루다 변경 검토: 13장 기준 각 무늬별 점수 비교 (kittyBonus 동일 적용)
+      // 기루다 변경 검토: 최종 핸드 10장 기준 각 무늬별 점수 비교 (kittyBonus 동일 적용)
       final girudaComp = <(Suit?, int, int, int)>[];
       for (final candidateSuit in [Suit.spade, Suit.diamond, Suit.heart, Suit.club]) {
-        final (cMin, cMax) = _aiPlayer.estimatePointRange(allCards, candidateSuit);
+        final (cMin, cMax) = _aiPlayer.estimatePointRange(finalHand, candidateSuit);
         final cMightySuit = (candidateSuit == Suit.spade) ? Suit.diamond : Suit.spade;
-        final cHasMighty = allCards.any((c) => !c.isJoker && c.suit == cMightySuit && c.rank == Rank.ace);
-        final cHasJoker = allCards.any((c) => c.isJoker);
-        final cHasGirudaAce = allCards.any((c) => !c.isJoker && c.suit == candidateSuit && c.rank == Rank.ace);
+        final cHasMighty = finalHand.any((c) => !c.isJoker && c.suit == cMightySuit && c.rank == Rank.ace);
+        final cHasJoker = finalHand.any((c) => c.isJoker);
+        final cHasGirudaAce = finalHand.any((c) => !c.isJoker && c.suit == candidateSuit && c.rank == Rank.ace);
         final cKeyCards = (cHasMighty ? 1 : 0) + (cHasJoker ? 1 : 0) + (cHasGirudaAce ? 1 : 0);
         final cKittyBonus = cKeyCards >= 2 ? 2 : (cKeyCards >= 1 ? 1 : 0);
         final cAdjustedMax = cMax + cKittyBonus;
