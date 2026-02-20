@@ -450,12 +450,20 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
 
   Widget _buildCardSymbolWidget(PlayingCard card, bool isDisabled, {bool forceBlack = false}) {
     if (card.isJoker) {
-      return Text(
-        '🃏',
-        style: TextStyle(
-          fontSize: 13,
-          color: isDisabled ? Colors.grey[500] : Colors.white,
-        ),
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.auto_awesome, color: isDisabled ? Colors.grey[500] : Colors.yellowAccent, size: 12),
+          const SizedBox(width: 2),
+          Text(
+            'JK',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: isDisabled ? Colors.grey[500] : Colors.white,
+            ),
+          ),
+        ],
       );
     }
     final suit = card.suit!;
@@ -675,7 +683,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
 
   String _getMightySymbol() {
     final mighty = widget.mighty;
-    if (mighty.isJoker) return '🃏';
+    if (mighty.isJoker) return '★JK';
     return '${mighty.suitSymbol}${mighty.rankSymbol}';
   }
 
@@ -739,7 +747,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
 
     if (card == null) return const SizedBox.shrink();
 
-    final suitSymbol = card.isJoker ? '🃏' : card.suitSymbol;
+    final suitSymbol = card.isJoker ? '★JK' : card.suitSymbol;
     final rankSymbol = card.isJoker ? '' : card.rankSymbol;
 
     return Row(

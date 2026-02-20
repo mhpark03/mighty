@@ -199,10 +199,9 @@ class CardWidget extends StatelessWidget {
   }
 
   Widget _buildJokerCard(BuildContext context) {
-    // 카드 크기에 따라 폰트 크기 조절
     final isSmall = height < 60;
-    final emojiSize = isSmall ? 16.0 : 24.0;
-    final textSize = isSmall ? 6.0 : 8.0;
+    final iconSize = isSmall ? 18.0 : 28.0;
+    final textSize = isSmall ? 7.0 : 11.0;
 
     return Container(
       decoration: BoxDecoration(
@@ -210,7 +209,7 @@ class CardWidget extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Colors.purple, Colors.deepPurple],
+          colors: [Color(0xFF7B1FA2), Color(0xFFAB47BC)],
         ),
       ),
       child: Center(
@@ -218,19 +217,18 @@ class CardWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
+            Icon(Icons.auto_awesome, color: Colors.yellowAccent, size: iconSize),
+            const SizedBox(height: 2),
             Text(
-              '🃏',
-              style: TextStyle(fontSize: emojiSize),
-            ),
-            if (!isSmall)
-              Text(
-                AppLocalizations.of(context)!.joker.toUpperCase(),
-                style: TextStyle(
-                  fontSize: textSize,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              isSmall ? 'JK' : AppLocalizations.of(context)!.joker.toUpperCase(),
+              style: TextStyle(
+                fontSize: textSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 1.2,
+                shadows: const [Shadow(color: Colors.black54, blurRadius: 2)],
               ),
+            ),
           ],
         ),
       ),
@@ -255,12 +253,23 @@ class MiniCardWidget extends StatelessWidget {
         width: size,
         height: size * 1.4,
         decoration: BoxDecoration(
-          color: Colors.purple,
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF7B1FA2), Color(0xFFAB47BC)],
+          ),
           borderRadius: BorderRadius.circular(4),
           border: Border.all(color: Colors.white, width: 1),
         ),
-        child: const Center(
-          child: Text('🃏', style: TextStyle(fontSize: 16)),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, color: Colors.yellowAccent, size: size * 0.35),
+              Text('JK', style: TextStyle(fontSize: size * 0.2, fontWeight: FontWeight.bold, color: Colors.white)),
+            ],
+          ),
         ),
       );
     }

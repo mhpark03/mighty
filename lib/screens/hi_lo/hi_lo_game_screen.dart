@@ -1763,7 +1763,13 @@ class _HiLoGameScreenState extends State<HiLoGameScreen> with TickerProviderStat
           border: Border.all(color: isOpen ? Colors.amber : Colors.grey, width: isOpen ? 2 : 1),
         ),
         child: Center(
-          child: Text('🃏', style: TextStyle(fontSize: sizes.playerFontSize + 4)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, color: Colors.amber[700], size: sizes.playerFontSize + 2),
+              Text('JK', style: TextStyle(fontSize: sizes.playerFontSize - 2, fontWeight: FontWeight.bold, color: Colors.purple)),
+            ],
+          ),
         ),
       );
     }

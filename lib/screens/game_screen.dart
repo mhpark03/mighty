@@ -763,10 +763,17 @@ class _GameScreenState extends State<GameScreen> {
         cardWidget = Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.white,
+            gradient: const LinearGradient(colors: [Color(0xFF7B1FA2), Color(0xFFAB47BC)]),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: const Text('🃏', style: TextStyle(fontSize: 20)),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, color: Colors.yellowAccent, size: 18),
+              SizedBox(width: 4),
+              Text('JOKER', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
+            ],
+          ),
         );
       } else {
         friendText = l10n.cardOwner('${card.suitSymbol}${card.rankSymbol}');
@@ -3893,12 +3900,19 @@ class _GameScreenState extends State<GameScreen> {
 
     if (card.isJoker) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
         decoration: BoxDecoration(
-          color: Colors.purple[600],
+          gradient: const LinearGradient(colors: [Color(0xFF7B1FA2), Color(0xFFAB47BC)]),
           borderRadius: BorderRadius.circular(3),
         ),
-        child: const Text('🃏', style: TextStyle(fontSize: 11)),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.auto_awesome, color: Colors.yellowAccent, size: 10),
+            SizedBox(width: 2),
+            Text('JK', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+          ],
+        ),
       );
     }
 
@@ -3953,11 +3967,23 @@ class _GameScreenState extends State<GameScreen> {
         width: width,
         padding: const EdgeInsets.symmetric(vertical: 1),
         decoration: BoxDecoration(
-          color: dimmed ? Colors.grey[700] : Colors.purple[600],
+          gradient: dimmed
+              ? LinearGradient(colors: [Colors.grey[700]!, Colors.grey[600]!])
+              : const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF7B1FA2), Color(0xFFAB47BC)],
+                ),
           borderRadius: BorderRadius.circular(3),
         ),
-        child: const Center(
-          child: Text('🃏', style: TextStyle(fontSize: 10)),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, color: dimmed ? Colors.grey[400] : Colors.yellowAccent, size: width * 0.32),
+              Text('JK', style: TextStyle(fontSize: width * 0.22, fontWeight: FontWeight.bold, color: dimmed ? Colors.grey[400] : Colors.white)),
+            ],
+          ),
         ),
       );
     } else {

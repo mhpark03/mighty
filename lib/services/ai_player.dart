@@ -456,7 +456,7 @@ class AIPlayer {
       final keyCardCount = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) + (hasGirudaAce ? 1 : 0);
       final kittyBonus = keyCardCount >= 2 ? 2 : (keyCardCount >= 1 ? 1 : 0);
       // kittyBonus는 적정 계산에만 반영, 최대값에는 더하지 않음
-      // (estimatePointRange의 2.2 배수가 이미 낙관적 최대를 산출)
+      // (estimatePointRange의 2.0 배수가 이미 낙관적 최대를 산출)
       final optimal = (minPts * 0.3 + (maxPts + kittyBonus) * 0.7 + 1).round();
 
       if (optimal > bestOptimal) {
@@ -801,11 +801,9 @@ class AIPlayer {
       // A, K 없이 Q 최상위 기루다 (4장+ 부터 유효, 3장 Q는 너무 약함)
       if (!gA && !gK && gQ) {
         if (gc.length >= 5) {
-          maxTricks++; // Q가 최상위
-          maxTricks += 2; // 후반 기루다 지배
+          maxTricks += 2; // Q가 AK 이후 1트릭 + 장수 우위 1트릭
         } else if (gc.length >= 4) {
-          maxTricks++; // Q가 최상위
-          maxTricks++; // 일부 후반 지배
+          maxTricks++; // Q가 AK 이후 1트릭
         }
         // 3장 Q: A,K 둘 다 소진되기 어려움 → 보너스 없음
       }
@@ -876,7 +874,7 @@ class AIPlayer {
       minTricks -= 1;
     }
     // 프렌드 협력 보너스: 마이티/조커 둘 다 없을 때만 추가 기대 트릭
-    if (!hasMighty || !hasJoker) {
+    if (!hasMighty && !hasJoker) {
       maxTricks++;
     }
     // 마이티+조커 모두 보유 시 프렌드 카드 예측
@@ -974,11 +972,11 @@ class AIPlayer {
     }
 
     // 트릭당 평균 점수 카드: 약 2장 (20장 / 10트릭)
-    // 강한 핸드는 점수카드 밀집 트릭을 먹어 ppt 2.0~2.5 분포
+    // 트릭당 평균 점수카드 = 2.0, 최대 추정에 2.0 적용
     // 선공 확정 트릭이 많으면 고점수 트릭을 선택적으로 확보 → 1.8배
     final double minPpt = minTricks >= 5 ? 1.8 : 1.5;
     int minPoints = ((minTricks + minAdj) * minPpt).round().clamp(0, 20);
-    int maxPoints = ((maxTricks + maxAdj) * 2.2).round().clamp(0, 20);
+    int maxPoints = ((maxTricks + maxAdj) * 2.0).round().clamp(0, 20);
 
     // === 런 감지: 마이티+조커+기루다A+5장기루다 → 올런 가능 ===
     if (hasMighty && hasJoker && giruda != null && girudaLen >= 5) {
