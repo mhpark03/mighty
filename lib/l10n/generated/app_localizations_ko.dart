@@ -1733,6 +1733,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get kittyFinalHand => '최종 보유 카드 (10장)';
 
   @override
+  String get girudaComparisonTitle => '기루다 비교 (13장)';
+
+  @override
   String get discardReasonCutSuit => '적은 무늬 정리 → 컷 가능';
 
   @override

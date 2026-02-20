@@ -782,6 +782,7 @@
   "kittyReceivedCards": "キティから受け取ったカード",
   "kittyDiscardCards": "捨てるカード",
   "kittyFinalHand": "最終手札 (10枚)",
+  "girudaComparisonTitle": "切り札比較（13枚）",
   "discardReasonCutSuit": "少ないスート整理 → カット可能",
   "discardReasonNonGirudaLow": "非切り札の低いカード",
   "discardReasonLowValue": "低い価値のカード",

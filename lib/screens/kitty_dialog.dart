@@ -39,6 +39,9 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
   late bool _recommendedNoGiruda;
   bool _isFull = false;
 
+  // 기루다 비교 (각 무늬별 적정 점수)
+  final Map<Suit, (int, int, int)> _girudaComparison = {}; // suit -> (min, max, optimal)
+
   @override
   void initState() {
     super.initState();
@@ -79,6 +82,15 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
       widget.kitty,
       _recommendedGiruda,
     );
+
+    // 기루다 비교: 13장 기준 각 무늬별 점수
+    final allCards = [...widget.hand, ...widget.kitty];
+    _girudaComparison.clear();
+    for (final suit in Suit.values) {
+      final (min, max) = _aiPlayer.estimatePointRange(allCards, suit);
+      final optimal = (min * 0.3 + max * 0.7 + 1).round();
+      _girudaComparison[suit] = (min, max, optimal);
+    }
   }
 
   void _applyRecommendation() {
@@ -487,6 +499,19 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
   Widget _buildGirudaChip(Suit suit, String symbol, bool isRed) {
     final isSelected = _selectedGiruda == suit && !_noGiruda;
     final isOriginal = widget.currentGiruda == suit;
+    final comp = _girudaComparison[suit];
+    final optimal = comp != null ? comp.$3 : 0;
+
+    // 최적 무늬 찾기
+    int bestOptimal = 0;
+    Suit? bestSuit;
+    for (final entry in _girudaComparison.entries) {
+      if (entry.value.$3 > bestOptimal) {
+        bestOptimal = entry.value.$3;
+        bestSuit = entry.key;
+      }
+    }
+    final isBest = suit == bestSuit;
 
     return ChoiceChip(
       label: Row(
@@ -499,9 +524,24 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          if (comp != null) ...[
+            const SizedBox(width: 3),
+            Text(
+              '$optimal',
+              style: TextStyle(
+                fontSize: 11,
+                color: isBest ? Colors.amber[700] : Colors.grey[600],
+                fontWeight: isBest ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+          if (isBest && !isOriginal) ...[
+            const SizedBox(width: 2),
+            Icon(Icons.star, size: 12, color: Colors.amber[700]),
+          ],
           if (isOriginal) ...[
-            const SizedBox(width: 4),
-            const Icon(Icons.check_circle, size: 14, color: Colors.green),
+            const SizedBox(width: 2),
+            const Icon(Icons.check_circle, size: 12, color: Colors.green),
           ],
         ],
       ),

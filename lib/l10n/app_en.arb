@@ -783,6 +783,7 @@
   "kittyReceivedCards": "Cards from Kitty",
   "kittyDiscardCards": "Discarded Cards",
   "kittyFinalHand": "Final Hand (10 cards)",
+  "girudaComparisonTitle": "Giruda Comparison (13 cards)",
   "discardReasonCutSuit": "Clear short suit → enable cut",
   "discardReasonNonGirudaLow": "Non-trump low card",
   "discardReasonLowValue": "Low value card",

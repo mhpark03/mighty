@@ -522,6 +522,14 @@ class GameController extends ChangeNotifier {
       // 각 버릴 카드의 이유 생성
       final reasons = _generateDiscardReasons(discardCards, newGiruda, declarer);
 
+      // 기루다 변경 검토: 13장 기준 각 무늬별 점수 비교
+      final girudaComp = <(Suit?, int, int, int)>[];
+      for (final candidateSuit in [Suit.spade, Suit.diamond, Suit.heart, Suit.club]) {
+        final (cMin, cMax) = _aiPlayer.estimatePointRange(allCards, candidateSuit);
+        final cOptimal = (cMin * 0.3 + cMax * 0.7 + 1).round();
+        girudaComp.add((candidateSuit, cMin, cMax, cOptimal));
+      }
+
       _kittyExplanation = KittyExplanation(
         kittyCards: kittyCards,
         discardCards: discardCards,
@@ -530,6 +538,7 @@ class GameController extends ChangeNotifier {
         newGiruda: newGiruda,
         girudaChanged: girudaChanged,
         discardReasons: reasons,
+        girudaComparison: girudaComp,
       );
 
       // 요약 화면 표시 (selectKitty 호출 전)
@@ -1265,6 +1274,7 @@ class KittyExplanation {
   final Suit? newGiruda;                   // 변경된 기루다 (변경 없으면 동일)
   final bool girudaChanged;                // 기루다 변경 여부
   final List<String> discardReasons;       // 각 버릴 카드의 이유
+  final List<(Suit?, int, int, int)> girudaComparison; // (suit, min, max, optimal)
 
   KittyExplanation({
     required this.kittyCards,
@@ -1274,6 +1284,7 @@ class KittyExplanation {
     required this.newGiruda,
     required this.girudaChanged,
     required this.discardReasons,
+    this.girudaComparison = const [],
   });
 }
 

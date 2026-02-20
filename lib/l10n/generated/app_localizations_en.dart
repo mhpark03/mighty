@@ -1747,6 +1747,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kittyFinalHand => 'Final Hand (10 cards)';
 
   @override
+  String get girudaComparisonTitle => 'Giruda Comparison (13 cards)';
+
+  @override
   String get discardReasonCutSuit => 'Clear short suit → enable cut';
 
   @override

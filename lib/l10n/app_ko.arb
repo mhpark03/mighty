@@ -942,6 +942,7 @@
   "kittyReceivedCards": "바닥에서 받은 카드",
   "kittyDiscardCards": "버릴 카드",
   "kittyFinalHand": "최종 보유 카드 (10장)",
+  "girudaComparisonTitle": "기루다 비교 (13장)",
   "discardReasonCutSuit": "적은 무늬 정리 → 컷 가능",
   "discardReasonNonGirudaLow": "비기루다 낮은 카드",
   "discardReasonLowValue": "낮은 가치 카드",

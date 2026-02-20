@@ -1721,6 +1721,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get kittyFinalHand => '最终手牌 (10张)';
 
   @override
+  String get girudaComparisonTitle => '王牌比较（13张）';
+
+  @override
   String get discardReasonCutSuit => '整理少花色 → 可切牌';
 
   @override

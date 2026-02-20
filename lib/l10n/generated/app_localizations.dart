@@ -3156,6 +3156,12 @@ abstract class AppLocalizations {
   /// **'최종 보유 카드 (10장)'**
   String get kittyFinalHand;
 
+  /// No description provided for @girudaComparisonTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 비교 (13장)'**
+  String get girudaComparisonTitle;
+
   /// No description provided for @discardReasonCutSuit.
   ///
   /// In ko, this message translates to:

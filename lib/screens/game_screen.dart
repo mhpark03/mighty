@@ -1082,6 +1082,41 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ),
 
+            // 기루다 비교 섹션
+            if (explanation.girudaComparison.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.teal.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.teal.withValues(alpha: 0.5)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.compare_arrows, color: Colors.tealAccent, size: 18),
+                        const SizedBox(width: 6),
+                        Text(
+                          l10n.girudaComparisonTitle,
+                          style: const TextStyle(
+                            color: Colors.tealAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    _buildGirudaComparisonContent(explanation),
+                  ],
+                ),
+              ),
+            ],
+
             const SizedBox(height: 20),
             // 자동 진행 타이머
             const SizedBox(
@@ -1095,6 +1130,120 @@ class _GameScreenState extends State<GameScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildGirudaComparisonContent(KittyExplanation explanation) {
+    final comp = explanation.girudaComparison;
+    if (comp.isEmpty) return const SizedBox.shrink();
+
+    final currentSuit = explanation.newGiruda;
+    int bestOptimal = 0;
+    Suit? bestSuit;
+    for (final (suit, _, _, optimal) in comp) {
+      if (optimal > bestOptimal) {
+        bestOptimal = optimal;
+        bestSuit = suit;
+      }
+    }
+
+    int currentOptimal = 0;
+    for (final (suit, _, _, optimal) in comp) {
+      if (suit == currentSuit) {
+        currentOptimal = optimal;
+        break;
+      }
+    }
+
+    return Column(
+      children: [
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          alignment: WrapAlignment.center,
+          children: comp.map((entry) {
+            final (suit, min, max, optimal) = entry;
+            final isCurrent = suit == currentSuit;
+            final isBest = suit == bestSuit && bestSuit != currentSuit;
+            final suitSymbol = switch (suit) {
+              Suit.spade => '♠', Suit.heart => '♥',
+              Suit.diamond => '♦', Suit.club => '♣', _ => ''
+            };
+            final suitColor = _getSuitColorOnDark(suit!);
+
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: isCurrent
+                    ? Colors.teal[800]!.withValues(alpha: 0.5)
+                    : isBest
+                        ? Colors.amber[800]!.withValues(alpha: 0.3)
+                        : Colors.black26,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: isCurrent
+                      ? Colors.teal[400]!
+                      : isBest
+                          ? Colors.amber[400]!
+                          : Colors.white24,
+                  width: isCurrent || isBest ? 1.5 : 0.5,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(suitSymbol, style: TextStyle(color: suitColor, fontSize: 16, fontWeight: FontWeight.bold)),
+                      if (isCurrent)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 2),
+                          child: Icon(Icons.check_circle, color: Colors.teal[300], size: 12),
+                        ),
+                      if (isBest)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 2),
+                          child: Icon(Icons.star, color: Colors.amber[400], size: 12),
+                        ),
+                    ],
+                  ),
+                  Text('$min~$max', style: TextStyle(color: Colors.grey[400], fontSize: 10)),
+                  Text(
+                    '$optimal점',
+                    style: TextStyle(
+                      color: isCurrent ? Colors.teal[200] : isBest ? Colors.amber[200] : Colors.white70,
+                      fontSize: 13,
+                      fontWeight: isCurrent || isBest ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+        if (bestSuit != null && bestSuit != currentSuit && bestOptimal > currentOptimal) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: bestOptimal >= currentOptimal + 3
+                  ? Colors.amber[900]!.withValues(alpha: 0.5)
+                  : Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              bestOptimal >= currentOptimal + 3
+                  ? '${switch (bestSuit) { Suit.spade => '♠', Suit.heart => '♥', Suit.diamond => '♦', Suit.club => '♣', _ => '' }} +${bestOptimal - currentOptimal}점 (변경 시 패널티 +2)'
+                  : '${switch (bestSuit) { Suit.spade => '♠', Suit.heart => '♥', Suit.diamond => '♦', Suit.club => '♣', _ => '' }} +${bestOptimal - currentOptimal}점 (변경 패널티 감안 시 유지 적절)',
+              style: TextStyle(
+                color: bestOptimal >= currentOptimal + 3 ? Colors.amber[200] : Colors.grey[400],
+                fontSize: 11,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 

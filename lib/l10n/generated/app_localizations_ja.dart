@@ -1727,6 +1727,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get kittyFinalHand => '最終手札 (10枚)';
 
   @override
+  String get girudaComparisonTitle => '切り札比較（13枚）';
+
+  @override
   String get discardReasonCutSuit => '少ないスート整理 → カット可能';
 
   @override
