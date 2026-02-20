@@ -722,14 +722,21 @@ class AIPlayer {
     int minTricks = 0; // 프렌드 도움 없이 확실한 트릭
     int maxTricks = 0; // 프렌드 포함 최대 트릭
     double maxAdj = 0; // 불확실한 트릭의 소수점 보정
+    double minAdj = 0; // 조커 등 불확실 트릭의 소수점 보정
 
     // === 마이티: 확실한 1트릭 ===
     if (hasMighty) { minTricks++; maxTricks++; }
 
-    // === 조커: 거의 확실하지만 조커콜 위험 ===
+    // === 조커: 조커콜 위험 감안 ===
     if (hasJoker) {
-      maxTricks++; // 최대에 포함
-      // 최소에서는 조커콜 당할 수 있으므로 제외
+      maxTricks++;
+      // 마이티 보유 시 초구에 마이티로 보호 → 확실한 1트릭
+      // 미보유 시 조커콜 위험 (초간 후 조커콜, 프렌드 마이티가 조커콜) → 0.7트릭
+      if (hasMighty) {
+        minTricks++;
+      } else {
+        minAdj += 0.7;
+      }
     }
 
     // === 기루다 분석 ===
@@ -746,16 +753,33 @@ class AIPlayer {
       // A 다음 K: A 이후 선 유지로 K도 확보
       if (gA && gK) { minTricks++; maxTricks++; }
       // A-K-Q 연속: Q까지 확보 가능
-      if (gA && gK && gQ) { maxTricks++; }
+      if (gA && gK && gQ) {
+        maxTricks++;
+        // AKQJ / AKQJ10 연속 콤보 보너스
+        bool gJ = gc.any((c) => c.rank == Rank.jack);
+        if (gJ) {
+          bool g10 = gc.any((c) => c.rank == Rank.ten);
+          if (g10) { minTricks += 2; } else { minTricks++; }
+        }
+      }
       // A+Q (K 없이): A 이후 Q가 차상위 → 최대에 포함
       if (gA && gQ && !gK) { maxTricks++; }
       // K만 있고 A 없으면: A 소진 후 K 승리 가능
       if (gK && !gA) {
         maxTricks++;
-        if (gc.length >= 3) minTricks++; // 3장+ K: A가 일찍 나가므로 K 거의 확실
+        // 마이티/조커 보유 시 2장이상, 미보유 시 3장이상에서 확정 트릭
+        if ((hasMighty || hasJoker) ? gc.length >= 2 : gc.length >= 3) minTricks++;
       }
       // K+Q 연속 (A 없이): A 소진 후 K→Q 연속 승리
       if (gK && gQ && !gA) { maxTricks++; }
+      // KQJ / KQJ10 연속 콤보 보너스
+      if (gK && gQ && !gA) {
+        bool gJ = gc.any((c) => c.rank == Rank.jack);
+        if (gJ) {
+          bool g10 = gc.any((c) => c.rank == Rank.ten);
+          if (g10) { minTricks += 2; } else { minTricks++; }
+        }
+      }
 
       // 기루다 장수가 많으면 후반 지배 (최대)
       // 5장+A: 상대 기루다 소진 후 남은 기루다가 전부 승리
@@ -945,6 +969,7 @@ class AIPlayer {
 
       if (initTricks > minTricks) {
         minTricks = initTricks;
+        minAdj = 0; // 선공 확정 트릭이 더 크면 조커 보정 불필요
       }
     }
 
@@ -952,7 +977,7 @@ class AIPlayer {
     // 강한 핸드는 점수카드 밀집 트릭을 먹어 ppt 2.0~2.5 분포
     // 선공 확정 트릭이 많으면 고점수 트릭을 선택적으로 확보 → 1.8배
     final double minPpt = minTricks >= 5 ? 1.8 : 1.5;
-    int minPoints = (minTricks * minPpt).round().clamp(0, 20);
+    int minPoints = ((minTricks + minAdj) * minPpt).round().clamp(0, 20);
     int maxPoints = ((maxTricks + maxAdj) * 2.2).round().clamp(0, 20);
 
     // === 런 감지: 마이티+조커+기루다A+5장기루다 → 올런 가능 ===
@@ -992,8 +1017,23 @@ class AIPlayer {
           hasFirstTrickCard = true;
           break;
         }
+        // 마이티 무늬의 K는 A가 마이티로 빠져 최상위 카드 → 초구 가능
+        if (suit == mightySuit && sc.any((c) => c.rank == Rank.king)) {
+          hasFirstTrickCard = true;
+          break;
+        }
       }
       if (!hasFirstTrickCard) {
+        minPoints = (minPoints - 2).clamp(0, 20);
+        maxPoints = (maxPoints - 2).clamp(0, 20);
+      }
+    }
+
+    // 마이티/조커/기루다A 모두 없음 → 핵심 카드 부재 추가 -2점
+    if (!hasMighty && !hasJoker) {
+      bool hasGirudaAce = giruda != null &&
+          hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+      if (!hasGirudaAce) {
         minPoints = (minPoints - 2).clamp(0, 20);
         maxPoints = (maxPoints - 2).clamp(0, 20);
       }
@@ -1002,6 +1042,87 @@ class AIPlayer {
     if (minPoints > maxPoints) minPoints = maxPoints;
 
     return (minPoints, maxPoints);
+  }
+
+  /// 예상 점수 계산 근거를 간략 텍스트로 반환
+  String getPointBreakdownText(List<PlayingCard> hand, Suit? giruda) {
+    if (giruda == null) return '';
+    const suitSymbols = {Suit.spade: '♠', Suit.heart: '♥', Suit.diamond: '♦', Suit.club: '♣'};
+    final mightySuit = (giruda == Suit.spade) ? Suit.diamond : Suit.spade;
+    final hasMighty = hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace);
+    final hasJoker = hand.any((c) => c.isJoker);
+    final gc = hand.where((c) => !c.isJoker && c.suit == giruda).toList();
+    final girudaLen = gc.length;
+
+    final parts = <String>[];
+
+    // 기루다 트릭 계산
+    bool gA = gc.any((c) => c.rank == Rank.ace);
+    bool gK = gc.any((c) => c.rank == Rank.king);
+    bool gQ = gc.any((c) => c.rank == Rank.queen);
+    int gMin = 0, gMax = 0;
+    if (gA) { gMin++; gMax++; }
+    if (gA && gK) { gMin++; gMax++; }
+    if (gA && gK && gQ) {
+      gMax++;
+      bool gJa = gc.any((c) => c.rank == Rank.jack);
+      if (gJa) {
+        bool g10a = gc.any((c) => c.rank == Rank.ten);
+        if (g10a) { gMin += 2; } else { gMin++; }
+      }
+    }
+    if (gA && gQ && !gK) { gMax++; }
+    if (gK && !gA) { gMax++; if ((hasMighty || hasJoker) ? girudaLen >= 2 : girudaLen >= 3) gMin++; }
+    if (gK && gQ && !gA) {
+      gMax++;
+      bool gJ = gc.any((c) => c.rank == Rank.jack);
+      if (gJ) {
+        bool g10 = gc.any((c) => c.rank == Rank.ten);
+        if (g10) { gMin += 2; } else { gMin++; }
+      }
+    }
+    if (girudaLen >= 5 && gA) { gMax += 2; } else if (girudaLen >= 4 && gA) { gMax++; }
+    if (girudaLen >= 6 && gA) { gMax++; }
+    if (!gA && gK) {
+      if (girudaLen >= 5) { gMin++; gMax += 2; } else if (girudaLen >= 4) { gMax++; }
+      if (girudaLen >= 6) { gMax++; }
+    }
+    if (!gA && !gK && gQ) {
+      if (girudaLen >= 5) { gMax += 3; } else if (girudaLen >= 4) { gMax += 2; }
+    }
+    final topCards = <String>[];
+    if (gA) topCards.add('A');
+    if (gK) topCards.add('K');
+    if (gQ) topCards.add('Q');
+    final topStr = topCards.isNotEmpty ? topCards.join('') : '하위';
+    parts.add('${suitSymbols[giruda]}$topStr(${girudaLen}장) ${gMin}~${gMax}트릭');
+
+    // 마이티/조커
+    if (hasMighty && hasJoker) {
+      parts.add('마이티+조커 2트릭');
+    } else if (hasMighty) {
+      parts.add('마이티 1트릭');
+    } else if (hasJoker) {
+      parts.add('조커 0.7트릭');
+    }
+
+    // 비기루다 에이스
+    for (final suit in Suit.values) {
+      if (suit == giruda) continue;
+      if (hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace &&
+          !(c.suit == mightySuit && c.rank == Rank.ace))) {
+        parts.add('${suitSymbols[suit]}A 1트릭');
+      }
+    }
+
+    // 프렌드 예상
+    if (!hasMighty) {
+      parts.add('프렌드(${suitSymbols[mightySuit]}A) 1트릭');
+    } else if (!hasJoker) {
+      parts.add('프렌드(조커) 1트릭');
+    }
+
+    return parts.join(' | ');
   }
 
   // Public method for debugging

@@ -1671,24 +1671,19 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 3),
-          Text(
-            _getPassReason(explanation, state, l10n),
-            style: const TextStyle(color: Colors.white70, fontSize: 11),
-          ),
           if (explanation.suit != null) ...[
-            const SizedBox(height: 2),
+            const SizedBox(height: 3),
+            if (explanation.scoreBreakdown.isNotEmpty) ...[
+              Text(
+                explanation.scoreBreakdown,
+                style: const TextStyle(color: Colors.white38, fontSize: 9),
+              ),
+              const SizedBox(height: 2),
+            ],
             _buildSuitColoredText(
               '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.estimatedRange(explanation.minPoints, explanation.maxPoints)} (${l10n.optimalScore(explanation.optimalPoints)})',
               const TextStyle(color: Colors.white54, fontSize: 10),
             ),
-            if (keyCardInfo != null) ...[
-              const SizedBox(height: 1),
-              _buildSuitColoredText(
-                keyCardInfo,
-                const TextStyle(color: Colors.white54, fontSize: 10),
-              ),
-            ],
             if (adjustedWidget != null) ...[
               const SizedBox(height: 3),
               adjustedWidget,
@@ -1712,17 +1707,17 @@ class _GameScreenState extends State<GameScreen> {
             ],
           ),
           const SizedBox(height: 3),
+          if (explanation.scoreBreakdown.isNotEmpty) ...[
+            Text(
+              explanation.scoreBreakdown,
+              style: const TextStyle(color: Colors.white38, fontSize: 9),
+            ),
+            const SizedBox(height: 2),
+          ],
           _buildSuitColoredText(
             '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.estimatedRange(explanation.minPoints, explanation.maxPoints)} (${l10n.optimalScore(explanation.optimalPoints)})',
             const TextStyle(color: Colors.white70, fontSize: 11),
           ),
-          if (keyCardInfo != null) ...[
-            const SizedBox(height: 1),
-            _buildSuitColoredText(
-              keyCardInfo,
-              const TextStyle(color: Colors.white70, fontSize: 10),
-            ),
-          ],
           if (explanation.friendType != null) ...[
             const SizedBox(height: 3),
             Row(

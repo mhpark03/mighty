@@ -333,6 +333,7 @@ class GameController extends ChangeNotifier {
         friendType: friendType,
         friendSuit: friendSuit,
         friendHolderName: friendHolderName,
+        scoreBreakdown: _aiPlayer.getPointBreakdownText(currentPlayer.hand, effectiveSuit),
       );
 
       _state.placeBid(bid);
@@ -1290,6 +1291,7 @@ class BidExplanation {
   final String? friendType; // 'MIGHTY', 'JOKER', 'ACE' (배팅 시 예상 프렌드)
   final Suit? friendSuit;  // 프렌드 카드 무늬 (ACE일 때)
   final String? friendHolderName; // 프렌드 카드 보유자 (null이면 키티)
+  final String scoreBreakdown;
 
   BidExplanation({
     required this.playerId,
@@ -1305,5 +1307,6 @@ class BidExplanation {
     this.friendType,
     this.friendSuit,
     this.friendHolderName,
+    this.scoreBreakdown = '',
   });
 }
