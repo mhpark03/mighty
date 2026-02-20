@@ -433,46 +433,81 @@ class AppLocalizationsJa extends AppLocalizations {
   String get gameGuide => '遊び方';
 
   @override
-  String get guideOverview => 'ゲーム概要';
+  String get guideIntro => '1. ゲーム紹介';
 
   @override
-  String get guideOverviewText =>
-      'マイティは5人で遊ぶトリックテイキングカードゲームです。宣言者(1人)とフレンド(1人)がチームを組み、守備チーム(3人)と対戦します。';
+  String get guideIntroText =>
+      'マイティは5人で遊ぶトリックテイキングカードゲームです。\nジョーカーを含む53枚のカードを使い、各プレイヤーに10枚ずつ配り、3枚はキティ(場札)として残します。\n\n宣言者(1人)とフレンド(1人)が攻撃チーム、残り3人が守備チームとなります。宣言者チームが公約以上の点数を獲得すれば勝利です。';
 
   @override
-  String get guideBidding => 'ビッディング';
+  String get guideGameFlow => '2. ゲーム進行順序';
+
+  @override
+  String get guideGameFlowText =>
+      '① カード配布 → ② ビッディング → ③ キティ交換 → ④ フレンド宣言 → ⑤ カードプレイ → ⑥ 点数計算\n\n各段階は順番に進行します。全プレイヤーがパスした場合、カードを再配布します。';
+
+  @override
+  String get guideBidding => '3. ビッディング';
 
   @override
   String get guideBiddingText =>
-      '• 各プレイヤーは獲得する得点カードの数を宣言します\n• 最高ビッドのプレイヤーが宣言者になります\n• 宣言者は切り札を決めます';
+      '獲得できる得点カードの数を宣言します。\n\n• 最低公約: 13点（得点カード全20枚中）\n• 切り札のスートも一緒に宣言\n• ノートランプ: 切り札なしで宣言（同じ数字の切り札宣言より優先）\n• 最も高い公約をしたプレイヤーが宣言者になります\n\n💡 マイティ、ジョーカー、切り札Aがあれば高い公約が可能です。';
 
   @override
-  String get guideSpecialCards => '特殊カード';
+  String get guideKitty => '4. キティ交換';
 
   @override
-  String get guideSpecialCardsText =>
-      '• マイティ: スペードのA (最強のカード)\n• ジョーカー: 2番目に強いカード\n• 切り札: 宣言者が選んだスート';
+  String get guideKittyText =>
+      '宣言者はキティの3枚を取り、13枚から3枚を捨てます。\n\n• 弱いカードを捨てて手札を強化します\n• 切り札を変更できます（公約+2追加）\n• 得点カードを捨てることもできますが、守備チームに有利になる可能性があります';
 
   @override
-  String get guideFriend => 'フレンド';
+  String get guideFriend => '5. フレンド宣言';
 
   @override
   String get guideFriendText =>
-      '• 宣言者は特定のカードを持つ人をフレンドに指定します\n• フレンドは正体を隠すことができます\n• ジョーカーコール: 特定の3を持つ人をフレンドに指定';
+      '宣言者がチームメイト（フレンド）を指定します。\n\n• カードフレンド: 特定カードの所有者（例: ♠Aを持つ人）\n• 初手フレンド: 最初のトリックに勝つ人\n• ノーフレンド: 一人で（点数×2）\n\nフレンドは該当カードを出すまで正体が明かされません。守備チームは誰がフレンドか推理する必要があります。';
 
   @override
-  String get guideScoring => 'スコア計算';
+  String get guideSpecialCards => '6. 特殊カード';
+
+  @override
+  String get guideSpecialCardsText =>
+      '♠A マイティ (Mighty)\n最強のカードです。どのカードにも勝ちます。\nただし、ジョーカーコール時は必ず出さなければならず、切り札が♠の場合は♦Aがマイティです。\n\n🃏 ジョーカー (Joker)\nマイティの次に強いカードです。\nリード時にスートを指定でき、初手では効力がありません。\nジョーカーコールされたら必ずジョーカーを出さなければなりません。\n\n切り札\n宣言者が決めたスートのカードです。\n非切り札のスートで切り札を出すと「カット」でトリックに勝ちます。';
+
+  @override
+  String get guideJokerCall => '7. ジョーカーコール';
+
+  @override
+  String get guideJokerCallText =>
+      'リードプレイヤーが特定スートのカードを出しながら「ジョーカーコール」を宣言すると、ジョーカーを持つプレイヤーは必ずジョーカーを出さなければなりません。\n\n• 初手ではジョーカーコール不可\n• ジョーカーコール時、ジョーカーは最も弱いカードになります\n• 守備チームが相手のジョーカーを無力化する核心戦略です';
+
+  @override
+  String get guideTrickPlay => '8. トリックプレイ';
+
+  @override
+  String get guideTrickPlayText =>
+      '10回のトリック（ラウンド）を行います。\n\n• リードプレイヤーがカード1枚を出します\n• 他のプレイヤーは同じスートのカードを出さなければなりません（フォロー）\n• そのスートがなければ任意のカードを出せます\n• 最も強いカードを出したプレイヤーがトリックに勝ち、次のリードになります\n\nカードの強さ順序:\nマイティ > ジョーカー > 切り札(A~2) > リードスート(A~2)';
+
+  @override
+  String get guideScoring => '9. 得点カード';
 
   @override
   String get guideScoringText =>
-      '• 得点カード: A, K, Q, J, 10 (各1点、合計20点)\n• 宣言者チームが目標点数以上で勝利\n• 勝者は+点、敗者は-点';
+      '得点カード: A, K, Q, J, 10（各スート5枚×4スート＝20枚）\n各得点カードは1点で、トリックに勝ったプレイヤーが獲得します。\n\n例: トリックに♠A、♠K、♥3、♦7、♣2が出た場合\n→ 得点カード2枚（♠A、♠K）＝ 2点をトリック勝者が獲得';
 
   @override
-  String get guideTips => 'ゲームのコツ';
+  String get guideWinLose => '10. 勝敗と得点計算';
+
+  @override
+  String get guideWinLoseText =>
+      '宣言者チームが公約以上の点数を獲得すれば勝利です。\n\n勝利時の基本点数:\n• （獲得点数 - 公約）+ 1 + 追加ボーナス\n• ラン（10トリック全勝利）: ボーナス点数\n• ノーフレンド: 点数×2\n• ノートランプ: 点数×2\n\n敗北時:\n• 宣言者は（守備チーム人数×基本点数）分減点\n• バックラン（守備全勝）: 追加減点';
+
+  @override
+  String get guideTips => '11. 戦略のコツ';
 
   @override
   String get guideTipsText =>
-      '• マイティとジョーカーは常に強力です\n• 切り札を上手く使いましょう\n• フレンドの正体を見抜くことが重要です';
+      '宣言者の戦略:\n• マイティ/ジョーカー/切り札Aがあれば積極的にビッディングしましょう\n• 序盤に切り札を消耗させて相手のカットを防ぎましょう\n• フレンドと協力して得点カードを集めましょう\n\n守備の戦略:\n• フレンドの正体を早く見抜きましょう\n• ジョーカーコールで相手のジョーカーを無力化しましょう\n• 得点カードを宣言者チームに渡さないよう注意しましょう\n• 切り札カットで相手の非切り札Aを捕まえましょう';
 
   @override
   String get close => '閉じる';

@@ -434,46 +434,81 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameGuide => 'How to Play';
 
   @override
-  String get guideOverview => 'Overview';
+  String get guideIntro => '1. Introduction';
 
   @override
-  String get guideOverviewText =>
-      'Mighty is a trick-taking card game for 5 players. The Declarer (1) and Friend (1) team up against the Defenders (3).';
+  String get guideIntroText =>
+      'Mighty is a trick-taking card game for 5 players.\nIt uses 53 cards including a Joker. Each player gets 10 cards, and 3 cards remain as the kitty.\n\nThe Declarer (1) and Friend (1) form the attack team, while the remaining 3 are the defense team. The Declarer\'s team wins by scoring at least their bid.';
 
   @override
-  String get guideBidding => 'Bidding';
+  String get guideGameFlow => '2. Game Flow';
+
+  @override
+  String get guideGameFlowText =>
+      '① Deal Cards → ② Bidding → ③ Kitty Exchange → ④ Friend Declaration → ⑤ Card Play → ⑥ Scoring\n\nEach phase proceeds in order. If all players pass, cards are redealt.';
+
+  @override
+  String get guideBidding => '3. Bidding';
 
   @override
   String get guideBiddingText =>
-      '• Each player declares how many point cards they will win\n• The highest bidder becomes the Declarer\n• The Declarer chooses the trump suit (Giruda)';
+      'Declare how many point cards you can win.\n\n• Minimum bid: 13 points (out of 20 total point cards)\n• Declare the trump suit (Giruda) along with your bid\n• No Trump: Bid without a trump suit (takes priority over same-number trump bids)\n• The highest bidder becomes the Declarer\n\n💡 Having Mighty, Joker, or Ace of trump enables higher bids.';
 
   @override
-  String get guideSpecialCards => 'Special Cards';
+  String get guideKitty => '4. Kitty Exchange';
 
   @override
-  String get guideSpecialCardsText =>
-      '• Mighty: Ace of Spades (strongest card)\n• Joker: Second strongest card\n• Trump: The suit chosen by the Declarer';
+  String get guideKittyText =>
+      'The Declarer takes the 3 kitty cards and discards 3 from their 13 cards.\n\n• Discard weak cards to strengthen your hand\n• You can change the trump suit (+2 added to bid)\n• You can discard point cards, but it may benefit the defense';
 
   @override
-  String get guideFriend => 'Friend';
+  String get guideFriend => '5. Friend Declaration';
 
   @override
   String get guideFriendText =>
-      '• The Declarer designates someone with a specific card as Friend\n• The Friend can hide their identity\n• Joker Call: Designate the holder of a specific 3 as Friend';
+      'The Declarer designates their teammate (Friend).\n\n• Card Friend: Owner of a specific card (e.g., holder of ♠A)\n• First Trick Friend: Winner of the first trick\n• No Friend: Play alone (score ×2)\n\nThe Friend\'s identity is hidden until they play the designated card. The defense must deduce who the Friend is.';
 
   @override
-  String get guideScoring => 'Scoring';
+  String get guideSpecialCards => '6. Special Cards';
+
+  @override
+  String get guideSpecialCardsText =>
+      '♠A Mighty\nThe strongest card. No other card can beat it.\nMust be played when Joker Call is declared. If trump is ♠, then ♦A is Mighty.\n\n🃏 Joker\nThe second strongest card.\nWhen leading, you can designate any suit. Has no power in the first trick.\nMust be played when targeted by Joker Call.\n\nTrump (Giruda)\nCards of the suit chosen by the Declarer.\nPlaying a trump on a non-trump lead \"cuts\" to win the trick.';
+
+  @override
+  String get guideJokerCall => '7. Joker Call';
+
+  @override
+  String get guideJokerCallText =>
+      'When the lead player plays a card and declares \"Joker Call\", the Joker holder must play the Joker.\n\n• Cannot Joker Call on the first trick\n• Joker becomes the weakest card when called\n• A key strategy for the defense to neutralize the opponent\'s Joker';
+
+  @override
+  String get guideTrickPlay => '8. Trick Play';
+
+  @override
+  String get guideTrickPlayText =>
+      'Play 10 tricks (rounds).\n\n• The lead player plays one card\n• Other players must follow suit (play the same suit)\n• If you don\'t have that suit, you can play any card\n• The player with the strongest card wins the trick and leads next\n\nCard strength order:\nMighty > Joker > Trump (A~2) > Lead suit (A~2)';
+
+  @override
+  String get guideScoring => '9. Point Cards';
 
   @override
   String get guideScoringText =>
-      '• Point cards: A, K, Q, J, 10 (1 point each, 20 total)\n• Declarer team wins if they reach the target score\n• Winners get + points, losers get - points';
+      'Point cards: A, K, Q, J, 10 (5 per suit × 4 suits = 20 cards)\nEach point card is worth 1 point, collected by the trick winner.\n\nExample: If ♠A, ♠K, ♥3, ♦7, ♣2 are played in a trick\n→ 2 point cards (♠A, ♠K) = 2 points for the trick winner';
 
   @override
-  String get guideTips => 'Tips';
+  String get guideWinLose => '10. Win/Loss & Scoring';
+
+  @override
+  String get guideWinLoseText =>
+      'The Declarer\'s team wins by scoring at least their bid.\n\nBase score on win:\n• (Points scored - Bid) + 1 + bonuses\n• Run (winning all 10 tricks): Bonus points\n• No Friend: Score ×2\n• No Trump: Score ×2\n\nOn loss:\n• Declarer loses (Defenders × base score) points\n• Back Run (defense wins all): Extra penalty';
+
+  @override
+  String get guideTips => '11. Strategy Tips';
 
   @override
   String get guideTipsText =>
-      '• Mighty and Joker are always powerful\n• Use trump cards wisely\n• Identifying the Friend is crucial';
+      'Declarer strategy:\n• Bid aggressively with Mighty/Joker/Trump Ace\n• Exhaust opponents\' trumps early to prevent cuts\n• Cooperate with Friend to collect point cards\n\nDefense strategy:\n• Identify the Friend quickly\n• Use Joker Call to neutralize the opponent\'s Joker\n• Prevent the Declarer team from collecting point cards\n• Use trump cuts to capture opponent\'s non-trump Aces';
 
   @override
   String get close => 'Close';
