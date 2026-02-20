@@ -4613,6 +4613,13 @@ class AIPlayer {
           //   - 기루다 최상위: 마이티/조커만 가능
           //   - 비기루다 리드 무늬 최상위 + 상대 기루다 소진: 마이티/조커만 가능
           bool declarerWinSecure = false;
+          // ★ 주공의 조커가 이기고 있고 마이티가 공격팀(내 손)에 있으면 안전
+          // 조커를 이길 수 있는 유일한 카드(마이티)가 같은 팀 수중 → 상대가 뒤집을 수 없음
+          if (attackTeamWinning && currentWinningCard != null &&
+              currentWinningCard.isJoker &&
+              player.hand.any((c) => c.isMightyWith(state.giruda))) {
+            declarerWinSecure = true;
+          }
           if (attackTeamWinning && currentWinningCard != null &&
               !currentWinningCard.isJoker &&
               !currentWinningCard.isMightyWith(state.giruda)) {
