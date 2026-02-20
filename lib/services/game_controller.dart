@@ -122,6 +122,7 @@ class GameController extends ChangeNotifier {
   bool get waitingForTrickConfirm => _waitingForTrickConfirm;
   Trick? get lastCompletedTrick => _lastCompletedTrick;
 
+  List<BidEvaluationSnapshot> get bidSnapshots => _bidSnapshots;
   Player get humanPlayer => _state.players[0];
   Player get currentPlayer => _state.players[_state.currentPlayer];
   bool get isHumanTurn =>
@@ -195,6 +196,7 @@ class GameController extends ChangeNotifier {
         predictedOptimal: evaluation.optimalPoints,
         bidAction: bid.passed ? 'PASS' : 'BID',
         bidAmount: bid.tricks,
+        suitComparison: evaluation.suitComparison,
       ));
 
       var effectiveSuit = evaluation.bestGiruda;
@@ -380,6 +382,7 @@ class GameController extends ChangeNotifier {
         predictedOptimal: evaluation.optimalPoints,
         bidAction: bid.passed ? 'PASS' : 'BID',
         bidAmount: bid.tricks,
+        suitComparison: evaluation.suitComparison,
       ));
 
       _state.placeBid(bid);
@@ -499,10 +502,20 @@ class GameController extends ChangeNotifier {
       return b.rankValue.compareTo(a.rankValue);
     });
 
-    // Tracking: kitty snapshot + mark declarer in bid snapshots
+    // 기루다별 예상 점수: 선택 기루다는 실제 finalHand, 나머지는 시뮬레이션
+    final girudaComp = <(Suit?, int, int, int)>[];
+    for (final candidateSuit in [Suit.spade, Suit.diamond, Suit.heart, Suit.club]) {
+      final hand10 = (candidateSuit == newGiruda)
+          ? finalHand
+          : _aiPlayer.simulateBest10Cards(allCards, candidateSuit);
+      final (cMin, cMax) = _aiPlayer.estimatePointRange(hand10, candidateSuit);
+      final cOptimal = (cMin * 0.3 + cMax * 0.7 + 1).round().clamp(cMin, cMax);
+      girudaComp.add((candidateSuit, cMin, cMax, cOptimal));
+    }
+
+    // Tracking: kitty snapshot (선택 기루다 점수는 기루다 비교에서 추출)
     final kittyPointCards = kittyCards.where((c) => c.isPointCard).length;
-    final (postMin, postMax) = _aiPlayer.estimatePointRange(finalHand, newGiruda);
-    final postOptimal = (postMin * 0.3 + postMax * 0.7 + 1).round();
+    final postEntry = girudaComp.firstWhere((e) => e.$1 == newGiruda);
     _kittySnapshot = KittySnapshot(
       kittyCards: kittyCards.map((c) => c.toJson()).toList(),
       kittyPointCards: kittyPointCards,
@@ -511,9 +524,9 @@ class GameController extends ChangeNotifier {
       girudaChanged: girudaChanged,
       originalGiruda: originalGiruda?.name,
       newGiruda: newGiruda?.name,
-      postKittyMin: postMin,
-      postKittyMax: postMax,
-      postKittyOptimal: postOptimal,
+      postKittyMin: postEntry.$2,
+      postKittyMax: postEntry.$3,
+      postKittyOptimal: postEntry.$4,
     );
     for (var snap in _bidSnapshots) {
       if (snap.playerId == _state.declarerId) snap.isDeclarer = true;
@@ -522,15 +535,6 @@ class GameController extends ChangeNotifier {
     if (_isAutoPlayMode) {
       // 각 버릴 카드의 이유 생성
       final reasons = _generateDiscardReasons(discardCards, newGiruda, declarer);
-
-      // 기루다 변경 검토: 13장에서 후보별 최적 10장 시뮬레이션 후 평가
-      final girudaComp = <(Suit?, int, int, int)>[];
-      for (final candidateSuit in [Suit.spade, Suit.diamond, Suit.heart, Suit.club]) {
-        final simHand = _aiPlayer.simulateBest10Cards(allCards, candidateSuit);
-        final (cMin, cMax) = _aiPlayer.estimatePointRange(simHand, candidateSuit);
-        final cOptimal = (cMin * 0.3 + cMax * 0.7 + 1).round().clamp(cMin, cMax);
-        girudaComp.add((candidateSuit, cMin, cMax, cOptimal));
-      }
 
       _kittyExplanation = KittyExplanation(
         kittyCards: kittyCards,

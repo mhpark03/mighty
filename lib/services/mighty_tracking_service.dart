@@ -20,6 +20,7 @@ class BidEvaluationSnapshot {
   final String bidAction;
   final int bidAmount;
   bool isDeclarer;
+  final List<(Suit, int, int, int)> suitComparison; // (suit, min, max, optimal)
 
   BidEvaluationSnapshot({
     required this.playerId,
@@ -36,6 +37,7 @@ class BidEvaluationSnapshot {
     required this.bidAction,
     required this.bidAmount,
     this.isDeclarer = false,
+    this.suitComparison = const [],
   });
 
   Map<String, dynamic> toJson() => {

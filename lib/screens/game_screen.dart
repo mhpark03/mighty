@@ -713,6 +713,12 @@ class _GameScreenState extends State<GameScreen> {
                 ],
               ),
             ),
+            SizedBox(height: 8 * s),
+
+            // 무늬별 예상 점수 비교
+            if (controller.bidSnapshots.isNotEmpty)
+              _buildBidSummarySuitComparison(controller, l10n, s),
+
             SizedBox(height: compact ? 10 : 20),
 
             // 게임 시작 버튼
@@ -1984,6 +1990,152 @@ class _GameScreenState extends State<GameScreen> {
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _buildBidSummarySuitComparison(GameController controller, AppLocalizations l10n, double s) {
+    final state = controller.state;
+    final snapshots = controller.bidSnapshots;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(10 * s),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.estimatedScore,
+            style: TextStyle(fontSize: 13 * s, fontWeight: FontWeight.bold, color: Colors.white70),
+          ),
+          SizedBox(height: 6 * s),
+          for (int i = 0; i < state.players.length; i++)
+            _buildBidSummaryPlayerRow(state.players[i], state, snapshots, l10n, s),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBidSummaryPlayerRow(Player player, GameState state, List<BidEvaluationSnapshot> snapshots, AppLocalizations l10n, double s) {
+    final snap = snapshots.where((s) => s.playerId == player.id).lastOrNull;
+    final isDeclarer = player.id == state.declarerId;
+
+    Suit? bestSuit;
+    int bestOptimal = 0;
+    if (snap != null && snap.suitComparison.isNotEmpty) {
+      for (final (suit, _, _, optimal) in snap.suitComparison) {
+        if (optimal > bestOptimal) {
+          bestOptimal = optimal;
+          bestSuit = suit;
+        }
+      }
+    }
+    final selectedSuit = snap?.bestGiruda != null
+        ? Suit.values.firstWhere((st) => st.name == snap!.bestGiruda)
+        : null;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 4 * s),
+      padding: EdgeInsets.symmetric(horizontal: 8 * s, vertical: 5 * s),
+      decoration: BoxDecoration(
+        color: isDeclarer ? Colors.teal[900] : Colors.black26,
+        borderRadius: BorderRadius.circular(6),
+        border: isDeclarer ? Border.all(color: Colors.teal, width: 1) : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: 60 * s,
+                child: Text(
+                  _getLocalizedPlayerName(player, l10n),
+                  style: TextStyle(
+                    color: isDeclarer ? Colors.amber : Colors.white,
+                    fontWeight: isDeclarer ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 12 * s,
+                  ),
+                ),
+              ),
+              if (snap != null) ...[
+                Text(
+                  '${snap.predictedMin}~${snap.predictedMax}',
+                  style: TextStyle(color: Colors.grey[400], fontSize: 11 * s),
+                ),
+                SizedBox(width: 6 * s),
+                Text(
+                  '${l10n.optimal}: ${snap.predictedOptimal}',
+                  style: TextStyle(color: Colors.greenAccent, fontSize: 11 * s),
+                ),
+              ],
+              const Spacer(),
+              if (isDeclarer)
+                Icon(Icons.star, color: Colors.amber, size: 14 * s),
+            ],
+          ),
+          if (snap != null && snap.suitComparison.isNotEmpty) ...[
+            SizedBox(height: 4 * s),
+            Wrap(
+              spacing: 4 * s,
+              runSpacing: 2 * s,
+              children: snap.suitComparison.map((entry) {
+                final (suit, min, max, optimal) = entry;
+                final isSelected = suit == selectedSuit;
+                final isBest = suit == bestSuit && bestSuit != selectedSuit;
+                final suitColor = _getSuitColorOnDark(suit);
+
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5 * s, vertical: 2 * s),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Colors.teal[800]!.withValues(alpha: 0.5)
+                        : isBest
+                            ? Colors.amber[800]!.withValues(alpha: 0.3)
+                            : Colors.black26,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: isSelected
+                          ? Colors.teal[400]!
+                          : isBest
+                              ? Colors.amber[400]!
+                              : Colors.white12,
+                      width: isSelected || isBest ? 1.5 : 0.5,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getSuitSymbol(suit),
+                        style: TextStyle(color: suitColor, fontSize: 11 * s, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(width: 2 * s),
+                      Text(
+                        '$min~$max',
+                        style: TextStyle(color: Colors.grey[500], fontSize: 9 * s),
+                      ),
+                      SizedBox(width: 2 * s),
+                      Text(
+                        '$optimal',
+                        style: TextStyle(
+                          color: isSelected ? Colors.teal[200] : isBest ? Colors.amber[200] : Colors.white54,
+                          fontSize: 10 * s,
+                          fontWeight: isSelected || isBest ? FontWeight.bold : FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
