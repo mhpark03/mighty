@@ -1984,6 +1984,34 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String strategyTrumpExhaustCheckK(String cards) {
+    return '$cards 선출 → 기루다 최상위 공격, K 소진 확인';
+  }
+
+  @override
+  String get strategyJokerAfterFriend => '프렌드 합류 후 조커 선출 → 점수 획득';
+
+  @override
+  String strategyJokerCallGiruda(String suit) {
+    return 'K 미소진 시 조커: $suit 호출 → K 유도';
+  }
+
+  @override
+  String strategyLowGirudaFriendLure(String card) {
+    return '$card 선출 → 프렌드에게 선 양보하여 유도';
+  }
+
+  @override
+  String strategyGirudaQReclaim(String card) {
+    return '$card 선출 → 선 탈환';
+  }
+
+  @override
+  String strategyHighCardAttack(String cards) {
+    return '$cards 선출 → 추가 점수 공격';
+  }
+
+  @override
   String get trickDetails => '트릭 상세';
 
   @override

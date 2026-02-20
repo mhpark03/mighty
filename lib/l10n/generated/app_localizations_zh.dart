@@ -1971,6 +1971,34 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String strategyTrumpExhaustCheckK(String cards) {
+    return '出$cards → 将牌最高攻击，确认K消耗';
+  }
+
+  @override
+  String get strategyJokerAfterFriend => '朋友合流后出王牌 → 得分';
+
+  @override
+  String strategyJokerCallGiruda(String suit) {
+    return 'K未消耗时王牌: 叫$suit → 引出K';
+  }
+
+  @override
+  String strategyLowGirudaFriendLure(String card) {
+    return '出$card → 让出牌权引诱朋友';
+  }
+
+  @override
+  String strategyGirudaQReclaim(String card) {
+    return '出$card → 夺回出牌权';
+  }
+
+  @override
+  String strategyHighCardAttack(String cards) {
+    return '出$cards → 追加得分攻击';
+  }
+
+  @override
   String get trickDetails => '墩详情';
 
   @override

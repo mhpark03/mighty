@@ -3568,6 +3568,42 @@ abstract class AppLocalizations {
   /// **'{suits} 보이드 → 상대 선공 시 기루다 컷으로 트릭 회수'**
   String strategyVoidTrumpCut(String suits);
 
+  /// No description provided for @strategyTrumpExhaustCheckK.
+  ///
+  /// In ko, this message translates to:
+  /// **'{cards} 선출 → 기루다 최상위 공격, K 소진 확인'**
+  String strategyTrumpExhaustCheckK(String cards);
+
+  /// No description provided for @strategyJokerAfterFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 합류 후 조커 선출 → 점수 획득'**
+  String get strategyJokerAfterFriend;
+
+  /// No description provided for @strategyJokerCallGiruda.
+  ///
+  /// In ko, this message translates to:
+  /// **'K 미소진 시 조커: {suit} 호출 → K 유도'**
+  String strategyJokerCallGiruda(String suit);
+
+  /// No description provided for @strategyLowGirudaFriendLure.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card} 선출 → 프렌드에게 선 양보하여 유도'**
+  String strategyLowGirudaFriendLure(String card);
+
+  /// No description provided for @strategyGirudaQReclaim.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card} 선출 → 선 탈환'**
+  String strategyGirudaQReclaim(String card);
+
+  /// No description provided for @strategyHighCardAttack.
+  ///
+  /// In ko, this message translates to:
+  /// **'{cards} 선출 → 추가 점수 공격'**
+  String strategyHighCardAttack(String cards);
+
   /// No description provided for @trickDetails.
   ///
   /// In ko, this message translates to:

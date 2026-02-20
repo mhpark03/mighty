@@ -974,6 +974,17 @@
       "suits": {"type": "String"}
     }
   },
+  "strategyTrumpExhaustCheckK": "{cards}出し → 切り札最上位攻撃、K消耗確認",
+  "@strategyTrumpExhaustCheckK": { "placeholders": { "cards": { "type": "String" } } },
+  "strategyJokerAfterFriend": "フレンド合流後ジョーカー出し → 得点獲得",
+  "strategyJokerCallGiruda": "K未消耗時ジョーカー: {suit}コール → K誘引",
+  "@strategyJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "strategyLowGirudaFriendLure": "{card}出し → フレンドにリード譲渡して誘引",
+  "@strategyLowGirudaFriendLure": { "placeholders": { "card": { "type": "String" } } },
+  "strategyGirudaQReclaim": "{card}出し → リード奪還",
+  "@strategyGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "strategyHighCardAttack": "{cards}出し → 追加得点攻撃",
+  "@strategyHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
 
   "trickDetails": "トリック詳細",
   "trickColumnGainLoss": "得失",

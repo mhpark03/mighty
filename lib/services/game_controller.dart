@@ -334,6 +334,7 @@ class GameController extends ChangeNotifier {
         friendSuit: friendSuit,
         friendHolderName: friendHolderName,
         scoreBreakdown: _aiPlayer.getPointBreakdownText(currentPlayer.hand, effectiveSuit),
+        suitComparison: evaluation.suitComparison,
       );
 
       _state.placeBid(bid);
@@ -522,19 +523,13 @@ class GameController extends ChangeNotifier {
       // 각 버릴 카드의 이유 생성
       final reasons = _generateDiscardReasons(discardCards, newGiruda, declarer);
 
-      // 기루다 변경 검토: 최종 핸드 10장 기준 각 무늬별 점수 비교 (kittyBonus 동일 적용)
+      // 기루다 변경 검토: 13장에서 후보별 최적 10장 시뮬레이션 후 평가
       final girudaComp = <(Suit?, int, int, int)>[];
       for (final candidateSuit in [Suit.spade, Suit.diamond, Suit.heart, Suit.club]) {
-        final (cMin, cMax) = _aiPlayer.estimatePointRange(finalHand, candidateSuit);
-        final cMightySuit = (candidateSuit == Suit.spade) ? Suit.diamond : Suit.spade;
-        final cHasMighty = finalHand.any((c) => !c.isJoker && c.suit == cMightySuit && c.rank == Rank.ace);
-        final cHasJoker = finalHand.any((c) => c.isJoker);
-        final cHasGirudaAce = finalHand.any((c) => !c.isJoker && c.suit == candidateSuit && c.rank == Rank.ace);
-        final cKeyCards = (cHasMighty ? 1 : 0) + (cHasJoker ? 1 : 0) + (cHasGirudaAce ? 1 : 0);
-        final cKittyBonus = cKeyCards >= 2 ? 2 : (cKeyCards >= 1 ? 1 : 0);
-        final cAdjustedMax = cMax + cKittyBonus;
-        final cOptimal = (cMin * 0.3 + cAdjustedMax * 0.7 + 1).round().clamp(cMin, cAdjustedMax);
-        girudaComp.add((candidateSuit, cMin, cAdjustedMax, cOptimal));
+        final simHand = _aiPlayer.simulateBest10Cards(allCards, candidateSuit);
+        final (cMin, cMax) = _aiPlayer.estimatePointRange(simHand, candidateSuit);
+        final cOptimal = (cMin * 0.3 + cMax * 0.7 + 1).round().clamp(cMin, cMax);
+        girudaComp.add((candidateSuit, cMin, cMax, cOptimal));
       }
 
       _kittyExplanation = KittyExplanation(
@@ -1197,11 +1192,18 @@ class GameController extends ChangeNotifier {
     }
 
     // === 2. 기루다 공격 전략 ===
+    bool hasGirudaA = girudaCards.any((c) => c.rank == Rank.ace);
+    bool hasGirudaK = girudaCards.any((c) => c.rank == Rank.king);
+    bool hasGirudaQ = girudaCards.any((c) => c.rank == Rank.queen);
+
     if (giruda != null && highGiruda.isNotEmpty) {
       final highNames = highGiruda.map((c) => rs(c.rank)).join('/');
       final source = friendIsGirudaCard ? 'friend' : 'reclaim';
       final cards = '${ss(giruda)}$highNames';
-      if (girudaCards.length >= 5) {
+      if (hasGirudaA && !hasGirudaK) {
+        // A는 있지만 K가 없음 → K 소진 확인 중요
+        strategies.add(('TRUMP_EXHAUST_CHECK_K', {'source': source, 'suit': ss(giruda), 'cards': cards}));
+      } else if (girudaCards.length >= 5) {
         strategies.add(('TRUMP_DOMINATE', {'source': source, 'suit': ss(giruda), 'cards': cards}));
       } else {
         strategies.add(('TRUMP_EXHAUST', {'source': source, 'suit': ss(giruda), 'cards': cards}));
@@ -1210,16 +1212,66 @@ class GameController extends ChangeNotifier {
       strategies.add(('TRUMP_MID_DRAW', {'suit': ss(giruda)}));
     }
 
-    // === 3. 조커 활용 전략 ===
-    if (hasJoker && giruda != null) {
-      final callSuits = weakSuits.map((s) => ss(s)).toList();
-      if (callSuits.isNotEmpty && callSuits.length <= 3) {
+    // === 2-1. 프렌드 유도 / 조커 활용 순서 ===
+    bool jokerUsedForGiruda = false;
+    if (friendCard != null && friendCard.isMightyWith(giruda) && !hasMighty) {
+      // 마이티 프렌드: 낮은 기루다로 프렌드 유도가 최우선 (조커보다 먼저)
+      final lowGiruda = girudaCards.where((c) =>
+          c.rank != Rank.ace && c.rank != Rank.king && c.rank != Rank.queen).toList();
+      if (lowGiruda.isNotEmpty) {
+        lowGiruda.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        strategies.add(('LOW_GIRUDA_FRIEND_LURE', {'card': cs(lowGiruda.first)}));
+      }
+      // 프렌드 합류 후 조커로 점수 획득
+      if (hasJoker) {
+        strategies.add(('JOKER_AFTER_FRIEND', <String, String>{}));
+        jokerUsedForGiruda = true;
+      }
+      if (hasGirudaQ) {
+        strategies.add(('GIRUDA_Q_RECLAIM', {'card': '${ss(giruda)}Q'}));
+      }
+    } else {
+      // 마이티 프렌드가 아닌 경우: K 미소진 시 조커로 기루다 호출
+      if (hasJoker && hasGirudaA && !hasGirudaK && giruda != null) {
+        strategies.add(('JOKER_CALL_GIRUDA', {'suit': ss(giruda)}));
+        jokerUsedForGiruda = true;
+      }
+    }
+
+    // === 3. 조커 활용 전략 (기루다 호출에 사용하지 않은 경우) ===
+    if (hasJoker && !jokerUsedForGiruda && giruda != null) {
+      // 보유 고액 카드의 무늬를 호출하여 소진
+      List<Suit> highValueSuits = [];
+      for (final suit in Suit.values) {
+        if (suit == giruda) continue;
+        final sc = hand.where((c) => !c.isJoker && !c.isMightyWith(giruda) && c.suit == suit).toList();
+        if (sc.isEmpty) continue;
+        if (sc.any((c) => c.rank == Rank.ace || c.rank == Rank.king)) {
+          highValueSuits.add(suit);
+        }
+      }
+      if (highValueSuits.isNotEmpty) {
+        final callSuits = highValueSuits.map((s) => ss(s)).toList();
         strategies.add(('JOKER_CALL_SUITS', {'suits': callSuits.join('/')}));
       } else {
         strategies.add(('JOKER_CALL_WEAK', <String, String>{}));
       }
-    } else if (hasJoker) {
+    } else if (hasJoker && !jokerUsedForGiruda) {
       strategies.add(('JOKER_OPTIMAL', <String, String>{}));
+    }
+
+    // === 3-1. 남은 고액 카드 공격 ===
+    final remainingHighCards = hand.where((c) =>
+        !c.isJoker && !c.isMightyWith(giruda) && c.suit != giruda &&
+        (c.rank == Rank.ace || c.rank == Rank.king)).toList();
+    final fta = firstTrickAce;
+    if (fta != null) {
+      remainingHighCards.removeWhere((c) => c.suit == fta.suit && c.rank == fta.rank);
+    }
+    if (remainingHighCards.isNotEmpty) {
+      remainingHighCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+      final cardStrs = remainingHighCards.map((c) => cs(c)).join('/');
+      strategies.add(('HIGH_CARD_ATTACK', {'cards': cardStrs}));
     }
 
     // === 4. 마이티 타이밍 ===
@@ -1227,8 +1279,8 @@ class GameController extends ChangeNotifier {
       strategies.add(('MIGHTY_TIMING', <String, String>{}));
     }
 
-    // === 5. 컷 전략 ===
-    if (voidSuits.isNotEmpty && giruda != null && girudaCards.isNotEmpty) {
+    // === 5. 컷 전략 (기루다 2장 이하일 때만) ===
+    if (voidSuits.isNotEmpty && giruda != null && girudaCards.isNotEmpty && girudaCards.length <= 2) {
       final voidSymbols = voidSuits.map((s) => ss(s)).join("/");
       strategies.add(('VOID_TRUMP_CUT', {'suits': voidSymbols}));
     }
@@ -1310,6 +1362,7 @@ class BidExplanation {
   final Suit? friendSuit;  // 프렌드 카드 무늬 (ACE일 때)
   final String? friendHolderName; // 프렌드 카드 보유자 (null이면 키티)
   final String scoreBreakdown;
+  final List<(Suit, int, int, int)> suitComparison; // (suit, min, max, optimal)
 
   BidExplanation({
     required this.playerId,
@@ -1326,5 +1379,6 @@ class BidExplanation {
     this.friendSuit,
     this.friendHolderName,
     this.scoreBreakdown = '',
+    this.suitComparison = const [],
   });
 }

@@ -2006,6 +2006,35 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String strategyTrumpExhaustCheckK(String cards) {
+    return 'Lead $cards → top trump attack, check K exhaustion';
+  }
+
+  @override
+  String get strategyJokerAfterFriend =>
+      'After friend joins, lead Joker → score points';
+
+  @override
+  String strategyJokerCallGiruda(String suit) {
+    return 'If K not exhausted, Joker: call $suit → draw out K';
+  }
+
+  @override
+  String strategyLowGirudaFriendLure(String card) {
+    return 'Lead $card → yield lead to lure friend';
+  }
+
+  @override
+  String strategyGirudaQReclaim(String card) {
+    return 'Lead $card → reclaim lead';
+  }
+
+  @override
+  String strategyHighCardAttack(String cards) {
+    return 'Lead $cards → additional score attack';
+  }
+
+  @override
   String get trickDetails => 'Trick Details';
 
   @override

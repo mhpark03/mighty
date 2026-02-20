@@ -1978,6 +1978,34 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String strategyTrumpExhaustCheckK(String cards) {
+    return '$cards出し → 切り札最上位攻撃、K消耗確認';
+  }
+
+  @override
+  String get strategyJokerAfterFriend => 'フレンド合流後ジョーカー出し → 得点獲得';
+
+  @override
+  String strategyJokerCallGiruda(String suit) {
+    return 'K未消耗時ジョーカー: $suitコール → K誘引';
+  }
+
+  @override
+  String strategyLowGirudaFriendLure(String card) {
+    return '$card出し → フレンドにリード譲渡して誘引';
+  }
+
+  @override
+  String strategyGirudaQReclaim(String card) {
+    return '$card出し → リード奪還';
+  }
+
+  @override
+  String strategyHighCardAttack(String cards) {
+    return '$cards出し → 追加得点攻撃';
+  }
+
+  @override
   String get trickDetails => 'トリック詳細';
 
   @override

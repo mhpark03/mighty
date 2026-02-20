@@ -974,6 +974,17 @@
       "suits": {"type": "String"}
     }
   },
+  "strategyTrumpExhaustCheckK": "出{cards} → 将牌最高攻击，确认K消耗",
+  "@strategyTrumpExhaustCheckK": { "placeholders": { "cards": { "type": "String" } } },
+  "strategyJokerAfterFriend": "朋友合流后出王牌 → 得分",
+  "strategyJokerCallGiruda": "K未消耗时王牌: 叫{suit} → 引出K",
+  "@strategyJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "strategyLowGirudaFriendLure": "出{card} → 让出牌权引诱朋友",
+  "@strategyLowGirudaFriendLure": { "placeholders": { "card": { "type": "String" } } },
+  "strategyGirudaQReclaim": "出{card} → 夺回出牌权",
+  "@strategyGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "strategyHighCardAttack": "出{cards} → 追加得分攻击",
+  "@strategyHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
 
   "trickDetails": "墩详情",
   "trickColumnGainLoss": "得失",

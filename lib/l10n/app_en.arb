@@ -975,6 +975,17 @@
       "suits": {"type": "String"}
     }
   },
+  "strategyTrumpExhaustCheckK": "Lead {cards} → top trump attack, check K exhaustion",
+  "@strategyTrumpExhaustCheckK": { "placeholders": { "cards": { "type": "String" } } },
+  "strategyJokerAfterFriend": "After friend joins, lead Joker → score points",
+  "strategyJokerCallGiruda": "If K not exhausted, Joker: call {suit} → draw out K",
+  "@strategyJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "strategyLowGirudaFriendLure": "Lead {card} → yield lead to lure friend",
+  "@strategyLowGirudaFriendLure": { "placeholders": { "card": { "type": "String" } } },
+  "strategyGirudaQReclaim": "Lead {card} → reclaim lead",
+  "@strategyGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "strategyHighCardAttack": "Lead {cards} → additional score attack",
+  "@strategyHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
 
   "trickDetails": "Trick Details",
   "trickColumnGainLoss": "Gain/\nLoss",

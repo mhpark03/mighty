@@ -1134,6 +1134,17 @@
       "suits": {"type": "String"}
     }
   },
+  "strategyTrumpExhaustCheckK": "{cards} 선출 → 기루다 최상위 공격, K 소진 확인",
+  "@strategyTrumpExhaustCheckK": { "placeholders": { "cards": { "type": "String" } } },
+  "strategyJokerAfterFriend": "프렌드 합류 후 조커 선출 → 점수 획득",
+  "strategyJokerCallGiruda": "K 미소진 시 조커: {suit} 호출 → K 유도",
+  "@strategyJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "strategyLowGirudaFriendLure": "{card} 선출 → 프렌드에게 선 양보하여 유도",
+  "@strategyLowGirudaFriendLure": { "placeholders": { "card": { "type": "String" } } },
+  "strategyGirudaQReclaim": "{card} 선출 → 선 탈환",
+  "@strategyGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "strategyHighCardAttack": "{cards} 선출 → 추가 점수 공격",
+  "@strategyHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
 
   "trickDetails": "트릭 상세",
   "trickColumnGainLoss": "득실",

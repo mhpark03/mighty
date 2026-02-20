@@ -9,6 +9,7 @@ class BidEvaluation {
   final int maxPoints;
   final int optimalPoints;
   final int girudaCount;
+  final List<(Suit, int, int, int)> suitComparison; // (suit, min, max, optimal)
 
   BidEvaluation({
     this.bestGiruda,
@@ -16,6 +17,7 @@ class BidEvaluation {
     required this.maxPoints,
     required this.optimalPoints,
     required this.girudaCount,
+    this.suitComparison = const [],
   });
 }
 
@@ -424,6 +426,7 @@ class AIPlayer {
   }
 
   /// 모든 suit에 대해 예상 점수 범위를 계산하여 최적 기루다 선택
+  /// 강도 필터 없이 순수 점수 기반으로 최적 기루다 선택
   BidEvaluation evaluateForBidding(List<PlayingCard> hand) {
     Suit? bestGiruda;
     int bestOptimal = 0;
@@ -431,61 +434,30 @@ class AIPlayer {
     int bestMax = 0;
     int bestGirudaCount = 0;
 
-    // 강도 점수 3.0 미만이라도 가장 높은 무늬는 평가 (0~0 방지)
-    Suit? fallbackSuit;
-    double fallbackScore = 0;
+    // 모든 무늬별 점수 수집 및 최적 기루다 선택
+    final suitComp = <(Suit, int, int, int)>[];
 
     for (final suit in Suit.values) {
       final suitCards = hand.where((c) => !c.isJoker && c.suit == suit).toList();
-      final score = _calcGirudaStrengthScore(suitCards);
-      // 기루다 강도 점수 기반 후보 필터링 (연결성 가중치 적용)
-      if (score < 3.0) {
-        // 3.0 미만 중 가장 높은 무늬를 폴백으로 저장
-        if (suitCards.length >= 2 && score > fallbackScore) {
-          fallbackScore = score;
-          fallbackSuit = suit;
-        }
-        continue;
-      }
 
-      final (minPts, maxPts) = estimatePointRange(hand, suit);
-      // 바닥패 기대값: 키카드 보유 시 약한 카드 제거 효과 증가
-      final hasMighty = hand.any((c) => !c.isJoker && c.suit == ((suit == Suit.spade) ? Suit.diamond : Suit.spade) && c.rank == Rank.ace);
-      final hasJoker = hand.any((c) => c.isJoker);
-      final hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace);
-      final keyCardCount = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) + (hasGirudaAce ? 1 : 0);
-      final kittyBonus = keyCardCount >= 2 ? 2 : (keyCardCount >= 1 ? 1 : 0);
-      final adjustedMax = maxPts + kittyBonus;
-      final rawOptimal = (minPts * 0.3 + adjustedMax * 0.7 + 1).round();
-      final optimal = rawOptimal.clamp(minPts, adjustedMax);
+      final (sPts, sMax) = estimatePointRange(hand, suit);
+      final sMightySuit = (suit == Suit.spade) ? Suit.diamond : Suit.spade;
+      final sHasMighty = hand.any((c) => !c.isJoker && c.suit == sMightySuit && c.rank == Rank.ace);
+      final sHasJoker = hand.any((c) => c.isJoker);
+      final sHasGirudaAce = hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace);
+      final sKeyCards = (sHasMighty ? 1 : 0) + (sHasJoker ? 1 : 0) + (sHasGirudaAce ? 1 : 0);
+      final sKittyBonus = sKeyCards >= 2 ? 2 : (sKeyCards >= 1 ? 1 : 0);
+      final sAdjMax = sMax + sKittyBonus;
+      final sOptimal = (sPts * 0.3 + sAdjMax * 0.7 + 1).round().clamp(sPts, sAdjMax);
+      suitComp.add((suit, sPts, sAdjMax, sOptimal));
 
-      if (optimal > bestOptimal) {
-        bestOptimal = optimal;
-        bestMin = minPts;
-        bestMax = adjustedMax;
+      if (sOptimal > bestOptimal) {
+        bestOptimal = sOptimal;
+        bestMin = sPts;
+        bestMax = sAdjMax;
         bestGiruda = suit;
         bestGirudaCount = suitCards.length;
       }
-    }
-
-    // 3.0 이상 후보가 없으면 폴백 무늬로 평가 (마이티 프렌드 등 고려)
-    if (bestGiruda == null && fallbackSuit != null) {
-      final (minPts, maxPts) = estimatePointRange(hand, fallbackSuit);
-      final fbSuitCards = hand.where((c) => !c.isJoker && c.suit == fallbackSuit).toList();
-      final hasMighty = hand.any((c) => !c.isJoker && c.suit == ((fallbackSuit == Suit.spade) ? Suit.diamond : Suit.spade) && c.rank == Rank.ace);
-      final hasJoker = hand.any((c) => c.isJoker);
-      final hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == fallbackSuit && c.rank == Rank.ace);
-      final keyCardCount = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) + (hasGirudaAce ? 1 : 0);
-      final kittyBonus = keyCardCount >= 2 ? 2 : (keyCardCount >= 1 ? 1 : 0);
-      final adjustedMax = maxPts + kittyBonus;
-      final rawOptimal = (minPts * 0.3 + adjustedMax * 0.7 + 1).round();
-      final optimal = rawOptimal.clamp(minPts, adjustedMax);
-
-      bestOptimal = optimal;
-      bestMin = minPts;
-      bestMax = adjustedMax;
-      bestGiruda = fallbackSuit;
-      bestGirudaCount = fbSuitCards.length;
     }
 
     return BidEvaluation(
@@ -494,6 +466,7 @@ class AIPlayer {
       maxPoints: bestMax,
       optimalPoints: bestOptimal,
       girudaCount: bestGirudaCount,
+      suitComparison: suitComp,
     );
   }
 
@@ -980,6 +953,9 @@ class AIPlayer {
     final double minPpt = minTricks >= 5 ? 1.8 : 1.5;
     int minPoints = ((minTricks + minAdj) * minPpt).round().clamp(0, 20);
     int maxPoints = ((maxTricks + maxAdj) * 2.0).round().clamp(0, 20);
+
+    // Initiative Floor가 min을 끌어올릴 때 max도 최소한 min 이상 보장
+    if (maxPoints < minPoints) maxPoints = minPoints;
 
     // === 런 감지: 마이티+조커+기루다A+5장기루다 → 올런 가능 ===
     if (hasMighty && hasJoker && giruda != null && girudaLen >= 5) {
@@ -1514,44 +1490,74 @@ class AIPlayer {
   /// 13장 카드로 계산하고, 목표 달성 가능 여부를 고려
   /// AI가 키티를 받은 후 기루다 변경 여부 결정
   /// 13장 카드로 estimatePointRange 기반 예상 점수 비교
-  Suit? decideGirudaChange(Player player, GameState state, List<PlayingCard> kitty) {
-    // 13장 카드 (hand + kitty)
-    final allCards = [...player.hand, ...kitty];
+  /// 13장에서 후보 기루다별 최적 10장을 시뮬레이션
+  List<PlayingCard> simulateBest10Cards(List<PlayingCard> allCards, Suit? candidateGiruda) {
+    final mightySuit = (candidateGiruda == Suit.spade) ? Suit.diamond : Suit.spade;
 
+    final scored = <(PlayingCard, double)>[];
+    for (final c in allCards) {
+      double score;
+      if (c.isJoker) {
+        score = 1000;
+      } else if (c.suit == mightySuit && c.rank == Rank.ace) {
+        score = 999; // 마이티
+      } else if (candidateGiruda != null && c.suit == candidateGiruda) {
+        score = 200 + c.rankValue.toDouble(); // 기루다 카드 우선
+      } else if (c.rank == Rank.ace) {
+        score = 150; // 비기루다 에이스
+      } else if (c.suit == mightySuit && c.rank == Rank.king) {
+        score = 140; // 마이티 무늬 K
+      } else if (c.rank == Rank.king) {
+        score = 100;
+      } else {
+        score = c.rankValue.toDouble();
+      }
+      scored.add((c, score));
+    }
+    scored.sort((a, b) => b.$2.compareTo(a.$2));
+    return scored.take(10).map((e) => e.$1).toList();
+  }
+
+  Suit? decideGirudaChange(Player player, GameState state, List<PlayingCard> kitty) {
+    final allCards = [...player.hand, ...kitty];
     final targetPoints = state.currentBid?.tricks ?? 13;
 
-    // 현재 기루다로의 예상 점수
-    final (curMin, curMax) = estimatePointRange(allCards, state.giruda);
+    // 현재 기루다로 최적 10장 시뮬레이션 후 평가
+    final currentHand10 = simulateBest10Cards(allCards, state.giruda);
+    final (curMin, curMax) = estimatePointRange(currentHand10, state.giruda);
     final currentOptimal = (curMin * 0.3 + curMax * 0.7 + 1).round();
 
-    // 최적의 기루다 찾기 (evaluateForBidding은 모든 무늬 탐색)
-    final bestEval = evaluateForBidding(allCards);
-    final bestSuit = bestEval.bestGiruda;
-    final bestOptimal = bestEval.optimalPoints;
+    // 모든 무늬 후보 평가 (10장 기반)
+    Suit? bestSuit;
+    int bestOptimal = 0;
 
-    // 노기루다 예상 점수
-    final (noMin, noMax) = estimatePointRange(allCards, null);
+    for (final suit in Suit.values) {
+      final hand10 = simulateBest10Cards(allCards, suit);
+      final (min, max) = estimatePointRange(hand10, suit);
+      final optimal = (min * 0.3 + max * 0.7 + 1).round();
+
+      if (optimal > bestOptimal) {
+        bestOptimal = optimal;
+        bestSuit = suit;
+      }
+    }
+
+    // 노기루다 평가 (10장 기반)
+    final noGirudaHand10 = simulateBest10Cards(allCards, null);
+    final (noMin, noMax) = estimatePointRange(noGirudaHand10, null);
     final noGirudaOptimal = (noMin * 0.3 + noMax * 0.7 + 1).round();
 
-    // 기루다 변경 시 목표 +2 증가
     final newTargetPoints = targetPoints + 2;
 
-    // 현재 기루다로 목표 달성 가능 여부
     bool currentCanAchieve = currentOptimal >= targetPoints;
-
-    // 새 기루다로 새 목표(+2) 달성 가능 여부
     bool newCanAchieve = bestOptimal >= newTargetPoints;
-
-    // 노기루다로 새 목표(+2) 달성 가능 여부
     bool noGirudaCanAchieve = noGirudaOptimal >= newTargetPoints;
 
     // 기루다 변경 결정
     if (bestSuit != null && bestSuit != state.giruda && newCanAchieve) {
-      // 현재 기루다로 목표 달성 어렵고, 새 기루다로는 가능한 경우
       if (!currentCanAchieve) {
         return bestSuit;
       }
-      // 새 기루다가 현재보다 2점 이상 강한 경우 (변경 페널티 +2와 동일하지만 기루다 장수 증가로 컨트롤 이득)
       if (bestOptimal >= currentOptimal + 2) {
         return bestSuit;
       }
@@ -1560,14 +1566,13 @@ class AIPlayer {
     // 노기루다 고려
     if (state.giruda != null && noGirudaCanAchieve) {
       if (!currentCanAchieve) {
-        return null; // 노기루다
+        return null;
       }
       if (noGirudaOptimal >= currentOptimal + 2) {
-        return null; // 노기루다
+        return null;
       }
     }
 
-    // 변경하지 않음 (기존 기루다 유지)
     return state.giruda;
   }
 

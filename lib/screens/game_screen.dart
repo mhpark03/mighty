@@ -1585,14 +1585,26 @@ class _GameScreenState extends State<GameScreen> {
         return l10n.strategyTrumpDominate(params['source'] == 'friend' ? l10n.strategySourceFriend : l10n.strategySourceReclaim, params['cards']!);
       case 'TRUMP_EXHAUST':
         return l10n.strategyTrumpExhaust(params['source'] == 'friend' ? l10n.strategySourceFriend : l10n.strategySourceReclaim, params['cards']!);
+      case 'TRUMP_EXHAUST_CHECK_K':
+        return l10n.strategyTrumpExhaustCheckK(params['cards']!);
       case 'TRUMP_MID_DRAW':
         return l10n.strategyTrumpMidDraw(params['suit']!);
+      case 'JOKER_AFTER_FRIEND':
+        return l10n.strategyJokerAfterFriend;
+      case 'JOKER_CALL_GIRUDA':
+        return l10n.strategyJokerCallGiruda(params['suit']!);
+      case 'LOW_GIRUDA_FRIEND_LURE':
+        return l10n.strategyLowGirudaFriendLure(params['card']!);
+      case 'GIRUDA_Q_RECLAIM':
+        return l10n.strategyGirudaQReclaim(params['card']!);
       case 'JOKER_CALL_SUITS':
         return l10n.strategyJokerCallSuits(params['suits']!);
       case 'JOKER_CALL_WEAK':
         return l10n.strategyJokerCallWeak;
       case 'JOKER_OPTIMAL':
         return l10n.strategyJokerOptimal;
+      case 'HIGH_CARD_ATTACK':
+        return l10n.strategyHighCardAttack(params['cards']!);
       case 'MIGHTY_TIMING':
         return l10n.strategyMightyTiming;
       case 'VOID_TRUMP_CUT':
@@ -1844,6 +1856,10 @@ class _GameScreenState extends State<GameScreen> {
               const SizedBox(height: 3),
               adjustedWidget,
             ],
+            if (explanation.suitComparison.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              _buildBidSuitComparison(explanation),
+            ],
           ],
         ],
       );
@@ -1894,9 +1910,81 @@ class _GameScreenState extends State<GameScreen> {
             const SizedBox(height: 3),
             adjustedWidget,
           ],
+          if (explanation.suitComparison.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            _buildBidSuitComparison(explanation),
+          ],
         ],
       );
     }
+  }
+
+  Widget _buildBidSuitComparison(BidExplanation explanation) {
+    final comp = explanation.suitComparison;
+    final selectedSuit = explanation.suit;
+
+    int bestOptimal = 0;
+    Suit? bestSuit;
+    for (final (suit, _, _, optimal) in comp) {
+      if (optimal > bestOptimal) {
+        bestOptimal = optimal;
+        bestSuit = suit;
+      }
+    }
+
+    return Wrap(
+      spacing: 4,
+      runSpacing: 2,
+      children: comp.map((entry) {
+        final (suit, min, max, optimal) = entry;
+        final isSelected = suit == selectedSuit;
+        final isBest = suit == bestSuit && bestSuit != selectedSuit;
+        final suitColor = _getSuitColorOnDark(suit);
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? Colors.teal[800]!.withValues(alpha: 0.5)
+                : isBest
+                    ? Colors.amber[800]!.withValues(alpha: 0.3)
+                    : Colors.black26,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(
+              color: isSelected
+                  ? Colors.teal[400]!
+                  : isBest
+                      ? Colors.amber[400]!
+                      : Colors.white12,
+              width: isSelected || isBest ? 1.5 : 0.5,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _getSuitSymbol(suit),
+                style: TextStyle(color: suitColor, fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 2),
+              Text(
+                '$min~$max',
+                style: TextStyle(color: Colors.grey[500], fontSize: 9),
+              ),
+              const SizedBox(width: 2),
+              Text(
+                '$optimal',
+                style: TextStyle(
+                  color: isSelected ? Colors.teal[200] : isBest ? Colors.amber[200] : Colors.white54,
+                  fontSize: 11,
+                  fontWeight: isSelected || isBest ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
   }
 
   /// 배팅 설명에 핵심 카드 정보 라인 생성
