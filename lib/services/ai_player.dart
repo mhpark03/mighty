@@ -863,6 +863,17 @@ class AIPlayer {
         minTricks++; // 기루다A 미보유 → 프렌드 기루다A 선언, A-K 체인 확실
       }
     }
+    // 마이티 보유 + 조커 미보유: 프렌드가 조커일 가능성 높음
+    // 마이티가 조커콜로부터 보호 → 프렌드 조커 확정 트릭 + 협력 보너스
+    if (hasMighty && !hasJoker && giruda != null) {
+      bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+      if (hasGirudaAce && girudaLen >= 4) {
+        maxTricks += 2; // 프렌드 조커 트릭 + 프렌드 협력 트릭
+        minTricks += 1; // 프렌드 조커 보호됨 → 최소 1트릭
+      } else if (hasGirudaAce) {
+        maxTricks += 1; // 기루다 짧으면 약한 보너스
+      }
+    }
 
     // === 선공 확정 트릭 하한 (Initiative Floor) ===
     // 핵심 카드 조합으로 보장되는 선공 트릭 수를 별도로 계산하여
@@ -962,6 +973,11 @@ class AIPlayer {
       bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
       if (hasGirudaAce && maxPoints < 20) { maxPoints = 20; }
     }
+    // 마이티 보유 + 조커 미보유: 프렌드 조커 가정 시 런 가능
+    if (hasMighty && !hasJoker && giruda != null && girudaLen >= 5) {
+      bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+      if (hasGirudaAce && maxPoints < 20) { maxPoints = 20; }
+    }
     // === 런 감지 2단계: 키카드 2개+ & 기루다A & 기루다4장+ ===
     if (giruda != null && girudaLen >= 4) {
       bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
@@ -977,8 +993,12 @@ class AIPlayer {
 
     // ★ 조커콜 사용 비용: 수비 조커 강제 유도 시 해당 트릭 점수 손실 또는 마이티 소모
     if (!hasJoker) {
-      minPoints = (minPoints - 1).clamp(0, 20);
-      maxPoints = (maxPoints - 1).clamp(0, 20);
+      if (!hasMighty) {
+        // 마이티도 없으면 조커콜 위험 → 감점
+        minPoints = (minPoints - 1).clamp(0, 20);
+        maxPoints = (maxPoints - 1).clamp(0, 20);
+      }
+      // 마이티 보유 시: 프렌드 조커 보호 → 감점 없음
     }
 
     // 초구 카드 체크 (비기루다 A 또는 마이티 무늬 K)

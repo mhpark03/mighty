@@ -8,6 +8,7 @@ import '../models/player.dart';
 import '../models/game_state.dart';
 import '../services/ad_service.dart';
 import '../services/game_controller.dart';
+import '../services/mighty_tracking_service.dart';
 import '../services/stats_service.dart';
 import '../widgets/banner_ad_widget.dart';
 import '../widgets/card_widget.dart';
@@ -2009,7 +2010,7 @@ class _GameScreenState extends State<GameScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.estimatedScore,
+            l10n.bidSummaryEstimatedRange,
             style: TextStyle(fontSize: 13 * s, fontWeight: FontWeight.bold, color: Colors.white70),
           ),
           SizedBox(height: 6 * s),
@@ -2069,7 +2070,7 @@ class _GameScreenState extends State<GameScreen> {
                 ),
                 SizedBox(width: 6 * s),
                 Text(
-                  '${l10n.optimal}: ${snap.predictedOptimal}',
+                  l10n.optimalScore(snap.predictedOptimal),
                   style: TextStyle(color: Colors.greenAccent, fontSize: 11 * s),
                 ),
               ],
