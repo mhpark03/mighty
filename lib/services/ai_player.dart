@@ -821,12 +821,12 @@ class AIPlayer {
           c.rank == Rank.ace && !(c.suit == mightySuit && c.rank == Rank.ace));
       bool hasKing = sc.any((c) => c.rank == Rank.king);
 
-      // 비기루다 A: 선공 시 확실한 1트릭
-      if (hasAce) { minTricks++; maxTricks++; }
-      // A-K 연속: 선 유지하여 K도 확보 (최대)
+      // 마이티 무늬의 K는 A가 마이티로 빠져 실질적 최상위 카드
+      bool hasTopCard = hasAce || (suit == mightySuit && hasKing);
+
+      if (hasTopCard) { minTricks++; maxTricks++; }
       if (hasAce && hasKing) { maxTricks++; }
-      // K만 있고 A 없으면: 후반에 A가 나간 후 K가 이김 (불확실하므로 0.6)
-      if (hasKing && !hasAce) { maxAdj += 0.6; }
+      if (hasKing && !hasTopCard) { maxAdj += 0.6; }
     }
 
     // === 비기루다 취약 수트 감점 ===
@@ -839,17 +839,18 @@ class AIPlayer {
       bool hasAce = sc.any((c) =>
           c.rank == Rank.ace && !(c.suit == mightySuit && c.rank == Rank.ace));
       bool hasKing = sc.any((c) => c.rank == Rank.king);
-      if (!hasAce && !hasKing) weakSuits++;
+      bool hasTopCard = hasAce || (suit == mightySuit && hasKing);
+      if (!hasTopCard && !hasKing) weakSuits++;
     }
     if (weakSuits >= 2) minTricks -= 1;
 
     // === 보이드 컷 기회 (최대만) ===
-    if (giruda != null) {
-      final girudaCount = hand.where((c) => !c.isJoker && c.suit == giruda).length;
+    // 기루다 5장 이상이면 장수 보너스에 이미 컷 효과 포함 → 중복 방지
+    if (giruda != null && girudaLen < 5) {
       for (final suit in Suit.values) {
         if (suit == giruda) continue;
         final suitCount = hand.where((c) => !c.isJoker && c.suit == suit).length;
-        if (suitCount == 0 && girudaCount >= 3) {
+        if (suitCount == 0 && girudaLen >= 3) {
           maxTricks++;
         }
       }
@@ -1543,8 +1544,8 @@ class AIPlayer {
       if (!currentCanAchieve) {
         return bestSuit;
       }
-      // 새 기루다가 현재보다 3점 이상 강한 경우 (충분한 이득)
-      if (bestOptimal >= currentOptimal + 3) {
+      // 새 기루다가 현재보다 2점 이상 강한 경우 (변경 페널티 +2와 동일하지만 기루다 장수 증가로 컨트롤 이득)
+      if (bestOptimal >= currentOptimal + 2) {
         return bestSuit;
       }
     }
@@ -1554,7 +1555,7 @@ class AIPlayer {
       if (!currentCanAchieve) {
         return null; // 노기루다
       }
-      if (noGirudaOptimal >= currentOptimal + 3) {
+      if (noGirudaOptimal >= currentOptimal + 2) {
         return null; // 노기루다
       }
     }
@@ -3477,13 +3478,16 @@ class AIPlayer {
           return myTopGiruda;
         }
 
-        // === 2. 기루다 최상위 없음 + 프렌드 지원 가능 → 중간 기루다로 선공 ===
-        // 9 이하 중간 기루다(9, 8, 7...)로 상대 고액 기루다(A, K) 소진 유도
-        // - 마이티 프렌드: 기루다 void이면 마이티로 트릭 승리 가능
-        // - 기루다 프렌드: 고액 기루다로 트릭 승리 가능
-        // (고액 기루다를 내면 상대 A/K에 불필요하게 상실)
+        // === 2. 기루다 최상위 없음 + 프렌드 지원 가능 → 프렌드 유도 ===
+        // 기루다 A가 없어서 단독으로 이길 수 없으므로,
+        // 낮은 기루다를 내서 프렌드가 조커/마이티/기루다 A로 이기게 유도 (높은 기루다 온존)
         if (!hasEffectiveTopGiruda && friendIsSpecialOrGiruda && myGirudaCardsForLead.isNotEmpty) {
-          // 9 이하 중간 기루다 우선 (높은 순: 9 > 8 > 7 ...)
+          if (friendIsMighty || friendIsJoker || friendIsGiruda) {
+            // 프렌드가 지원 가능 → 낮은 기루다로 유도 (높은 기루다는 이후 트릭용)
+            myGirudaCardsForLead.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return myGirudaCardsForLead.first;
+          }
+          // 프렌드 지원 불확실 (노프렌드 등) → 9 이하 중간 기루다로 선공 (점수 카드 보호)
           final midGiruda = myGirudaCardsForLead.where((c) => c.rankValue <= 9).toList();
           if (midGiruda.isNotEmpty) {
             midGiruda.sort((a, b) => b.rankValue.compareTo(a.rankValue));
@@ -4579,6 +4583,17 @@ class AIPlayer {
                     return leadSuitAce.first;
                   }
                 }
+              }
+            }
+            // ★ 기루다 리드 시 기루다 A가 있으면: 프렌드 카드(조커/마이티) 온존
+            // 기루다 A는 기루다 트릭에서 마이티 외에는 지지 않음 (조커와 동일한 위험)
+            // → 조커/마이티는 미래 트릭에서 범용적으로 사용 가능하므로 온존 가치가 높음
+            if (leadSuit == state.giruda) {
+              final girudaAceAlt = nonFriendWinners.where((c) =>
+                  c.suit == state.giruda && c.rankValue == 14 &&
+                  !c.isMightyWith(state.giruda)).toList();
+              if (girudaAceAlt.isNotEmpty) {
+                return girudaAceAlt.first;
               }
             }
           }
@@ -6413,6 +6428,17 @@ class AIPlayer {
             bool jokerSafe = mightyPlayed || mightyInMyHand || isLastPlayer;
 
             if (jokerSafe) {
+              // ★ 기루다 리드 시 기루다 A로 이길 수 있으면: 조커 온존
+              // 기루다 A는 기루다 트릭에서 마이티 외에는 지지 않음 (조커와 동일한 위험)
+              if (leadSuit == state.giruda && currentWinningCard != null) {
+                final girudaAceForDef = playableCards.where((c) =>
+                    !c.isJoker && !c.isMightyWith(state.giruda) &&
+                    c.suit == state.giruda && c.rankValue == 14).toList();
+                if (girudaAceForDef.isNotEmpty &&
+                    state.isCardStronger(girudaAceForDef.first, currentWinningCard, leadSuit, false)) {
+                  return girudaAceForDef.first;
+                }
+              }
               return joker.first;
             }
           }
@@ -6447,6 +6473,16 @@ class AIPlayer {
             bool jokerSafeForLead = mightyPlayedForLead || mightyInMyHandForLead || isLastPlayerForLead;
 
             if (jokerSafeForLead) {
+              // ★ 기루다 리드 시 기루다 A로 이길 수 있으면: 조커 온존
+              if (leadSuit == state.giruda && currentWinningCard != null) {
+                final girudaAceForLead = playableCards.where((c) =>
+                    !c.isJoker && !c.isMightyWith(state.giruda) &&
+                    c.suit == state.giruda && c.rankValue == 14).toList();
+                if (girudaAceForLead.isNotEmpty &&
+                    state.isCardStronger(girudaAceForLead.first, currentWinningCard, leadSuit, false)) {
+                  return girudaAceForLead.first;
+                }
+              }
               return jokerForLead.first;
             }
           }
