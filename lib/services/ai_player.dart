@@ -455,14 +455,14 @@ class AIPlayer {
       final hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace);
       final keyCardCount = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) + (hasGirudaAce ? 1 : 0);
       final kittyBonus = keyCardCount >= 2 ? 2 : (keyCardCount >= 1 ? 1 : 0);
-      // kittyBonus는 적정 계산에만 반영, 최대값에는 더하지 않음
-      // (estimatePointRange의 2.0 배수가 이미 낙관적 최대를 산출)
-      final optimal = (minPts * 0.3 + (maxPts + kittyBonus) * 0.7 + 1).round();
+      final adjustedMax = maxPts + kittyBonus;
+      final rawOptimal = (minPts * 0.3 + adjustedMax * 0.7 + 1).round();
+      final optimal = rawOptimal.clamp(minPts, adjustedMax);
 
       if (optimal > bestOptimal) {
         bestOptimal = optimal;
         bestMin = minPts;
-        bestMax = maxPts;
+        bestMax = adjustedMax;
         bestGiruda = suit;
         bestGirudaCount = suitCards.length;
       }
@@ -477,11 +477,13 @@ class AIPlayer {
       final hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == fallbackSuit && c.rank == Rank.ace);
       final keyCardCount = (hasMighty ? 1 : 0) + (hasJoker ? 1 : 0) + (hasGirudaAce ? 1 : 0);
       final kittyBonus = keyCardCount >= 2 ? 2 : (keyCardCount >= 1 ? 1 : 0);
-      final optimal = (minPts * 0.3 + (maxPts + kittyBonus) * 0.7 + 1).round();
+      final adjustedMax = maxPts + kittyBonus;
+      final rawOptimal = (minPts * 0.3 + adjustedMax * 0.7 + 1).round();
+      final optimal = rawOptimal.clamp(minPts, adjustedMax);
 
       bestOptimal = optimal;
       bestMin = minPts;
-      bestMax = maxPts;
+      bestMax = adjustedMax;
       bestGiruda = fallbackSuit;
       bestGirudaCount = fbSuitCards.length;
     }
@@ -1003,11 +1005,9 @@ class AIPlayer {
       maxPoints = (maxPoints - 1).clamp(0, 20);
     }
 
-    // ★ 마이티 프렌드 + 초구 카드 없음: 초구에 마이티 유도 필요 → 선공 불안정 -2점
-    // 조커/마이티 모두 없어 마이티 프렌드 호출 필수인데 비기루다 A도 없으면
-    // 초구를 확실히 잡을 수 없어 마이티를 유도해야 하므로 점수 감점
-    if (!hasMighty && !hasJoker) {
-      bool hasFirstTrickCard = false;
+    // 초구 카드 체크 (비기루다 A 또는 마이티 무늬 K)
+    bool hasFirstTrickCard = hasMighty; // 마이티 자체가 초구 카드
+    if (!hasFirstTrickCard) {
       for (final suit in Suit.values) {
         if (suit == giruda) continue;
         final sc = hand.where((c) => !c.isJoker && c.suit == suit).toList();
@@ -1022,10 +1022,17 @@ class AIPlayer {
           break;
         }
       }
-      if (!hasFirstTrickCard) {
-        minPoints = (minPoints - 2).clamp(0, 20);
-        maxPoints = (maxPoints - 2).clamp(0, 20);
-      }
+    }
+
+    if (!hasMighty && !hasJoker && !hasFirstTrickCard) {
+      // 마이티/조커 모두 없고 초구 카드도 없음 → 큰 감점
+      minPoints = (minPoints - 2).clamp(0, 20);
+      maxPoints = (maxPoints - 2).clamp(0, 20);
+    } else if (hasJoker && !hasMighty && !hasFirstTrickCard) {
+      // 조커는 있으나 마이티/초구 카드 없음
+      // → 조커로 초구 가능하지만 마이티에 취약 & 조커 낭비
+      minPoints = (minPoints - 1).clamp(0, 20);
+      maxPoints = (maxPoints - 1).clamp(0, 20);
     }
 
     // 마이티/조커/기루다A 모두 없음 → 핵심 카드 부재 추가 -2점
