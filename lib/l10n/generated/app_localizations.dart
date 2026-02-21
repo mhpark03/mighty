@@ -3592,6 +3592,12 @@ abstract class AppLocalizations {
   /// **'수비 상위 카드 {count}점 방어'**
   String trickEventLastCardDefenseWin(int count);
 
+  /// No description provided for @trickEventLastDefenseTopProtectFail.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 최상위 카드 보호 {count}점 방어하나 방어 실패'**
+  String trickEventLastDefenseTopProtectFail(int count);
+
   /// No description provided for @trickEventLastCardAttackWin.
   ///
   /// In ko, this message translates to:
@@ -3634,17 +3640,11 @@ abstract class AppLocalizations {
   /// **'기루다 중간으로 마이티 유도'**
   String get trickEventMidGirudaMightyBait;
 
-  /// No description provided for @trickEventMidGirudaMightyBaitForA.
+  /// No description provided for @trickEventMidGirudaMightyBaitForTop.
   ///
   /// In ko, this message translates to:
-  /// **'A 최상위 확보 위해 저액 기루다로 마이티 유도'**
-  String get trickEventMidGirudaMightyBaitForA;
-
-  /// No description provided for @trickEventMidGirudaMightyBaitForQ.
-  ///
-  /// In ko, this message translates to:
-  /// **'Q 공격 위해 저액 기루다로 마이티 유도'**
-  String get trickEventMidGirudaMightyBaitForQ;
+  /// **'{topCard} 최상위 확보 위해 저액 기루다로 마이티 유도'**
+  String trickEventMidGirudaMightyBaitForTop(String topCard);
 
   /// No description provided for @trickEventMidGirudaPassLead.
   ///

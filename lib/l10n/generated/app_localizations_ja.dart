@@ -1998,6 +1998,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String trickEventLastDefenseTopProtectFail(int count) {
+    return '守備最上位カード保護$count点防御も防衛失敗';
+  }
+
+  @override
   String trickEventLastCardAttackWin(int count) {
     return '攻撃$count点獲得';
   }
@@ -2023,10 +2028,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventMidGirudaMightyBait => '切り札中位でマイティ誘導';
 
   @override
-  String get trickEventMidGirudaMightyBaitForA => 'A最上位確保のため低位切り札でマイティ誘導';
-
-  @override
-  String get trickEventMidGirudaMightyBaitForQ => 'Q攻撃のため低位切り札でマイティ誘導';
+  String trickEventMidGirudaMightyBaitForTop(String topCard) {
+    return '$topCard最上位確保のため低位切り札でマイティ誘導';
+  }
 
   @override
   String get trickEventMidGirudaPassLead => '切り札中位でリード譲渡';

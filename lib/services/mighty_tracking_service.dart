@@ -157,53 +157,7 @@ class MightyTrackingService {
       final lastParts = <String>[];
       final pointCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
 
-      String? lastLabel;
-      if (trick.winnerId != null) {
-        final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
-        if (winIdx >= 0 && winIdx < trick.cards.length) {
-          final winCard = trick.cards[winIdx];
-          if (isMighty(winCard)) {
-            lastLabel = '마이티 마지막 트릭';
-          } else if (isGiruda(winCard)) {
-            lastLabel = '기루다 마지막 트릭';
-          }
-        }
-      }
-      // 비기루다 최상위 선공 (무늬 소진으로 낮은 카드가 최상위가 된 경우)
-      if (!leadCard.isJoker && leadCard.suit != null && leadCard.suit != giruda &&
-          leadCard.rankValue < 11) {
-        bool isTop = true;
-        for (int r = 14; r > leadCard.rankValue; r--) {
-          if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
-          if (!playedCards.contains('${leadCard.suit!.index}-$r')) { isTop = false; break; }
-        }
-        if (isTop) {
-          final cardStr = '${_suitSymbols[leadCard.suit!]}${_rankSymbols[leadCard.rankValue]}';
-          lastLabel = '무늬 소진 → $cardStr 최상위 선공';
-        }
-      }
-      // "마지막 카드"는 최상위 카드가 아닐 때만 표시
-      if (lastLabel == null && !leadCard.isJoker && leadCard.suit != null) {
-        bool isLeadTop = leadCard.rankValue >= 14;
-        if (!isLeadTop && leadCard.suit != giruda) {
-          isLeadTop = true;
-          for (int r = 14; r > leadCard.rankValue; r--) {
-            if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
-            if (!playedCards.contains('${leadCard.suit!.index}-$r')) { isLeadTop = false; break; }
-          }
-        }
-        if (!isLeadTop) lastLabel = '마지막 카드';
-      }
-      if (lastLabel != null) lastParts.add(lastLabel);
-
-      if (trick.winnerId != null && pointCount > 0) {
-        if (!isAttack(trick.winnerId!)) {
-          lastParts.add('수비 상위 카드 ${pointCount}점 방어');
-        } else {
-          lastParts.add('공격 ${pointCount}점 획득');
-        }
-      }
-
+      // 게임 결과 선계산
       int attackPoints = 0;
       for (final t in state.tricks) {
         if (t.winnerId != null && isAttack(t.winnerId!)) {
@@ -211,7 +165,81 @@ class MightyTrackingService {
         }
       }
       final bidTricks = state.currentBid?.tricks ?? 13;
-      if (attackPoints >= bidTricks) {
+      final attackWins = attackPoints >= bidTricks;
+
+      // 수비 최상위 카드 보호 승리 but 방어 실패 판정
+      bool defenseTopProtect = false;
+      if (trick.winnerId != null && !isAttack(trick.winnerId!) && pointCount > 0 && attackWins) {
+        final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
+        if (winIdx >= 0 && winIdx < trick.cards.length) {
+          final winCard = trick.cards[winIdx];
+          if (!winCard.isJoker && winCard.suit != null && !isMighty(winCard)) {
+            bool isWinTop = winCard.rankValue >= 14;
+            if (!isWinTop) {
+              isWinTop = true;
+              for (int r = 14; r > winCard.rankValue; r--) {
+                if (winCard.suit == mighty.suit && r == mighty.rankValue) continue;
+                if (!playedCards.contains('${winCard.suit!.index}-$r')) { isWinTop = false; break; }
+              }
+            }
+            if (isWinTop) defenseTopProtect = true;
+          }
+        }
+      }
+
+      if (defenseTopProtect) {
+        lastParts.add('수비 최상위 카드 보호 ${pointCount}점 방어하나 방어 실패');
+      } else {
+        String? lastLabel;
+        if (trick.winnerId != null) {
+          final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
+          if (winIdx >= 0 && winIdx < trick.cards.length) {
+            final winCard = trick.cards[winIdx];
+            if (isMighty(winCard)) {
+              lastLabel = '마이티 마지막 트릭';
+            } else if (isGiruda(winCard)) {
+              lastLabel = '기루다 마지막 트릭';
+            }
+          }
+        }
+        // 비기루다 최상위 선공 (무늬 소진으로 낮은 카드가 최상위가 된 경우)
+        if (!leadCard.isJoker && leadCard.suit != null && leadCard.suit != giruda &&
+            leadCard.rankValue < 11) {
+          bool isTop = true;
+          for (int r = 14; r > leadCard.rankValue; r--) {
+            if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
+            if (!playedCards.contains('${leadCard.suit!.index}-$r')) { isTop = false; break; }
+          }
+          if (isTop) {
+            final cardStr = '${_suitSymbols[leadCard.suit!]}${_rankSymbols[leadCard.rankValue]}';
+            lastLabel = '무늬 소진 → $cardStr 최상위 선공';
+          }
+        }
+        // "마지막 카드"는 최상위 카드가 아닐 때만 표시
+        if (lastLabel == null && !leadCard.isJoker && leadCard.suit != null) {
+          bool isLeadTop = leadCard.rankValue >= 14;
+          if (!isLeadTop && leadCard.suit != giruda) {
+            isLeadTop = true;
+            for (int r = 14; r > leadCard.rankValue; r--) {
+              if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
+              if (!playedCards.contains('${leadCard.suit!.index}-$r')) { isLeadTop = false; break; }
+            }
+          }
+          if (!isLeadTop) lastLabel = '마지막 카드';
+        }
+        if (lastLabel != null) lastParts.add(lastLabel);
+
+        if (trick.winnerId != null && pointCount > 0) {
+          if (!isAttack(trick.winnerId!)) {
+            lastParts.add('수비 상위 카드 ${pointCount}점 방어');
+          } else {
+            lastParts.add('공격 ${pointCount}점 획득');
+          }
+        }
+      }
+
+      // 게임 결과
+      if (attackWins) {
         final isRun = state.tricks.every((t) => t.winnerId != null && isAttack(t.winnerId!));
         if (isRun) {
           lastParts.add('공격 런(풀) 대승 확정');
@@ -232,19 +260,19 @@ class MightyTrackingService {
     bool girudaKInTrick = giruda != null && trick.cards.any((c) =>
         !c.isJoker && c.suit == giruda && c.rank == Rank.king);
 
-    bool declarerPlaysGirudaA = false;
-    bool declarerPlaysGirudaQ = false;
-    if (isAutoPlay && giruda != null) {
-      for (final t in state.tricks) {
-        for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
-          if (t.playerOrder[i] == state.declarerId) {
-            final c = t.cards[i];
-            if (!c.isJoker && c.suit == giruda) {
-              if (c.rank == Rank.ace) declarerPlaysGirudaA = true;
-              if (c.rank == Rank.queen) declarerPlaysGirudaQ = true;
-            }
-          }
-        }
+    // 이번 트릭 이후 남은 기루다 최상위 카드 계산
+    String? topRemainingGirudaStr;
+    if (giruda != null) {
+      final currentTrickGiruda = trick.cards
+          .where((c) => !c.isJoker && c.suit == giruda)
+          .map((c) => c.rankValue)
+          .toSet();
+      for (int r = 14; r >= 2; r--) {
+        if (giruda == mighty.suit && r == mighty.rankValue) continue;
+        if (playedCards.contains('${giruda.index}-$r')) continue;
+        if (currentTrickGiruda.contains(r)) continue;
+        topRemainingGirudaStr = '${_suitSymbols[giruda]}${_rankSymbols[r]}';
+        break;
       }
     }
 
@@ -313,10 +341,8 @@ class MightyTrackingService {
         parts.add('기루다 최상위 선공');
       } else {
         if (hasMightyInTrick) {
-          if (isAutoPlay && isDeclarerLead && declarerPlaysGirudaA) {
-            parts.add('A 최상위 확보 위해 저액 기루다로 마이티 유도');
-          } else if (isAutoPlay && isDeclarerLead && declarerPlaysGirudaQ) {
-            parts.add('Q 공격 위해 저액 기루다로 마이티 유도');
+          if (isAutoPlay && isDeclarerLead && topRemainingGirudaStr != null) {
+            parts.add('$topRemainingGirudaStr 최상위 확보 위해 저액 기루다로 마이티 유도');
           } else {
             parts.add('기루다 중간으로 마이티 유도');
           }

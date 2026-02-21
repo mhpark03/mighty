@@ -2004,6 +2004,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String trickEventLastDefenseTopProtectFail(int count) {
+    return '수비 최상위 카드 보호 $count점 방어하나 방어 실패';
+  }
+
+  @override
   String trickEventLastCardAttackWin(int count) {
     return '공격 $count점 획득';
   }
@@ -2029,10 +2034,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventMidGirudaMightyBait => '기루다 중간으로 마이티 유도';
 
   @override
-  String get trickEventMidGirudaMightyBaitForA => 'A 최상위 확보 위해 저액 기루다로 마이티 유도';
-
-  @override
-  String get trickEventMidGirudaMightyBaitForQ => 'Q 공격 위해 저액 기루다로 마이티 유도';
+  String trickEventMidGirudaMightyBaitForTop(String topCard) {
+    return '$topCard 최상위 확보 위해 저액 기루다로 마이티 유도';
+  }
 
   @override
   String get trickEventMidGirudaPassLead => '기루다 중간으로 선 넘김';

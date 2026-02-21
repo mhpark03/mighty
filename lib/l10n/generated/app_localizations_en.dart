@@ -2027,6 +2027,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String trickEventLastDefenseTopProtectFail(int count) {
+    return 'Defense top card saved, ${count}pts guarded but defense failed';
+  }
+
+  @override
   String trickEventLastCardAttackWin(int count) {
     return 'Attack ${count}pt gained';
   }
@@ -2052,12 +2057,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventMidGirudaMightyBait => 'Mid trump to bait Mighty';
 
   @override
-  String get trickEventMidGirudaMightyBaitForA =>
-      'Low trump to bait Mighty for A dominance';
-
-  @override
-  String get trickEventMidGirudaMightyBaitForQ =>
-      'Low trump to bait Mighty for Q attack';
+  String trickEventMidGirudaMightyBaitForTop(String topCard) {
+    return 'Low trump to bait Mighty, securing $topCard dominance';
+  }
 
   @override
   String get trickEventMidGirudaPassLead => 'Mid trump to pass lead';
