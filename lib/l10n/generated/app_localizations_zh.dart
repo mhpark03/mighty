@@ -2125,6 +2125,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventFriendTopCardWin => '朋友最高牌胜利';
 
   @override
+  String get trickEventFriendGirudaKDeclarerA => '朋友王牌K胜利，庄家持有A，攻击队王牌掌控';
+
+  @override
   String trickEventFriendTrickContribution(int count) {
     return '朋友助攻$count墩攻击成功';
   }

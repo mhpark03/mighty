@@ -1035,6 +1035,7 @@
   "trickMightyAppeared": "Mighty出现",
   "trickFriendJoined": "朋友合流",
   "trickEventFriendTopCardWin": "朋友最高牌胜利",
+  "trickEventFriendGirudaKDeclarerA": "朋友王牌K胜利，庄家持有A，攻击队王牌掌控",
   "trickEventFriendTrickContribution": "朋友助攻{count}墩攻击成功",
   "@trickEventFriendTrickContribution": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerSkipNoPoints": "{name}: Joker保有，无得分墩跳过",

@@ -5473,7 +5473,21 @@ class _GameScreenState extends State<GameScreen> {
             friendPlayedCard.suit != null) {
           final isTopCard = isTopOfSuit(friendPlayedCard.suit!, friendPlayedCard.rankValue);
           if (isTopCard) {
-            parts.add(l10n.trickEventFriendTopCardWin);
+            // 프렌드 기루다 K + 주공 A 보유 → 공격팀 기루다 장악
+            if (giruda != null && friendPlayedCard.suit == giruda && friendPlayedCard.rank == Rank.king) {
+              bool declarerHasGirudaA = false;
+              for (final t in state.tricks) {
+                for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+                  if (t.playerOrder[i] == state.declarerId && !t.cards[i].isJoker &&
+                      t.cards[i].suit == giruda && t.cards[i].rank == Rank.ace) {
+                    declarerHasGirudaA = true;
+                  }
+                }
+              }
+              parts.add(declarerHasGirudaA ? l10n.trickEventFriendGirudaKDeclarerA : l10n.trickEventFriendTopCardWin);
+            } else {
+              parts.add(l10n.trickEventFriendTopCardWin);
+            }
           }
         }
       }

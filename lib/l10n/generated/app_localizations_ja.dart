@@ -2132,6 +2132,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventFriendTopCardWin => 'フレンド最上位カード勝利';
 
   @override
+  String get trickEventFriendGirudaKDeclarerA => 'フレンド切り札K勝利、主攻A保有 攻撃チーム切り札掌握';
+
+  @override
   String trickEventFriendTrickContribution(int count) {
     return 'フレンド貢献$countトリック攻撃成功';
   }

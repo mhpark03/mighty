@@ -3820,6 +3820,12 @@ abstract class AppLocalizations {
   /// **'프렌드 최상위 카드 승리'**
   String get trickEventFriendTopCardWin;
 
+  /// No description provided for @trickEventFriendGirudaKDeclarerA.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 기루다 K 승리, 주공 A 보유 공격팀 기루다 장악'**
+  String get trickEventFriendGirudaKDeclarerA;
+
   /// No description provided for @trickEventFriendTrickContribution.
   ///
   /// In ko, this message translates to:

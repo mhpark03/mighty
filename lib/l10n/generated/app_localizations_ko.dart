@@ -2138,6 +2138,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventFriendTopCardWin => '프렌드 최상위 카드 승리';
 
   @override
+  String get trickEventFriendGirudaKDeclarerA =>
+      '프렌드 기루다 K 승리, 주공 A 보유 공격팀 기루다 장악';
+
+  @override
   String trickEventFriendTrickContribution(int count) {
     return '프렌드 도움 $count트릭 공격 성공';
   }

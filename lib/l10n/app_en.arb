@@ -1036,6 +1036,7 @@
   "trickMightyAppeared": "Mighty appeared",
   "trickFriendJoined": "Friend joined",
   "trickEventFriendTopCardWin": "Friend top card win",
+  "trickEventFriendGirudaKDeclarerA": "Friend giruda K win, declarer has A - attack giruda dominance",
   "trickEventFriendTrickContribution": "Friend helped {count} attack tricks",
   "@trickEventFriendTrickContribution": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerSkipNoPoints": "{name}: held Joker, skipped (no points)",

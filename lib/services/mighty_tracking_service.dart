@@ -443,7 +443,20 @@ class MightyTrackingService {
         if (!friendPlayedCard.isJoker && !friendPlayedCard.isMightyWith(giruda) &&
             friendPlayedCard.suit != null) {
           if (isTopOfSuit(friendPlayedCard.suit!, friendPlayedCard.rankValue)) {
-            parts.add('프렌드 최상위 카드 승리');
+            if (giruda != null && friendPlayedCard.suit == giruda && friendPlayedCard.rank == Rank.king) {
+              bool declarerHasGirudaA = false;
+              for (final t in state.tricks) {
+                for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+                  if (t.playerOrder[i] == state.declarerId && !t.cards[i].isJoker &&
+                      t.cards[i].suit == giruda && t.cards[i].rank == Rank.ace) {
+                    declarerHasGirudaA = true;
+                  }
+                }
+              }
+              parts.add(declarerHasGirudaA ? '프렌드 기루다 K 승리, 주공 A 보유 공격팀 기루다 장악' : '프렌드 최상위 카드 승리');
+            } else {
+              parts.add('프렌드 최상위 카드 승리');
+            }
           }
         }
       }

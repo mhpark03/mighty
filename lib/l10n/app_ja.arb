@@ -1035,6 +1035,7 @@
   "trickMightyAppeared": "マイティ出現",
   "trickFriendJoined": "フレンド合流",
   "trickEventFriendTopCardWin": "フレンド最上位カード勝利",
+  "trickEventFriendGirudaKDeclarerA": "フレンド切り札K勝利、主攻A保有 攻撃チーム切り札掌握",
   "trickEventFriendTrickContribution": "フレンド貢献{count}トリック攻撃成功",
   "@trickEventFriendTrickContribution": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerSkipNoPoints": "{name}: ジョーカー保有、無得点トリックスキップ",
