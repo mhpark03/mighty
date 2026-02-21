@@ -5531,9 +5531,9 @@ class _GameScreenState extends State<GameScreen> {
           final mightyPlayed = mighty.suit != null &&
               (playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}') ||
                trick.cards.any((c) => isMighty(c)));
-          if (!mightyPlayed) {
+          if (!mightyPlayed && !isAttack(girudaAHolder)) {
             parts.add(l10n.trickEventGirudaAceHeldMightyGuard(name));
-          } else {
+          } else if (mightyPlayed) {
             parts.add(l10n.trickEventGirudaAceHeld(name));
           }
         }

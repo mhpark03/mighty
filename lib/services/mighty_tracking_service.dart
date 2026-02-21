@@ -495,9 +495,9 @@ class MightyTrackingService {
           final mightyPlayed = mighty.suit != null &&
               (playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}') ||
                trick.cards.any((c) => isMighty(c)));
-          if (!mightyPlayed) {
+          if (!mightyPlayed && !isAttack(girudaAHolder)) {
             parts.add('$name: 기루다 A 보유, 마이티 경계로 미사용');
-          } else {
+          } else if (mightyPlayed) {
             parts.add('$name: 기루다 A 보유, 미사용');
           }
         }
