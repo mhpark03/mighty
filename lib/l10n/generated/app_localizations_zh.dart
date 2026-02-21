@@ -2020,6 +2020,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventLastCard => '最后一张牌';
 
   @override
+  String trickEventLastCardDefenseWin(int count) {
+    return '守方高牌$count分防御';
+  }
+
+  @override
+  String trickEventLastCardAttackWin(int count) {
+    return '攻方$count分获取';
+  }
+
+  @override
   String get trickEventJokerLead => 'Joker首攻';
 
   @override
@@ -2056,6 +2066,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickEventDefenseTopCardDefend => '守方最高牌得分防御';
+
+  @override
+  String get trickEventDefenseLeadAttackCut => '守方非将牌攻击 → 将牌切入夺先';
 
   @override
   String get trickEventFirstTrickFriendBait => '首墩缺牌 / 诱导Friend';
@@ -2135,6 +2148,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickFriendJoined => '朋友合流';
+
+  @override
+  String get trickEventFriendTopCardWin => '朋友最高牌胜利';
+
+  @override
+  String trickEventFriendTrickContribution(int count) {
+    return '朋友助攻$count墩攻击成功';
+  }
 
   @override
   String estimatedMinWins(int count) {

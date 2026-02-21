@@ -3646,6 +3646,18 @@ abstract class AppLocalizations {
   /// **'마지막 카드'**
   String get trickEventLastCard;
 
+  /// No description provided for @trickEventLastCardDefenseWin.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 상위 카드 {count}점 방어'**
+  String trickEventLastCardDefenseWin(int count);
+
+  /// No description provided for @trickEventLastCardAttackWin.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격 {count}점 획득'**
+  String trickEventLastCardAttackWin(int count);
+
   /// No description provided for @trickEventJokerLead.
   ///
   /// In ko, this message translates to:
@@ -3717,6 +3729,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'수비 최상위 카드 점수 방어'**
   String get trickEventDefenseTopCardDefend;
+
+  /// No description provided for @trickEventDefenseLeadAttackCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 비기루다 공격 → 기루다 컷 선 탈환'**
+  String get trickEventDefenseLeadAttackCut;
 
   /// No description provided for @trickEventFirstTrickFriendBait.
   ///
@@ -3855,6 +3873,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'프렌드 합류'**
   String get trickFriendJoined;
+
+  /// No description provided for @trickEventFriendTopCardWin.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 최상위 카드 승리'**
+  String get trickEventFriendTopCardWin;
+
+  /// No description provided for @trickEventFriendTrickContribution.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 도움 {count}트릭 공격 성공'**
+  String trickEventFriendTrickContribution(int count);
 
   /// No description provided for @estimatedMinWins.
   ///
