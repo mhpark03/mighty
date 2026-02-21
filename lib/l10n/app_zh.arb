@@ -1004,6 +1004,7 @@
   "trickEventMightyLead": "Mighty首攻",
   "trickEventTopGirudaLead": "将牌最高首攻",
   "trickEventMidGirudaMightyBait": "中位将牌诱导Mighty",
+  "trickEventMidGirudaMightyBaitForQ": "为Q攻击用低位将牌诱导Mighty",
   "trickEventMidGirudaPassLead": "中位将牌让先",
   "trickEventDefenderGirudaWin": "守方将牌胜",
   "trickEventMidGirudaLead": "中位将牌首攻",

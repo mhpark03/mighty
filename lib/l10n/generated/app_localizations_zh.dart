@@ -2040,6 +2040,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventMidGirudaMightyBait => '中位将牌诱导Mighty';
 
   @override
+  String get trickEventMidGirudaMightyBaitForQ => '为Q攻击用低位将牌诱导Mighty';
+
+  @override
   String get trickEventMidGirudaPassLead => '中位将牌让先';
 
   @override

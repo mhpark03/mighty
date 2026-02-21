@@ -2076,6 +2076,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventMidGirudaMightyBait => 'Mid trump to bait Mighty';
 
   @override
+  String get trickEventMidGirudaMightyBaitForQ =>
+      'Low trump to bait Mighty for Q attack';
+
+  @override
   String get trickEventMidGirudaPassLead => 'Mid trump to pass lead';
 
   @override

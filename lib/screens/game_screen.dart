@@ -5229,6 +5229,23 @@ class _GameScreenState extends State<GameScreen> {
         !c.isJoker && c.suit == giruda && c.rank == Rank.king);
     bool girudaKAlreadyPlayed = giruda != null &&
         playedCards.contains('${giruda!.index}-13'); // King rankValue = 13
+
+    // 주공이 기루다 K/Q를 보유하는지 확인 (전체 트릭에서 주공이 낸 카드 확인)
+    bool declarerPlaysGirudaK = false;
+    bool declarerPlaysGirudaQ = false;
+    if (isAutoPlay && giruda != null) {
+      for (final t in state.tricks) {
+        for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+          if (t.playerOrder[i] == state.declarerId) {
+            final c = t.cards[i];
+            if (!c.isJoker && c.suit == giruda) {
+              if (c.rank == Rank.king) declarerPlaysGirudaK = true;
+              if (c.rank == Rank.queen) declarerPlaysGirudaQ = true;
+            }
+          }
+        }
+      }
+    }
     bool friendAlreadyRevealed = false;
     final friendCard = state.friendDeclaration?.card;
     if (friendCard != null) {
@@ -5280,7 +5297,10 @@ class _GameScreenState extends State<GameScreen> {
       if (isTop) {
         if (isAutoPlay && isDeclarerLead && leadCard.rank == Rank.ace && giruda != null) {
           // 전략: 기루다 A 공격 → K 소진 확인
-          if (girudaKInTrick) {
+          if (declarerPlaysGirudaK) {
+            // 주공이 K도 보유 → 단순 최상위 선공
+            parts.add(l10n.trickEventTopGirudaLead);
+          } else if (girudaKInTrick) {
             parts.add(l10n.trickEventGirudaAceKExhausted);
           } else if (girudaKAlreadyPlayed) {
             parts.add(l10n.trickEventTopGirudaLead);
@@ -5292,7 +5312,12 @@ class _GameScreenState extends State<GameScreen> {
         }
       } else {
         if (hasMightyInTrick) {
-          parts.add(l10n.trickEventMidGirudaMightyBait);
+          if (isAutoPlay && isDeclarerLead && declarerPlaysGirudaQ) {
+            // 주공이 Q도 보유 → Q 공격 준비를 위한 마이티 유도
+            parts.add(l10n.trickEventMidGirudaMightyBaitForQ);
+          } else {
+            parts.add(l10n.trickEventMidGirudaMightyBait);
+          }
         } else if (isAutoPlay && isDeclarerLead && leadCard.rank == Rank.queen) {
           // 전략: Q로 선 탈환
           final won = trick.winnerId == leadId;

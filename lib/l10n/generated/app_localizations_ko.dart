@@ -2053,6 +2053,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventMidGirudaMightyBait => '기루다 중간으로 마이티 유도';
 
   @override
+  String get trickEventMidGirudaMightyBaitForQ => 'Q 공격 위해 저액 기루다로 마이티 유도';
+
+  @override
   String get trickEventMidGirudaPassLead => '기루다 중간으로 선 넘김';
 
   @override

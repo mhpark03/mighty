@@ -1164,6 +1164,7 @@
   "trickEventMightyLead": "마이티 선공",
   "trickEventTopGirudaLead": "기루다 최상위 선공",
   "trickEventMidGirudaMightyBait": "기루다 중간으로 마이티 유도",
+  "trickEventMidGirudaMightyBaitForQ": "Q 공격 위해 저액 기루다로 마이티 유도",
   "trickEventMidGirudaPassLead": "기루다 중간으로 선 넘김",
   "trickEventDefenderGirudaWin": "수비팀 기루다 승리",
   "trickEventMidGirudaLead": "기루다 중간 선공",

@@ -2047,6 +2047,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventMidGirudaMightyBait => '切り札中位でマイティ誘導';
 
   @override
+  String get trickEventMidGirudaMightyBaitForQ => 'Q攻撃のため低位切り札でマイティ誘導';
+
+  @override
   String get trickEventMidGirudaPassLead => '切り札中位でリード譲渡';
 
   @override

@@ -1004,6 +1004,7 @@
   "trickEventMightyLead": "マイティリード",
   "trickEventTopGirudaLead": "切り札最上位リード",
   "trickEventMidGirudaMightyBait": "切り札中位でマイティ誘導",
+  "trickEventMidGirudaMightyBaitForQ": "Q攻撃のため低位切り札でマイティ誘導",
   "trickEventMidGirudaPassLead": "切り札中位でリード譲渡",
   "trickEventDefenderGirudaWin": "守備側切り札勝利",
   "trickEventMidGirudaLead": "切り札中位リード",
