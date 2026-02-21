@@ -2068,6 +2068,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventWaste => '捨て札';
 
   @override
+  String get trickEventWasteFriendRescue => '捨て札 → フレンド救出!';
+
+  @override
   String get trickEventAttackGirudaCut => '攻撃切り札カット';
 
   @override

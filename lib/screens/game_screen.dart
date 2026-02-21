@@ -5324,7 +5324,11 @@ class _GameScreenState extends State<GameScreen> {
           parts.add(l10n.trickEventFirstTrickWaste);
         }
       } else {
-        parts.add(l10n.trickEventWaste);
+        if (trick.winnerId != null && trick.winnerId != leadId && isAttack(trick.winnerId!)) {
+          parts.add(l10n.trickEventWasteFriendRescue);
+        } else {
+          parts.add(l10n.trickEventWaste);
+        }
       }
     }
 

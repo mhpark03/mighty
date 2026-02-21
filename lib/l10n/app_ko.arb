@@ -1171,6 +1171,7 @@
   "trickEventFirstTrickFriendBait": "초구 부재 / 물패로 프렌드 유도",
   "trickEventFirstTrickWaste": "초구 부재 / 물패 처리",
   "trickEventWaste": "물패 처리",
+  "trickEventWasteFriendRescue": "물패 → 프렌드 기사회생!",
   "trickEventAttackGirudaCut": "공격 기루다 컷",
   "trickEventDefenseGirudaCut": "수비 기루다 컷",
   "trickEventNonGirudaExhaust": "비기루다 소진",

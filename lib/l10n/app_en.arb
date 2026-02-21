@@ -1012,6 +1012,7 @@
   "trickEventFirstTrickFriendBait": "No lead in 1st trick / Friend bait",
   "trickEventFirstTrickWaste": "No lead in 1st trick / Waste",
   "trickEventWaste": "Waste play",
+  "trickEventWasteFriendRescue": "Waste → Friend rescue!",
   "trickEventAttackGirudaCut": "Attack trump cut",
   "trickEventDefenseGirudaCut": "Defense trump cut",
   "trickEventNonGirudaExhaust": "Non-trump exhausted",

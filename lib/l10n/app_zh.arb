@@ -1011,6 +1011,7 @@
   "trickEventFirstTrickFriendBait": "首墩缺牌 / 诱导Friend",
   "trickEventFirstTrickWaste": "首墩缺牌 / 弃牌",
   "trickEventWaste": "弃牌",
+  "trickEventWasteFriendRescue": "弃牌 → 朋友救场!",
   "trickEventAttackGirudaCut": "攻方将牌切入",
   "trickEventDefenseGirudaCut": "守方将牌切入",
   "trickEventNonGirudaExhaust": "非将牌消耗",

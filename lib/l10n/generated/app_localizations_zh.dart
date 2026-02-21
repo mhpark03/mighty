@@ -2061,6 +2061,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventWaste => '弃牌';
 
   @override
+  String get trickEventWasteFriendRescue => '弃牌 → 朋友救场!';
+
+  @override
   String get trickEventAttackGirudaCut => '攻方将牌切入';
 
   @override

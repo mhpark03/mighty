@@ -3724,6 +3724,12 @@ abstract class AppLocalizations {
   /// **'물패 처리'**
   String get trickEventWaste;
 
+  /// No description provided for @trickEventWasteFriendRescue.
+  ///
+  /// In ko, this message translates to:
+  /// **'물패 → 프렌드 기사회생!'**
+  String get trickEventWasteFriendRescue;
+
   /// No description provided for @trickEventAttackGirudaCut.
   ///
   /// In ko, this message translates to:

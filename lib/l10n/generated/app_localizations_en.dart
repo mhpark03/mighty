@@ -2098,6 +2098,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventWaste => 'Waste play';
 
   @override
+  String get trickEventWasteFriendRescue => 'Waste → Friend rescue!';
+
+  @override
   String get trickEventAttackGirudaCut => 'Attack trump cut';
 
   @override
