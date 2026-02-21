@@ -1147,6 +1147,7 @@
   "trickEventTopNonGirudaLead": "비기루다 최상위 선공",
   "trickEventDefenseTopCardDefend": "수비 최상위 카드 점수 방어",
   "trickEventDefenseLeadAttackCut": "수비 비기루다 공격 → 기루다 컷 선 탈환",
+  "trickEventAttackLeadDefenseCut": "공격 비기루다 최상위 선공 → 수비 기루다 컷",
   "trickEventFirstTrickFriendBait": "초구 부재 / 물패로 프렌드 유도",
   "trickEventFirstTrickWaste": "초구 부재 / 물패 처리",
   "trickEventAttackFailed": "공격 실패 → 수비 상위 카드에 패배",

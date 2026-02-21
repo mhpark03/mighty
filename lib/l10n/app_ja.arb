@@ -987,6 +987,7 @@
   "trickEventTopNonGirudaLead": "非切り札最上位リード",
   "trickEventDefenseTopCardDefend": "守備最上位カード得点防御",
   "trickEventDefenseLeadAttackCut": "守備非切り札攻撃 → 切り札カット奪還",
+  "trickEventAttackLeadDefenseCut": "攻撃非切り札最上位先攻 → 守備切り札カット",
   "trickEventFirstTrickFriendBait": "初トリック不在 / フレンド誘導",
   "trickEventFirstTrickWaste": "初トリック不在 / 捨て札",
   "trickEventAttackFailed": "攻撃失敗 → 守備上位カードに敗北",

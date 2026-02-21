@@ -223,6 +223,12 @@ class MightyTrackingService {
       if (winIdx < 0 || winIdx >= trick.cards.length) return false;
       return isGiruda(trick.cards[winIdx]) && trick.winnerId != leadId && isAttack(trick.winnerId!);
     }
+    bool isDefenseGirudaCut() {
+      if (trick.leadSuit == giruda || giruda == null || trick.winnerId == null) return false;
+      final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
+      if (winIdx < 0 || winIdx >= trick.cards.length) return false;
+      return isGiruda(trick.cards[winIdx]) && trick.winnerId != leadId && !isAttack(trick.winnerId!);
+    }
 
     final parts = <String>[];
 
@@ -281,6 +287,9 @@ class MightyTrackingService {
           parts.add('추가 점수 공격');
         } else if (!isAttack(leadId) && isAttackGirudaCut()) {
           parts.add('수비 비기루다 공격 → 기루다 컷 선 탈환');
+          girudaCutDescribed = true;
+        } else if (isAttack(leadId) && isDefenseGirudaCut()) {
+          parts.add('공격 비기루다 최상위 선공 → 수비 기루다 컷');
           girudaCutDescribed = true;
         } else if (!isAttack(leadId) && trick.winnerId != null && !isAttack(trick.winnerId!)) {
           parts.add('수비 최상위 카드 점수 방어');

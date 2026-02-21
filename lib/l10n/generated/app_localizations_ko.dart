@@ -2038,6 +2038,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventDefenseLeadAttackCut => '수비 비기루다 공격 → 기루다 컷 선 탈환';
 
   @override
+  String get trickEventAttackLeadDefenseCut => '공격 비기루다 최상위 선공 → 수비 기루다 컷';
+
+  @override
   String get trickEventFirstTrickFriendBait => '초구 부재 / 물패로 프렌드 유도';
 
   @override

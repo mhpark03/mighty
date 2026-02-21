@@ -5237,6 +5237,12 @@ class _GameScreenState extends State<GameScreen> {
       if (winIdx < 0 || winIdx >= trick.cards.length) return false;
       return isGiruda(trick.cards[winIdx]) && trick.winnerId != leadId && isAttack(trick.winnerId!);
     }
+    bool isDefenseGirudaCut() {
+      if (trick.leadSuit == giruda || giruda == null || trick.winnerId == null) return false;
+      final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
+      if (winIdx < 0 || winIdx >= trick.cards.length) return false;
+      return isGiruda(trick.cards[winIdx]) && trick.winnerId != leadId && !isAttack(trick.winnerId!);
+    }
 
     final parts = <String>[];
 
@@ -5301,6 +5307,10 @@ class _GameScreenState extends State<GameScreen> {
         } else if (!isAttack(leadId) && isAttackGirudaCut()) {
           // 수비 비기루다 공격 → 공격팀 기루다 컷 선 탈환
           parts.add(l10n.trickEventDefenseLeadAttackCut);
+          girudaCutDescribed = true;
+        } else if (isAttack(leadId) && isDefenseGirudaCut()) {
+          // 공격 비기루다 최상위 선공 → 수비 기루다 컷
+          parts.add(l10n.trickEventAttackLeadDefenseCut);
           girudaCutDescribed = true;
         } else if (!isAttack(leadId) && trick.winnerId != null && !isAttack(trick.winnerId!)) {
           // 수비팀 비기루다 최상위 선공 → 점수 방어

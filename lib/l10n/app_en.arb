@@ -988,6 +988,7 @@
   "trickEventTopNonGirudaLead": "Top non-trump lead",
   "trickEventDefenseTopCardDefend": "Defense top card point guard",
   "trickEventDefenseLeadAttackCut": "Defense non-trump lead → Trump cut reclaim",
+  "trickEventAttackLeadDefenseCut": "Attack non-trump top lead → Defense trump cut",
   "trickEventFirstTrickFriendBait": "No lead in 1st trick / Friend bait",
   "trickEventFirstTrickWaste": "No lead in 1st trick / Waste",
   "trickEventAttackFailed": "Attack failed → lost to higher defense card",

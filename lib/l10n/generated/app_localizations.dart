@@ -3652,6 +3652,12 @@ abstract class AppLocalizations {
   /// **'수비 비기루다 공격 → 기루다 컷 선 탈환'**
   String get trickEventDefenseLeadAttackCut;
 
+  /// No description provided for @trickEventAttackLeadDefenseCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격 비기루다 최상위 선공 → 수비 기루다 컷'**
+  String get trickEventAttackLeadDefenseCut;
+
   /// No description provided for @trickEventFirstTrickFriendBait.
   ///
   /// In ko, this message translates to:

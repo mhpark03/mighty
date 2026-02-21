@@ -2064,6 +2064,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Defense non-trump lead → Trump cut reclaim';
 
   @override
+  String get trickEventAttackLeadDefenseCut =>
+      'Attack non-trump top lead → Defense trump cut';
+
+  @override
   String get trickEventFirstTrickFriendBait =>
       'No lead in 1st trick / Friend bait';
 

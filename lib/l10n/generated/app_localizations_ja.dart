@@ -2032,6 +2032,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventDefenseLeadAttackCut => '守備非切り札攻撃 → 切り札カット奪還';
 
   @override
+  String get trickEventAttackLeadDefenseCut => '攻撃非切り札最上位先攻 → 守備切り札カット';
+
+  @override
   String get trickEventFirstTrickFriendBait => '初トリック不在 / フレンド誘導';
 
   @override

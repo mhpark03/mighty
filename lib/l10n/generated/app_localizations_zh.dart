@@ -2025,6 +2025,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventDefenseLeadAttackCut => '守方非将牌攻击 → 将牌切入夺先';
 
   @override
+  String get trickEventAttackLeadDefenseCut => '进攻非将牌最高出牌 → 守方将牌切入';
+
+  @override
   String get trickEventFirstTrickFriendBait => '首墩缺牌 / 诱导Friend';
 
   @override
