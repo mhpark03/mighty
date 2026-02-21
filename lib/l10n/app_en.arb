@@ -1015,6 +1015,71 @@
   "trickEventAttackGirudaCut": "Attack trump cut",
   "trickEventDefenseGirudaCut": "Defense trump cut",
   "trickEventNonGirudaExhaust": "Non-trump exhausted",
+  "trickEventGirudaAceKExhausted": "Trump A attack → K exhausted",
+  "trickEventGirudaAceKNotExhausted": "Trump A attack → K not exhausted",
+  "trickEventJokerAfterFriend": "Joker after friend joined ({suit}) → score",
+  "@trickEventJokerAfterFriend": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "trickEventJokerAfterFriendGeneral": "Joker after friend joined → score",
+  "trickEventGirudaQReclaimSuccess": "Trump Q → lead reclaimed",
+  "trickEventGirudaQReclaimFail": "Trump Q reclaim failed, defense wins",
+  "trickEventHighCardAttack": "High card score attack",
+  "trickResultAttack": "→ Attack +{count}",
+  "@trickResultAttack": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultDefense": "→ Defense +{count}",
+  "@trickResultDefense": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultNoScore": "→ No score",
+  "trickMightyAppeared": "Mighty appeared",
+  "trickFriendJoined": "Friend joined",
   "estimatedMinWins": "→ {count}+ wins expected",
-  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } }
+  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
+  "stepFirstAce": "Lead {card} to maintain initiative on first trick",
+  "@stepFirstAce": { "placeholders": { "card": { "type": "String" } } },
+  "stepFirstKing": "Lead {card} to maintain initiative (highest in Mighty suit)",
+  "@stepFirstKing": { "placeholders": { "card": { "type": "String" } } },
+  "stepFirstMighty": "Lead Mighty to secure first trick",
+  "stepFirstJoker": "Lead Joker to secure first trick",
+  "stepGirudaAce": "Attack with {card} as trump",
+  "@stepGirudaAce": { "placeholders": { "card": { "type": "String" } } },
+  "stepGirudaAceCheckK": "Attack with {card} as trump (check K exhaustion)",
+  "@stepGirudaAceCheckK": { "placeholders": { "card": { "type": "String" } } },
+  "stepGirudaKing": "Additional trump attack with {card}",
+  "@stepGirudaKing": { "placeholders": { "card": { "type": "String" } } },
+  "stepJokerCallGiruda": "If K not exhausted, call {suit} with Joker to draw out K",
+  "@stepJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "stepJokerAfterFriend": "Score points with Joker after friend joins",
+  "stepFriendMightyJoin": "Mighty friend joins on first trick",
+  "stepFriendJokerJoin": "Joker friend naturally joins on trump lead",
+  "stepLowGirudaFriendLure": "If {highCards} not appeared, lure Mighty({mightyCard}) with {card} while attacking trump",
+  "@stepLowGirudaFriendLure": { "placeholders": { "highCards": { "type": "String" }, "card": { "type": "String" }, "mightyCard": { "type": "String" } } },
+  "stepGirudaQReclaim": "Reclaim lead with {card}",
+  "@stepGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "stepGirudaLeadFriend": "Lead trump to draw out {friendCard}",
+  "@stepGirudaLeadFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "stepJokerCallFriend": "If {friendCard} not appeared, call trump with Joker to lure friend",
+  "@stepJokerCallFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "stepLureWithGiruda": "Still not appeared, lead {card} to lure friend({friendCard})",
+  "@stepLureWithGiruda": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "stepSuitLeadFriend": "Lead {card} to lure friend({friendCard})",
+  "@stepSuitLeadFriend": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "stepJokerCall": "Call {suits} with Joker to secure point cards",
+  "@stepJokerCall": { "placeholders": { "suits": { "type": "String" } } },
+  "stepJokerOptimal": "Use Joker at optimal timing to score points",
+  "stepHighCardAttack": "Score additional points with {cards}",
+  "@stepHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
+  "stepMightyTiming": "Use Mighty after trump exhaustion to secure trick",
+  "stepVoidCut": "Use {suits} void for trump cut scoring",
+  "@stepVoidCut": { "placeholders": { "suits": { "type": "String" } } },
+  "stepEndgameScoring": "Maximize point collection through endgame play"
 }

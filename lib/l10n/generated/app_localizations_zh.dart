@@ -2070,7 +2070,152 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventNonGirudaExhaust => '非将牌消耗';
 
   @override
+  String get trickEventGirudaAceKExhausted => '将牌A攻击 → K消耗';
+
+  @override
+  String get trickEventGirudaAceKNotExhausted => '将牌A攻击 → K未消耗';
+
+  @override
+  String trickEventJokerAfterFriend(String suit) {
+    return '朋友合流后王牌 ($suit) → 得分';
+  }
+
+  @override
+  String get trickEventJokerAfterFriendGeneral => '朋友合流后王牌 → 得分';
+
+  @override
+  String get trickEventGirudaQReclaimSuccess => '将牌Q → 夺回出牌权成功';
+
+  @override
+  String get trickEventGirudaQReclaimFail => '将牌Q夺回失败，防守胜';
+
+  @override
+  String get trickEventHighCardAttack => '高牌追加攻击';
+
+  @override
+  String trickResultAttack(int count) {
+    return '→ 攻方 +$count';
+  }
+
+  @override
+  String trickResultDefense(int count) {
+    return '→ 守方 +$count';
+  }
+
+  @override
+  String get trickResultNoScore => '→ 无得分';
+
+  @override
+  String get trickMightyAppeared => 'Mighty出现';
+
+  @override
+  String get trickFriendJoined => '朋友合流';
+
+  @override
   String estimatedMinWins(int count) {
     return '→ 预计$count胜以上';
   }
+
+  @override
+  String stepFirstAce(String card) {
+    return '用$card保持首墩先手';
+  }
+
+  @override
+  String stepFirstKing(String card) {
+    return '用$card保持首墩先手（至尊花色最高）';
+  }
+
+  @override
+  String get stepFirstMighty => '用至尊确保首墩先手';
+
+  @override
+  String get stepFirstJoker => '用王牌确保首墩先手';
+
+  @override
+  String stepGirudaAce(String card) {
+    return '用$card进行将牌攻击';
+  }
+
+  @override
+  String stepGirudaAceCheckK(String card) {
+    return '用$card进行将牌攻击（确认K消耗）';
+  }
+
+  @override
+  String stepGirudaKing(String card) {
+    return '用$card追加将牌攻击';
+  }
+
+  @override
+  String stepJokerCallGiruda(String suit) {
+    return 'K未消耗时，用王牌叫$suit引出K';
+  }
+
+  @override
+  String get stepJokerAfterFriend => '朋友合流后用王牌得分';
+
+  @override
+  String get stepFriendMightyJoin => '至尊朋友 → 首墩合流';
+
+  @override
+  String get stepFriendJokerJoin => '王牌朋友 → 将牌引领时自然合流';
+
+  @override
+  String stepLowGirudaFriendLure(
+    String highCards,
+    String card,
+    String mightyCard,
+  ) {
+    return '$highCards未出现时，用$card引诱至尊($mightyCard)同时进行将牌攻击';
+  }
+
+  @override
+  String stepGirudaQReclaim(String card) {
+    return '用$card夺回出牌权';
+  }
+
+  @override
+  String stepGirudaLeadFriend(String friendCard) {
+    return '将牌引领引出$friendCard';
+  }
+
+  @override
+  String stepJokerCallFriend(String friendCard) {
+    return '$friendCard未出现时，用王牌叫将牌引诱朋友';
+  }
+
+  @override
+  String stepLureWithGiruda(String card, String friendCard) {
+    return '仍未出现时，用$card引诱朋友($friendCard)';
+  }
+
+  @override
+  String stepSuitLeadFriend(String card, String friendCard) {
+    return '用$card引领引诱朋友($friendCard)';
+  }
+
+  @override
+  String stepJokerCall(String suits) {
+    return '用王牌叫$suits确保得分牌';
+  }
+
+  @override
+  String get stepJokerOptimal => '在最佳时机使用王牌获得分数';
+
+  @override
+  String stepHighCardAttack(String cards) {
+    return '用$cards获得额外分数';
+  }
+
+  @override
+  String get stepMightyTiming => '将牌消耗后使用至尊确保赢墩';
+
+  @override
+  String stepVoidCut(String suits) {
+    return '利用$suits缺门进行将牌切入得分';
+  }
+
+  @override
+  String get stepEndgameScoring => '通过间（カン）尽量获得更多分数';
 }

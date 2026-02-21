@@ -1014,6 +1014,71 @@
   "trickEventAttackGirudaCut": "攻撃切り札カット",
   "trickEventDefenseGirudaCut": "守備切り札カット",
   "trickEventNonGirudaExhaust": "非切り札消耗",
+  "trickEventGirudaAceKExhausted": "切り札A攻撃 → K消耗",
+  "trickEventGirudaAceKNotExhausted": "切り札A攻撃 → K未消耗",
+  "trickEventJokerAfterFriend": "フレンド合流後ジョーカー ({suit}) → 得点",
+  "@trickEventJokerAfterFriend": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "trickEventJokerAfterFriendGeneral": "フレンド合流後ジョーカー → 得点",
+  "trickEventGirudaQReclaimSuccess": "切り札Q → リード奪還成功",
+  "trickEventGirudaQReclaimFail": "切り札Qリード奪還失敗、守備勝利",
+  "trickEventHighCardAttack": "高額カード追加攻撃",
+  "trickResultAttack": "→ 攻撃 +{count}",
+  "@trickResultAttack": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultDefense": "→ 守備 +{count}",
+  "@trickResultDefense": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultNoScore": "→ 無得点",
+  "trickMightyAppeared": "マイティ出現",
+  "trickFriendJoined": "フレンド合流",
   "estimatedMinWins": "→ {count}勝以上予想",
-  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } }
+  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
+  "stepFirstAce": "{card}で初手の先手を維持",
+  "@stepFirstAce": { "placeholders": { "card": { "type": "String" } } },
+  "stepFirstKing": "{card}で初手の先手を維持（マイティスート最上位）",
+  "@stepFirstKing": { "placeholders": { "card": { "type": "String" } } },
+  "stepFirstMighty": "マイティで初手を確保",
+  "stepFirstJoker": "ジョーカーで初手を確保",
+  "stepGirudaAce": "{card}で切り札攻撃",
+  "@stepGirudaAce": { "placeholders": { "card": { "type": "String" } } },
+  "stepGirudaAceCheckK": "{card}で切り札攻撃（K消耗確認）",
+  "@stepGirudaAceCheckK": { "placeholders": { "card": { "type": "String" } } },
+  "stepGirudaKing": "{card}で切り札追加攻撃",
+  "@stepGirudaKing": { "placeholders": { "card": { "type": "String" } } },
+  "stepJokerCallGiruda": "K未消耗時、ジョーカーで{suit}コールしてK誘引",
+  "@stepJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "stepJokerAfterFriend": "フレンド合流後、ジョーカーで得点獲得",
+  "stepFriendMightyJoin": "マイティフレンド → 初手で合流",
+  "stepFriendJokerJoin": "ジョーカーフレンド → 切り札リード時に自然合流",
+  "stepLowGirudaFriendLure": "{highCards}未出現時、{card}でマイティ({mightyCard})を誘引しつつ切り札攻撃",
+  "@stepLowGirudaFriendLure": { "placeholders": { "highCards": { "type": "String" }, "card": { "type": "String" }, "mightyCard": { "type": "String" } } },
+  "stepGirudaQReclaim": "{card}で先手を奪還",
+  "@stepGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "stepGirudaLeadFriend": "切り札リードで{friendCard}を誘導",
+  "@stepGirudaLeadFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "stepJokerCallFriend": "{friendCard}未出現時、ジョーカーで切り札コールしフレンド誘導",
+  "@stepJokerCallFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "stepLureWithGiruda": "それでも未出現時、{card}でフレンド({friendCard})を誘導",
+  "@stepLureWithGiruda": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "stepSuitLeadFriend": "{card}でリードしてフレンド({friendCard})を誘導",
+  "@stepSuitLeadFriend": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "stepJokerCall": "ジョーカーで{suits}コールして得点カード確保",
+  "@stepJokerCall": { "placeholders": { "suits": { "type": "String" } } },
+  "stepJokerOptimal": "ジョーカーを最適タイミングで使用して得点獲得",
+  "stepHighCardAttack": "{cards}で追加得点獲得",
+  "@stepHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
+  "stepMightyTiming": "マイティを切り札消耗後に使用してトリック確保",
+  "stepVoidCut": "{suits}ボイドを活用して切り札カットで得点",
+  "@stepVoidCut": { "placeholders": { "suits": { "type": "String" } } },
+  "stepEndgameScoring": "間（カン）を通じて最大限の得点獲得を試みる"
 }

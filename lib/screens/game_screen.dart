@@ -560,19 +560,6 @@ class _GameScreenState extends State<GameScreen> {
     final giruda = state.giruda;
     final targetTricks = bid.tricks;
 
-    // 트릭 기반 예상 득점 범위
-    final (estMinPoints, estMaxPoints) = controller.getEstimatedPointRange();
-    // 점수 계산: 득점 >= 목표이면 승리, 미만이면 패배
-    int _calcScore(int points) {
-      if (points >= targetTricks) {
-        return ((points - targetTricks + 1) + (points - 13) * 2) * 2;
-      } else {
-        return (points - targetTricks) * 2;
-      }
-    }
-    final maxScore = _calcScore(estMaxPoints);
-    final minScore = _calcScore(estMinPoints);
-
     // 노기루다 여부
     final isNoGiruda = giruda == null;
 
@@ -677,48 +664,44 @@ class _GameScreenState extends State<GameScreen> {
             _buildFriendInfoRow(controller, l10n),
             SizedBox(height: 8 * s),
 
-            // 점수 설명
+            // 주공 최종 카드
             Container(
               width: double.infinity,
-              padding: EdgeInsets.all(compact ? 10 : 16),
+              padding: EdgeInsets.all(8 * s),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white12),
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber.withValues(alpha: 0.4)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    l10n.bidSummaryEstimatedRange,
-                    style: TextStyle(fontSize: 14 * s, fontWeight: FontWeight.bold, color: Colors.white),
+                  Row(
+                    children: [
+                      Icon(Icons.style, color: Colors.amber, size: 14 * s),
+                      SizedBox(width: 4 * s),
+                      Text(
+                        '$declarerName ${l10n.handCards}',
+                        style: TextStyle(color: Colors.amber, fontSize: 12 * s, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 8 * s),
-                  _buildScoreRow(
-                    l10n.bidSummaryEstMax(estMaxPoints),
-                    '${maxScore >= 0 ? '+' : ''}$maxScore',
-                    maxScore >= 0 ? Colors.green : Colors.red[300]!,
-                  ),
-                  Text(l10n.bidSummaryEstMaxDesc, style: TextStyle(color: Colors.white38, fontSize: 10 * s)),
-                  SizedBox(height: 4 * s),
-                  _buildScoreRow(
-                    l10n.bidSummaryEstMin(estMinPoints),
-                    '${minScore >= 0 ? '+' : ''}$minScore',
-                    minScore >= 0 ? Colors.green[300]! : Colors.red[300]!,
-                  ),
-                  Text(_getBidMinDesc(controller, l10n), style: TextStyle(color: Colors.white38, fontSize: 10 * s)),
                   SizedBox(height: 6 * s),
-                  Text(l10n.bidSummaryMultipliers, style: TextStyle(color: Colors.white54, fontSize: 11 * s)),
-                  if (isNoGiruda)
-                    Text(l10n.multiplierNoGiruda, style: TextStyle(color: Colors.amber, fontSize: 11 * s)),
+                  Wrap(
+                    spacing: 3,
+                    runSpacing: 3,
+                    children: _sortedHand(declarer.hand, giruda)
+                        .map((card) => _buildTinyCardFixed(card, controller.state, 32.0))
+                        .toList(),
+                  ),
                 ],
               ),
             ),
             SizedBox(height: 8 * s),
 
-            // 무늬별 예상 점수 비교
-            if (controller.bidSnapshots.isNotEmpty)
-              _buildBidSummarySuitComparison(controller, l10n, s),
+            // 점수 획득 전략
+            _buildStrategySection(controller, l10n, s),
+            SizedBox(height: 8 * s),
 
             SizedBox(height: compact ? 10 : 20),
 
@@ -749,6 +732,100 @@ class _GameScreenState extends State<GameScreen> {
         ),
       ),
     );
+  }
+
+  List<PlayingCard> _sortedHand(List<PlayingCard> hand, Suit? giruda) {
+    final sorted = hand.toList();
+    sorted.sort((a, b) {
+      if (a.isJoker && !b.isJoker) return -1;
+      if (!a.isJoker && b.isJoker) return 1;
+      if (a.isJoker && b.isJoker) return 0;
+      final aIsGiruda = a.suit == giruda;
+      final bIsGiruda = b.suit == giruda;
+      if (aIsGiruda && !bIsGiruda) return -1;
+      if (!aIsGiruda && bIsGiruda) return 1;
+      if (a.suit == b.suit) return b.rankValue.compareTo(a.rankValue);
+      return a.suit!.index.compareTo(b.suit!.index);
+    });
+    return sorted;
+  }
+
+  Widget _buildStrategySection(GameController controller, AppLocalizations l10n, double s) {
+    final strategyPoints = controller.getStrategyPoints();
+    if (strategyPoints.isEmpty) return const SizedBox.shrink();
+    final giruda = controller.state.giruda;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(10 * s),
+      decoration: BoxDecoration(
+        color: Colors.black26,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.green.withValues(alpha: 0.4), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.military_tech, color: Colors.greenAccent, size: 18 * s),
+              SizedBox(width: 6 * s),
+              Text(
+                '${l10n.scoreStrategy} (${giruda != null ? _getSuitSymbol(giruda) : "NT"})',
+                style: TextStyle(color: Colors.greenAccent, fontSize: 13 * s, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          SizedBox(height: 6 * s),
+          for (int i = 0; i < strategyPoints.length; i++)
+            Padding(
+              padding: EdgeInsets.only(bottom: 3 * s),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${String.fromCharCode(0x2460 + i)} ', style: TextStyle(color: Colors.white54, fontSize: 12 * s)),
+                  Expanded(
+                    child: _buildSuitColoredText(
+                      _getStrategyText(strategyPoints[i], l10n),
+                      TextStyle(color: Colors.white70, fontSize: 12 * s),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  String _getStrategyText((String, Map<String, String>) strategy, AppLocalizations l10n) {
+    final (code, params) = strategy;
+    return switch (code) {
+      'STEP_FIRST_ACE' => l10n.stepFirstAce(params['card']!),
+      'STEP_FIRST_KING' => l10n.stepFirstKing(params['card']!),
+      'STEP_FIRST_MIGHTY' => l10n.stepFirstMighty,
+      'STEP_FIRST_JOKER' => l10n.stepFirstJoker,
+      'STEP_GIRUDA_ACE' => l10n.stepGirudaAce(params['card']!),
+      'STEP_GIRUDA_ACE_CHECK_K' => l10n.stepGirudaAceCheckK(params['card']!),
+      'STEP_GIRUDA_KING' => l10n.stepGirudaKing(params['card']!),
+      'STEP_JOKER_CALL_GIRUDA' => l10n.stepJokerCallGiruda(params['suit']!),
+      'STEP_JOKER_AFTER_FRIEND' => l10n.stepJokerAfterFriend,
+      'STEP_FRIEND_MIGHTY_JOIN' => l10n.stepFriendMightyJoin,
+      'STEP_FRIEND_JOKER_JOIN' => l10n.stepFriendJokerJoin,
+      'STEP_LOW_GIRUDA_FRIEND_LURE' => l10n.stepLowGirudaFriendLure(params['highCards']!, params['card']!, params['mightyCard']!),
+      'STEP_GIRUDA_Q_RECLAIM' => l10n.stepGirudaQReclaim(params['card']!),
+      'STEP_GIRUDA_LEAD_FRIEND' => l10n.stepGirudaLeadFriend(params['friendCard']!),
+      'STEP_JOKER_CALL_FRIEND' => l10n.stepJokerCallFriend(params['friendCard']!),
+      'STEP_LURE_WITH_GIRUDA' => l10n.stepLureWithGiruda(params['card']!, params['friendCard']!),
+      'STEP_SUIT_LEAD_FRIEND' => l10n.stepSuitLeadFriend(params['card']!, params['friendCard']!),
+      'STEP_JOKER_CALL' => l10n.stepJokerCall(params['suits']!),
+      'STEP_JOKER_OPTIMAL' => l10n.stepJokerOptimal,
+      'STEP_HIGH_CARD_ATTACK' => l10n.stepHighCardAttack(params['cards']!),
+      'STEP_MIGHTY_TIMING' => l10n.stepMightyTiming,
+      'STEP_VOID_CUT' => l10n.stepVoidCut(params['suits']!),
+      'STEP_ENDGAME_SCORING' => l10n.stepEndgameScoring,
+      _ => code,
+    };
   }
 
   Widget _buildFriendInfoRow(GameController controller, AppLocalizations l10n) {
@@ -1490,56 +1567,6 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
 
-            // 점수 획득 전략
-            if (explanation.strategyPoints.isNotEmpty) ...[
-              const SizedBox(height: 14),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.green.withValues(alpha: 0.4)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.military_tech, color: Colors.greenAccent, size: 18),
-                        const SizedBox(width: 6),
-                        Text(
-                          l10n.scoreStrategy,
-                          style: const TextStyle(
-                            color: Colors.greenAccent,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    for (final strategy in explanation.strategyPoints)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('• ', style: TextStyle(color: Colors.white54, fontSize: 13)),
-                            Expanded(
-                              child: Text(
-                                _getStrategyText(strategy, l10n),
-                                style: const TextStyle(color: Colors.white70, fontSize: 13),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-
             const SizedBox(height: 20),
             // 자동 진행 타이머
             const SizedBox(
@@ -1569,7 +1596,7 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  String _getStrategyText((String, Map<String, String>) strategy, AppLocalizations l10n) {
+  String _getFriendStrategyText((String, Map<String, String>) strategy, AppLocalizations l10n) {
     final (code, params) = strategy;
     switch (code) {
       case 'FIRST_TRICK_ACE_LEAD':
@@ -5179,7 +5206,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   /// describeTrick: 서버 GameDetailPage.tsx의 로직을 Dart로 포팅
-  String? _describeTrick(Trick trick, GameState state, AppLocalizations l10n, Set<String> playedCards) {
+  String? _describeTrick(Trick trick, GameState state, AppLocalizations l10n, Set<String> playedCards, {bool isAutoPlay = false}) {
     if (trick.cards.isEmpty) return null;
     if (trick.trickNumber == 10) return l10n.trickEventLastCard;
 
@@ -5195,6 +5222,24 @@ class _GameScreenState extends State<GameScreen> {
     bool isAttack(int id) => id == state.declarerId || id == state.friendId;
     bool isTeammate(int winnerId) => isAttack(leadId) == isAttack(winnerId);
     final hasMightyInTrick = trick.cards.any((c) => isMighty(c));
+    final isDeclarerLead = leadId == state.declarerId;
+
+    // auto-play 전략 비교용: K가 이 트릭에서 나왔는지, 프렌드 기합류 여부
+    bool girudaKInTrick = giruda != null && trick.cards.any((c) =>
+        !c.isJoker && c.suit == giruda && c.rank == Rank.king);
+    bool girudaKAlreadyPlayed = giruda != null &&
+        playedCards.contains('${giruda!.index}-13'); // King rankValue = 13
+    bool friendAlreadyRevealed = false;
+    final friendCard = state.friendDeclaration?.card;
+    if (friendCard != null) {
+      if (friendCard.isMightyWith(giruda)) {
+        friendAlreadyRevealed = mighty.suit != null && playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}');
+      } else if (friendCard.isJoker) {
+        friendAlreadyRevealed = playedCards.any((s) => s == 'joker');
+      } else if (friendCard.suit != null) {
+        friendAlreadyRevealed = playedCards.contains('${friendCard.suit!.index}-${friendCard.rankValue}');
+      }
+    }
 
     bool isTopOfSuit(Suit suit, int rankValue) {
       final mightySuit = mighty.suit;
@@ -5210,25 +5255,52 @@ class _GameScreenState extends State<GameScreen> {
 
     // Lead card description
     if (leadCard.isJoker) {
-      final suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
+      const suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
       final declaredSuit = trick.leadSuit;
       final suitStr = declaredSuit != null ? suitSymbols[declaredSuit] ?? '' : '';
-      String jokerDesc = suitStr.isNotEmpty
-          ? l10n.trickEventJokerLeadSuit(suitStr)
-          : l10n.trickEventJokerLead;
-      if (declaredSuit != null && declaredSuit == giruda) {
-        jokerDesc += ' / ${l10n.trickEventJokerGirudaExhaust}';
+      if (isAutoPlay && isDeclarerLead && friendAlreadyRevealed) {
+        // 전략: 프렌드 합류 후 조커 사용
+        String jokerDesc = suitStr.isNotEmpty
+            ? l10n.trickEventJokerAfterFriend(suitStr)
+            : l10n.trickEventJokerAfterFriendGeneral;
+        parts.add(jokerDesc);
+      } else {
+        String jokerDesc = suitStr.isNotEmpty
+            ? l10n.trickEventJokerLeadSuit(suitStr)
+            : l10n.trickEventJokerLead;
+        if (declaredSuit != null && declaredSuit == giruda) {
+          jokerDesc += ' / ${l10n.trickEventJokerGirudaExhaust}';
+        }
+        parts.add(jokerDesc);
       }
-      parts.add(jokerDesc);
     } else if (isMighty(leadCard)) {
       parts.add(l10n.trickEventMightyLead);
     } else if (isGiruda(leadCard)) {
       final isTop = leadCard.rankValue >= 14 || isTopOfSuit(leadCard.suit!, leadCard.rankValue);
       if (isTop) {
-        parts.add(l10n.trickEventTopGirudaLead);
+        if (isAutoPlay && isDeclarerLead && leadCard.rank == Rank.ace && giruda != null) {
+          // 전략: 기루다 A 공격 → K 소진 확인
+          if (girudaKInTrick) {
+            parts.add(l10n.trickEventGirudaAceKExhausted);
+          } else if (girudaKAlreadyPlayed) {
+            parts.add(l10n.trickEventTopGirudaLead);
+          } else {
+            parts.add(l10n.trickEventGirudaAceKNotExhausted);
+          }
+        } else {
+          parts.add(l10n.trickEventTopGirudaLead);
+        }
       } else {
         if (hasMightyInTrick) {
           parts.add(l10n.trickEventMidGirudaMightyBait);
+        } else if (isAutoPlay && isDeclarerLead && leadCard.rank == Rank.queen) {
+          // 전략: Q로 선 탈환
+          final won = trick.winnerId == leadId;
+          if (won) {
+            parts.add(l10n.trickEventGirudaQReclaimSuccess);
+          } else {
+            parts.add(l10n.trickEventGirudaQReclaimFail);
+          }
         } else if (trick.winnerId != leadId && isTeammate(trick.winnerId!)) {
           parts.add(l10n.trickEventMidGirudaPassLead);
         } else if (trick.winnerId != leadId && !isTeammate(trick.winnerId!)) {
@@ -5240,7 +5312,11 @@ class _GameScreenState extends State<GameScreen> {
     } else {
       final isTop = leadCard.rankValue >= 14 || isTopOfSuit(leadCard.suit!, leadCard.rankValue);
       if (isTop) {
-        parts.add(l10n.trickEventTopNonGirudaLead);
+        if (isAutoPlay && isDeclarerLead && trick.trickNumber > 1) {
+          parts.add(l10n.trickEventHighCardAttack);
+        } else {
+          parts.add(l10n.trickEventTopNonGirudaLead);
+        }
       } else if (trick.trickNumber == 1) {
         if (trick.winnerId != null && isAttack(trick.winnerId!)) {
           parts.add(l10n.trickEventFirstTrickFriendBait);
@@ -5264,6 +5340,43 @@ class _GameScreenState extends State<GameScreen> {
             parts.add(l10n.trickEventDefenseGirudaCut);
           }
         }
+      }
+    }
+
+    // Outcome: 마이티 출현 (비선공 카드)
+    for (int i = 0; i < trick.cards.length; i++) {
+      if (i == leadIdx) continue;
+      if (isMighty(trick.cards[i])) {
+        parts.add(l10n.trickMightyAppeared);
+        break;
+      }
+    }
+
+    // Outcome: 프렌드 합류 (이번 트릭에서 프렌드 카드 출현)
+    if (friendCard != null && !friendAlreadyRevealed) {
+      bool friendInTrick = false;
+      if (friendCard.isJoker) {
+        friendInTrick = trick.cards.any((c) => c.isJoker);
+      } else if (friendCard.suit != null) {
+        friendInTrick = trick.cards.any((c) =>
+            !c.isJoker && c.suit == friendCard.suit && c.rank == friendCard.rank);
+      }
+      if (friendInTrick) {
+        parts.add(l10n.trickFriendJoined);
+      }
+    }
+
+    // Outcome: 득점 결과
+    if (trick.winnerId != null) {
+      final pointCount = trick.cards.where((c) => c.isPointCard).length;
+      if (pointCount > 0) {
+        if (isAttack(trick.winnerId!)) {
+          parts.add(l10n.trickResultAttack(pointCount));
+        } else {
+          parts.add(l10n.trickResultDefense(pointCount));
+        }
+      } else {
+        parts.add(l10n.trickResultNoScore);
       }
     }
 
@@ -5387,7 +5500,7 @@ class _GameScreenState extends State<GameScreen> {
 
     for (final trick in tricks) {
       // describeTrick
-      final description = _describeTrick(trick, state, l10n, playedCards);
+      final description = _describeTrick(trick, state, l10n, playedCards, isAutoPlay: widget.isAutoPlay);
 
       // 카드 → playedCards에 추가, 기루다 카운트 감소
       int girudaInTrick = 0;
@@ -5396,7 +5509,9 @@ class _GameScreenState extends State<GameScreen> {
         final card = trick.cards[i];
         final playerId = trick.playerOrder[i];
         cardsByPlayer[playerId] = card;
-        if (!card.isJoker && card.suit != null) {
+        if (card.isJoker) {
+          playedCards.add('joker');
+        } else if (card.suit != null) {
           playedCards.add('${card.suit!.index}-${card.rankValue}');
           if (card.suit == giruda) girudaInTrick++;
         }

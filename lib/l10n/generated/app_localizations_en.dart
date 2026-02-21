@@ -2107,7 +2107,159 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventNonGirudaExhaust => 'Non-trump exhausted';
 
   @override
+  String get trickEventGirudaAceKExhausted => 'Trump A attack → K exhausted';
+
+  @override
+  String get trickEventGirudaAceKNotExhausted =>
+      'Trump A attack → K not exhausted';
+
+  @override
+  String trickEventJokerAfterFriend(String suit) {
+    return 'Joker after friend joined ($suit) → score';
+  }
+
+  @override
+  String get trickEventJokerAfterFriendGeneral =>
+      'Joker after friend joined → score';
+
+  @override
+  String get trickEventGirudaQReclaimSuccess => 'Trump Q → lead reclaimed';
+
+  @override
+  String get trickEventGirudaQReclaimFail =>
+      'Trump Q reclaim failed, defense wins';
+
+  @override
+  String get trickEventHighCardAttack => 'High card score attack';
+
+  @override
+  String trickResultAttack(int count) {
+    return '→ Attack +$count';
+  }
+
+  @override
+  String trickResultDefense(int count) {
+    return '→ Defense +$count';
+  }
+
+  @override
+  String get trickResultNoScore => '→ No score';
+
+  @override
+  String get trickMightyAppeared => 'Mighty appeared';
+
+  @override
+  String get trickFriendJoined => 'Friend joined';
+
+  @override
   String estimatedMinWins(int count) {
     return '→ $count+ wins expected';
   }
+
+  @override
+  String stepFirstAce(String card) {
+    return 'Lead $card to maintain initiative on first trick';
+  }
+
+  @override
+  String stepFirstKing(String card) {
+    return 'Lead $card to maintain initiative (highest in Mighty suit)';
+  }
+
+  @override
+  String get stepFirstMighty => 'Lead Mighty to secure first trick';
+
+  @override
+  String get stepFirstJoker => 'Lead Joker to secure first trick';
+
+  @override
+  String stepGirudaAce(String card) {
+    return 'Attack with $card as trump';
+  }
+
+  @override
+  String stepGirudaAceCheckK(String card) {
+    return 'Attack with $card as trump (check K exhaustion)';
+  }
+
+  @override
+  String stepGirudaKing(String card) {
+    return 'Additional trump attack with $card';
+  }
+
+  @override
+  String stepJokerCallGiruda(String suit) {
+    return 'If K not exhausted, call $suit with Joker to draw out K';
+  }
+
+  @override
+  String get stepJokerAfterFriend =>
+      'Score points with Joker after friend joins';
+
+  @override
+  String get stepFriendMightyJoin => 'Mighty friend joins on first trick';
+
+  @override
+  String get stepFriendJokerJoin =>
+      'Joker friend naturally joins on trump lead';
+
+  @override
+  String stepLowGirudaFriendLure(
+    String highCards,
+    String card,
+    String mightyCard,
+  ) {
+    return 'If $highCards not appeared, lure Mighty($mightyCard) with $card while attacking trump';
+  }
+
+  @override
+  String stepGirudaQReclaim(String card) {
+    return 'Reclaim lead with $card';
+  }
+
+  @override
+  String stepGirudaLeadFriend(String friendCard) {
+    return 'Lead trump to draw out $friendCard';
+  }
+
+  @override
+  String stepJokerCallFriend(String friendCard) {
+    return 'If $friendCard not appeared, call trump with Joker to lure friend';
+  }
+
+  @override
+  String stepLureWithGiruda(String card, String friendCard) {
+    return 'Still not appeared, lead $card to lure friend($friendCard)';
+  }
+
+  @override
+  String stepSuitLeadFriend(String card, String friendCard) {
+    return 'Lead $card to lure friend($friendCard)';
+  }
+
+  @override
+  String stepJokerCall(String suits) {
+    return 'Call $suits with Joker to secure point cards';
+  }
+
+  @override
+  String get stepJokerOptimal => 'Use Joker at optimal timing to score points';
+
+  @override
+  String stepHighCardAttack(String cards) {
+    return 'Score additional points with $cards';
+  }
+
+  @override
+  String get stepMightyTiming =>
+      'Use Mighty after trump exhaustion to secure trick';
+
+  @override
+  String stepVoidCut(String suits) {
+    return 'Use $suits void for trump cut scoring';
+  }
+
+  @override
+  String get stepEndgameScoring =>
+      'Maximize point collection through endgame play';
 }

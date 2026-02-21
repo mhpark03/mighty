@@ -3742,11 +3742,225 @@ abstract class AppLocalizations {
   /// **'비기루다 소진'**
   String get trickEventNonGirudaExhaust;
 
+  /// No description provided for @trickEventGirudaAceKExhausted.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 A 공격 → K 소진'**
+  String get trickEventGirudaAceKExhausted;
+
+  /// No description provided for @trickEventGirudaAceKNotExhausted.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 A 공격 → K 미소진'**
+  String get trickEventGirudaAceKNotExhausted;
+
+  /// No description provided for @trickEventJokerAfterFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 합류 후 조커 ({suit}) → 점수 획득'**
+  String trickEventJokerAfterFriend(String suit);
+
+  /// No description provided for @trickEventJokerAfterFriendGeneral.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 합류 후 조커 → 점수 획득'**
+  String get trickEventJokerAfterFriendGeneral;
+
+  /// No description provided for @trickEventGirudaQReclaimSuccess.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 Q → 선 탈환 성공'**
+  String get trickEventGirudaQReclaimSuccess;
+
+  /// No description provided for @trickEventGirudaQReclaimFail.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 Q 선 탈환 실패, 수비 승리'**
+  String get trickEventGirudaQReclaimFail;
+
+  /// No description provided for @trickEventHighCardAttack.
+  ///
+  /// In ko, this message translates to:
+  /// **'추가 점수 공격'**
+  String get trickEventHighCardAttack;
+
+  /// No description provided for @trickResultAttack.
+  ///
+  /// In ko, this message translates to:
+  /// **'→ 공격 +{count}'**
+  String trickResultAttack(int count);
+
+  /// No description provided for @trickResultDefense.
+  ///
+  /// In ko, this message translates to:
+  /// **'→ 수비 +{count}'**
+  String trickResultDefense(int count);
+
+  /// No description provided for @trickResultNoScore.
+  ///
+  /// In ko, this message translates to:
+  /// **'→ 무득점'**
+  String get trickResultNoScore;
+
+  /// No description provided for @trickMightyAppeared.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 출현'**
+  String get trickMightyAppeared;
+
+  /// No description provided for @trickFriendJoined.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 합류'**
+  String get trickFriendJoined;
+
   /// No description provided for @estimatedMinWins.
   ///
   /// In ko, this message translates to:
   /// **'→ {count}승 이상 예상'**
   String estimatedMinWins(int count);
+
+  /// No description provided for @stepFirstAce.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card}로 초구 선 유지'**
+  String stepFirstAce(String card);
+
+  /// No description provided for @stepFirstKing.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card}로 초구 선 유지 (마이티 무늬 최상위)'**
+  String stepFirstKing(String card);
+
+  /// No description provided for @stepFirstMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티로 초구 선 확보'**
+  String get stepFirstMighty;
+
+  /// No description provided for @stepFirstJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커로 초구 선 확보'**
+  String get stepFirstJoker;
+
+  /// No description provided for @stepGirudaAce.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card}로 기루다 공격'**
+  String stepGirudaAce(String card);
+
+  /// No description provided for @stepGirudaAceCheckK.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card}로 기루다 공격 (K 소진 확인)'**
+  String stepGirudaAceCheckK(String card);
+
+  /// No description provided for @stepGirudaKing.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card}로 기루다 추가 공격'**
+  String stepGirudaKing(String card);
+
+  /// No description provided for @stepJokerCallGiruda.
+  ///
+  /// In ko, this message translates to:
+  /// **'K 미소진 시 조커로 {suit} 호출하여 K 유도'**
+  String stepJokerCallGiruda(String suit);
+
+  /// No description provided for @stepJokerAfterFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 합류 후 조커로 점수 획득'**
+  String get stepJokerAfterFriend;
+
+  /// No description provided for @stepFriendMightyJoin.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 프렌드 → 초구에서 합류'**
+  String get stepFriendMightyJoin;
+
+  /// No description provided for @stepFriendJokerJoin.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 프렌드 → 기루다 리드 시 자연 합류'**
+  String get stepFriendJokerJoin;
+
+  /// No description provided for @stepLowGirudaFriendLure.
+  ///
+  /// In ko, this message translates to:
+  /// **'{highCards} 미출현 시 {card}로 마이티({mightyCard}) 유도하면서 기루다 공격'**
+  String stepLowGirudaFriendLure(
+    String highCards,
+    String card,
+    String mightyCard,
+  );
+
+  /// No description provided for @stepGirudaQReclaim.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card}로 선 탈환'**
+  String stepGirudaQReclaim(String card);
+
+  /// No description provided for @stepGirudaLeadFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 리드로 {friendCard} 유도'**
+  String stepGirudaLeadFriend(String friendCard);
+
+  /// No description provided for @stepJokerCallFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'{friendCard} 미출현 시 조커로 기루다 호출하여 프렌드 유도'**
+  String stepJokerCallFriend(String friendCard);
+
+  /// No description provided for @stepLureWithGiruda.
+  ///
+  /// In ko, this message translates to:
+  /// **'그래도 미출현 시 {card}로 프렌드({friendCard}) 유도'**
+  String stepLureWithGiruda(String card, String friendCard);
+
+  /// No description provided for @stepSuitLeadFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'{card}로 리드하여 프렌드({friendCard}) 유도'**
+  String stepSuitLeadFriend(String card, String friendCard);
+
+  /// No description provided for @stepJokerCall.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커로 {suits} 호출하여 점수 카드 확보'**
+  String stepJokerCall(String suits);
+
+  /// No description provided for @stepJokerOptimal.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커를 최적 타이밍에 사용하여 점수 획득'**
+  String get stepJokerOptimal;
+
+  /// No description provided for @stepHighCardAttack.
+  ///
+  /// In ko, this message translates to:
+  /// **'{cards}로 추가 점수 획득'**
+  String stepHighCardAttack(String cards);
+
+  /// No description provided for @stepMightyTiming.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티를 기루다 소진 후 사용하여 확실한 트릭 확보'**
+  String get stepMightyTiming;
+
+  /// No description provided for @stepVoidCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'{suits} 보이드를 활용하여 기루다 컷으로 점수 획득'**
+  String stepVoidCut(String suits);
+
+  /// No description provided for @stepEndgameScoring.
+  ///
+  /// In ko, this message translates to:
+  /// **'간(間)을 통해 최대한 많은 점수 획득 시도'**
+  String get stepEndgameScoring;
 }
 
 class _AppLocalizationsDelegate

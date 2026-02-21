@@ -1014,6 +1014,71 @@
   "trickEventAttackGirudaCut": "攻方将牌切入",
   "trickEventDefenseGirudaCut": "守方将牌切入",
   "trickEventNonGirudaExhaust": "非将牌消耗",
+  "trickEventGirudaAceKExhausted": "将牌A攻击 → K消耗",
+  "trickEventGirudaAceKNotExhausted": "将牌A攻击 → K未消耗",
+  "trickEventJokerAfterFriend": "朋友合流后王牌 ({suit}) → 得分",
+  "@trickEventJokerAfterFriend": {
+    "placeholders": {
+      "suit": {"type": "String"}
+    }
+  },
+  "trickEventJokerAfterFriendGeneral": "朋友合流后王牌 → 得分",
+  "trickEventGirudaQReclaimSuccess": "将牌Q → 夺回出牌权成功",
+  "trickEventGirudaQReclaimFail": "将牌Q夺回失败，防守胜",
+  "trickEventHighCardAttack": "高牌追加攻击",
+  "trickResultAttack": "→ 攻方 +{count}",
+  "@trickResultAttack": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultDefense": "→ 守方 +{count}",
+  "@trickResultDefense": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "trickResultNoScore": "→ 无得分",
+  "trickMightyAppeared": "Mighty出现",
+  "trickFriendJoined": "朋友合流",
   "estimatedMinWins": "→ 预计{count}胜以上",
-  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } }
+  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
+  "stepFirstAce": "用{card}保持首墩先手",
+  "@stepFirstAce": { "placeholders": { "card": { "type": "String" } } },
+  "stepFirstKing": "用{card}保持首墩先手（至尊花色最高）",
+  "@stepFirstKing": { "placeholders": { "card": { "type": "String" } } },
+  "stepFirstMighty": "用至尊确保首墩先手",
+  "stepFirstJoker": "用王牌确保首墩先手",
+  "stepGirudaAce": "用{card}进行将牌攻击",
+  "@stepGirudaAce": { "placeholders": { "card": { "type": "String" } } },
+  "stepGirudaAceCheckK": "用{card}进行将牌攻击（确认K消耗）",
+  "@stepGirudaAceCheckK": { "placeholders": { "card": { "type": "String" } } },
+  "stepGirudaKing": "用{card}追加将牌攻击",
+  "@stepGirudaKing": { "placeholders": { "card": { "type": "String" } } },
+  "stepJokerCallGiruda": "K未消耗时，用王牌叫{suit}引出K",
+  "@stepJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "stepJokerAfterFriend": "朋友合流后用王牌得分",
+  "stepFriendMightyJoin": "至尊朋友 → 首墩合流",
+  "stepFriendJokerJoin": "王牌朋友 → 将牌引领时自然合流",
+  "stepLowGirudaFriendLure": "{highCards}未出现时，用{card}引诱至尊({mightyCard})同时进行将牌攻击",
+  "@stepLowGirudaFriendLure": { "placeholders": { "highCards": { "type": "String" }, "card": { "type": "String" }, "mightyCard": { "type": "String" } } },
+  "stepGirudaQReclaim": "用{card}夺回出牌权",
+  "@stepGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "stepGirudaLeadFriend": "将牌引领引出{friendCard}",
+  "@stepGirudaLeadFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "stepJokerCallFriend": "{friendCard}未出现时，用王牌叫将牌引诱朋友",
+  "@stepJokerCallFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "stepLureWithGiruda": "仍未出现时，用{card}引诱朋友({friendCard})",
+  "@stepLureWithGiruda": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "stepSuitLeadFriend": "用{card}引领引诱朋友({friendCard})",
+  "@stepSuitLeadFriend": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "stepJokerCall": "用王牌叫{suits}确保得分牌",
+  "@stepJokerCall": { "placeholders": { "suits": { "type": "String" } } },
+  "stepJokerOptimal": "在最佳时机使用王牌获得分数",
+  "stepHighCardAttack": "用{cards}获得额外分数",
+  "@stepHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
+  "stepMightyTiming": "将牌消耗后使用至尊确保赢墩",
+  "stepVoidCut": "利用{suits}缺门进行将牌切入得分",
+  "@stepVoidCut": { "placeholders": { "suits": { "type": "String" } } },
+  "stepEndgameScoring": "通过间（カン）尽量获得更多分数"
 }
