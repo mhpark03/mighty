@@ -1985,7 +1985,7 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               Text(
                 _getSuitSymbol(suit),
-                style: TextStyle(color: suitColor, fontSize: 12, fontWeight: FontWeight.bold),
+                style: TextStyle(color: suitColor, fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Roboto'),
               ),
               const SizedBox(width: 2),
               Text(
