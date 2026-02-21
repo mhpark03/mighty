@@ -5324,10 +5324,33 @@ class _GameScreenState extends State<GameScreen> {
           parts.add(l10n.trickEventFirstTrickWaste);
         }
       } else {
+        // 해당 무늬의 최상위 미출현 카드 찾기
+        const rankSymbols = {14: 'A', 13: 'K', 12: 'Q', 11: 'J', 10: '10', 9: '9', 8: '8', 7: '7', 6: '6', 5: '5', 4: '4', 3: '3', 2: '2'};
+        const suitSymbolMap = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
+        String? topCardStr;
+        if (leadCard.suit != null) {
+          final s = leadCard.suit!;
+          for (int r = 14; r > leadCard.rankValue; r--) {
+            if (s == mighty.suit && r == mighty.rankValue) continue;
+            if (!playedCards.contains('${s.index}-$r')) {
+              topCardStr = '${suitSymbolMap[s]}${rankSymbols[r]}';
+              break;
+            }
+          }
+        }
+
         if (trick.winnerId != null && trick.winnerId != leadId && isAttack(trick.winnerId!)) {
-          parts.add(l10n.trickEventWasteFriendRescue);
+          if (topCardStr != null) {
+            parts.add(l10n.trickEventWasteFriendRescueWithTop(topCardStr));
+          } else {
+            parts.add(l10n.trickEventWasteFriendRescue);
+          }
         } else {
-          parts.add(l10n.trickEventWaste);
+          if (topCardStr != null) {
+            parts.add(l10n.trickEventWasteWithTop(topCardStr));
+          } else {
+            parts.add(l10n.trickEventWaste);
+          }
         }
       }
     }

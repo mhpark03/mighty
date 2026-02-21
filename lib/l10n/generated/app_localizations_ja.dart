@@ -2068,7 +2068,17 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventWaste => '捨て札';
 
   @override
+  String trickEventWasteWithTop(String topCard) {
+    return '捨て札 ($topCard 最上位)';
+  }
+
+  @override
   String get trickEventWasteFriendRescue => '捨て札 → フレンド救出!';
+
+  @override
+  String trickEventWasteFriendRescueWithTop(String topCard) {
+    return '捨て札 ($topCard 最上位) → フレンド救出!';
+  }
 
   @override
   String get trickEventAttackGirudaCut => '攻撃切り札カット';

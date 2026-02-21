@@ -2074,7 +2074,17 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventWaste => '물패 처리';
 
   @override
+  String trickEventWasteWithTop(String topCard) {
+    return '물패 ($topCard 최상위)';
+  }
+
+  @override
   String get trickEventWasteFriendRescue => '물패 → 프렌드 기사회생!';
+
+  @override
+  String trickEventWasteFriendRescueWithTop(String topCard) {
+    return '물패 ($topCard 최상위) → 프렌드 기사회생!';
+  }
 
   @override
   String get trickEventAttackGirudaCut => '공격 기루다 컷';
