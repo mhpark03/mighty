@@ -747,37 +747,6 @@
   },
   "friendInKitty": "キティにある可能性",
   "friendJokerNote": "初手使用不可",
-  "trickLead": "リード",
-  "trickIntentJoker": "ジョーカーで確実にトリック獲得",
-  "trickIntentMighty": "マイティで確実にトリック獲得",
-  "trickIntentGiruda": "切り札リードで相手の切り札を消耗させる",
-  "trickIntentAce": "エースでリードを維持しトリック獲得",
-  "trickIntentHighCard": "高位カードでトリック挑戦",
-  "trickIntentLowCard": "低いカードで探索/犠牲",
-  "trickIntentMidCard": "中位カードでトリック挑戦",
-  "trickResultBigWin": "リード勝利！得点カード{count}枚獲得",
-  "@trickResultBigWin": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "trickResultWin": "リード勝利、得点カード{count}枚獲得",
-  "@trickResultWin": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "trickResultWinNoPoint": "リード勝利、得点カードなし",
-  "trickLostToJoker": "ジョーカーに奪われた",
-  "trickLostToMighty": "マイティに奪われた",
-  "trickLostToCut": "切り札カットで奪われた",
-  "trickLostToHigher": "より高いカードに奪われた",
-  "trickPointCards": "得点カード{count}枚",
-  "@trickPointCards": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
   "kittySummaryTitle": "キティ選択結果",
   "kittyReceivedCards": "キティから受け取ったカード",
   "kittyDiscardCards": "捨てるカード",
@@ -997,6 +966,8 @@
   "@trickEventLastCardDefenseWin": { "placeholders": { "count": { "type": "int" } } },
   "trickEventLastCardAttackWin": "攻撃{count}点獲得",
   "@trickEventLastCardAttackWin": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventLastCardLeadFailed": "{name}リード失敗、{count}点逃す",
+  "@trickEventLastCardLeadFailed": { "placeholders": { "name": { "type": "String" }, "count": { "type": "int" } } },
   "trickEventJokerLead": "ジョーカーリード",
   "trickEventJokerLeadSuit": "ジョーカーリード ({suit})",
   "@trickEventJokerLeadSuit": {
@@ -1008,6 +979,7 @@
   "trickEventMightyLead": "マイティリード",
   "trickEventTopGirudaLead": "切り札最上位リード",
   "trickEventMidGirudaMightyBait": "切り札中位でマイティ誘導",
+  "trickEventMidGirudaMightyBaitForA": "A最上位確保のため低位切り札でマイティ誘導",
   "trickEventMidGirudaMightyBaitForQ": "Q攻撃のため低位切り札でマイティ誘導",
   "trickEventMidGirudaPassLead": "切り札中位でリード譲渡",
   "trickEventDefenderGirudaWin": "守備側切り札勝利",
@@ -1017,9 +989,15 @@
   "trickEventDefenseLeadAttackCut": "守備非切り札攻撃 → 切り札カット奪還",
   "trickEventFirstTrickFriendBait": "初トリック不在 / フレンド誘導",
   "trickEventFirstTrickWaste": "初トリック不在 / 捨て札",
+  "trickEventAttackFailed": "攻撃失敗 → 守備上位カードに敗北",
+  "trickEventAttackFailedWithTop": "攻撃 ({topCard} 最上位) 失敗 → 守備に敗北",
+  "@trickEventAttackFailedWithTop": { "placeholders": { "topCard": { "type": "String" } } },
   "trickEventWaste": "捨て札",
   "trickEventWasteWithTop": "捨て札 ({topCard} 最上位)",
   "@trickEventWasteWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "trickEventWasteDeclarerReclaim": "捨て札 → 宣言者リード奪還",
+  "trickEventWasteDeclarerReclaimWithTop": "捨て札 ({topCard} 最上位) → 宣言者リード奪還",
+  "@trickEventWasteDeclarerReclaimWithTop": { "placeholders": { "topCard": { "type": "String" } } },
   "trickEventWasteFriendRescue": "捨て札 → フレンド救出!",
   "trickEventWasteFriendRescueWithTop": "捨て札 ({topCard} 最上位) → フレンド救出!",
   "@trickEventWasteFriendRescueWithTop": { "placeholders": { "topCard": { "type": "String" } } },
@@ -1058,6 +1036,12 @@
   "trickEventFriendTopCardWin": "フレンド最上位カード勝利",
   "trickEventFriendTrickContribution": "フレンド貢献{count}トリック攻撃成功",
   "@trickEventFriendTrickContribution": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventJokerSkipNoPoints": "{name}: ジョーカー保有、無得点トリックスキップ",
+  "@trickEventJokerSkipNoPoints": { "placeholders": { "name": { "type": "String" } } },
+  "trickEventGirudaAceHeldMightyGuard": "{name}: 切り札A保有、マイティ警戒で未使用",
+  "@trickEventGirudaAceHeldMightyGuard": { "placeholders": { "name": { "type": "String" } } },
+  "trickEventGirudaAceHeld": "{name}: 切り札A保有、未使用",
+  "@trickEventGirudaAceHeld": { "placeholders": { "name": { "type": "String" } } },
   "estimatedMinWins": "→ {count}勝以上予想",
   "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
   "stepFirstAce": "{card}で初手の先手を維持",

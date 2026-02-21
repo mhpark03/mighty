@@ -1667,60 +1667,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get friendJokerNote => '초구 사용 불가';
 
   @override
-  String get trickLead => '선공';
-
-  @override
-  String get trickIntentJoker => '조커로 확실한 트릭 확보';
-
-  @override
-  String get trickIntentMighty => '마이티로 확실한 트릭 확보';
-
-  @override
-  String get trickIntentGiruda => '기루다 선공으로 상대 기루다 소진 유도';
-
-  @override
-  String get trickIntentAce => '에이스로 선 유지하며 트릭 확보';
-
-  @override
-  String get trickIntentHighCard => '고위 카드로 트릭 도전';
-
-  @override
-  String get trickIntentLowCard => '낮은 카드로 탐색/희생';
-
-  @override
-  String get trickIntentMidCard => '중간 카드로 트릭 도전';
-
-  @override
-  String trickResultBigWin(int count) {
-    return '선공 승리! 점수 카드 $count장 획득';
-  }
-
-  @override
-  String trickResultWin(int count) {
-    return '선공 승리, 점수 카드 $count장 획득';
-  }
-
-  @override
-  String get trickResultWinNoPoint => '선공 승리, 점수 카드 없음';
-
-  @override
-  String get trickLostToJoker => '조커에 빼앗김';
-
-  @override
-  String get trickLostToMighty => '마이티에 빼앗김';
-
-  @override
-  String get trickLostToCut => '기루다 컷으로 빼앗김';
-
-  @override
-  String get trickLostToHigher => '더 높은 카드에 빼앗김';
-
-  @override
-  String trickPointCards(int count) {
-    return '점수 카드 $count장';
-  }
-
-  @override
   String get kittySummaryTitle => '키티 선택 결과';
 
   @override
@@ -2043,6 +1989,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String trickEventLastCardLeadFailed(String name, int count) {
+    return '$name 선공 실패, $count점 놓침';
+  }
+
+  @override
   String get trickEventJokerLead => '조커 선공';
 
   @override
@@ -2061,6 +2012,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trickEventMidGirudaMightyBait => '기루다 중간으로 마이티 유도';
+
+  @override
+  String get trickEventMidGirudaMightyBaitForA => 'A 최상위 확보 위해 저액 기루다로 마이티 유도';
 
   @override
   String get trickEventMidGirudaMightyBaitForQ => 'Q 공격 위해 저액 기루다로 마이티 유도';
@@ -2090,11 +2044,27 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventFirstTrickWaste => '초구 부재 / 물패 처리';
 
   @override
+  String get trickEventAttackFailed => '공격 실패 → 수비 상위 카드에 패배';
+
+  @override
+  String trickEventAttackFailedWithTop(String topCard) {
+    return '공격 ($topCard 최상위) 실패 → 수비에 패배';
+  }
+
+  @override
   String get trickEventWaste => '물패 처리';
 
   @override
   String trickEventWasteWithTop(String topCard) {
     return '물패 ($topCard 최상위)';
+  }
+
+  @override
+  String get trickEventWasteDeclarerReclaim => '물패 → 주공 선 탈환';
+
+  @override
+  String trickEventWasteDeclarerReclaimWithTop(String topCard) {
+    return '물패 ($topCard 최상위) → 주공 선 탈환';
   }
 
   @override
@@ -2168,6 +2138,21 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String trickEventFriendTrickContribution(int count) {
     return '프렌드 도움 $count트릭 공격 성공';
+  }
+
+  @override
+  String trickEventJokerSkipNoPoints(String name) {
+    return '$name: 조커 보유, 무득점 트릭 스킵';
+  }
+
+  @override
+  String trickEventGirudaAceHeldMightyGuard(String name) {
+    return '$name: 기루다 A 보유, 마이티 경계로 미사용';
+  }
+
+  @override
+  String trickEventGirudaAceHeld(String name) {
+    return '$name: 기루다 A 보유, 미사용';
   }
 
   @override

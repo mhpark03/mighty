@@ -748,37 +748,6 @@
   },
   "friendInKitty": "may be in kitty",
   "friendJokerNote": "cannot play 1st trick",
-  "trickLead": "leads",
-  "trickIntentJoker": "Secure trick with Joker",
-  "trickIntentMighty": "Secure trick with Mighty",
-  "trickIntentGiruda": "Lead trump to exhaust opponents' trumps",
-  "trickIntentAce": "Hold lead with Ace to secure trick",
-  "trickIntentHighCard": "Challenge trick with high card",
-  "trickIntentLowCard": "Probe/sacrifice with low card",
-  "trickIntentMidCard": "Challenge trick with mid card",
-  "trickResultBigWin": "Lead wins! {count} point cards taken",
-  "@trickResultBigWin": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "trickResultWin": "Lead wins, {count} point card(s) taken",
-  "@trickResultWin": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "trickResultWinNoPoint": "Lead wins, no point cards",
-  "trickLostToJoker": "taken by Joker",
-  "trickLostToMighty": "taken by Mighty",
-  "trickLostToCut": "taken by trump cut",
-  "trickLostToHigher": "taken by higher card",
-  "trickPointCards": "{count} point cards",
-  "@trickPointCards": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
   "kittySummaryTitle": "Kitty Selection Result",
   "kittyReceivedCards": "Cards from Kitty",
   "kittyDiscardCards": "Discarded Cards",
@@ -998,6 +967,8 @@
   "@trickEventLastCardDefenseWin": { "placeholders": { "count": { "type": "int" } } },
   "trickEventLastCardAttackWin": "Attack {count}pt gained",
   "@trickEventLastCardAttackWin": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventLastCardLeadFailed": "{name} lead failed, {count}pt missed",
+  "@trickEventLastCardLeadFailed": { "placeholders": { "name": { "type": "String" }, "count": { "type": "int" } } },
   "trickEventJokerLead": "Joker lead",
   "trickEventJokerLeadSuit": "Joker lead ({suit})",
   "@trickEventJokerLeadSuit": {
@@ -1009,6 +980,7 @@
   "trickEventMightyLead": "Mighty lead",
   "trickEventTopGirudaLead": "Top trump lead",
   "trickEventMidGirudaMightyBait": "Mid trump to bait Mighty",
+  "trickEventMidGirudaMightyBaitForA": "Low trump to bait Mighty for A dominance",
   "trickEventMidGirudaMightyBaitForQ": "Low trump to bait Mighty for Q attack",
   "trickEventMidGirudaPassLead": "Mid trump to pass lead",
   "trickEventDefenderGirudaWin": "Defender trump win",
@@ -1018,9 +990,15 @@
   "trickEventDefenseLeadAttackCut": "Defense non-trump lead → Trump cut reclaim",
   "trickEventFirstTrickFriendBait": "No lead in 1st trick / Friend bait",
   "trickEventFirstTrickWaste": "No lead in 1st trick / Waste",
+  "trickEventAttackFailed": "Attack failed → lost to higher defense card",
+  "trickEventAttackFailedWithTop": "Attack ({topCard} top) failed → lost to defense",
+  "@trickEventAttackFailedWithTop": { "placeholders": { "topCard": { "type": "String" } } },
   "trickEventWaste": "Waste play",
   "trickEventWasteWithTop": "Waste ({topCard} is top)",
   "@trickEventWasteWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "trickEventWasteDeclarerReclaim": "Waste → Declarer reclaim",
+  "trickEventWasteDeclarerReclaimWithTop": "Waste ({topCard} top) → Declarer reclaim",
+  "@trickEventWasteDeclarerReclaimWithTop": { "placeholders": { "topCard": { "type": "String" } } },
   "trickEventWasteFriendRescue": "Waste → Friend rescue!",
   "trickEventWasteFriendRescueWithTop": "Waste ({topCard} top) → Friend rescue!",
   "@trickEventWasteFriendRescueWithTop": { "placeholders": { "topCard": { "type": "String" } } },
@@ -1059,6 +1037,12 @@
   "trickEventFriendTopCardWin": "Friend top card win",
   "trickEventFriendTrickContribution": "Friend helped {count} attack tricks",
   "@trickEventFriendTrickContribution": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventJokerSkipNoPoints": "{name}: held Joker, skipped (no points)",
+  "@trickEventJokerSkipNoPoints": { "placeholders": { "name": { "type": "String" } } },
+  "trickEventGirudaAceHeldMightyGuard": "{name}: held trump A, guarding against Mighty",
+  "@trickEventGirudaAceHeldMightyGuard": { "placeholders": { "name": { "type": "String" } } },
+  "trickEventGirudaAceHeld": "{name}: held trump A, not played",
+  "@trickEventGirudaAceHeld": { "placeholders": { "name": { "type": "String" } } },
   "estimatedMinWins": "→ {count}+ wins expected",
   "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
   "stepFirstAce": "Lead {card} to maintain initiative on first trick",

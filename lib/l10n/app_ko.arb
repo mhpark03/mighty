@@ -907,37 +907,6 @@
   },
   "friendInKitty": "키티에 있을 수 있음",
   "friendJokerNote": "초구 사용 불가",
-  "trickLead": "선공",
-  "trickIntentJoker": "조커로 확실한 트릭 확보",
-  "trickIntentMighty": "마이티로 확실한 트릭 확보",
-  "trickIntentGiruda": "기루다 선공으로 상대 기루다 소진 유도",
-  "trickIntentAce": "에이스로 선 유지하며 트릭 확보",
-  "trickIntentHighCard": "고위 카드로 트릭 도전",
-  "trickIntentLowCard": "낮은 카드로 탐색/희생",
-  "trickIntentMidCard": "중간 카드로 트릭 도전",
-  "trickResultBigWin": "선공 승리! 점수 카드 {count}장 획득",
-  "@trickResultBigWin": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "trickResultWin": "선공 승리, 점수 카드 {count}장 획득",
-  "@trickResultWin": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
-  "trickResultWinNoPoint": "선공 승리, 점수 카드 없음",
-  "trickLostToJoker": "조커에 빼앗김",
-  "trickLostToMighty": "마이티에 빼앗김",
-  "trickLostToCut": "기루다 컷으로 빼앗김",
-  "trickLostToHigher": "더 높은 카드에 빼앗김",
-  "trickPointCards": "점수 카드 {count}장",
-  "@trickPointCards": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
   "kittySummaryTitle": "키티 선택 결과",
   "kittyReceivedCards": "바닥에서 받은 카드",
   "kittyDiscardCards": "버릴 카드",
@@ -1157,6 +1126,8 @@
   "@trickEventLastCardDefenseWin": { "placeholders": { "count": { "type": "int" } } },
   "trickEventLastCardAttackWin": "공격 {count}점 획득",
   "@trickEventLastCardAttackWin": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventLastCardLeadFailed": "{name} 선공 실패, {count}점 놓침",
+  "@trickEventLastCardLeadFailed": { "placeholders": { "name": { "type": "String" }, "count": { "type": "int" } } },
   "trickEventJokerLead": "조커 선공",
   "trickEventJokerLeadSuit": "조커 선공 ({suit})",
   "@trickEventJokerLeadSuit": {
@@ -1168,6 +1139,7 @@
   "trickEventMightyLead": "마이티 선공",
   "trickEventTopGirudaLead": "기루다 최상위 선공",
   "trickEventMidGirudaMightyBait": "기루다 중간으로 마이티 유도",
+  "trickEventMidGirudaMightyBaitForA": "A 최상위 확보 위해 저액 기루다로 마이티 유도",
   "trickEventMidGirudaMightyBaitForQ": "Q 공격 위해 저액 기루다로 마이티 유도",
   "trickEventMidGirudaPassLead": "기루다 중간으로 선 넘김",
   "trickEventDefenderGirudaWin": "수비팀 기루다 승리",
@@ -1177,9 +1149,15 @@
   "trickEventDefenseLeadAttackCut": "수비 비기루다 공격 → 기루다 컷 선 탈환",
   "trickEventFirstTrickFriendBait": "초구 부재 / 물패로 프렌드 유도",
   "trickEventFirstTrickWaste": "초구 부재 / 물패 처리",
+  "trickEventAttackFailed": "공격 실패 → 수비 상위 카드에 패배",
+  "trickEventAttackFailedWithTop": "공격 ({topCard} 최상위) 실패 → 수비에 패배",
+  "@trickEventAttackFailedWithTop": { "placeholders": { "topCard": { "type": "String" } } },
   "trickEventWaste": "물패 처리",
   "trickEventWasteWithTop": "물패 ({topCard} 최상위)",
   "@trickEventWasteWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "trickEventWasteDeclarerReclaim": "물패 → 주공 선 탈환",
+  "trickEventWasteDeclarerReclaimWithTop": "물패 ({topCard} 최상위) → 주공 선 탈환",
+  "@trickEventWasteDeclarerReclaimWithTop": { "placeholders": { "topCard": { "type": "String" } } },
   "trickEventWasteFriendRescue": "물패 → 프렌드 기사회생!",
   "trickEventWasteFriendRescueWithTop": "물패 ({topCard} 최상위) → 프렌드 기사회생!",
   "@trickEventWasteFriendRescueWithTop": { "placeholders": { "topCard": { "type": "String" } } },
@@ -1218,6 +1196,12 @@
   "trickEventFriendTopCardWin": "프렌드 최상위 카드 승리",
   "trickEventFriendTrickContribution": "프렌드 도움 {count}트릭 공격 성공",
   "@trickEventFriendTrickContribution": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventJokerSkipNoPoints": "{name}: 조커 보유, 무득점 트릭 스킵",
+  "@trickEventJokerSkipNoPoints": { "placeholders": { "name": { "type": "String" } } },
+  "trickEventGirudaAceHeldMightyGuard": "{name}: 기루다 A 보유, 마이티 경계로 미사용",
+  "@trickEventGirudaAceHeldMightyGuard": { "placeholders": { "name": { "type": "String" } } },
+  "trickEventGirudaAceHeld": "{name}: 기루다 A 보유, 미사용",
+  "@trickEventGirudaAceHeld": { "placeholders": { "name": { "type": "String" } } },
   "estimatedMinWins": "→ {count}승 이상 예상",
   "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
   "stepFirstAce": "{card}로 초구 선 유지",

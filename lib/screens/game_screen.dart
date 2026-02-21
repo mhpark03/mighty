@@ -2322,78 +2322,19 @@ class _GameScreenState extends State<GameScreen> {
     return '${l10n.friendExpected}: $cardName - $holder$note';
   }
 
-  String _getTrickAnalysis(Trick trick, GameState state, AppLocalizations l10n) {
-    if (trick.cards.isEmpty) return '';
-
-    final giruda = state.giruda;
-    final leadCard = trick.cards.first;
-    final leadPlayer = state.players[trick.leadPlayerId];
-    final leadName = _getLocalizedPlayerName(leadPlayer, l10n);
-    final winnerId = trick.winnerId ?? 0;
-    final winnerPlayer = state.players[winnerId];
-    final leadWon = trick.leadPlayerId == winnerId;
-
-    // 트릭 내 점수 카드 수
-    final pointCount = trick.cards.where((c) => c.isPointCard).length;
-
-    // 선공 카드 설명
-    String leadCardDesc;
-    if (leadCard.isJoker) {
-      leadCardDesc = l10n.friendCardJoker;
-    } else if (leadCard.isMightyWith(giruda)) {
-      leadCardDesc = l10n.friendCardMighty;
-    } else {
-      leadCardDesc = '${_getSuitSymbol(leadCard.suit!)}${_getRankName(leadCard.rank!)}';
-    }
-
-    // 선공 의도 분석
-    String intention;
-    if (leadCard.isJoker) {
-      intention = l10n.trickIntentJoker;
-    } else if (leadCard.isMightyWith(giruda)) {
-      intention = l10n.trickIntentMighty;
-    } else if (giruda != null && !leadCard.isJoker && leadCard.suit == giruda) {
-      intention = l10n.trickIntentGiruda;
-    } else if (leadCard.rank == Rank.ace) {
-      intention = l10n.trickIntentAce;
-    } else if (leadCard.rank == Rank.king || leadCard.rank == Rank.queen) {
-      intention = l10n.trickIntentHighCard;
-    } else if (!leadCard.isPointCard) {
-      intention = l10n.trickIntentLowCard;
-    } else {
-      intention = l10n.trickIntentMidCard;
-    }
-
-    // 결과 분석
-    String result;
-    if (leadWon) {
-      if (pointCount >= 3) {
-        result = l10n.trickResultBigWin(pointCount);
-      } else if (pointCount >= 1) {
-        result = l10n.trickResultWin(pointCount);
-      } else {
-        result = l10n.trickResultWinNoPoint;
-      }
-    } else {
-      final winCard = trick.cards[trick.playerOrder.indexOf(winnerId)];
-      String winReason;
-      if (winCard.isJoker) {
-        winReason = l10n.trickLostToJoker;
-      } else if (winCard.isMightyWith(giruda)) {
-        winReason = l10n.trickLostToMighty;
-      } else if (giruda != null && !winCard.isJoker && winCard.suit == giruda && trick.leadSuit != giruda) {
-        winReason = l10n.trickLostToCut;
-      } else {
-        winReason = l10n.trickLostToHigher;
-      }
-      final winnerName = _getLocalizedPlayerName(winnerPlayer, l10n);
-      result = '$winnerName: $winReason';
-      if (pointCount >= 2) {
-        result += ' (${l10n.trickPointCards(pointCount)})';
+  Set<String> _computePlayedCardsBefore(GameState state, int trickNumber) {
+    final played = <String>{};
+    for (final t in state.tricks) {
+      if (t.trickNumber >= trickNumber) break;
+      for (final c in t.cards) {
+        if (c.isJoker) {
+          played.add('joker');
+        } else if (c.suit != null) {
+          played.add('${c.suit!.index}-${c.rankValue}');
+        }
       }
     }
-
-    return '$leadName $leadCardDesc ${l10n.trickLead}\n$intention\n→ $result';
+    return played;
   }
 
   String _getRankName(Rank rank) {
@@ -3390,22 +3331,25 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                   ),
                 ),
-                // 선공 의도 및 결과 설명 (데모 모드)
-                if (widget.isAutoPlay) ...[
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Text(
-                      _getTrickAnalysis(trick, controller.state, l10n),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 10,
-                        height: 1.4,
+                // 트릭 이벤트 설명
+                () {
+                  final playedCards = _computePlayedCardsBefore(controller.state, trick.trickNumber);
+                  final description = _describeTrick(trick, controller.state, l10n, playedCards, isAutoPlay: widget.isAutoPlay);
+                  if (description != null)
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
+                      child: Text(
+                        description,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 11,
+                          height: 1.4,
+                        ),
                       ),
-                    ),
-                  ),
-                ],
+                    );
+                  return const SizedBox.shrink();
+                }(),
                 const SizedBox(height: 20),
                 if (widget.isAutoPlay)
                   // auto-play: 자동 진행 표시
@@ -5230,6 +5174,11 @@ class _GameScreenState extends State<GameScreen> {
         } else {
           lastParts.add(l10n.trickEventLastCardAttackWin(pointCount));
         }
+        // 선공 실패로 대거 점수 놓침
+        if (trick.winnerId != leadId && pointCount >= 2) {
+          final leadName = _getLocalizedPlayerName(state.players[leadId], l10n);
+          lastParts.add(l10n.trickEventLastCardLeadFailed(leadName, pointCount));
+        }
       }
       return lastParts.join(' / ');
     }
@@ -5243,7 +5192,8 @@ class _GameScreenState extends State<GameScreen> {
     bool girudaKAlreadyPlayed = giruda != null &&
         playedCards.contains('${giruda!.index}-13'); // King rankValue = 13
 
-    // 주공이 기루다 K/Q를 보유하는지 확인 (전체 트릭에서 주공이 낸 카드 확인)
+    // 주공이 기루다 A/K/Q를 보유하는지 확인 (전체 트릭에서 주공이 낸 카드 확인)
+    bool declarerPlaysGirudaA = false;
     bool declarerPlaysGirudaK = false;
     bool declarerPlaysGirudaQ = false;
     if (isAutoPlay && giruda != null) {
@@ -5252,6 +5202,7 @@ class _GameScreenState extends State<GameScreen> {
           if (t.playerOrder[i] == state.declarerId) {
             final c = t.cards[i];
             if (!c.isJoker && c.suit == giruda) {
+              if (c.rank == Rank.ace) declarerPlaysGirudaA = true;
               if (c.rank == Rank.king) declarerPlaysGirudaK = true;
               if (c.rank == Rank.queen) declarerPlaysGirudaQ = true;
             }
@@ -5334,8 +5285,11 @@ class _GameScreenState extends State<GameScreen> {
         }
       } else {
         if (hasMightyInTrick) {
-          if (isAutoPlay && isDeclarerLead && declarerPlaysGirudaQ) {
-            // 주공이 Q도 보유 → Q 공격 준비를 위한 마이티 유도
+          if (isAutoPlay && isDeclarerLead && declarerPlaysGirudaA) {
+            // 주공이 A 보유 → 마이티 제거로 A 최상위 확보
+            parts.add(l10n.trickEventMidGirudaMightyBaitForA);
+          } else if (isAutoPlay && isDeclarerLead && declarerPlaysGirudaQ) {
+            // 주공이 Q 보유 → Q 공격 준비를 위한 마이티 유도
             parts.add(l10n.trickEventMidGirudaMightyBaitForQ);
           } else {
             parts.add(l10n.trickEventMidGirudaMightyBait);
@@ -5393,11 +5347,52 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
-        if (trick.winnerId != null && trick.winnerId != leadId && isAttack(trick.winnerId!)) {
+        // 선공자가 해당 무늬 손패 중 최선의 카드를 냈는지 확인
+        bool leadPlayedBestOfSuit = false;
+        if (leadCard.suit != null && isAttack(leadId)) {
+          leadPlayedBestOfSuit = true;
+          // 현재 손패에 더 높은 같은 무늬 카드 확인
+          for (final c in state.players[leadId].hand) {
+            if (!c.isJoker && c.suit == leadCard.suit && c.rankValue > leadCard.rankValue) {
+              leadPlayedBestOfSuit = false;
+              break;
+            }
+          }
+          // 향후 트릭에서 더 높은 같은 무늬 카드를 내는지 확인
+          if (leadPlayedBestOfSuit) {
+            for (final t in state.tricks) {
+              if (t.trickNumber <= trick.trickNumber) continue;
+              for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+                if (t.playerOrder[i] == leadId) {
+                  final c = t.cards[i];
+                  if (!c.isJoker && c.suit == leadCard.suit && c.rankValue > leadCard.rankValue) {
+                    leadPlayedBestOfSuit = false;
+                  }
+                }
+              }
+              if (!leadPlayedBestOfSuit) break;
+            }
+          }
+        }
+
+        if (trick.winnerId != null && trick.winnerId != leadId && trick.winnerId == state.declarerId) {
+          if (topCardStr != null) {
+            parts.add(l10n.trickEventWasteDeclarerReclaimWithTop(topCardStr));
+          } else {
+            parts.add(l10n.trickEventWasteDeclarerReclaim);
+          }
+        } else if (trick.winnerId != null && trick.winnerId != leadId && isAttack(trick.winnerId!)) {
           if (topCardStr != null) {
             parts.add(l10n.trickEventWasteFriendRescueWithTop(topCardStr));
           } else {
             parts.add(l10n.trickEventWasteFriendRescue);
+          }
+        } else if (leadPlayedBestOfSuit && trick.winnerId != null && trick.winnerId != leadId && !isAttack(trick.winnerId!)) {
+          // 공격팀 최선 공격 → 수비 상위 카드에 패배
+          if (topCardStr != null) {
+            parts.add(l10n.trickEventAttackFailedWithTop(topCardStr));
+          } else {
+            parts.add(l10n.trickEventAttackFailed);
           }
         } else {
           if (topCardStr != null) {
@@ -5496,6 +5491,52 @@ class _GameScreenState extends State<GameScreen> {
       }
       if (friendWinCount >= 2) {
         parts.add(l10n.trickEventFriendTrickContribution(friendWinCount));
+      }
+    }
+
+    // 주요 카드 보유 미사용 분석 (조커, 기루다 A)
+    {
+      // 현재 손패 또는 향후 트릭에서 특정 카드를 내는 플레이어 찾기
+      int? findCardHolder(bool Function(PlayingCard) matcher) {
+        for (final pid in trick.playerOrder) {
+          if (state.players[pid].hand.any(matcher)) return pid;
+        }
+        for (final t in state.tricks) {
+          if (t.trickNumber <= trick.trickNumber) continue;
+          for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+            if (matcher(t.cards[i])) return t.playerOrder[i];
+          }
+        }
+        return null;
+      }
+
+      final pointCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
+
+      // 조커 보유자가 이 트릭에서 조커를 내지 않았을 때 (무득점 트릭)
+      if (trick.trickNumber > 1 && !playedCards.contains('joker') &&
+          !trick.cards.any((c) => c.isJoker) && pointCount == 0) {
+        final jokerHolder = findCardHolder((c) => c.isJoker);
+        if (jokerHolder != null) {
+          final name = _getLocalizedPlayerName(state.players[jokerHolder], l10n);
+          parts.add(l10n.trickEventJokerSkipNoPoints(name));
+        }
+      }
+
+      // 기루다 A 보유자가 이 트릭에서 기루다 A를 내지 않았을 때
+      if (giruda != null && !playedCards.contains('${giruda.index}-14') &&
+          !trick.cards.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace)) {
+        final girudaAHolder = findCardHolder((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
+        if (girudaAHolder != null) {
+          final name = _getLocalizedPlayerName(state.players[girudaAHolder], l10n);
+          final mightyPlayed = mighty.suit != null &&
+              (playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}') ||
+               trick.cards.any((c) => isMighty(c)));
+          if (!mightyPlayed) {
+            parts.add(l10n.trickEventGirudaAceHeldMightyGuard(name));
+          } else {
+            parts.add(l10n.trickEventGirudaAceHeld(name));
+          }
+        }
       }
     }
 
