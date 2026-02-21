@@ -2086,7 +2086,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventGirudaAceKExhausted => '기루다 A 공격 → K 소진';
 
   @override
-  String get trickEventGirudaAceKNotExhausted => '기루다 A 공격 → K 미소진';
+  String get trickEventGirudaAceKNotExhausted => '기루다 A 공격 (K 유도)';
+
+  @override
+  String get trickEventGirudaKExhaustSuccess => 'K 소진 성공';
 
   @override
   String trickEventJokerAfterFriend(String suit) {

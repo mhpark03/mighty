@@ -1016,7 +1016,8 @@
   "trickEventDefenseGirudaCut": "Defense trump cut",
   "trickEventNonGirudaExhaust": "Non-trump exhausted",
   "trickEventGirudaAceKExhausted": "Trump A attack → K exhausted",
-  "trickEventGirudaAceKNotExhausted": "Trump A attack → K not exhausted",
+  "trickEventGirudaAceKNotExhausted": "Trump A attack (draw K)",
+  "trickEventGirudaKExhaustSuccess": "K exhausted",
   "trickEventJokerAfterFriend": "Joker after friend joined ({suit}) → score",
   "@trickEventJokerAfterFriend": {
     "placeholders": {

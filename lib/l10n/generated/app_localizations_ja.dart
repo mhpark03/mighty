@@ -2080,7 +2080,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventGirudaAceKExhausted => '切り札A攻撃 → K消耗';
 
   @override
-  String get trickEventGirudaAceKNotExhausted => '切り札A攻撃 → K未消耗';
+  String get trickEventGirudaAceKNotExhausted => '切り札A攻撃 (K誘導)';
+
+  @override
+  String get trickEventGirudaKExhaustSuccess => 'K消耗成功';
 
   @override
   String trickEventJokerAfterFriend(String suit) {

@@ -1015,7 +1015,8 @@
   "trickEventDefenseGirudaCut": "守備切り札カット",
   "trickEventNonGirudaExhaust": "非切り札消耗",
   "trickEventGirudaAceKExhausted": "切り札A攻撃 → K消耗",
-  "trickEventGirudaAceKNotExhausted": "切り札A攻撃 → K未消耗",
+  "trickEventGirudaAceKNotExhausted": "切り札A攻撃 (K誘導)",
+  "trickEventGirudaKExhaustSuccess": "K消耗成功",
   "trickEventJokerAfterFriend": "フレンド合流後ジョーカー ({suit}) → 得点",
   "@trickEventJokerAfterFriend": {
     "placeholders": {

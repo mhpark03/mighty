@@ -3751,8 +3751,14 @@ abstract class AppLocalizations {
   /// No description provided for @trickEventGirudaAceKNotExhausted.
   ///
   /// In ko, this message translates to:
-  /// **'기루다 A 공격 → K 미소진'**
+  /// **'기루다 A 공격 (K 유도)'**
   String get trickEventGirudaAceKNotExhausted;
+
+  /// No description provided for @trickEventGirudaKExhaustSuccess.
+  ///
+  /// In ko, this message translates to:
+  /// **'K 소진 성공'**
+  String get trickEventGirudaKExhaustSuccess;
 
   /// No description provided for @trickEventJokerAfterFriend.
   ///

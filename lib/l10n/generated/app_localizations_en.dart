@@ -2110,8 +2110,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventGirudaAceKExhausted => 'Trump A attack → K exhausted';
 
   @override
-  String get trickEventGirudaAceKNotExhausted =>
-      'Trump A attack → K not exhausted';
+  String get trickEventGirudaAceKNotExhausted => 'Trump A attack (draw K)';
+
+  @override
+  String get trickEventGirudaKExhaustSuccess => 'K exhausted';
 
   @override
   String trickEventJokerAfterFriend(String suit) {

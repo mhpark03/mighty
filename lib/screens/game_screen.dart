@@ -5343,6 +5343,15 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
 
+    // Outcome: K 소진 성공 (기루다 K가 비선공으로 출현)
+    if (giruda != null && girudaKInTrick) {
+      final kIdx = trick.cards.indexWhere((c) =>
+          !c.isJoker && c.suit == giruda && c.rank == Rank.king);
+      if (kIdx >= 0 && kIdx != leadIdx) {
+        parts.add(l10n.trickEventGirudaKExhaustSuccess);
+      }
+    }
+
     // Outcome: 마이티 출현 (비선공 카드)
     for (int i = 0; i < trick.cards.length; i++) {
       if (i == leadIdx) continue;
@@ -5363,20 +5372,6 @@ class _GameScreenState extends State<GameScreen> {
       }
       if (friendInTrick) {
         parts.add(l10n.trickFriendJoined);
-      }
-    }
-
-    // Outcome: 득점 결과
-    if (trick.winnerId != null) {
-      final pointCount = trick.cards.where((c) => c.isPointCard).length;
-      if (pointCount > 0) {
-        if (isAttack(trick.winnerId!)) {
-          parts.add(l10n.trickResultAttack(pointCount));
-        } else {
-          parts.add(l10n.trickResultDefense(pointCount));
-        }
-      } else {
-        parts.add(l10n.trickResultNoScore);
       }
     }
 

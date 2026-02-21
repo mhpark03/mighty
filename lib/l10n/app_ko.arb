@@ -1175,7 +1175,8 @@
   "trickEventDefenseGirudaCut": "수비 기루다 컷",
   "trickEventNonGirudaExhaust": "비기루다 소진",
   "trickEventGirudaAceKExhausted": "기루다 A 공격 → K 소진",
-  "trickEventGirudaAceKNotExhausted": "기루다 A 공격 → K 미소진",
+  "trickEventGirudaAceKNotExhausted": "기루다 A 공격 (K 유도)",
+  "trickEventGirudaKExhaustSuccess": "K 소진 성공",
   "trickEventJokerAfterFriend": "프렌드 합류 후 조커 ({suit}) → 점수 획득",
   "@trickEventJokerAfterFriend": {
     "placeholders": {

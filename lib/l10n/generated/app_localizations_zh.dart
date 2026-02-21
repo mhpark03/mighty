@@ -2073,7 +2073,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventGirudaAceKExhausted => '将牌A攻击 → K消耗';
 
   @override
-  String get trickEventGirudaAceKNotExhausted => '将牌A攻击 → K未消耗';
+  String get trickEventGirudaAceKNotExhausted => '将牌A攻击 (引K)';
+
+  @override
+  String get trickEventGirudaKExhaustSuccess => 'K消耗成功';
 
   @override
   String trickEventJokerAfterFriend(String suit) {
