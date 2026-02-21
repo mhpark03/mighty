@@ -4001,6 +4001,25 @@ class AIPlayer {
             return myGirudaForLead.first;
           }
 
+          // (C-2) 비기루다 최상위 카드 우선: 상대 기루다 소진 → 컷 불가 → 확정 승리
+          // 물패 전략(D)보다 우선: 비기루다 최상위 카드는 확정 승리이므로 먼저 사용
+          // 예: ♣J가 클로버 최상위(A,K,Q 소진)이면 ♣4(물패) 대신 ♣J 선공
+          {
+            final topNonGiruda = nonGirudaDump.where((c) =>
+                _getEffectiveCardValue(c, state) >= 14).toList();
+            if (topNonGiruda.isNotEmpty) {
+              // 점수 카드 우선, 같은 점수면 높은 카드 우선
+              topNonGiruda.sort((a, b) {
+                final aPoint = a.isPointCard ? 1 : 0;
+                final bPoint = b.isPointCard ? 1 : 0;
+                if (aPoint != bPoint) return bPoint.compareTo(aPoint);
+                return _getEffectiveCardValue(b, state).compareTo(
+                    _getEffectiveCardValue(a, state));
+              });
+              return topNonGiruda.first;
+            }
+          }
+
           // (D) 물패/기루다 교대: D ≥ 2 AND (G ≥ 2 OR (G ≥ 1 AND voidSuits ≥ 1))
           // 기루다를 리드 대신 컷용으로 보존, 물패로 선 넘기기
           // → 상대 리드 시 void 무늬에서 기루다 컷 → 선 탈환
