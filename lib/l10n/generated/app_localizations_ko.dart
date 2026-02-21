@@ -2108,6 +2108,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventGirudaKExhaustSuccess => 'K 소진 성공';
 
   @override
+  String get trickEventDefenseJokerCounterattack => '마이티 소멸 → 수비 조커 반격';
+
+  @override
   String trickEventJokerAfterFriend(String suit) {
     return '프렌드 합류 후 조커 ($suit) → 점수 획득';
   }

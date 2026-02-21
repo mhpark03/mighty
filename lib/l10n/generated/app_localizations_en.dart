@@ -2133,6 +2133,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventGirudaKExhaustSuccess => 'K exhausted';
 
   @override
+  String get trickEventDefenseJokerCounterattack =>
+      'Mighty gone → Defense Joker counterattack';
+
+  @override
   String trickEventJokerAfterFriend(String suit) {
     return 'Joker after friend joined ($suit) → score';
   }

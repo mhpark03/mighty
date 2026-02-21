@@ -3784,6 +3784,12 @@ abstract class AppLocalizations {
   /// **'K 소진 성공'**
   String get trickEventGirudaKExhaustSuccess;
 
+  /// No description provided for @trickEventDefenseJokerCounterattack.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 소멸 → 수비 조커 반격'**
+  String get trickEventDefenseJokerCounterattack;
+
   /// No description provided for @trickEventJokerAfterFriend.
   ///
   /// In ko, this message translates to:

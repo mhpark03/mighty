@@ -1183,6 +1183,7 @@
   "trickEventGirudaAceKExhausted": "기루다 A 공격 → K 소진",
   "trickEventGirudaAceKNotExhausted": "기루다 A 공격 (K 유도)",
   "trickEventGirudaKExhaustSuccess": "K 소진 성공",
+  "trickEventDefenseJokerCounterattack": "마이티 소멸 → 수비 조커 반격",
   "trickEventJokerAfterFriend": "프렌드 합류 후 조커 ({suit}) → 점수 획득",
   "@trickEventJokerAfterFriend": {
     "placeholders": {

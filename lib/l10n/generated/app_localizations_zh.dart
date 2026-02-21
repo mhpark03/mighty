@@ -2095,6 +2095,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventGirudaKExhaustSuccess => 'K消耗成功';
 
   @override
+  String get trickEventDefenseJokerCounterattack => 'Mighty消失 → 守方小丑反击';
+
+  @override
   String trickEventJokerAfterFriend(String suit) {
     return '朋友合流后王牌 ($suit) → 得分';
   }

@@ -5413,6 +5413,24 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
 
+    // Outcome: 마이티 소멸 후 수비팀 조커 반격 (비선공 조커가 트릭 승리)
+    {
+      final bool mightyAlreadyPlayed = mighty.suit != null &&
+          playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}');
+      if (mightyAlreadyPlayed) {
+        for (int i = 0; i < trick.cards.length; i++) {
+          if (i == leadIdx) continue;
+          if (trick.cards[i].isJoker &&
+              i < trick.playerOrder.length &&
+              trick.winnerId == trick.playerOrder[i] &&
+              !isAttack(trick.playerOrder[i])) {
+            parts.add(l10n.trickEventDefenseJokerCounterattack);
+            break;
+          }
+        }
+      }
+    }
+
     // Outcome: 프렌드 합류 (이번 트릭에서 프렌드 카드 출현)
     if (friendCard != null && !friendAlreadyRevealed) {
       bool friendInTrick = false;

@@ -1024,6 +1024,7 @@
   "trickEventGirudaAceKExhausted": "Trump A attack → K exhausted",
   "trickEventGirudaAceKNotExhausted": "Trump A attack (draw K)",
   "trickEventGirudaKExhaustSuccess": "K exhausted",
+  "trickEventDefenseJokerCounterattack": "Mighty gone → Defense Joker counterattack",
   "trickEventJokerAfterFriend": "Joker after friend joined ({suit}) → score",
   "@trickEventJokerAfterFriend": {
     "placeholders": {
