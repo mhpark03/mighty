@@ -1009,6 +1009,7 @@
   "trickEventDefenderGirudaWin": "守方将牌胜",
   "trickEventMidGirudaLead": "中位将牌首攻",
   "trickEventTopNonGirudaLead": "非将牌最高首攻",
+  "trickEventDefenseTopCardDefend": "守方最高牌得分防御",
   "trickEventFirstTrickFriendBait": "首墩缺牌 / 诱导Friend",
   "trickEventFirstTrickWaste": "首墩缺牌 / 弃牌",
   "trickEventWaste": "弃牌",

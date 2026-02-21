@@ -2055,6 +2055,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventTopNonGirudaLead => '非将牌最高首攻';
 
   @override
+  String get trickEventDefenseTopCardDefend => '守方最高牌得分防御';
+
+  @override
   String get trickEventFirstTrickFriendBait => '首墩缺牌 / 诱导Friend';
 
   @override

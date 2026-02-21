@@ -2062,6 +2062,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventTopNonGirudaLead => '非切り札最上位リード';
 
   @override
+  String get trickEventDefenseTopCardDefend => '守備最上位カード得点防御';
+
+  @override
   String get trickEventFirstTrickFriendBait => '初トリック不在 / フレンド誘導';
 
   @override

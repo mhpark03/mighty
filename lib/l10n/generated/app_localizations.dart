@@ -3712,6 +3712,12 @@ abstract class AppLocalizations {
   /// **'비기루다 최상위 선공'**
   String get trickEventTopNonGirudaLead;
 
+  /// No description provided for @trickEventDefenseTopCardDefend.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 최상위 카드 점수 방어'**
+  String get trickEventDefenseTopCardDefend;
+
   /// No description provided for @trickEventFirstTrickFriendBait.
   ///
   /// In ko, this message translates to:

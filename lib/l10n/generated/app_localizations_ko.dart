@@ -2068,6 +2068,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventTopNonGirudaLead => '비기루다 최상위 선공';
 
   @override
+  String get trickEventDefenseTopCardDefend => '수비 최상위 카드 점수 방어';
+
+  @override
   String get trickEventFirstTrickFriendBait => '초구 부재 / 물패로 프렌드 유도';
 
   @override

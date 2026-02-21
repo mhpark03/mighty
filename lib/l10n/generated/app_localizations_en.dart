@@ -2092,6 +2092,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventTopNonGirudaLead => 'Top non-trump lead';
 
   @override
+  String get trickEventDefenseTopCardDefend => 'Defense top card point guard';
+
+  @override
   String get trickEventFirstTrickFriendBait =>
       'No lead in 1st trick / Friend bait';
 

@@ -1169,6 +1169,7 @@
   "trickEventDefenderGirudaWin": "수비팀 기루다 승리",
   "trickEventMidGirudaLead": "기루다 중간 선공",
   "trickEventTopNonGirudaLead": "비기루다 최상위 선공",
+  "trickEventDefenseTopCardDefend": "수비 최상위 카드 점수 방어",
   "trickEventFirstTrickFriendBait": "초구 부재 / 물패로 프렌드 유도",
   "trickEventFirstTrickWaste": "초구 부재 / 물패 처리",
   "trickEventWaste": "물패 처리",

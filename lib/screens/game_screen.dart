@@ -5339,6 +5339,9 @@ class _GameScreenState extends State<GameScreen> {
       if (isTop) {
         if (isAutoPlay && isDeclarerLead && trick.trickNumber > 1) {
           parts.add(l10n.trickEventHighCardAttack);
+        } else if (!isAttack(leadId) && trick.winnerId != null && !isAttack(trick.winnerId!)) {
+          // 수비팀 비기루다 최상위 선공 → 점수 방어
+          parts.add(l10n.trickEventDefenseTopCardDefend);
         } else {
           parts.add(l10n.trickEventTopNonGirudaLead);
         }
