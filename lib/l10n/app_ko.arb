@@ -1166,6 +1166,9 @@
   "trickEventNonGirudaExhaust": "비기루다 소진",
   "trickEventGirudaKExhaustSuccess": "K 소진 성공",
   "trickEventDefenseJokerCounterattack": "마이티 소멸 → 수비 조커 반격",
+  "trickEventDefenseMightyExhaust": "수비 마이티 소진 유도 성공",
+  "trickEventDefenseMightyExhaustPoints": "수비 마이티 유도, {count}점 유출",
+  "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerAfterFriend": "프렌드 합류 후 조커 ({suit}) → 점수 획득",
   "@trickEventJokerAfterFriend": {
     "placeholders": {

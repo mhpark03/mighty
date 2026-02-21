@@ -5228,8 +5228,9 @@ class _GameScreenState extends State<GameScreen> {
       return true;
     }
 
-    // 기루다 컷 여부 사전 확인 (리드 설명에 포함 시 outcome 중복 방지용)
+    // 리드 설명에 포함 시 outcome 중복 방지용 플래그
     bool girudaCutDescribed = false;
+    bool mightyExhaustDescribed = false;
     bool isAttackGirudaCut() {
       if (trick.leadSuit == giruda || giruda == null || trick.winnerId == null) return false;
       final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
@@ -5357,7 +5358,16 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
-        if (trick.winnerId != null && trick.winnerId != leadId && trick.winnerId == state.declarerId) {
+        // 수비팀이 마이티 무늬를 내서 마이티 소진 유도
+        if (!isAttack(leadId) && leadCard.suit == mighty.suit && hasMightyInTrick) {
+          final ptCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
+          if (ptCount <= 1) {
+            parts.add(l10n.trickEventDefenseMightyExhaust);
+          } else {
+            parts.add(l10n.trickEventDefenseMightyExhaustPoints(ptCount));
+          }
+          mightyExhaustDescribed = true;
+        } else if (trick.winnerId != null && trick.winnerId != leadId && trick.winnerId == state.declarerId) {
           if (topCardStr != null) {
             parts.add(l10n.trickEventWasteDeclarerReclaimWithTop(topCardStr));
           } else {
@@ -5410,12 +5420,14 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
 
-    // Outcome: 마이티 출현 (비선공 카드)
-    for (int i = 0; i < trick.cards.length; i++) {
-      if (i == leadIdx) continue;
-      if (isMighty(trick.cards[i])) {
-        parts.add(l10n.trickMightyAppeared);
-        break;
+    // Outcome: 마이티 출현 (비선공 카드, 마이티 소진 유도에서 이미 기술된 경우 생략)
+    if (!mightyExhaustDescribed) {
+      for (int i = 0; i < trick.cards.length; i++) {
+        if (i == leadIdx) continue;
+        if (isMighty(trick.cards[i])) {
+          parts.add(l10n.trickMightyAppeared);
+          break;
+        }
       }
     }
 

@@ -2085,6 +2085,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventDefenseJokerCounterattack => 'マイティ消滅 → 守備ジョーカー反撃';
 
   @override
+  String get trickEventDefenseMightyExhaust => '守備マイティ消耗成功';
+
+  @override
+  String trickEventDefenseMightyExhaustPoints(int count) {
+    return '守備マイティ消耗、$count点流出';
+  }
+
+  @override
   String trickEventJokerAfterFriend(String suit) {
     return 'フレンド合流後ジョーカー ($suit) → 得点';
   }

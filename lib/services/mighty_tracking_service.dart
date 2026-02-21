@@ -216,6 +216,7 @@ class MightyTrackingService {
     }
 
     bool girudaCutDescribed = false;
+    bool mightyExhaustDescribed = false;
     bool isAttackGirudaCut() {
       if (trick.leadSuit == giruda || giruda == null || trick.winnerId == null) return false;
       final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
@@ -330,7 +331,16 @@ class MightyTrackingService {
           }
         }
 
-        if (trick.winnerId != null && trick.winnerId != leadId && trick.winnerId == state.declarerId) {
+        // 수비팀이 마이티 무늬를 내서 마이티 소진 유도
+        if (!isAttack(leadId) && leadCard.suit == mighty.suit && hasMightyInTrick) {
+          final ptCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
+          if (ptCount <= 1) {
+            parts.add('수비 마이티 소진 유도 성공');
+          } else {
+            parts.add('수비 마이티 유도, ${ptCount}점 유출');
+          }
+          mightyExhaustDescribed = true;
+        } else if (trick.winnerId != null && trick.winnerId != leadId && trick.winnerId == state.declarerId) {
           if (topCardStr != null) {
             parts.add('물패 ($topCardStr 최상위) → 주공 선 탈환');
           } else {
@@ -382,12 +392,14 @@ class MightyTrackingService {
       }
     }
 
-    // Outcome: 마이티 출현 (비선공 카드)
-    for (int i = 0; i < trick.cards.length; i++) {
-      if (i == leadIdx) continue;
-      if (isMighty(trick.cards[i])) {
-        parts.add('마이티 출현');
-        break;
+    // Outcome: 마이티 출현 (비선공 카드, 마이티 소진 유도에서 이미 기술된 경우 생략)
+    if (!mightyExhaustDescribed) {
+      for (int i = 0; i < trick.cards.length; i++) {
+        if (i == leadIdx) continue;
+        if (isMighty(trick.cards[i])) {
+          parts.add('마이티 출현');
+          break;
+        }
       }
     }
 

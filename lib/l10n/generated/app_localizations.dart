@@ -3742,6 +3742,18 @@ abstract class AppLocalizations {
   /// **'마이티 소멸 → 수비 조커 반격'**
   String get trickEventDefenseJokerCounterattack;
 
+  /// No description provided for @trickEventDefenseMightyExhaust.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 마이티 소진 유도 성공'**
+  String get trickEventDefenseMightyExhaust;
+
+  /// No description provided for @trickEventDefenseMightyExhaustPoints.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 마이티 유도, {count}점 유출'**
+  String trickEventDefenseMightyExhaustPoints(int count);
+
   /// No description provided for @trickEventJokerAfterFriend.
   ///
   /// In ko, this message translates to:

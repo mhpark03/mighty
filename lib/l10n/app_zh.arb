@@ -1006,6 +1006,9 @@
   "trickEventNonGirudaExhaust": "非将牌消耗",
   "trickEventGirudaKExhaustSuccess": "K消耗成功",
   "trickEventDefenseJokerCounterattack": "Mighty消失 → 守方小丑反击",
+  "trickEventDefenseMightyExhaust": "防守逼出Mighty成功",
+  "trickEventDefenseMightyExhaustPoints": "防守逼出Mighty，流失{count}分",
+  "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerAfterFriend": "朋友合流后王牌 ({suit}) → 得分",
   "@trickEventJokerAfterFriend": {
     "placeholders": {

@@ -2078,6 +2078,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventDefenseJokerCounterattack => 'Mighty消失 → 守方小丑反击';
 
   @override
+  String get trickEventDefenseMightyExhaust => '防守逼出Mighty成功';
+
+  @override
+  String trickEventDefenseMightyExhaustPoints(int count) {
+    return '防守逼出Mighty，流失$count分';
+  }
+
+  @override
   String trickEventJokerAfterFriend(String suit) {
     return '朋友合流后王牌 ($suit) → 得分';
   }

@@ -1006,6 +1006,9 @@
   "trickEventNonGirudaExhaust": "非切り札消耗",
   "trickEventGirudaKExhaustSuccess": "K消耗成功",
   "trickEventDefenseJokerCounterattack": "マイティ消滅 → 守備ジョーカー反撃",
+  "trickEventDefenseMightyExhaust": "守備マイティ消耗成功",
+  "trickEventDefenseMightyExhaustPoints": "守備マイティ消耗、{count}点流出",
+  "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerAfterFriend": "フレンド合流後ジョーカー ({suit}) → 得点",
   "@trickEventJokerAfterFriend": {
     "placeholders": {

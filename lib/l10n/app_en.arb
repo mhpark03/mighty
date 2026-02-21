@@ -1007,6 +1007,9 @@
   "trickEventNonGirudaExhaust": "Non-trump exhausted",
   "trickEventGirudaKExhaustSuccess": "K exhausted",
   "trickEventDefenseJokerCounterattack": "Mighty gone → Defense Joker counterattack",
+  "trickEventDefenseMightyExhaust": "Defense mighty exhaust success",
+  "trickEventDefenseMightyExhaustPoints": "Defense mighty exhaust, {count}pts lost",
+  "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerAfterFriend": "Joker after friend joined ({suit}) → score",
   "@trickEventJokerAfterFriend": {
     "placeholders": {
