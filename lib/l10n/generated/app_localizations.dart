@@ -3550,6 +3550,30 @@ abstract class AppLocalizations {
   /// **'마지막 카드'**
   String get trickEventLastCard;
 
+  /// No description provided for @trickEventLastTrickGiruda.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 마지막 트릭'**
+  String get trickEventLastTrickGiruda;
+
+  /// No description provided for @trickEventLastTrickMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 마지막 트릭'**
+  String get trickEventLastTrickMighty;
+
+  /// No description provided for @trickEventGameVictory.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격 승리 확정'**
+  String get trickEventGameVictory;
+
+  /// No description provided for @trickEventGameDefeat.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격 패배 확정'**
+  String get trickEventGameDefeat;
+
   /// No description provided for @trickEventLastCardDefenseWin.
   ///
   /// In ko, this message translates to:
@@ -3561,12 +3585,6 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'공격 {count}점 획득'**
   String trickEventLastCardAttackWin(int count);
-
-  /// No description provided for @trickEventLastCardLeadFailed.
-  ///
-  /// In ko, this message translates to:
-  /// **'{name} 선공 실패, {count}점 놓침'**
-  String trickEventLastCardLeadFailed(String name, int count);
 
   /// No description provided for @trickEventJokerLead.
   ///
@@ -3634,6 +3652,12 @@ abstract class AppLocalizations {
   /// **'기루다 중간 선공'**
   String get trickEventMidGirudaLead;
 
+  /// No description provided for @trickEventSoleGirudaLeadMaintain.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격 단독 기루다 보유, 선 유지'**
+  String get trickEventSoleGirudaLeadMaintain;
+
   /// No description provided for @trickEventTopNonGirudaLead.
   ///
   /// In ko, this message translates to:
@@ -3649,7 +3673,7 @@ abstract class AppLocalizations {
   /// No description provided for @trickEventDefenseLeadAttackCut.
   ///
   /// In ko, this message translates to:
-  /// **'수비 비기루다 공격 → 기루다 컷 선 탈환'**
+  /// **'수비 비기루다 최상위 선공 → 공격 기루다 컷 선 탈환'**
   String get trickEventDefenseLeadAttackCut;
 
   /// No description provided for @trickEventAttackLeadDefenseCut.

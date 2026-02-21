@@ -152,21 +152,46 @@ class MightyTrackingService {
     bool isGiruda(PlayingCard c) => !c.isJoker && giruda != null && c.suit == giruda;
     bool isAttack(int id) => id == state.declarerId || id == state.friendId;
 
-    // 트릭 10: 마지막 카드 + 승패 결과
+    // 트릭 10: 마지막 트릭 + 점수 + 승패 확정
     if (trick.trickNumber == 10) {
-      final lastParts = <String>['마지막 카드'];
+      final lastParts = <String>[];
       final pointCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
+
+      String lastLabel = '마지막 카드';
+      if (trick.winnerId != null) {
+        final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
+        if (winIdx >= 0 && winIdx < trick.cards.length) {
+          final winCard = trick.cards[winIdx];
+          if (isMighty(winCard)) {
+            lastLabel = '마이티 마지막 트릭';
+          } else if (isGiruda(winCard)) {
+            lastLabel = '기루다 마지막 트릭';
+          }
+        }
+      }
+      lastParts.add(lastLabel);
+
       if (trick.winnerId != null && pointCount > 0) {
         if (!isAttack(trick.winnerId!)) {
           lastParts.add('수비 상위 카드 ${pointCount}점 방어');
         } else {
           lastParts.add('공격 ${pointCount}점 획득');
         }
-        if (trick.winnerId != leadId && pointCount >= 2) {
-          final leadName = leadId >= 0 && leadId < _playerNamesKo.length ? _playerNamesKo[leadId] : '?';
-          lastParts.add('$leadName 선공 실패, ${pointCount}점 놓침');
+      }
+
+      int attackPoints = 0;
+      for (final t in state.tricks) {
+        if (t.winnerId != null && isAttack(t.winnerId!)) {
+          attackPoints += t.cards.where((c) => !c.isJoker && c.isPointCard).length;
         }
       }
+      final bidTricks = state.currentBid?.tricks ?? 13;
+      if (attackPoints >= bidTricks) {
+        lastParts.add('공격 승리 확정');
+      } else {
+        lastParts.add('공격 패배 확정');
+      }
+
       return lastParts.join(' / ');
     }
 
@@ -277,7 +302,19 @@ class MightyTrackingService {
         } else if (trick.winnerId != leadId && trick.winnerId != null && !isTeammate(trick.winnerId!)) {
           parts.add('수비팀 기루다 승리');
         } else {
-          parts.add('기루다 중간 선공');
+          bool onlyLeaderHasGiruda = true;
+          for (int i = 0; i < trick.cards.length; i++) {
+            if (i == leadIdx) continue;
+            if (!trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
+              onlyLeaderHasGiruda = false;
+              break;
+            }
+          }
+          if (onlyLeaderHasGiruda && isAttack(leadId)) {
+            parts.add('공격 단독 기루다 보유, 선 유지');
+          } else {
+            parts.add('기루다 중간 선공');
+          }
         }
       }
     } else {
@@ -286,7 +323,7 @@ class MightyTrackingService {
         if (isAutoPlay && isDeclarerLead && trick.trickNumber > 1) {
           parts.add('추가 점수 공격');
         } else if (!isAttack(leadId) && isAttackGirudaCut()) {
-          parts.add('수비 비기루다 공격 → 기루다 컷 선 탈환');
+          parts.add('수비 비기루다 최상위 선공 → 공격 기루다 컷 선 탈환');
           girudaCutDescribed = true;
         } else if (isAttack(leadId) && isDefenseGirudaCut()) {
           parts.add('공격 비기루다 최상위 선공 → 수비 기루다 컷');

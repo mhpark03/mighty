@@ -1973,6 +1973,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventLastCard => '最後のカード';
 
   @override
+  String get trickEventLastTrickGiruda => '切り札最終トリック';
+
+  @override
+  String get trickEventLastTrickMighty => 'マイティ最終トリック';
+
+  @override
+  String get trickEventGameVictory => '攻撃勝利確定';
+
+  @override
+  String get trickEventGameDefeat => '攻撃敗北確定';
+
+  @override
   String trickEventLastCardDefenseWin(int count) {
     return '守備上位カード$count点防御';
   }
@@ -1980,11 +1992,6 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String trickEventLastCardAttackWin(int count) {
     return '攻撃$count点獲得';
-  }
-
-  @override
-  String trickEventLastCardLeadFailed(String name, int count) {
-    return '$nameリード失敗、$count点逃す';
   }
 
   @override
@@ -2023,13 +2030,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventMidGirudaLead => '切り札中位リード';
 
   @override
+  String get trickEventSoleGirudaLeadMaintain => '攻撃単独切り札保有、先手維持';
+
+  @override
   String get trickEventTopNonGirudaLead => '非切り札最上位リード';
 
   @override
   String get trickEventDefenseTopCardDefend => '守備最上位カード得点防御';
 
   @override
-  String get trickEventDefenseLeadAttackCut => '守備非切り札攻撃 → 切り札カット奪還';
+  String get trickEventDefenseLeadAttackCut => '守備非切り札最上位先攻 → 攻撃切り札カット奪還';
 
   @override
   String get trickEventAttackLeadDefenseCut => '攻撃非切り札最上位先攻 → 守備切り札カット';

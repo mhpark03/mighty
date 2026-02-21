@@ -5164,22 +5164,49 @@ class _GameScreenState extends State<GameScreen> {
     bool isGiruda(PlayingCard c) => !c.isJoker && giruda != null && c.suit == giruda;
     bool isAttack(int id) => id == state.declarerId || id == state.friendId;
 
-    // 트릭 10: 마지막 카드 + 승패 결과
+    // 트릭 10: 마지막 트릭 + 점수 + 승패 확정
     if (trick.trickNumber == 10) {
-      final lastParts = <String>[l10n.trickEventLastCard];
+      final lastParts = <String>[];
       final pointCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
+
+      // 승리 카드 유형에 따른 마지막 트릭 설명
+      String lastLabel = l10n.trickEventLastCard;
+      if (trick.winnerId != null) {
+        final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
+        if (winIdx >= 0 && winIdx < trick.cards.length) {
+          final winCard = trick.cards[winIdx];
+          if (isMighty(winCard)) {
+            lastLabel = l10n.trickEventLastTrickMighty;
+          } else if (isGiruda(winCard)) {
+            lastLabel = l10n.trickEventLastTrickGiruda;
+          }
+        }
+      }
+      lastParts.add(lastLabel);
+
+      // 점수
       if (trick.winnerId != null && pointCount > 0) {
         if (!isAttack(trick.winnerId!)) {
           lastParts.add(l10n.trickEventLastCardDefenseWin(pointCount));
         } else {
           lastParts.add(l10n.trickEventLastCardAttackWin(pointCount));
         }
-        // 선공 실패로 대거 점수 놓침
-        if (trick.winnerId != leadId && pointCount >= 2) {
-          final leadName = _getLocalizedPlayerName(state.players[leadId], l10n);
-          lastParts.add(l10n.trickEventLastCardLeadFailed(leadName, pointCount));
+      }
+
+      // 게임 결과
+      int attackPoints = 0;
+      for (final t in state.tricks) {
+        if (t.winnerId != null && isAttack(t.winnerId!)) {
+          attackPoints += t.cards.where((c) => !c.isJoker && c.isPointCard).length;
         }
       }
+      final bidTricks = state.currentBid?.tricks ?? 13;
+      if (attackPoints >= bidTricks) {
+        lastParts.add(l10n.trickEventGameVictory);
+      } else {
+        lastParts.add(l10n.trickEventGameDefeat);
+      }
+
       return lastParts.join(' / ');
     }
     bool isTeammate(int winnerId) => isAttack(leadId) == isAttack(winnerId);
@@ -5296,7 +5323,20 @@ class _GameScreenState extends State<GameScreen> {
         } else if (trick.winnerId != leadId && !isTeammate(trick.winnerId!)) {
           parts.add(l10n.trickEventDefenderGirudaWin);
         } else {
-          parts.add(l10n.trickEventMidGirudaLead);
+          // 기루다 리드 시 다른 플레이어가 기루다를 내지 못하면 → 선공자만 기루다 보유
+          bool onlyLeaderHasGiruda = true;
+          for (int i = 0; i < trick.cards.length; i++) {
+            if (i == leadIdx) continue;
+            if (!trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
+              onlyLeaderHasGiruda = false;
+              break;
+            }
+          }
+          if (onlyLeaderHasGiruda && isAttack(leadId)) {
+            parts.add(l10n.trickEventSoleGirudaLeadMaintain);
+          } else {
+            parts.add(l10n.trickEventMidGirudaLead);
+          }
         }
       }
     } else {

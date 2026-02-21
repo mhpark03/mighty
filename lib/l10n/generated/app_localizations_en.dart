@@ -2002,6 +2002,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventLastCard => 'Last card';
 
   @override
+  String get trickEventLastTrickGiruda => 'Trump last trick';
+
+  @override
+  String get trickEventLastTrickMighty => 'Mighty last trick';
+
+  @override
+  String get trickEventGameVictory => 'Attack victory';
+
+  @override
+  String get trickEventGameDefeat => 'Attack defeat';
+
+  @override
   String trickEventLastCardDefenseWin(int count) {
     return 'Defense higher card ${count}pt guard';
   }
@@ -2009,11 +2021,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String trickEventLastCardAttackWin(int count) {
     return 'Attack ${count}pt gained';
-  }
-
-  @override
-  String trickEventLastCardLeadFailed(String name, int count) {
-    return '$name lead failed, ${count}pt missed';
   }
 
   @override
@@ -2054,6 +2061,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventMidGirudaLead => 'Mid trump lead';
 
   @override
+  String get trickEventSoleGirudaLeadMaintain =>
+      'Attack sole trump holder, lead maintained';
+
+  @override
   String get trickEventTopNonGirudaLead => 'Top non-trump lead';
 
   @override
@@ -2061,7 +2072,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trickEventDefenseLeadAttackCut =>
-      'Defense non-trump lead → Trump cut reclaim';
+      'Defense non-trump top lead → Attack trump cut reclaim';
 
   @override
   String get trickEventAttackLeadDefenseCut =>

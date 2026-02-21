@@ -1979,6 +1979,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventLastCard => '마지막 카드';
 
   @override
+  String get trickEventLastTrickGiruda => '기루다 마지막 트릭';
+
+  @override
+  String get trickEventLastTrickMighty => '마이티 마지막 트릭';
+
+  @override
+  String get trickEventGameVictory => '공격 승리 확정';
+
+  @override
+  String get trickEventGameDefeat => '공격 패배 확정';
+
+  @override
   String trickEventLastCardDefenseWin(int count) {
     return '수비 상위 카드 $count점 방어';
   }
@@ -1986,11 +1998,6 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String trickEventLastCardAttackWin(int count) {
     return '공격 $count점 획득';
-  }
-
-  @override
-  String trickEventLastCardLeadFailed(String name, int count) {
-    return '$name 선공 실패, $count점 놓침';
   }
 
   @override
@@ -2029,13 +2036,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventMidGirudaLead => '기루다 중간 선공';
 
   @override
+  String get trickEventSoleGirudaLeadMaintain => '공격 단독 기루다 보유, 선 유지';
+
+  @override
   String get trickEventTopNonGirudaLead => '비기루다 최상위 선공';
 
   @override
   String get trickEventDefenseTopCardDefend => '수비 최상위 카드 점수 방어';
 
   @override
-  String get trickEventDefenseLeadAttackCut => '수비 비기루다 공격 → 기루다 컷 선 탈환';
+  String get trickEventDefenseLeadAttackCut => '수비 비기루다 최상위 선공 → 공격 기루다 컷 선 탈환';
 
   @override
   String get trickEventAttackLeadDefenseCut => '공격 비기루다 최상위 선공 → 수비 기루다 컷';

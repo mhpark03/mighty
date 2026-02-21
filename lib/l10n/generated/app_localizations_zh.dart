@@ -1966,6 +1966,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventLastCard => '最后一张牌';
 
   @override
+  String get trickEventLastTrickGiruda => '将牌最后一墩';
+
+  @override
+  String get trickEventLastTrickMighty => 'Mighty最后一墩';
+
+  @override
+  String get trickEventGameVictory => '进攻胜利确定';
+
+  @override
+  String get trickEventGameDefeat => '进攻败北确定';
+
+  @override
   String trickEventLastCardDefenseWin(int count) {
     return '守方高牌$count分防御';
   }
@@ -1973,11 +1985,6 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String trickEventLastCardAttackWin(int count) {
     return '攻方$count分获取';
-  }
-
-  @override
-  String trickEventLastCardLeadFailed(String name, int count) {
-    return '$name先攻失败，错失$count分';
   }
 
   @override
@@ -2016,13 +2023,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventMidGirudaLead => '中位将牌首攻';
 
   @override
+  String get trickEventSoleGirudaLeadMaintain => '进攻独占将牌，保持先手';
+
+  @override
   String get trickEventTopNonGirudaLead => '非将牌最高首攻';
 
   @override
   String get trickEventDefenseTopCardDefend => '守方最高牌得分防御';
 
   @override
-  String get trickEventDefenseLeadAttackCut => '守方非将牌攻击 → 将牌切入夺先';
+  String get trickEventDefenseLeadAttackCut => '守方非将牌最高出牌 → 进攻将牌切入夺先';
 
   @override
   String get trickEventAttackLeadDefenseCut => '进攻非将牌最高出牌 → 守方将牌切入';
