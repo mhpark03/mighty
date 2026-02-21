@@ -1979,7 +1979,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventLastTrickMighty => 'マイティ最終トリック';
 
   @override
+  String trickEventLastTrickTopByExhaust(String card) {
+    return 'スート消耗 → $card 最上位先攻';
+  }
+
+  @override
   String get trickEventGameVictory => '攻撃勝利確定';
+
+  @override
+  String get trickEventGameRunVictory => '攻撃ラン(完封)大勝確定';
 
   @override
   String get trickEventGameDefeat => '攻撃敗北確定';
@@ -2075,6 +2083,10 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get trickEventFriendLeadDefenseBeatDeclarerCut =>
+      'フレンド先攻 → 守備逆転 → 宣言者切り札再逆転';
+
+  @override
   String get trickEventWasteFriendRescue => '捨て札 → フレンド救出!';
 
   @override
@@ -2093,6 +2105,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trickEventGirudaKExhaustSuccess => 'K消耗成功';
+
+  @override
+  String get trickEventGirudaKQExhaustSuccess => 'K/Q同時消耗 大成功';
 
   @override
   String get trickEventDefenseJokerCounterattack => 'マイティ消滅 → 守備ジョーカー反撃';

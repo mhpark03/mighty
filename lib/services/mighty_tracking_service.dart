@@ -157,7 +157,7 @@ class MightyTrackingService {
       final lastParts = <String>[];
       final pointCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
 
-      String lastLabel = '마지막 카드';
+      String? lastLabel;
       if (trick.winnerId != null) {
         final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
         if (winIdx >= 0 && winIdx < trick.cards.length) {
@@ -169,7 +169,32 @@ class MightyTrackingService {
           }
         }
       }
-      lastParts.add(lastLabel);
+      // 비기루다 최상위 선공 (무늬 소진으로 낮은 카드가 최상위가 된 경우)
+      if (!leadCard.isJoker && leadCard.suit != null && leadCard.suit != giruda &&
+          leadCard.rankValue < 11) {
+        bool isTop = true;
+        for (int r = 14; r > leadCard.rankValue; r--) {
+          if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
+          if (!playedCards.contains('${leadCard.suit!.index}-$r')) { isTop = false; break; }
+        }
+        if (isTop) {
+          final cardStr = '${_suitSymbols[leadCard.suit!]}${_rankSymbols[leadCard.rankValue]}';
+          lastLabel = '무늬 소진 → $cardStr 최상위 선공';
+        }
+      }
+      // "마지막 카드"는 최상위 카드가 아닐 때만 표시
+      if (lastLabel == null && !leadCard.isJoker && leadCard.suit != null) {
+        bool isLeadTop = leadCard.rankValue >= 14;
+        if (!isLeadTop && leadCard.suit != giruda) {
+          isLeadTop = true;
+          for (int r = 14; r > leadCard.rankValue; r--) {
+            if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
+            if (!playedCards.contains('${leadCard.suit!.index}-$r')) { isLeadTop = false; break; }
+          }
+        }
+        if (!isLeadTop) lastLabel = '마지막 카드';
+      }
+      if (lastLabel != null) lastParts.add(lastLabel);
 
       if (trick.winnerId != null && pointCount > 0) {
         if (!isAttack(trick.winnerId!)) {
@@ -187,7 +212,12 @@ class MightyTrackingService {
       }
       final bidTricks = state.currentBid?.tricks ?? 13;
       if (attackPoints >= bidTricks) {
-        lastParts.add('공격 승리 확정');
+        final isRun = state.tricks.every((t) => t.winnerId != null && isAttack(t.winnerId!));
+        if (isRun) {
+          lastParts.add('공격 런(풀) 대승 확정');
+        } else {
+          lastParts.add('공격 승리 확정');
+        }
       } else {
         lastParts.add('공격 패배 확정');
       }
@@ -377,8 +407,30 @@ class MightyTrackingService {
           }
         }
 
+        // 프렌드 선공 → 수비 역전 → 주공 기루다 컷 재역전
+        bool isFriendLeadDefenseBeatDeclarerCut = false;
+        if (isAttack(leadId) && leadId != state.declarerId && trick.winnerId == state.declarerId) {
+          final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
+          if (winIdx >= 0 && winIdx < trick.cards.length) {
+            final winCard = trick.cards[winIdx];
+            if (!winCard.isJoker && winCard.suit == giruda && leadCard.suit != giruda) {
+              for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+                if (i == leadIdx || i == winIdx) continue;
+                final c = trick.cards[i];
+                if (!isAttack(trick.playerOrder[i]) && !c.isJoker && c.suit == leadCard.suit && c.rankValue > leadCard.rankValue) {
+                  isFriendLeadDefenseBeatDeclarerCut = true;
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        if (isFriendLeadDefenseBeatDeclarerCut) {
+          parts.add('프렌드 선공 → 수비 역전 → 주공 기루다 컷 재역전');
+          girudaCutDescribed = true;
         // 수비팀이 마이티 무늬를 내서 마이티 소진 유도
-        if (!isAttack(leadId) && leadCard.suit == mighty.suit && hasMightyInTrick) {
+        } else if (!isAttack(leadId) && leadCard.suit == mighty.suit && hasMightyInTrick) {
           final ptCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
           if (ptCount <= 1) {
             parts.add('수비 마이티 소진 유도 성공');
@@ -429,11 +481,15 @@ class MightyTrackingService {
       }
     }
 
-    // Outcome: K 소진 성공
+    // Outcome: K/Q 소진 성공
     if (giruda != null && girudaKInTrick) {
       final kIdx = trick.cards.indexWhere((c) =>
           !c.isJoker && c.suit == giruda && c.rank == Rank.king);
-      if (kIdx >= 0 && kIdx != leadIdx) {
+      final qIdx = trick.cards.indexWhere((c) =>
+          !c.isJoker && c.suit == giruda && c.rank == Rank.queen);
+      if (kIdx >= 0 && kIdx != leadIdx && qIdx >= 0 && qIdx != leadIdx) {
+        parts.add('K/Q 동시 소진 대성공');
+      } else if (kIdx >= 0 && kIdx != leadIdx) {
         parts.add('K 소진 성공');
       }
     }

@@ -3562,11 +3562,23 @@ abstract class AppLocalizations {
   /// **'마이티 마지막 트릭'**
   String get trickEventLastTrickMighty;
 
+  /// No description provided for @trickEventLastTrickTopByExhaust.
+  ///
+  /// In ko, this message translates to:
+  /// **'무늬 소진 → {card} 최상위 선공'**
+  String trickEventLastTrickTopByExhaust(String card);
+
   /// No description provided for @trickEventGameVictory.
   ///
   /// In ko, this message translates to:
   /// **'공격 승리 확정'**
   String get trickEventGameVictory;
+
+  /// No description provided for @trickEventGameRunVictory.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격 런(풀) 대승 확정'**
+  String get trickEventGameRunVictory;
 
   /// No description provided for @trickEventGameDefeat.
   ///
@@ -3730,6 +3742,12 @@ abstract class AppLocalizations {
   /// **'물패 ({topCard} 최상위) → 주공 선 탈환'**
   String trickEventWasteDeclarerReclaimWithTop(String topCard);
 
+  /// No description provided for @trickEventFriendLeadDefenseBeatDeclarerCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 선공 → 수비 역전 → 주공 기루다 컷 재역전'**
+  String get trickEventFriendLeadDefenseBeatDeclarerCut;
+
   /// No description provided for @trickEventWasteFriendRescue.
   ///
   /// In ko, this message translates to:
@@ -3765,6 +3783,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'K 소진 성공'**
   String get trickEventGirudaKExhaustSuccess;
+
+  /// No description provided for @trickEventGirudaKQExhaustSuccess.
+  ///
+  /// In ko, this message translates to:
+  /// **'K/Q 동시 소진 대성공'**
+  String get trickEventGirudaKQExhaustSuccess;
 
   /// No description provided for @trickEventDefenseJokerCounterattack.
   ///
