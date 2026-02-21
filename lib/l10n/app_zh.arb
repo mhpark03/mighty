@@ -1004,8 +1004,6 @@
   "trickEventAttackGirudaCut": "攻方将牌切入",
   "trickEventDefenseGirudaCut": "守方将牌切入",
   "trickEventNonGirudaExhaust": "非将牌消耗",
-  "trickEventGirudaAceKExhausted": "将牌A攻击 → K消耗",
-  "trickEventGirudaAceKNotExhausted": "将牌A攻击 (引K)",
   "trickEventGirudaKExhaustSuccess": "K消耗成功",
   "trickEventDefenseJokerCounterattack": "Mighty消失 → 守方小丑反击",
   "trickEventJokerAfterFriend": "朋友合流后王牌 ({suit}) → 得分",

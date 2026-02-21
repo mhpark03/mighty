@@ -3730,18 +3730,6 @@ abstract class AppLocalizations {
   /// **'비기루다 소진'**
   String get trickEventNonGirudaExhaust;
 
-  /// No description provided for @trickEventGirudaAceKExhausted.
-  ///
-  /// In ko, this message translates to:
-  /// **'기루다 A 공격 → K 소진'**
-  String get trickEventGirudaAceKExhausted;
-
-  /// No description provided for @trickEventGirudaAceKNotExhausted.
-  ///
-  /// In ko, this message translates to:
-  /// **'기루다 A 공격 (K 유도)'**
-  String get trickEventGirudaAceKNotExhausted;
-
   /// No description provided for @trickEventGirudaKExhaustSuccess.
   ///
   /// In ko, this message translates to:

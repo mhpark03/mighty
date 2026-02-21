@@ -5186,15 +5186,12 @@ class _GameScreenState extends State<GameScreen> {
     final hasMightyInTrick = trick.cards.any((c) => isMighty(c));
     final isDeclarerLead = leadId == state.declarerId;
 
-    // auto-play 전략 비교용: K가 이 트릭에서 나왔는지, 프렌드 기합류 여부
+    // auto-play 전략 비교용: K가 이 트릭에서 나왔는지, 프렌드 합류 여부
     bool girudaKInTrick = giruda != null && trick.cards.any((c) =>
         !c.isJoker && c.suit == giruda && c.rank == Rank.king);
-    bool girudaKAlreadyPlayed = giruda != null &&
-        playedCards.contains('${giruda!.index}-13'); // King rankValue = 13
 
-    // 주공이 기루다 A/K/Q를 보유하는지 확인 (전체 트릭에서 주공이 낸 카드 확인)
+    // 주공이 기루다 A/Q를 보유하는지 확인 (전체 트릭에서 주공이 낸 카드 확인)
     bool declarerPlaysGirudaA = false;
-    bool declarerPlaysGirudaK = false;
     bool declarerPlaysGirudaQ = false;
     if (isAutoPlay && giruda != null) {
       for (final t in state.tricks) {
@@ -5203,7 +5200,6 @@ class _GameScreenState extends State<GameScreen> {
             final c = t.cards[i];
             if (!c.isJoker && c.suit == giruda) {
               if (c.rank == Rank.ace) declarerPlaysGirudaA = true;
-              if (c.rank == Rank.king) declarerPlaysGirudaK = true;
               if (c.rank == Rank.queen) declarerPlaysGirudaQ = true;
             }
           }
@@ -5268,21 +5264,7 @@ class _GameScreenState extends State<GameScreen> {
     } else if (isGiruda(leadCard)) {
       final isTop = leadCard.rankValue >= 14 || isTopOfSuit(leadCard.suit!, leadCard.rankValue);
       if (isTop) {
-        if (isAutoPlay && isDeclarerLead && leadCard.rank == Rank.ace && giruda != null) {
-          // 전략: 기루다 A 공격 → K 소진 확인
-          if (declarerPlaysGirudaK) {
-            // 주공이 K도 보유 → 단순 최상위 선공
-            parts.add(l10n.trickEventTopGirudaLead);
-          } else if (girudaKInTrick) {
-            parts.add(l10n.trickEventGirudaAceKExhausted);
-          } else if (girudaKAlreadyPlayed) {
-            parts.add(l10n.trickEventTopGirudaLead);
-          } else {
-            parts.add(l10n.trickEventGirudaAceKNotExhausted);
-          }
-        } else {
-          parts.add(l10n.trickEventTopGirudaLead);
-        }
+        parts.add(l10n.trickEventTopGirudaLead);
       } else {
         if (hasMightyInTrick) {
           if (isAutoPlay && isDeclarerLead && declarerPlaysGirudaA) {

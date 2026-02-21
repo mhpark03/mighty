@@ -176,11 +176,8 @@ class MightyTrackingService {
 
     bool girudaKInTrick = giruda != null && trick.cards.any((c) =>
         !c.isJoker && c.suit == giruda && c.rank == Rank.king);
-    bool girudaKAlreadyPlayed = giruda != null &&
-        playedCards.contains('${giruda.index}-13');
 
     bool declarerPlaysGirudaA = false;
-    bool declarerPlaysGirudaK = false;
     bool declarerPlaysGirudaQ = false;
     if (isAutoPlay && giruda != null) {
       for (final t in state.tricks) {
@@ -189,7 +186,6 @@ class MightyTrackingService {
             final c = t.cards[i];
             if (!c.isJoker && c.suit == giruda) {
               if (c.rank == Rank.ace) declarerPlaysGirudaA = true;
-              if (c.rank == Rank.king) declarerPlaysGirudaK = true;
               if (c.rank == Rank.queen) declarerPlaysGirudaQ = true;
             }
           }
@@ -252,19 +248,7 @@ class MightyTrackingService {
     } else if (isGiruda(leadCard)) {
       final isTop = leadCard.rankValue >= 14 || isTopOfSuit(leadCard.suit!, leadCard.rankValue);
       if (isTop) {
-        if (isAutoPlay && isDeclarerLead && leadCard.rank == Rank.ace && giruda != null) {
-          if (declarerPlaysGirudaK) {
-            parts.add('기루다 최상위 선공');
-          } else if (girudaKInTrick) {
-            parts.add('기루다 A 공격 → K 소진');
-          } else if (girudaKAlreadyPlayed) {
-            parts.add('기루다 최상위 선공');
-          } else {
-            parts.add('기루다 A 공격 (K 유도)');
-          }
-        } else {
-          parts.add('기루다 최상위 선공');
-        }
+        parts.add('기루다 최상위 선공');
       } else {
         if (hasMightyInTrick) {
           if (isAutoPlay && isDeclarerLead && declarerPlaysGirudaA) {
