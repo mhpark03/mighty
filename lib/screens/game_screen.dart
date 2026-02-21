@@ -874,6 +874,7 @@ class _GameScreenState extends State<GameScreen> {
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: isRed ? Colors.red : Colors.black,
+              fontFamily: 'Roboto',
             ),
           ),
         );
@@ -1286,7 +1287,7 @@ class _GameScreenState extends State<GameScreen> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(suitSymbol, style: TextStyle(color: suitColor, fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text(suitSymbol, style: TextStyle(color: suitColor, fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Roboto')),
                       if (isCurrent)
                         Padding(
                           padding: const EdgeInsets.only(left: 2),
@@ -1330,6 +1331,7 @@ class _GameScreenState extends State<GameScreen> {
               style: TextStyle(
                 color: bestOptimal >= currentOptimal + 3 ? Colors.amber[200] : Colors.grey[400],
                 fontSize: 11,
+                fontFamily: 'Roboto',
               ),
             ),
           ),
@@ -2703,6 +2705,7 @@ class _GameScreenState extends State<GameScreen> {
                   color: symbolColor,
                   fontSize: compact ? 16 : 20,
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'Roboto',
                 ),
               ),
               SizedBox(width: compact ? 2 : 4),
@@ -3653,15 +3656,7 @@ class _GameScreenState extends State<GameScreen> {
         spans.add(TextSpan(text: text.substring(lastEnd, match.start)));
       }
       final symbol = match.group(0)!;
-      Suit suit;
-      Color color;
-      switch (symbol) {
-        case '♠': suit = Suit.spade; color = Colors.black;
-        case '♣': suit = Suit.club; color = Colors.black;
-        case '♥': suit = Suit.heart; color = Colors.red;
-        case '♦': suit = Suit.diamond; color = Colors.red;
-        default: suit = Suit.spade; color = Colors.black;
-      }
+      final color = (symbol == '♥' || symbol == '♦') ? Colors.red : Colors.black;
       spans.add(WidgetSpan(
         alignment: PlaceholderAlignment.middle,
         child: Container(
@@ -3673,9 +3668,14 @@ class _GameScreenState extends State<GameScreen> {
             borderRadius: BorderRadius.circular(2),
           ),
           child: Center(
-            child: CustomPaint(
-              size: Size(cardSize * 0.7, cardSize * 0.7),
-              painter: SuitSymbolPainter(suit: suit, color: color),
+            child: Text(
+              symbol,
+              style: TextStyle(
+                fontSize: cardSize * 0.8,
+                color: color,
+                fontFamily: 'Roboto',
+                height: 1.0,
+              ),
             ),
           ),
         ),
@@ -3744,6 +3744,7 @@ class _GameScreenState extends State<GameScreen> {
             color: _getSuitColorForInfo(suit),
             fontSize: 16,
             fontWeight: FontWeight.bold,
+            fontFamily: 'Roboto',
           ),
         ),
         Text(

@@ -522,6 +522,7 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
             style: TextStyle(
               color: isRed ? Colors.red : null,
               fontWeight: FontWeight.bold,
+              fontFamily: 'Roboto',
             ),
           ),
           if (comp != null) ...[

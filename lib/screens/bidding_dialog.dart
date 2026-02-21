@@ -101,7 +101,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
               runSpacing: 8,
               children: [
                 ChoiceChip(
-                  label: Text('♠ ${l10n.spade}'),
+                  label: Text('♠ ${l10n.spade}', style: const TextStyle(fontFamily: 'Roboto')),
                   selected: _selectedSuit == Suit.spade && !_noGiruda,
                   onSelected: (selected) {
                     setState(() {
@@ -113,7 +113,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
                 ChoiceChip(
                   label: Text(
                     '♦ ${l10n.diamond}',
-                    style: const TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Colors.red, fontFamily: 'Roboto'),
                   ),
                   selected: _selectedSuit == Suit.diamond && !_noGiruda,
                   onSelected: (selected) {
@@ -126,7 +126,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
                 ChoiceChip(
                   label: Text(
                     '♥ ${l10n.heart}',
-                    style: const TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Colors.red, fontFamily: 'Roboto'),
                   ),
                   selected: _selectedSuit == Suit.heart && !_noGiruda,
                   onSelected: (selected) {
@@ -137,7 +137,7 @@ class _BiddingDialogState extends State<BiddingDialog> {
                   },
                 ),
                 ChoiceChip(
-                  label: Text('♣ ${l10n.club}'),
+                  label: Text('♣ ${l10n.club}', style: const TextStyle(fontFamily: 'Roboto')),
                   selected: _selectedSuit == Suit.club && !_noGiruda,
                   onSelected: (selected) {
                     setState(() {
