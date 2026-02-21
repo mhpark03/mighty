@@ -3741,6 +3741,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'비기루다 소진'**
   String get trickEventNonGirudaExhaust;
+
+  /// No description provided for @estimatedMinWins.
+  ///
+  /// In ko, this message translates to:
+  /// **'→ {count}승 이상 예상'**
+  String estimatedMinWins(int count);
 }
 
 class _AppLocalizationsDelegate

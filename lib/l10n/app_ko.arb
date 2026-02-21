@@ -1173,5 +1173,7 @@
   "trickEventWaste": "물패 처리",
   "trickEventAttackGirudaCut": "공격 기루다 컷",
   "trickEventDefenseGirudaCut": "수비 기루다 컷",
-  "trickEventNonGirudaExhaust": "비기루다 소진"
+  "trickEventNonGirudaExhaust": "비기루다 소진",
+  "estimatedMinWins": "→ {count}승 이상 예상",
+  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } }
 }

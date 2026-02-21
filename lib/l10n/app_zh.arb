@@ -1013,5 +1013,7 @@
   "trickEventWaste": "弃牌",
   "trickEventAttackGirudaCut": "攻方将牌切入",
   "trickEventDefenseGirudaCut": "守方将牌切入",
-  "trickEventNonGirudaExhaust": "非将牌消耗"
+  "trickEventNonGirudaExhaust": "非将牌消耗",
+  "estimatedMinWins": "→ 预计{count}胜以上",
+  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } }
 }

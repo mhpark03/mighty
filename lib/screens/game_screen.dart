@@ -1829,8 +1829,6 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildBidExplanationContent(BidExplanation explanation, GameState state, AppLocalizations l10n) {
     final keyCardInfo = _getKeyCardInfo(explanation, state, l10n);
-    final adjustedWidget = (explanation.suit != null) ? _getAdjustedEstimateWidget(explanation, state, l10n) : null;
-
     if (explanation.passed) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1849,9 +1847,9 @@ class _GameScreenState extends State<GameScreen> {
           if (explanation.suit != null) ...[
             const SizedBox(height: 3),
             if (explanation.scoreBreakdown.isNotEmpty) ...[
-              Text(
-                explanation.scoreBreakdown,
-                style: const TextStyle(color: Colors.white38, fontSize: 9),
+              _buildSuitColoredText(
+                '${explanation.scoreBreakdown} ${l10n.estimatedMinWins(explanation.totalMinTricks)}',
+                const TextStyle(color: Colors.white38, fontSize: 9),
               ),
               const SizedBox(height: 2),
             ],
@@ -1859,10 +1857,6 @@ class _GameScreenState extends State<GameScreen> {
               '${_getSuitSymbol(explanation.suit!)} ${explanation.girudaCount}${l10n.cardCount(explanation.girudaCount).replaceAll('${explanation.girudaCount}', '').trim()}, ${l10n.estimatedRange(explanation.minPoints, explanation.maxPoints)} (${l10n.optimalScore(explanation.optimalPoints)})',
               const TextStyle(color: Colors.white54, fontSize: 10),
             ),
-            if (adjustedWidget != null) ...[
-              const SizedBox(height: 3),
-              adjustedWidget,
-            ],
             if (explanation.suitComparison.isNotEmpty) ...[
               const SizedBox(height: 6),
               _buildBidSuitComparison(explanation),
@@ -1887,9 +1881,9 @@ class _GameScreenState extends State<GameScreen> {
           ),
           const SizedBox(height: 3),
           if (explanation.scoreBreakdown.isNotEmpty) ...[
-            Text(
-              explanation.scoreBreakdown,
-              style: const TextStyle(color: Colors.white38, fontSize: 9),
+            _buildSuitColoredText(
+              '${explanation.scoreBreakdown} ${l10n.estimatedMinWins(explanation.totalMinTricks)}',
+              const TextStyle(color: Colors.white38, fontSize: 9),
             ),
             const SizedBox(height: 2),
           ],
@@ -1911,11 +1905,6 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ],
             ),
-          ],
-          // 바닥패 + 프렌드 핸드 기반 조정 예상 점수
-          if (adjustedWidget != null) ...[
-            const SizedBox(height: 3),
-            adjustedWidget,
           ],
           if (explanation.suitComparison.isNotEmpty) ...[
             const SizedBox(height: 6),
@@ -1951,18 +1940,14 @@ class _GameScreenState extends State<GameScreen> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           decoration: BoxDecoration(
-            color: isSelected
-                ? Colors.teal[800]!.withValues(alpha: 0.5)
-                : isBest
-                    ? Colors.amber[800]!.withValues(alpha: 0.3)
-                    : Colors.black26,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(4),
             border: Border.all(
               color: isSelected
-                  ? Colors.teal[400]!
+                  ? Colors.teal
                   : isBest
-                      ? Colors.amber[400]!
-                      : Colors.white12,
+                      ? Colors.amber[700]!
+                      : Colors.grey[300]!,
               width: isSelected || isBest ? 1.5 : 0.5,
             ),
           ),
@@ -1980,9 +1965,9 @@ class _GameScreenState extends State<GameScreen> {
               ),
               const SizedBox(width: 2),
               Text(
-                '$optimal',
+                '($optimal)',
                 style: TextStyle(
-                  color: isSelected ? Colors.teal[200] : isBest ? Colors.amber[200] : Colors.white54,
+                  color: isSelected ? Colors.teal[700] : isBest ? Colors.amber[800] : Colors.black54,
                   fontSize: 11,
                   fontWeight: isSelected || isBest ? FontWeight.bold : FontWeight.normal,
                 ),
@@ -2274,116 +2259,6 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   /// 바닥패 + 프렌드 핸드를 고려한 조정 예상 점수 위젯
-  Widget? _getAdjustedEstimateWidget(BidExplanation explanation, GameState state, AppLocalizations l10n) {
-    if (explanation.suit == null) return null;
-
-    final giruda = explanation.suit!;
-    final declarerHand = state.players[explanation.playerId].hand;
-    final mightySuit = (giruda == Suit.spade) ? Suit.diamond : Suit.spade;
-    final kittyPoints = state.kitty.where((c) => c.isPointCard).length;
-
-    final friendPlayer = _findExpectedFriend(explanation, state);
-
-    if (friendPlayer == null) {
-      if (kittyPoints > 0) {
-        return Row(
-          children: [
-            Text(l10n.kittyLabel, style: const TextStyle(color: Colors.amber, fontSize: 10)),
-            ...state.kitty.map((c) => Padding(
-              padding: const EdgeInsets.only(right: 2),
-              child: _buildTinyCardFixed(c, state, 22.0),
-            )),
-            Text(l10n.kittyPointsWithFriend(kittyPoints), style: const TextStyle(color: Colors.amber, fontSize: 10)),
-          ],
-        );
-      }
-      return null;
-    }
-
-    final fHand = friendPlayer.hand;
-    final friendName = _getLocalizedPlayerName(friendPlayer, l10n);
-
-    // 프렌드의 핵심 카드 추출
-    final friendKeyCards = <PlayingCard>[];
-    int friendTricks = 0;
-
-    // 마이티 보유?
-    final fMightyCard = fHand.where((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace).toList();
-    if (fMightyCard.isNotEmpty) { friendKeyCards.addAll(fMightyCard); friendTricks++; }
-
-    // 조커 보유?
-    final fJokerCard = fHand.where((c) => c.isJoker).toList();
-    if (fJokerCard.isNotEmpty) { friendKeyCards.addAll(fJokerCard); friendTricks++; }
-
-    // 프렌드의 기루다 카드
-    final fGiruda = fHand.where((c) => !c.isJoker && c.suit == giruda).toList();
-    final declarerHasGirudaA = declarerHand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
-    for (final c in fGiruda) {
-      if (c.rank == Rank.ace) { friendKeyCards.add(c); friendTricks++; }
-    }
-    for (final c in fGiruda) {
-      if (c.rank == Rank.king) {
-        friendKeyCards.add(c);
-        if (declarerHasGirudaA || fGiruda.any((c) => c.rank == Rank.ace)) friendTricks++;
-      }
-    }
-    for (final c in fGiruda) {
-      if (c.rank == Rank.queen) friendKeyCards.add(c);
-    }
-
-    // 프렌드의 비기루다 A (마이티 제외)
-    for (final suit in Suit.values) {
-      if (suit == giruda) continue;
-      final aces = fHand.where((c) =>
-          !c.isJoker && c.suit == suit && c.rank == Rank.ace &&
-          !(c.suit == mightySuit && c.rank == Rank.ace)).toList();
-      if (aces.isNotEmpty) { friendKeyCards.addAll(aces); friendTricks++; }
-    }
-
-    if (friendKeyCards.isEmpty && kittyPoints == 0) return null;
-
-    // 조정 예상 점수
-    final adjMin = (explanation.minPoints + kittyPoints).clamp(0, 20);
-    final adjMax = (explanation.maxPoints + kittyPoints + friendTricks * 2).clamp(0, 20);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // 바닥패 라인
-        Row(
-          children: [
-            Text(l10n.kittyLabel, style: const TextStyle(color: Colors.white60, fontSize: 10)),
-            ...state.kitty.map((c) => Padding(
-              padding: const EdgeInsets.only(right: 2),
-              child: _buildTinyCardFixed(c, state, 22.0),
-            )),
-            Text(l10n.kittyPoints(kittyPoints), style: const TextStyle(color: Colors.white60, fontSize: 10)),
-          ],
-        ),
-        const SizedBox(height: 2),
-        // 프렌드 라인
-        Row(
-          children: [
-            Text(l10n.friendWithName(friendName), style: const TextStyle(color: Colors.cyanAccent, fontSize: 10)),
-            if (friendKeyCards.isNotEmpty) ...[
-              ...friendKeyCards.map((c) => Padding(
-                padding: const EdgeInsets.only(right: 2),
-                child: _buildTinyCardFixed(c, state, 22.0),
-              )),
-            ],
-          ],
-        ),
-        const SizedBox(height: 2),
-        // 조정 점수
-        Text(
-          l10n.adjustedPointsRange(adjMin, adjMax),
-          style: const TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
-
   String _getFriendExpectedText(BidExplanation explanation, AppLocalizations l10n) {
     String cardName;
     String note = '';
@@ -3796,25 +3671,44 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  // 무늬 기호가 포함된 텍스트를 색상 적용하여 렌더링 (어두운 배경용)
+  // 무늬 기호가 포함된 텍스트를 흰색 배경 미니 카드로 렌더링 (어두운 배경용)
   Widget _buildSuitColoredText(String text, TextStyle baseStyle) {
     final suitPattern = RegExp('[♠♦♥♣]');
-    final spans = <TextSpan>[];
+    final spans = <InlineSpan>[];
     int lastEnd = 0;
+    final cardSize = (baseStyle.fontSize ?? 10) * 1.2;
     for (final match in suitPattern.allMatches(text)) {
       if (match.start > lastEnd) {
         spans.add(TextSpan(text: text.substring(lastEnd, match.start)));
       }
       final symbol = match.group(0)!;
+      Suit suit;
       Color color;
       switch (symbol) {
-        case '♠': color = Colors.white; break;
-        case '♣': color = Colors.white; break;
-        case '♥': color = Colors.red[300]!; break;
-        case '♦': color = Colors.red[300]!; break;
-        default: color = baseStyle.color ?? Colors.white;
+        case '♠': suit = Suit.spade; color = Colors.black;
+        case '♣': suit = Suit.club; color = Colors.black;
+        case '♥': suit = Suit.heart; color = Colors.red;
+        case '♦': suit = Suit.diamond; color = Colors.red;
+        default: suit = Suit.spade; color = Colors.black;
       }
-      spans.add(TextSpan(text: symbol, style: TextStyle(color: color)));
+      spans.add(WidgetSpan(
+        alignment: PlaceholderAlignment.middle,
+        child: Container(
+          width: cardSize,
+          height: cardSize,
+          margin: const EdgeInsets.symmetric(horizontal: 1),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(2),
+          ),
+          child: Center(
+            child: CustomPaint(
+              size: Size(cardSize * 0.7, cardSize * 0.7),
+              painter: SuitSymbolPainter(suit: suit, color: color),
+            ),
+          ),
+        ),
+      ));
       lastEnd = match.end;
     }
     if (lastEnd < text.length) {
@@ -5093,37 +4987,24 @@ class _GameScreenState extends State<GameScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               () {
-                final isPlayerWinner = state.getPlayerScore(state.players[0].id) >= 0;
-                return Column(
-                  children: [
-                    Text(
-                      isPlayerWinner ? l10n.victory : l10n.defeat,
-                      style: TextStyle(
-                        fontSize: compact ? 22 : 28,
-                        fontWeight: FontWeight.bold,
-                        color: isPlayerWinner ? Colors.green : Colors.red,
-                      ),
-                    ),
-                    SizedBox(height: compact ? 2 : 4),
-                    Text(
-                      state.declarerWon ? l10n.declarerTeamWins : l10n.defenderTeamWins,
-                      style: TextStyle(fontSize: compact ? 13 : 16, color: Colors.grey[600]),
-                    ),
-                  ],
+                final isPlayerWinner = widget.isAutoPlay ? state.declarerWon : state.getPlayerScore(state.players[0].id) >= 0;
+                return Text(
+                  widget.isAutoPlay
+                      ? (isPlayerWinner ? l10n.declarerTeamWins : l10n.defenderTeamWins)
+                      : (isPlayerWinner ? l10n.victory : l10n.defeat),
+                  style: TextStyle(
+                    fontSize: compact ? 22 : 28,
+                    fontWeight: FontWeight.bold,
+                    color: isPlayerWinner ? Colors.green : Colors.red,
+                  ),
                 );
               }(),
-            SizedBox(height: compact ? 8 : 16),
+            SizedBox(height: compact ? 2 : 4),
             Text(
-              state.declarerTeamPoints == 20
-                  ? '${l10n.declarerTeam}: ${l10n.fullPoints}'
-                  : l10n.declarerTeamPoints(state.declarerTeamPoints),
-              style: TextStyle(fontSize: compact ? 15 : 18),
+              '${state.declarerTeamPoints == 20 ? '${l10n.declarerTeam}: ${l10n.fullPoints}' : l10n.declarerTeamPoints(state.declarerTeamPoints)}  /  ${l10n.targetPoints(state.currentBid?.tricks ?? 0)}',
+              style: TextStyle(fontSize: compact ? 13 : 15, color: Colors.grey[700]),
             ),
-            Text(
-              l10n.targetPoints(state.currentBid?.tricks ?? 0),
-              style: TextStyle(fontSize: compact ? 13 : 16, color: Colors.grey),
-            ),
-            SizedBox(height: compact ? 8 : 16),
+            SizedBox(height: compact ? 6 : 12),
             if (widget.isAutoPlay)
               _buildTrickDetailsTable(state, compact: compact, l10n: l10n)
             else ...[
@@ -5409,37 +5290,24 @@ class _GameScreenState extends State<GameScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               () {
-                final isPlayerWinner = state.getPlayerScore(state.players[0].id) >= 0;
-                return Column(
-                  children: [
-                    Text(
-                      isPlayerWinner ? l10n.victory : l10n.defeat,
-                      style: TextStyle(
-                        fontSize: compact ? 22 : 28,
-                        fontWeight: FontWeight.bold,
-                        color: isPlayerWinner ? Colors.green : Colors.red,
-                      ),
-                    ),
-                    SizedBox(height: compact ? 2 : 4),
-                    Text(
-                      state.declarerWon ? l10n.declarerTeamWins : l10n.defenderTeamWins,
-                      style: TextStyle(fontSize: compact ? 13 : 16, color: Colors.grey[600]),
-                    ),
-                  ],
+                final isPlayerWinner = widget.isAutoPlay ? state.declarerWon : state.getPlayerScore(state.players[0].id) >= 0;
+                return Text(
+                  widget.isAutoPlay
+                      ? (isPlayerWinner ? l10n.declarerTeamWins : l10n.defenderTeamWins)
+                      : (isPlayerWinner ? l10n.victory : l10n.defeat),
+                  style: TextStyle(
+                    fontSize: compact ? 22 : 28,
+                    fontWeight: FontWeight.bold,
+                    color: isPlayerWinner ? Colors.green : Colors.red,
+                  ),
                 );
               }(),
-              SizedBox(height: compact ? 4 : 8),
+              SizedBox(height: compact ? 2 : 4),
               Text(
-                state.declarerTeamPoints == 20
-                    ? '${l10n.declarerTeam}: ${l10n.fullPoints}'
-                    : l10n.declarerTeamPoints(state.declarerTeamPoints),
-                style: TextStyle(fontSize: compact ? 15 : 18),
+                '${state.declarerTeamPoints == 20 ? '${l10n.declarerTeam}: ${l10n.fullPoints}' : l10n.declarerTeamPoints(state.declarerTeamPoints)}  /  ${l10n.targetPoints(state.currentBid?.tricks ?? 0)}',
+                style: TextStyle(fontSize: compact ? 13 : 15, color: Colors.grey[700]),
               ),
-              Text(
-                l10n.targetPoints(state.currentBid?.tricks ?? 0),
-                style: TextStyle(fontSize: compact ? 13 : 16, color: Colors.grey),
-              ),
-              SizedBox(height: compact ? 8 : 16),
+              SizedBox(height: compact ? 6 : 12),
               _buildTrickDetailsTable(state, compact: compact, l10n: l10n),
               SizedBox(height: compact ? 10 : 20),
               Row(

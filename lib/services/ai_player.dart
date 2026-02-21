@@ -845,10 +845,7 @@ class AIPlayer {
       // 수비 조커가 트릭 탈취 가능 → 최소에서 감점
       minTricks -= 1;
     }
-    // 마이티+조커 둘 다 미보유: 수비가 양대 키카드 보유 → 최소 2트릭 탈취
-    if (!hasMighty && !hasJoker) {
-      minTricks -= 1;
-    }
+    // 마이티+조커 둘 다 미보유: 수비가 조커 보유 (마이티는 프렌드 → 아군)
     // 프렌드 협력 보너스: 마이티/조커 둘 다 없을 때만 추가 기대 트릭
     if (!hasMighty && !hasJoker) {
       maxTricks++;
@@ -952,6 +949,9 @@ class AIPlayer {
         initTricks--; // 조커콜로 인한 트릭 손실 감안
       }
 
+      // 마이티 프렌드: 확실한 1트릭 (선공 하한에도 반영)
+      if (!hasMighty) initTricks++;
+
       if (initTricks > minTricks) {
         minTricks = initTricks;
         minAdj = 0; // 선공 확정 트릭이 더 크면 조커 보정 불필요
@@ -992,14 +992,8 @@ class AIPlayer {
     }
 
     // ★ 조커콜 사용 비용: 수비 조커 강제 유도 시 해당 트릭 점수 손실 또는 마이티 소모
-    if (!hasJoker) {
-      if (!hasMighty) {
-        // 마이티도 없으면 조커콜 위험 → 감점
-        minPoints = (minPoints - 1).clamp(0, 20);
-        maxPoints = (maxPoints - 1).clamp(0, 20);
-      }
-      // 마이티 보유 시: 프렌드 조커 보호 → 감점 없음
-    }
+    // !hasMighty일 때 마이티는 프렌드(아군) → 프렌드 마이티가 보호하므로 감점 불필요
+    // 마이티 보유 시: 프렌드 조커 보호 → 감점 없음
 
     // 초구 카드 체크 (비기루다 A 또는 마이티 무늬 K)
     bool hasFirstTrickCard = hasMighty; // 마이티 자체가 초구 카드
@@ -1031,13 +1025,14 @@ class AIPlayer {
       maxPoints = (maxPoints - 1).clamp(0, 20);
     }
 
-    // 마이티/조커/기루다A 모두 없음 → 핵심 카드 부재 추가 -2점
-    if (!hasMighty && !hasJoker) {
+    // 핵심 카드 부재: 마이티/조커/기루다A 모두 없음 → 추가 감점
+    // !hasMighty일 때 마이티는 프렌드(아군 키카드) → 핵심 카드 부재 아님
+    if (hasMighty && !hasJoker) {
       bool hasGirudaAce = giruda != null &&
           hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
       if (!hasGirudaAce) {
-        minPoints = (minPoints - 2).clamp(0, 20);
-        maxPoints = (maxPoints - 2).clamp(0, 20);
+        minPoints = (minPoints - 1).clamp(0, 20);
+        maxPoints = (maxPoints - 1).clamp(0, 20);
       }
     }
 
@@ -1047,8 +1042,8 @@ class AIPlayer {
   }
 
   /// 예상 점수 계산 근거를 간략 텍스트로 반환
-  String getPointBreakdownText(List<PlayingCard> hand, Suit? giruda) {
-    if (giruda == null) return '';
+  (String, int) getPointBreakdownText(List<PlayingCard> hand, Suit? giruda) {
+    if (giruda == null) return ('', 0);
     const suitSymbols = {Suit.spade: '♠', Suit.heart: '♥', Suit.diamond: '♦', Suit.club: '♣'};
     final mightySuit = (giruda == Suit.spade) ? Suit.diamond : Suit.spade;
     final hasMighty = hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace);
@@ -1057,6 +1052,7 @@ class AIPlayer {
     final girudaLen = gc.length;
 
     final parts = <String>[];
+    int totalMin = 0;
 
     // 기루다 트릭 계산
     bool gA = gc.any((c) => c.rank == Rank.ace);
@@ -1092,18 +1088,21 @@ class AIPlayer {
     if (!gA && !gK && gQ) {
       if (girudaLen >= 5) { gMax += 3; } else if (girudaLen >= 4) { gMax += 2; }
     }
+    totalMin += gMin;
     final topCards = <String>[];
     if (gA) topCards.add('A');
     if (gK) topCards.add('K');
     if (gQ) topCards.add('Q');
     final topStr = topCards.isNotEmpty ? topCards.join('') : '하위';
-    parts.add('${suitSymbols[giruda]}$topStr(${girudaLen}장) ${gMin}~${gMax}트릭');
+    parts.add('${suitSymbols[giruda]}$topStr(${girudaLen}장) ${gMin == gMax ? '$gMin' : '$gMin~$gMax'}트릭');
 
     // 마이티/조커
     if (hasMighty && hasJoker) {
       parts.add('마이티+조커 2트릭');
+      totalMin += 2;
     } else if (hasMighty) {
       parts.add('마이티 1트릭');
+      totalMin += 1;
     } else if (hasJoker) {
       parts.add('조커 0.7트릭');
     }
@@ -1114,17 +1113,19 @@ class AIPlayer {
       if (hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace &&
           !(c.suit == mightySuit && c.rank == Rank.ace))) {
         parts.add('${suitSymbols[suit]}A 1트릭');
+        totalMin += 1;
       }
     }
 
-    // 프렌드 예상
+    // 프렌드 예상 (마이티 프렌드는 확실, 조커 프렌드는 조커콜 위험으로 최소 제외)
     if (!hasMighty) {
       parts.add('프렌드(${suitSymbols[mightySuit]}A) 1트릭');
+      totalMin += 1;
     } else if (!hasJoker) {
       parts.add('프렌드(조커) 1트릭');
     }
 
-    return parts.join(' | ');
+    return (parts.join(' | '), totalMin);
   }
 
   // Public method for debugging

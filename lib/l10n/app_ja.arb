@@ -1013,5 +1013,7 @@
   "trickEventWaste": "捨て札",
   "trickEventAttackGirudaCut": "攻撃切り札カット",
   "trickEventDefenseGirudaCut": "守備切り札カット",
-  "trickEventNonGirudaExhaust": "非切り札消耗"
+  "trickEventNonGirudaExhaust": "非切り札消耗",
+  "estimatedMinWins": "→ {count}勝以上予想",
+  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } }
 }

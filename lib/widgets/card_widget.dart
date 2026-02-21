@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../l10n/generated/app_localizations.dart';
 import '../models/card.dart';
 
 class CardWidget extends StatelessWidget {
@@ -126,12 +125,12 @@ class CardWidget extends StatelessWidget {
 
     // 간소화 모드: 숫자와 무늬만 중앙에 표시
     if (compact) {
+      final compactSuitSize = height * 0.25;
       return Padding(
         padding: const EdgeInsets.all(2),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 랭크 심볼 (10 등 긴 텍스트도 한 줄에 표시)
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
@@ -143,14 +142,9 @@ class CardWidget extends StatelessWidget {
                 ),
               ),
             ),
-            // 무늬 심볼
-            Text(
-              card.suitSymbol,
-              style: TextStyle(
-                fontSize: height * 0.28,
-                color: color,
-                fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
-              ),
+            CustomPaint(
+              size: Size(compactSuitSize, compactSuitSize),
+              painter: SuitSymbolPainter(suit: card.suit!, color: color),
             ),
           ],
         ),
@@ -159,7 +153,7 @@ class CardWidget extends StatelessWidget {
 
     // 카드 크기에 비례한 폰트 크기
     final cornerFontSize = height * 0.12;
-    final centerFontSize = height * 0.30;
+    final centerSuitSize = height * 0.28;
 
     return Padding(
       padding: const EdgeInsets.all(2),
@@ -168,28 +162,32 @@ class CardWidget extends StatelessWidget {
           // 상단 왼쪽: 숫자와 무늬
           Align(
             alignment: Alignment.topLeft,
-            child: Text(
-              '${card.rankSymbol}\n${card.suitSymbol}',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: cornerFontSize,
-                fontWeight: FontWeight.bold,
-                color: color,
-                height: 1.0,
-                fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  card.rankSymbol,
+                  style: TextStyle(
+                    fontSize: cornerFontSize,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+                const SizedBox(width: 1),
+                CustomPaint(
+                  size: Size(cornerFontSize, cornerFontSize),
+                  painter: SuitSymbolPainter(suit: card.suit!, color: color),
+                ),
+              ],
             ),
           ),
           // 중앙: 큰 무늬
           Expanded(
             child: Center(
-              child: Text(
-                card.suitSymbol,
-                style: TextStyle(
-                  fontSize: centerFontSize,
-                  color: color,
-                  fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
-                ),
+              child: CustomPaint(
+                size: Size(centerSuitSize, centerSuitSize),
+                painter: SuitSymbolPainter(suit: card.suit!, color: color),
               ),
             ),
           ),
@@ -220,7 +218,7 @@ class CardWidget extends StatelessWidget {
             Icon(Icons.auto_awesome, color: Colors.yellowAccent, size: iconSize),
             const SizedBox(height: 2),
             Text(
-              isSmall ? 'JK' : AppLocalizations.of(context)!.joker.toUpperCase(),
+              isSmall ? 'JK' : 'JOKER',
               style: TextStyle(
                 fontSize: textSize,
                 fontWeight: FontWeight.bold,
@@ -288,13 +286,9 @@ class MiniCardWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              card.suitSymbol,
-              style: TextStyle(
-                fontSize: 14,
-                color: color,
-                fontFamily: 'Roboto',  // 이모지 폰트 대신 텍스트 폰트 사용
-              ),
+            CustomPaint(
+              size: Size(size * 0.35, size * 0.35),
+              painter: SuitSymbolPainter(suit: card.suit!, color: color),
             ),
             Text(
               card.rankSymbol,
@@ -309,4 +303,96 @@ class MiniCardWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+class SuitSymbolPainter extends CustomPainter {
+  final Suit suit;
+  final Color color;
+
+  SuitSymbolPainter({required this.suit, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
+
+    switch (suit) {
+      case Suit.spade:
+        _drawSpade(canvas, size, paint);
+      case Suit.heart:
+        _drawHeart(canvas, size, paint);
+      case Suit.diamond:
+        _drawDiamond(canvas, size, paint);
+      case Suit.club:
+        _drawClub(canvas, size, paint);
+    }
+  }
+
+  void _drawHeart(Canvas canvas, Size size, Paint paint) {
+    final w = size.width;
+    final h = size.height;
+    final path = Path()
+      ..moveTo(w * 0.5, h * 0.2)
+      ..cubicTo(w * 0.5, h * 0.05, 0, 0, 0, h * 0.35)
+      ..cubicTo(0, h * 0.65, w * 0.5, h * 0.85, w * 0.5, h)
+      ..cubicTo(w * 0.5, h * 0.85, w, h * 0.65, w, h * 0.35)
+      ..cubicTo(w, 0, w * 0.5, h * 0.05, w * 0.5, h * 0.2)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  void _drawSpade(Canvas canvas, Size size, Paint paint) {
+    final w = size.width;
+    final bodyH = size.height * 0.72;
+    final path = Path()
+      ..moveTo(w * 0.5, 0)
+      ..cubicTo(w * 0.5, bodyH * 0.15, 0, bodyH * 0.1, 0, bodyH * 0.5)
+      ..cubicTo(0, bodyH * 0.8, w * 0.4, bodyH * 0.9, w * 0.5, bodyH)
+      ..cubicTo(w * 0.6, bodyH * 0.9, w, bodyH * 0.8, w, bodyH * 0.5)
+      ..cubicTo(w, bodyH * 0.1, w * 0.5, bodyH * 0.15, w * 0.5, 0)
+      ..close();
+    canvas.drawPath(path, paint);
+    final sh = size.height;
+    final stem = Path()
+      ..moveTo(w * 0.35, sh * 0.62)
+      ..cubicTo(w * 0.35, sh * 0.8, w * 0.22, sh * 0.95, w * 0.22, sh)
+      ..lineTo(w * 0.78, sh)
+      ..cubicTo(w * 0.78, sh * 0.95, w * 0.65, sh * 0.8, w * 0.65, sh * 0.62)
+      ..close();
+    canvas.drawPath(stem, paint);
+  }
+
+  void _drawDiamond(Canvas canvas, Size size, Paint paint) {
+    final w = size.width;
+    final h = size.height;
+    final path = Path()
+      ..moveTo(w * 0.5, 0)
+      ..lineTo(w, h * 0.5)
+      ..lineTo(w * 0.5, h)
+      ..lineTo(0, h * 0.5)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  void _drawClub(Canvas canvas, Size size, Paint paint) {
+    final w = size.width;
+    final h = size.height;
+    final r = w * 0.26;
+    canvas.drawCircle(Offset(w * 0.5, r), r, paint);
+    canvas.drawCircle(Offset(w * 0.22, h * 0.48), r, paint);
+    canvas.drawCircle(Offset(w * 0.78, h * 0.48), r, paint);
+    final stem = Path()
+      ..moveTo(w * 0.38, h * 0.45)
+      ..lineTo(w * 0.28, h)
+      ..lineTo(w * 0.72, h)
+      ..lineTo(w * 0.62, h * 0.45)
+      ..close();
+    canvas.drawPath(stem, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant SuitSymbolPainter oldDelegate) =>
+      suit != oldDelegate.suit || color != oldDelegate.color;
 }

@@ -2105,4 +2105,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trickEventNonGirudaExhaust => 'Non-trump exhausted';
+
+  @override
+  String estimatedMinWins(int count) {
+    return '→ $count+ wins expected';
+  }
 }

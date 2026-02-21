@@ -2075,4 +2075,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trickEventNonGirudaExhaust => '非切り札消耗';
+
+  @override
+  String estimatedMinWins(int count) {
+    return '→ $count勝以上予想';
+  }
 }

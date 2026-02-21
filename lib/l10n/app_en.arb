@@ -1014,5 +1014,7 @@
   "trickEventWaste": "Waste play",
   "trickEventAttackGirudaCut": "Attack trump cut",
   "trickEventDefenseGirudaCut": "Defense trump cut",
-  "trickEventNonGirudaExhaust": "Non-trump exhausted"
+  "trickEventNonGirudaExhaust": "Non-trump exhausted",
+  "estimatedMinWins": "→ {count}+ wins expected",
+  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } }
 }

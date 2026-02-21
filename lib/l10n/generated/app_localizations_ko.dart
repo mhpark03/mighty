@@ -2081,4 +2081,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trickEventNonGirudaExhaust => '비기루다 소진';
+
+  @override
+  String estimatedMinWins(int count) {
+    return '→ $count승 이상 예상';
+  }
 }
