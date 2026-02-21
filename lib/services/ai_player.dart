@@ -331,16 +331,27 @@ class AIPlayer {
     int higherCardsPlayed = 0;
 
     // A(14), K(13), Q(12), J(11), 10(10) ... 순서
+    final mightyCard = state.mighty;
+    final mightyInMyHand = _currentPlayer != null &&
+        _currentPlayer!.hand.any((c) => c.isMightyWith(state.giruda));
     for (int rankValue = 14; rankValue > card.rankValue; rankValue--) {
       Rank rank = _rankFromValue(rankValue);
       bool isPlayed = playedCardsOfSuit.any((c) => c.rank == rank);
       if (isPlayed) {
+        higherCardsPlayed++;
+        continue;
+      }
+      // 마이티가 같은 무늬 상위 카드이고 내 손에 있으면 무늬 경쟁 제외
+      // (마이티는 특수 용도로 사용되므로 해당 무늬 순위에 참여하지 않음)
+      if (mightyInMyHand && !mightyCard.isJoker &&
+          mightyCard.suit == suit && mightyCard.rankValue == rankValue) {
         higherCardsPlayed++;
       }
     }
 
     // 실효 가치 = 원래 가치 + 나간 상위 카드 수
     // 예: A가 나갔으면 K의 실효 가치 = 13 + 1 = 14 (A와 동급)
+    // 예: 마이티(♦A)가 내 손에 있으면 ♦K의 실효 가치 = 13 + 1 = 14
     return card.rankValue + higherCardsPlayed;
   }
 
