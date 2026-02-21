@@ -125,7 +125,6 @@ class CardWidget extends StatelessWidget {
 
     // 간소화 모드: 숫자와 무늬만 중앙에 표시
     if (compact) {
-      final compactSuitSize = height * 0.25;
       return Padding(
         padding: const EdgeInsets.all(2),
         child: Column(
@@ -142,9 +141,13 @@ class CardWidget extends StatelessWidget {
                 ),
               ),
             ),
-            CustomPaint(
-              size: Size(compactSuitSize, compactSuitSize),
-              painter: SuitSymbolPainter(suit: card.suit!, color: color),
+            Text(
+              card.suitSymbol,
+              style: TextStyle(
+                fontSize: height * 0.28,
+                color: color,
+                fontFamily: 'Roboto',
+              ),
             ),
           ],
         ),
@@ -153,7 +156,7 @@ class CardWidget extends StatelessWidget {
 
     // 카드 크기에 비례한 폰트 크기
     final cornerFontSize = height * 0.12;
-    final centerSuitSize = height * 0.28;
+    final centerFontSize = height * 0.30;
 
     return Padding(
       padding: const EdgeInsets.all(2),
@@ -162,32 +165,28 @@ class CardWidget extends StatelessWidget {
           // 상단 왼쪽: 숫자와 무늬
           Align(
             alignment: Alignment.topLeft,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  card.rankSymbol,
-                  style: TextStyle(
-                    fontSize: cornerFontSize,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-                const SizedBox(width: 1),
-                CustomPaint(
-                  size: Size(cornerFontSize, cornerFontSize),
-                  painter: SuitSymbolPainter(suit: card.suit!, color: color),
-                ),
-              ],
+            child: Text(
+              '${card.rankSymbol}\n${card.suitSymbol}',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: cornerFontSize,
+                fontWeight: FontWeight.bold,
+                color: color,
+                height: 1.0,
+                fontFamily: 'Roboto',
+              ),
             ),
           ),
           // 중앙: 큰 무늬
           Expanded(
             child: Center(
-              child: CustomPaint(
-                size: Size(centerSuitSize, centerSuitSize),
-                painter: SuitSymbolPainter(suit: card.suit!, color: color),
+              child: Text(
+                card.suitSymbol,
+                style: TextStyle(
+                  fontSize: centerFontSize,
+                  color: color,
+                  fontFamily: 'Roboto',
+                ),
               ),
             ),
           ),
@@ -211,23 +210,27 @@ class CardWidget extends StatelessWidget {
         ),
       ),
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.auto_awesome, color: Colors.yellowAccent, size: iconSize),
-            const SizedBox(height: 2),
-            Text(
-              isSmall ? 'JK' : 'JOKER',
-              style: TextStyle(
-                fontSize: textSize,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 1.2,
-                shadows: const [Shadow(color: Colors.black54, blurRadius: 2)],
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, color: Colors.yellowAccent, size: iconSize),
+              const SizedBox(height: 2),
+              Text(
+                isSmall ? 'JK' : 'JOKER',
+                softWrap: false,
+                style: TextStyle(
+                  fontSize: textSize,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                  shadows: const [Shadow(color: Colors.black54, blurRadius: 2)],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -286,9 +289,13 @@ class MiniCardWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CustomPaint(
-              size: Size(size * 0.35, size * 0.35),
-              painter: SuitSymbolPainter(suit: card.suit!, color: color),
+            Text(
+              card.suitSymbol,
+              style: TextStyle(
+                fontSize: 14,
+                color: color,
+                fontFamily: 'Roboto',
+              ),
             ),
             Text(
               card.rankSymbol,
