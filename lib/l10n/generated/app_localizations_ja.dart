@@ -1982,6 +1982,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventLastCard => '最後のカード';
 
   @override
+  String get trickEventLastAttackTopCardWin => '攻撃側最上位カードで勝利';
+
+  @override
   String get trickEventLastTrickGiruda => '切り札最終トリック';
 
   @override
@@ -2037,28 +2040,22 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String summaryJokerCounter(String name) {
-    return '$nameジョーカー反撃';
-  }
+  String get summaryJokerCounter => 'ジョーカー反撃';
 
   @override
-  String summaryJokerUse(String name) {
-    return '$nameジョーカー活用';
-  }
+  String get summaryJokerUse => 'ジョーカー活用';
 
   @override
   String get summaryWasteExploit => '捨て札攻略成功';
 
   @override
-  String get summaryTrumpDominate => '切り札支配';
+  String get summaryTrumpDominate => '切り札掌握';
 
   @override
-  String summaryFriendContrib(String name) {
-    return '$nameフレンド活躍';
-  }
+  String get summaryFriendContrib => 'フレンド活躍';
 
   @override
-  String get summaryLateDefense => '後半得点防御';
+  String get summaryLateDefense => '後半防御成功';
 
   @override
   String get summaryDefenseCut => '守備切り札カット';
@@ -2067,21 +2064,21 @@ class AppLocalizationsJa extends AppLocalizations {
   String get summaryMightyImpact => 'マイティ活用';
 
   @override
-  String get summaryJokerMightyNoExtra => 'ジョーカー/マイティ保有も追加得点失敗';
+  String get summaryJokerMightyNoExtra => 'ジョーカー/マイティ追加得点不足';
 
   @override
-  String summaryNarrative(String events, int points, int bid, String result) {
-    return '総評: $events → $points/$bid点 $result';
+  String summaryNarrative(String events, String result) {
+    return '総評 : $events → $result';
   }
 
   @override
-  String get summaryResultBigWin => '大勝';
+  String get summaryResultBigWin => '攻撃大勝';
 
   @override
   String get summaryResultMinGoal => '最低目標達成';
 
   @override
-  String get summaryResultWin => '勝利';
+  String get summaryResultWin => '攻撃成功';
 
   @override
   String get summaryResultNarrowLoss => '惜敗';
@@ -2100,7 +2097,7 @@ class AppLocalizationsJa extends AppLocalizations {
     int bid,
     String result,
   ) {
-    return '総評: $wins勝$losses敗 → $points/$bid点 $result';
+    return '総評 : $wins勝$losses敗 → $points/$bid点 $result';
   }
 
   @override
@@ -2189,6 +2186,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventAttackLeadDefenseCut => '攻撃非切り札最上位先攻 → 守備切り札カット';
 
   @override
+  String get trickEventFirstTrickTopAttack => '初手 非切り札最上位先攻';
+
+  @override
   String get trickEventFirstTrickMightyBait => '初手不在 / マイティフレンド誘導';
 
   @override
@@ -2206,7 +2206,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get trickEventWaste => '捨て札';
+  String get trickEventWaste => '捨て札で先手譲り';
 
   @override
   String trickEventWasteWithTop(String topCard) {
@@ -2239,6 +2239,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trickEventDeclarerFriendLureFailed => 'フレンド誘導失敗';
+
+  @override
+  String trickEventFriendLureGirudaExhaust(String card) {
+    return '守備切り札$card消化成功';
+  }
 
   @override
   String get trickEventWasteFriendRescue => '捨て札 → フレンド救出!';
@@ -2306,7 +2311,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventGirudaQReclaimFail => '切り札Qリード奪還失敗、守備勝利';
 
   @override
-  String get trickEventHighCardAttack => '高額カード追加攻撃';
+  String get trickEventHighCardAttack => '非切り札最上位先攻';
+
+  @override
+  String get trickEventHighCardAttackFailed => '追加得点攻撃失敗';
 
   @override
   String trickResultAttack(int count) {

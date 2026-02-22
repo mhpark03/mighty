@@ -1988,6 +1988,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventLastCard => '마지막 카드';
 
   @override
+  String get trickEventLastAttackTopCardWin => '공격팀 최상위 카드로 승리';
+
+  @override
   String get trickEventLastTrickGiruda => '기루다 마지막 트릭';
 
   @override
@@ -2043,28 +2046,22 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String summaryJokerCounter(String name) {
-    return '$name 조커 반격';
-  }
+  String get summaryJokerCounter => '조커 반격';
 
   @override
-  String summaryJokerUse(String name) {
-    return '$name 조커 활용';
-  }
+  String get summaryJokerUse => '조커 활용';
 
   @override
   String get summaryWasteExploit => '물패 공략 성공';
 
   @override
-  String get summaryTrumpDominate => '기루다 지배';
+  String get summaryTrumpDominate => '기루다 장악';
 
   @override
-  String summaryFriendContrib(String name) {
-    return '$name 프렌드 활약';
-  }
+  String get summaryFriendContrib => '프렌드 활약';
 
   @override
-  String get summaryLateDefense => '후반 점수 방어';
+  String get summaryLateDefense => '후반 방어 성공';
 
   @override
   String get summaryDefenseCut => '수비 기루다 컷';
@@ -2073,21 +2070,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get summaryMightyImpact => '마이티 활용';
 
   @override
-  String get summaryJokerMightyNoExtra => '조커/마이티 보유 추가 점수 실패';
+  String get summaryJokerMightyNoExtra => '조커/마이티 추가 득점 부족';
 
   @override
-  String summaryNarrative(String events, int points, int bid, String result) {
-    return '총평: $events → $points/$bid점 $result';
+  String summaryNarrative(String events, String result) {
+    return '총평 : $events으로 $result';
   }
 
   @override
-  String get summaryResultBigWin => '대승';
+  String get summaryResultBigWin => '공격 대승';
 
   @override
   String get summaryResultMinGoal => '최소 점수 달성';
 
   @override
-  String get summaryResultWin => '승리';
+  String get summaryResultWin => '공격 성공';
 
   @override
   String get summaryResultNarrowLoss => '석패';
@@ -2106,7 +2103,7 @@ class AppLocalizationsKo extends AppLocalizations {
     int bid,
     String result,
   ) {
-    return '총평: $wins승$losses패 → $points/$bid점 $result';
+    return '총평 : $wins승$losses패 → $points/$bid점 $result';
   }
 
   @override
@@ -2195,6 +2192,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventAttackLeadDefenseCut => '공격 비기루다 최상위 선공 → 수비 기루다 컷';
 
   @override
+  String get trickEventFirstTrickTopAttack => '초구 비기루다 최상위 선공';
+
+  @override
   String get trickEventFirstTrickMightyBait => '초구 부재 / 물패로 마이티 프렌드 유도';
 
   @override
@@ -2212,7 +2212,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get trickEventWaste => '물패 처리';
+  String get trickEventWaste => '물패로 선 넘김';
 
   @override
   String trickEventWasteWithTop(String topCard) {
@@ -2245,6 +2245,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trickEventDeclarerFriendLureFailed => '프렌드 유도 실패';
+
+  @override
+  String trickEventFriendLureGirudaExhaust(String card) {
+    return '수비 기루다 $card 소진 성공';
+  }
 
   @override
   String get trickEventWasteFriendRescue => '물패 → 프렌드 기사회생!';
@@ -2312,7 +2317,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventGirudaQReclaimFail => '기루다 Q 선 탈환 실패, 수비 승리';
 
   @override
-  String get trickEventHighCardAttack => '추가 점수 공격';
+  String get trickEventHighCardAttack => '비기루다 최상위 선공';
+
+  @override
+  String get trickEventHighCardAttackFailed => '추가 점수 공격 실패';
 
   @override
   String trickResultAttack(int count) {

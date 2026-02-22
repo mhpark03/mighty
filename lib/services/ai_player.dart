@@ -3005,10 +3005,10 @@ class AIPlayer {
           // 기루다를 내면 주공의 기루다만 소진되므로 비기루다 전략으로 전환
 
           // 1. 비기루다 최상위 카드 (실효가치 13+ = K 이상)
+          // ★ 프렌드 공개 후이므로 마이티 무늬 제외 불필요
           final nonGirudaTop = playableCards.where((c) {
             if (c.isJoker || c.isMightyWith(state.giruda)) return false;
             if (c.suit == state.giruda) return false;
-            if (isJokerFriend && c.suit == mightySuit) return false;
             if (c.suit != null && cutSuits.contains(c.suit)) return false;
             return _getEffectiveCardValue(c, state) >= 13;
           }).toList();
@@ -3419,7 +3419,7 @@ class AIPlayer {
             if (a.rank != Rank.ace && b.rank == Rank.ace) return 1;
             return a.rankValue.compareTo(b.rankValue);
           });
-          _lastLeadIntent = LeadIntent.highCardAttack;
+          _lastLeadIntent = LeadIntent.firstTrickTopAttack;
           return firstTrickWinners.first;
         }
       }
@@ -5552,7 +5552,18 @@ class AIPlayer {
               final suitCards = playableCards.where((c) =>
                   !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == leadSuit).toList();
               if (suitCards.isNotEmpty) {
-                // 이기는 카드보다 낮은 점수 카드 찾기 (이길 수 없는 점수 카드)
+                // ★ 기루다 리드 시: 기루다 상위 카드(K/Q) 보호
+                // 기루다 K/Q는 미래 트릭에서 선을 잡을 수 있으므로 보존
+                // 비점수 카드 우선, 점수 카드만 있으면 최저(10) 우선
+                if (leadSuit == state.giruda) {
+                  suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                  final nonPointCards = suitCards.where((c) => !c.isPointCard).toList();
+                  if (nonPointCards.isNotEmpty) {
+                    return nonPointCards.first;
+                  }
+                  return suitCards.first;
+                }
+                // 비기루다 리드: 이기는 카드보다 낮은 점수 카드 찾기 (이길 수 없는 점수 카드)
                 final losingPointCards = suitCards.where((c) =>
                     c.isPointCard && c.rankValue < currentWinningCard.rankValue).toList();
                 if (losingPointCards.isNotEmpty) {

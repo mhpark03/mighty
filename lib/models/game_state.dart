@@ -147,6 +147,7 @@ enum LeadIntent {
   highCardAttack,
   topNonGirudaLead,
   defenseTopCard,
+  firstTrickTopAttack,
   firstTrickMightyBait,
   firstTrickFriendBait,
   firstTrickWaste,

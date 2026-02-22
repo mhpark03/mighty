@@ -181,6 +181,8 @@ class MightyTrackingService {
         return '비기루다 최상위 선공';
       case LeadIntent.defenseTopCard:
         return '수비 최상위 카드 점수 방어';
+      case LeadIntent.firstTrickTopAttack:
+        return '초구 비기루다 최상위 선공';
       case LeadIntent.firstTrickMightyBait:
         return '초구 부재 / 물패로 마이티 프렌드 유도';
       case LeadIntent.firstTrickFriendBait:

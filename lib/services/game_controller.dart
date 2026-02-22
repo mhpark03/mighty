@@ -1107,7 +1107,15 @@ class GameController extends ChangeNotifier {
     if (card.isJoker) return LeadIntent.jokerLeadSuit;
     if (card.isMightyWith(_state.giruda)) return LeadIntent.mightyLead;
     if (_state.giruda != null && card.suit == _state.giruda) return LeadIntent.midGirudaLead;
-    if (_state.currentTrickNumber == 1) return LeadIntent.firstTrickWaste;
+    if (_state.currentTrickNumber == 1) {
+      final mightySuit = _state.mighty.suit;
+      if (!card.isMightyWith(_state.giruda) && card.suit != _state.giruda &&
+          ((card.rank == Rank.ace && card.suit != mightySuit) ||
+           (card.rank == Rank.king && card.suit == mightySuit))) {
+        return LeadIntent.firstTrickTopAttack;
+      }
+      return LeadIntent.firstTrickWaste;
+    }
     return LeadIntent.waste;
   }
 

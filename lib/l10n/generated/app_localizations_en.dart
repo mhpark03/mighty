@@ -2011,6 +2011,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventLastCard => 'Last card';
 
   @override
+  String get trickEventLastAttackTopCardWin => 'Attack wins with top card';
+
+  @override
   String get trickEventLastTrickGiruda => 'Trump last trick';
 
   @override
@@ -2066,14 +2069,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String summaryJokerCounter(String name) {
-    return '$name\'s Joker counter';
-  }
+  String get summaryJokerCounter => 'Joker counter';
 
   @override
-  String summaryJokerUse(String name) {
-    return '$name\'s Joker play';
-  }
+  String get summaryJokerUse => 'Joker play';
 
   @override
   String get summaryWasteExploit => 'Waste exploit success';
@@ -2082,9 +2081,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryTrumpDominate => 'Trump domination';
 
   @override
-  String summaryFriendContrib(String name) {
-    return '$name friend MVP';
-  }
+  String get summaryFriendContrib => 'Friend MVP';
 
   @override
   String get summaryLateDefense => 'Late-game defense';
@@ -2096,22 +2093,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryMightyImpact => 'Mighty impact';
 
   @override
-  String get summaryJokerMightyNoExtra =>
-      'Failed to score extra with Joker/Mighty';
+  String get summaryJokerMightyNoExtra => 'Joker/Mighty extra score shortage';
 
   @override
-  String summaryNarrative(String events, int points, int bid, String result) {
-    return 'Review: $events → $points/${bid}pts $result';
+  String summaryNarrative(String events, String result) {
+    return 'Review: $events → $result';
   }
 
   @override
-  String get summaryResultBigWin => 'dominant win';
+  String get summaryResultBigWin => 'attack dominant win';
 
   @override
   String get summaryResultMinGoal => 'minimum goal achieved';
 
   @override
-  String get summaryResultWin => 'victory';
+  String get summaryResultWin => 'attack success';
 
   @override
   String get summaryResultNarrowLoss => 'narrow loss';
@@ -2222,6 +2218,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Attack non-trump top lead → Defense trump cut';
 
   @override
+  String get trickEventFirstTrickTopAttack => '1st trick top non-trump lead';
+
+  @override
   String get trickEventFirstTrickMightyBait =>
       'No lead in 1st trick / Mighty friend bait';
 
@@ -2242,7 +2241,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get trickEventWaste => 'Waste play';
+  String get trickEventWaste => 'Passing lead with waste';
 
   @override
   String trickEventWasteWithTop(String topCard) {
@@ -2275,6 +2274,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trickEventDeclarerFriendLureFailed => 'Friend lure failed';
+
+  @override
+  String trickEventFriendLureGirudaExhaust(String card) {
+    return 'Defense trump $card exhausted';
+  }
 
   @override
   String get trickEventWasteFriendRescue => 'Waste → Friend rescue!';
@@ -2347,7 +2351,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Trump Q reclaim failed, defense wins';
 
   @override
-  String get trickEventHighCardAttack => 'High card score attack';
+  String get trickEventHighCardAttack => 'Top non-trump lead';
+
+  @override
+  String get trickEventHighCardAttackFailed => 'High card attack failed';
 
   @override
   String trickResultAttack(int count) {
