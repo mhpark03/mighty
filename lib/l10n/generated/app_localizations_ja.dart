@@ -2067,12 +2067,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get summaryMightyImpact => 'マイティ活用';
 
   @override
+  String get summaryJokerMightyNoExtra => 'ジョーカー/マイティ保有も追加得点失敗';
+
+  @override
   String summaryNarrative(String events, int points, int bid, String result) {
     return '総評: $events → $points/$bid点 $result';
   }
 
   @override
   String get summaryResultBigWin => '大勝';
+
+  @override
+  String get summaryResultMinGoal => '最低目標達成';
 
   @override
   String get summaryResultWin => '勝利';
@@ -2143,6 +2149,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trickEventMidGirudaPassLead => '切り札中位でリード譲渡';
+
+  @override
+  String get trickEventFriendAttackDeclarerReOvertake =>
+      'フレンド攻撃 → 守備逆転試み → 主攻再逆転（幸運）';
 
   @override
   String trickEventGirudaDepletionFail(String card) {
@@ -2236,6 +2246,14 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String trickEventWasteFriendRescueWithTop(String topCard) {
     return '捨て札 ($topCard 最上位) → フレンド救出!';
+  }
+
+  @override
+  String get trickEventFriendMightyReclaim => '捨て札 → 守備攻撃をマイティで先手奪還';
+
+  @override
+  String trickEventFriendMightyReclaimWithTop(String topCard) {
+    return '捨て札 ($topCard 最上位) → 守備攻撃をマイティで先手奪還';
   }
 
   @override
@@ -2352,6 +2370,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get stepFirstJoker => 'ジョーカーで初手を確保';
+
+  @override
+  String stepJokerCallExhaust(String card) {
+    return '初手成功後$cardでジョーカーコール → ジョーカー消耗';
+  }
 
   @override
   String stepGirudaAce(String card) {

@@ -805,6 +805,7 @@ class _GameScreenState extends State<GameScreen> {
       'STEP_FIRST_KING' => l10n.stepFirstKing(params['card']!),
       'STEP_FIRST_MIGHTY' => l10n.stepFirstMighty,
       'STEP_FIRST_JOKER' => l10n.stepFirstJoker,
+      'STEP_JOKER_CALL_EXHAUST' => l10n.stepJokerCallExhaust(params['card']!),
       'STEP_GIRUDA_ACE' => l10n.stepGirudaAce(params['card']!),
       'STEP_GIRUDA_ACE_CHECK_K' => l10n.stepGirudaAceCheckK(params['card']!),
       'STEP_GIRUDA_KING' => l10n.stepGirudaKing(params['card']!),
@@ -5445,14 +5446,34 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
+        // 8. 조커/마이티 보유 추가 점수 실패 (최소 점수 달성 시)
+        if (attackWins && attackPoints == bidTricks) {
+          bool attackPlayedJoker = false;
+          bool attackPlayedMighty = false;
+          for (final t in state.tricks) {
+            for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+              if (isAttack(t.playerOrder[i])) {
+                if (t.cards[i].isJoker) attackPlayedJoker = true;
+                if (isMighty(t.cards[i])) attackPlayedMighty = true;
+              }
+            }
+          }
+          if (attackPlayedJoker && attackPlayedMighty) {
+            keyEvents.clear();
+            keyEvents.add(l10n.summaryJokerMightyNoExtra);
+          }
+        }
+
         // 결과 라벨
         final result = attackWins && attackPoints >= bidTricks + 5
             ? l10n.summaryResultBigWin
-            : attackWins
-                ? l10n.summaryResultWin
-                : attackPoints >= bidTricks - 3
-                    ? l10n.summaryResultNarrowLoss
-                    : l10n.summaryResultBigLoss;
+            : attackWins && attackPoints == bidTricks
+                ? l10n.summaryResultMinGoal
+                : attackWins
+                    ? l10n.summaryResultWin
+                    : attackPoints >= bidTricks - 3
+                        ? l10n.summaryResultNarrowLoss
+                        : l10n.summaryResultBigLoss;
 
         if (keyEvents.isNotEmpty) {
           final events = keyEvents.length >= 2
@@ -5588,7 +5609,22 @@ class _GameScreenState extends State<GameScreen> {
             parts.add(l10n.trickEventGirudaQReclaimFail);
           }
         } else if (trick.winnerId != leadId && isTeammate(trick.winnerId!)) {
-          parts.add(l10n.trickEventMidGirudaPassLead);
+          // 수비가 선공보다 높은 카드를 냈는지 확인 (역전 시도)
+          bool defenseTriedOvertake = false;
+          for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+            if (i == leadIdx) continue;
+            final c = trick.cards[i];
+            if (!isAttack(trick.playerOrder[i]) && !c.isJoker &&
+                c.suit == leadCard.suit && c.rankValue > leadCard.rankValue) {
+              defenseTriedOvertake = true;
+              break;
+            }
+          }
+          if (defenseTriedOvertake) {
+            parts.add(l10n.trickEventFriendAttackDeclarerReOvertake);
+          } else {
+            parts.add(l10n.trickEventMidGirudaPassLead);
+          }
         } else if (trick.winnerId != leadId && !isTeammate(trick.winnerId!)) {
           parts.add(l10n.trickEventDefenderGirudaWin);
         } else {
@@ -5864,10 +5900,22 @@ class _GameScreenState extends State<GameScreen> {
             parts.add(l10n.trickEventWasteDeclarerReclaim);
           }
         } else if (trick.winnerId != null && trick.winnerId != leadId && isAttack(trick.winnerId!)) {
-          if (topCardStr != null) {
-            parts.add(l10n.trickEventWasteFriendRescueWithTop(topCardStr));
+          // 프렌드가 마이티로 수비 공격을 탈환한 경우
+          final fWinIdx = trick.playerOrder.indexOf(trick.winnerId!);
+          final fWinCard = (fWinIdx >= 0 && fWinIdx < trick.cards.length) ? trick.cards[fWinIdx] : null;
+          final friendWonWithMighty = fWinCard != null && fWinCard.isMightyWith(giruda);
+          if (!isAttack(leadId) && friendWonWithMighty) {
+            if (topCardStr != null) {
+              parts.add(l10n.trickEventFriendMightyReclaimWithTop(topCardStr));
+            } else {
+              parts.add(l10n.trickEventFriendMightyReclaim);
+            }
           } else {
-            parts.add(l10n.trickEventWasteFriendRescue);
+            if (topCardStr != null) {
+              parts.add(l10n.trickEventWasteFriendRescueWithTop(topCardStr));
+            } else {
+              parts.add(l10n.trickEventWasteFriendRescue);
+            }
           }
         } else if (leadPlayedBestOfSuit && trick.winnerId != null && trick.winnerId != leadId && !isAttack(trick.winnerId!)) {
           // 공격팀 최선 공격 → 수비 상위 카드에 패배

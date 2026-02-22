@@ -3688,6 +3688,12 @@ abstract class AppLocalizations {
   /// **'마이티 활용'**
   String get summaryMightyImpact;
 
+  /// No description provided for @summaryJokerMightyNoExtra.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커/마이티 보유 추가 점수 실패'**
+  String get summaryJokerMightyNoExtra;
+
   /// No description provided for @summaryNarrative.
   ///
   /// In ko, this message translates to:
@@ -3699,6 +3705,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'대승'**
   String get summaryResultBigWin;
+
+  /// No description provided for @summaryResultMinGoal.
+  ///
+  /// In ko, this message translates to:
+  /// **'최소 점수 달성'**
+  String get summaryResultMinGoal;
 
   /// No description provided for @summaryResultWin.
   ///
@@ -3807,6 +3819,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'기루다 중간으로 선 넘김'**
   String get trickEventMidGirudaPassLead;
+
+  /// No description provided for @trickEventFriendAttackDeclarerReOvertake.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 공격 → 수비 역전 시도 → 주공 재역전 (행운)'**
+  String get trickEventFriendAttackDeclarerReOvertake;
 
   /// No description provided for @trickEventGirudaDepletionFail.
   ///
@@ -3963,6 +3981,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'물패 ({topCard} 최상위) → 프렌드 기사회생!'**
   String trickEventWasteFriendRescueWithTop(String topCard);
+
+  /// No description provided for @trickEventFriendMightyReclaim.
+  ///
+  /// In ko, this message translates to:
+  /// **'물패 → 수비 공격을 마이티로 선 탈환'**
+  String get trickEventFriendMightyReclaim;
+
+  /// No description provided for @trickEventFriendMightyReclaimWithTop.
+  ///
+  /// In ko, this message translates to:
+  /// **'물패 ({topCard} 최상위) → 수비 공격을 마이티로 선 탈환'**
+  String trickEventFriendMightyReclaimWithTop(String topCard);
 
   /// No description provided for @trickEventAttackGirudaCut.
   ///
@@ -4149,6 +4179,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'조커로 초구 선 확보'**
   String get stepFirstJoker;
+
+  /// No description provided for @stepJokerCallExhaust.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구 성공 후 {card}로 조커콜 → 조커 소진'**
+  String stepJokerCallExhaust(String card);
 
   /// No description provided for @stepGirudaAce.
   ///

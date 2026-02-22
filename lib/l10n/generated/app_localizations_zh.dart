@@ -2060,12 +2060,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get summaryMightyImpact => 'Mighty发挥';
 
   @override
+  String get summaryJokerMightyNoExtra => '持有小丑/至尊但未能多得分';
+
+  @override
   String summaryNarrative(String events, int points, int bid, String result) {
     return '总评: $events → $points/$bid分 $result';
   }
 
   @override
   String get summaryResultBigWin => '大胜';
+
+  @override
+  String get summaryResultMinGoal => '最低目标达成';
 
   @override
   String get summaryResultWin => '胜利';
@@ -2136,6 +2142,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickEventMidGirudaPassLead => '中位将牌让先';
+
+  @override
+  String get trickEventFriendAttackDeclarerReOvertake =>
+      '朋友进攻 → 防守逆转尝试 → 庄家再逆转（幸运）';
 
   @override
   String trickEventGirudaDepletionFail(String card) {
@@ -2229,6 +2239,14 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String trickEventWasteFriendRescueWithTop(String topCard) {
     return '弃牌 ($topCard 最高) → 朋友救场!';
+  }
+
+  @override
+  String get trickEventFriendMightyReclaim => '弃牌 → 朋友用至尊夺回先手';
+
+  @override
+  String trickEventFriendMightyReclaimWithTop(String topCard) {
+    return '弃牌 ($topCard 最高) → 朋友用至尊夺回先手';
   }
 
   @override
@@ -2345,6 +2363,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get stepFirstJoker => '用王牌确保首墩先手';
+
+  @override
+  String stepJokerCallExhaust(String card) {
+    return '首墩成功后用$card叫王牌 → 消耗小丑';
+  }
 
   @override
   String stepGirudaAce(String card) {

@@ -2096,12 +2096,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryMightyImpact => 'Mighty impact';
 
   @override
+  String get summaryJokerMightyNoExtra =>
+      'Failed to score extra with Joker/Mighty';
+
+  @override
   String summaryNarrative(String events, int points, int bid, String result) {
     return 'Review: $events → $points/${bid}pts $result';
   }
 
   @override
   String get summaryResultBigWin => 'dominant win';
+
+  @override
+  String get summaryResultMinGoal => 'minimum goal achieved';
 
   @override
   String get summaryResultWin => 'victory';
@@ -2172,6 +2179,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trickEventMidGirudaPassLead => 'Mid trump to pass lead';
+
+  @override
+  String get trickEventFriendAttackDeclarerReOvertake =>
+      'Friend attacks → Defense overtake attempt → Declarer re-overtakes (lucky)';
 
   @override
   String trickEventGirudaDepletionFail(String card) {
@@ -2271,6 +2282,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String trickEventWasteFriendRescueWithTop(String topCard) {
     return 'Waste ($topCard top) → Friend rescue!';
+  }
+
+  @override
+  String get trickEventFriendMightyReclaim =>
+      'Waste → Friend reclaims lead with Mighty';
+
+  @override
+  String trickEventFriendMightyReclaimWithTop(String topCard) {
+    return 'Waste ($topCard top) → Friend reclaims lead with Mighty';
   }
 
   @override
@@ -2392,6 +2412,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stepFirstJoker => 'Lead Joker to secure first trick';
+
+  @override
+  String stepJokerCallExhaust(String card) {
+    return 'After first trick, lead $card for Joker Call → exhaust Joker';
+  }
 
   @override
   String stepGirudaAce(String card) {

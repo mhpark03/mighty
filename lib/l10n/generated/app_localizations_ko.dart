@@ -2073,12 +2073,18 @@ class AppLocalizationsKo extends AppLocalizations {
   String get summaryMightyImpact => '마이티 활용';
 
   @override
+  String get summaryJokerMightyNoExtra => '조커/마이티 보유 추가 점수 실패';
+
+  @override
   String summaryNarrative(String events, int points, int bid, String result) {
     return '총평: $events → $points/$bid점 $result';
   }
 
   @override
   String get summaryResultBigWin => '대승';
+
+  @override
+  String get summaryResultMinGoal => '최소 점수 달성';
 
   @override
   String get summaryResultWin => '승리';
@@ -2149,6 +2155,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trickEventMidGirudaPassLead => '기루다 중간으로 선 넘김';
+
+  @override
+  String get trickEventFriendAttackDeclarerReOvertake =>
+      '프렌드 공격 → 수비 역전 시도 → 주공 재역전 (행운)';
 
   @override
   String trickEventGirudaDepletionFail(String card) {
@@ -2242,6 +2252,14 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String trickEventWasteFriendRescueWithTop(String topCard) {
     return '물패 ($topCard 최상위) → 프렌드 기사회생!';
+  }
+
+  @override
+  String get trickEventFriendMightyReclaim => '물패 → 수비 공격을 마이티로 선 탈환';
+
+  @override
+  String trickEventFriendMightyReclaimWithTop(String topCard) {
+    return '물패 ($topCard 최상위) → 수비 공격을 마이티로 선 탈환';
   }
 
   @override
@@ -2359,6 +2377,11 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get stepFirstJoker => '조커로 초구 선 확보';
+
+  @override
+  String stepJokerCallExhaust(String card) {
+    return '초구 성공 후 $card로 조커콜 → 조커 소진';
+  }
 
   @override
   String stepGirudaAce(String card) {

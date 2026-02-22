@@ -118,33 +118,40 @@ class GameController extends ChangeNotifier {
 
     // === ① 초구 ===
     PlayingCard? firstTrickAce;
+    PlayingCard? firstTrickKing;
     for (final card in hand) {
-      if (card.isJoker) continue;
-      if (card.suit == mightySuit && card.rank == Rank.ace) continue; // 마이티
+      if (card.isJoker || card.isMightyWith(giruda)) continue;
       if (card.suit == giruda) continue;
       if (card.rank == Rank.ace && card.suit != mightySuit) {
         firstTrickAce = card; break;
       }
     }
-    if (firstTrickAce != null) {
-      strategies.add(('STEP_FIRST_ACE', {'card': cs(firstTrickAce)}));
-    } else {
-      PlayingCard? firstTrickKing;
+    if (firstTrickAce == null) {
       for (final card in hand) {
-        if (card.isJoker) continue;
-        if (card.suit == mightySuit && card.rank == Rank.ace) continue;
+        if (card.isJoker || card.isMightyWith(giruda)) continue;
         if (card.suit == giruda) continue;
         if (card.rank == Rank.king && card.suit == mightySuit) {
           firstTrickKing = card; break;
         }
       }
-      if (firstTrickKing != null) {
-        strategies.add(('STEP_FIRST_KING', {'card': cs(firstTrickKing)}));
-      } else if (hasMighty) {
-        strategies.add(('STEP_FIRST_MIGHTY', <String, String>{}));
-      } else if (hasJoker) {
-        strategies.add(('STEP_FIRST_JOKER', <String, String>{}));
-      }
+    }
+    if (firstTrickAce != null) {
+      strategies.add(('STEP_FIRST_ACE', {'card': cs(firstTrickAce)}));
+    } else if (firstTrickKing != null) {
+      strategies.add(('STEP_FIRST_KING', {'card': cs(firstTrickKing)}));
+    } else if (hasMighty) {
+      strategies.add(('STEP_FIRST_MIGHTY', <String, String>{}));
+    } else if (hasJoker) {
+      strategies.add(('STEP_FIRST_JOKER', <String, String>{}));
+    }
+
+    // === 초구 성공 후 조커콜 ===
+    final jokerCallCard = state.jokerCall;
+    final hasJokerCallCard = hand.any((c) =>
+        !c.isJoker && c.suit == jokerCallCard.suit && c.rank == jokerCallCard.rank);
+    // 마이티 프렌드가 외부에 있으면 프렌드가 조커를 보유할 수 있으므로 조커콜 제외
+    if (hasJokerCallCard && !hasJoker && !friendIsJoker && !(friendIsMighty && !hasMighty)) {
+      strategies.add(('STEP_JOKER_CALL_EXHAUST', {'card': cs(jokerCallCard)}));
     }
 
     // === ② 기루다 A → K 소진 확인 ===
@@ -162,6 +169,7 @@ class GameController extends ChangeNotifier {
     // === 프렌드 합류/유도 ===
     bool jokerUsedForGiruda = false;
     if (friendIsMighty && !hasMighty) {
+      // 마이티 프렌드: 낮은 기루다로 프렌드 유도가 최우선
       final mightyCardStr = '${ss(mightySuit)}A';
       final highRanks = [Rank.king, Rank.queen, Rank.jack];
       final missingHighGiruda = highRanks.where((r) =>
@@ -245,8 +253,12 @@ class GameController extends ChangeNotifier {
         c.suit != giruda &&
         (c.rank == Rank.ace || c.rank == Rank.king)).toList();
     final fta = firstTrickAce;
+    final ftk = firstTrickKing;
     if (fta != null) {
       remainingHighCards.removeWhere((c) => c.suit == fta.suit && c.rank == fta.rank);
+    }
+    if (ftk != null) {
+      remainingHighCards.removeWhere((c) => c.suit == ftk.suit && c.rank == ftk.rank);
     }
     if (remainingHighCards.isNotEmpty) {
       remainingHighCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
