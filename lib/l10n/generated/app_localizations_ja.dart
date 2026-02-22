@@ -1641,6 +1641,15 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get kittyScoreChange => '予想点数変化';
+
+  @override
+  String get kittyBeforeExchange => '交換前';
+
+  @override
+  String get kittyAfterExchange => '交換後';
+
+  @override
   String get friendExpected => 'フレンド予想';
 
   @override
@@ -1993,6 +2002,41 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventGameDefeat => '攻撃敗北確定';
 
   @override
+  String trickEventSummaryRun(int points, int bid) {
+    return '総評: 全勝ラン $points/$bid点 大勝';
+  }
+
+  @override
+  String trickEventSummaryBackRun(int bid) {
+    return '総評: 全敗バックラン 0/$bid点 完敗';
+  }
+
+  @override
+  String trickEventSummaryBigWin(int wins, int losses, int points, int bid) {
+    return '総評: $wins勝$losses敗 $points/$bid点 大勝';
+  }
+
+  @override
+  String trickEventSummaryWin(int wins, int losses, int points, int bid) {
+    return '総評: $wins勝$losses敗 $points/$bid点 勝利';
+  }
+
+  @override
+  String trickEventSummaryNarrowLoss(
+    int wins,
+    int losses,
+    int points,
+    int bid,
+  ) {
+    return '総評: $wins勝$losses敗 $points/$bid点 惜敗';
+  }
+
+  @override
+  String trickEventSummaryBigLoss(int wins, int losses, int points, int bid) {
+    return '総評: $wins勝$losses敗 $points/$bid点 大敗';
+  }
+
+  @override
   String trickEventLastCardDefenseWin(int count) {
     return '守備上位カード$count点防御';
   }
@@ -2036,6 +2080,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventMidGirudaPassLead => '切り札中位でリード譲渡';
 
   @override
+  String trickEventGirudaDepletionFail(String card) {
+    return '$card 排出失敗';
+  }
+
+  @override
   String get trickEventDefenderGirudaWin => '守備側切り札勝利';
 
   @override
@@ -2051,13 +2100,24 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventDefenseTopCardDefend => '守備最上位カード得点防御';
 
   @override
+  String get trickEventDefenseTopDeclarerCutDefense =>
+      '守備最上位先攻 → 宣言者切り札カット → 守備上位切り札防御';
+
+  @override
+  String get trickEventDefenseTopDeclarerCutTeamDefense =>
+      '守備最上位先攻 → 宣言者切り札カット → 守備チームワーク切り札防御';
+
+  @override
   String get trickEventDefenseLeadAttackCut => '守備非切り札最上位先攻 → 攻撃切り札カット奪還';
 
   @override
   String get trickEventAttackLeadDefenseCut => '攻撃非切り札最上位先攻 → 守備切り札カット';
 
   @override
-  String get trickEventFirstTrickFriendBait => '初トリック不在 / フレンド誘導';
+  String get trickEventFirstTrickMightyBait => '初手不在 / マイティフレンド誘導';
+
+  @override
+  String get trickEventFirstTrickFriendBait => '初手不在 / スート消化 → 幸運のフレンド勝利';
 
   @override
   String get trickEventFirstTrickWaste => '初トリック不在 / 捨て札';
@@ -2087,6 +2147,15 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get trickEventFriendWasteDeclarerCutDefenseOvercut =>
+      'フレンド捨て札 → 宣言者切り札カット → 守備上位切り札逆転';
+
+  @override
+  String trickEventFriendWasteDeclarerCutDefenseOvercutPoints(int count) {
+    return 'フレンド捨て札 → 宣言者切り札カット → 守備上位切り札逆転 $count点防御';
+  }
+
+  @override
   String get trickEventFriendLeadDefenseBeatDeclarerCut =>
       'フレンド先攻 → 守備逆転 → 宣言者切り札再逆転';
 
@@ -2105,6 +2174,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventDefenseGirudaCut => '守備切り札カット';
 
   @override
+  String get trickEventAttackNoGirudaDefenseHas => '攻撃側切り札枯渇 / 守備のみ切り札保有';
+
+  @override
   String get trickEventNonGirudaExhaust => '非切り札消耗';
 
   @override
@@ -2112,6 +2184,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trickEventGirudaKQExhaustSuccess => 'K/Q同時消耗 大成功';
+
+  @override
+  String get trickEventDefenseJokerRunBlock => '守備ジョーカーでラン阻止';
 
   @override
   String get trickEventDefenseJokerCounterattack => 'マイティ消滅 → 守備ジョーカー反撃';

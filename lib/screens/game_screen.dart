@@ -1174,6 +1174,112 @@ class _GameScreenState extends State<GameScreen> {
               ),
             ),
 
+            // 예상 점수 변화 섹션
+            const SizedBox(height: 14),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.purple.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.purple.withValues(alpha: 0.5)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.trending_up, color: Colors.purple[300], size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        explanation.girudaChanged
+                            ? '${l10n.kittyScoreChange} (${_getSuitSymbol(explanation.originalGiruda!)} → ${_getSuitSymbol(explanation.newGiruda!)})'
+                            : '${l10n.kittyScoreChange} (${_getSuitSymbol(explanation.newGiruda!)})',
+                        style: TextStyle(
+                          color: Colors.purple[300],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          fontFamily: 'Roboto',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // 교체 전
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${l10n.kittyBeforeExchange} ${_getSuitSymbol(explanation.originalGiruda!)}',
+                            style: TextStyle(color: Colors.grey[400], fontSize: 11, fontFamily: 'Roboto'),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${explanation.beforeMinPoints}~${explanation.beforeMaxPoints}',
+                            style: const TextStyle(color: Colors.white70, fontSize: 14),
+                          ),
+                          Text(
+                            l10n.optimalScore(explanation.beforeOptimalPoints),
+                            style: TextStyle(color: Colors.orange[300], fontSize: 12),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Icon(Icons.arrow_forward, color: Colors.purple[300], size: 20),
+                      ),
+                      // 교체 후
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${l10n.kittyAfterExchange} ${_getSuitSymbol(explanation.newGiruda!)}',
+                            style: TextStyle(color: Colors.grey[400], fontSize: 11, fontFamily: 'Roboto'),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${explanation.afterMinPoints}~${explanation.afterMaxPoints}',
+                            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            l10n.optimalScore(explanation.afterOptimalPoints),
+                            style: TextStyle(
+                              color: explanation.afterOptimalPoints > explanation.beforeOptimalPoints
+                                  ? Colors.greenAccent
+                                  : explanation.afterOptimalPoints < explanation.beforeOptimalPoints
+                                      ? Colors.red[300]
+                                      : Colors.orange[300],
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (explanation.afterOptimalPoints != explanation.beforeOptimalPoints) ...[
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: explanation.afterOptimalPoints > explanation.beforeOptimalPoints
+                                ? Colors.green[800]
+                                : Colors.red[800],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '${explanation.afterOptimalPoints > explanation.beforeOptimalPoints ? '+' : ''}${explanation.afterOptimalPoints - explanation.beforeOptimalPoints}',
+                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
             // 기루다 비교 섹션
             if (explanation.girudaComparison.isNotEmpty) ...[
               const SizedBox(height: 14),
@@ -3608,6 +3714,7 @@ class _GameScreenState extends State<GameScreen> {
                         color: _getSuitColorForInfo(giruda),
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'Roboto',
                       ),
                     ),
                     Text(
@@ -4007,18 +4114,14 @@ class _GameScreenState extends State<GameScreen> {
 
     if (card.isJoker) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
         decoration: BoxDecoration(
           gradient: const LinearGradient(colors: [Color(0xFF7B1FA2), Color(0xFFAB47BC)]),
           borderRadius: BorderRadius.circular(3),
         ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.auto_awesome, color: Colors.yellowAccent, size: 10),
-            SizedBox(width: 2),
-            Text('JK', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
-          ],
+        child: const Text(
+          '★JK',
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.yellowAccent, fontFamily: 'Roboto'),
         ),
       );
     }
@@ -4072,7 +4175,7 @@ class _GameScreenState extends State<GameScreen> {
     if (card.isJoker) {
       cardWidget = Container(
         width: width,
-        padding: const EdgeInsets.symmetric(vertical: 1),
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 1),
         decoration: BoxDecoration(
           gradient: dimmed
               ? LinearGradient(colors: [Colors.grey[700]!, Colors.grey[600]!])
@@ -4083,13 +4186,11 @@ class _GameScreenState extends State<GameScreen> {
                 ),
           borderRadius: BorderRadius.circular(3),
         ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.auto_awesome, color: dimmed ? Colors.grey[400] : Colors.yellowAccent, size: width * 0.32),
-              Text('JK', style: TextStyle(fontSize: width * 0.22, fontWeight: FontWeight.bold, color: dimmed ? Colors.grey[400] : Colors.white)),
-            ],
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            '★JK',
+            style: TextStyle(fontSize: width * 0.43, fontWeight: FontWeight.bold, color: dimmed ? Colors.grey[400] : Colors.yellowAccent, fontFamily: 'Roboto'),
           ),
         ),
       );
@@ -5216,21 +5317,6 @@ class _GameScreenState extends State<GameScreen> {
             }
           }
         }
-        // 비기루다 최상위 선공 (무늬 소진으로 낮은 카드가 최상위가 된 경우)
-        if (!leadCard.isJoker && leadCard.suit != null && leadCard.suit != giruda &&
-            leadCard.rankValue < 11) {
-          bool isTop = true;
-          for (int r = 14; r > leadCard.rankValue; r--) {
-            if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
-            if (!playedCards.contains('${leadCard.suit!.index}-$r')) { isTop = false; break; }
-          }
-          if (isTop) {
-            const suitSymbolMap = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
-            const rankSymbols = {14: 'A', 13: 'K', 12: 'Q', 11: 'J', 10: '10', 9: '9', 8: '8', 7: '7', 6: '6', 5: '5', 4: '4', 3: '3', 2: '2'};
-            final cardStr = '${suitSymbolMap[leadCard.suit!]}${rankSymbols[leadCard.rankValue]}';
-            lastLabel = l10n.trickEventLastTrickTopByExhaust(cardStr);
-          }
-        }
         // "마지막 카드"는 최상위 카드가 아닐 때만 표시
         if (lastLabel == null && !leadCard.isJoker && leadCard.suit != null) {
           bool isLeadTop = leadCard.rankValue >= 14;
@@ -5265,6 +5351,23 @@ class _GameScreenState extends State<GameScreen> {
         }
       } else {
         lastParts.add(l10n.trickEventGameDefeat);
+      }
+
+      // 총평
+      final attackTrickWins = state.tricks.where((t) => t.winnerId != null && isAttack(t.winnerId!)).length;
+      final defenseTrickWins = 10 - attackTrickWins;
+      if (attackTrickWins == 10) {
+        lastParts.add(l10n.trickEventSummaryRun(attackPoints, bidTricks));
+      } else if (defenseTrickWins == 10) {
+        lastParts.add(l10n.trickEventSummaryBackRun(bidTricks));
+      } else if (attackWins && attackPoints >= bidTricks + 5) {
+        lastParts.add(l10n.trickEventSummaryBigWin(attackTrickWins, defenseTrickWins, attackPoints, bidTricks));
+      } else if (attackWins) {
+        lastParts.add(l10n.trickEventSummaryWin(attackTrickWins, defenseTrickWins, attackPoints, bidTricks));
+      } else if (attackPoints >= bidTricks - 3) {
+        lastParts.add(l10n.trickEventSummaryNarrowLoss(attackTrickWins, defenseTrickWins, attackPoints, bidTricks));
+      } else {
+        lastParts.add(l10n.trickEventSummaryBigLoss(attackTrickWins, defenseTrickWins, attackPoints, bidTricks));
       }
 
       return lastParts.join(' / ');
@@ -5395,6 +5498,42 @@ class _GameScreenState extends State<GameScreen> {
             parts.add(l10n.trickEventMidGirudaLead);
           }
         }
+        // Check for high giruda card depletion failure
+        if (!hasMightyInTrick && isAttack(leadId) && giruda != null) {
+          const suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
+          final girudaSymbol = suitSymbols[giruda] ?? '';
+          // Collect giruda ranks seen up to and including this trick
+          final Set<int> seenGirudaRanks = {};
+          for (final pt in state.tricks) {
+            if (pt.trickNumber > trick.trickNumber) break;
+            for (final c in pt.cards) {
+              if (!c.isJoker && c.suit == giruda) {
+                seenGirudaRanks.add(c.rankValue);
+              }
+            }
+          }
+          // Find highest giruda (J+) played by defense in future tricks
+          int? highestUnflushed;
+          for (final ft in state.tricks) {
+            if (ft.trickNumber <= trick.trickNumber) continue;
+            for (int i = 0; i < ft.cards.length && i < ft.playerOrder.length; i++) {
+              final c = ft.cards[i];
+              if (!c.isJoker && c.suit == giruda && !isMighty(c) &&
+                  c.rankValue > leadCard.rankValue && c.rankValue >= 11 &&
+                  !isAttack(ft.playerOrder[i]) && !seenGirudaRanks.contains(c.rankValue)) {
+                if (highestUnflushed == null || c.rankValue > highestUnflushed) {
+                  highestUnflushed = c.rankValue;
+                }
+                seenGirudaRanks.add(c.rankValue);
+              }
+            }
+          }
+          if (highestUnflushed != null) {
+            const rankNames = {11: 'J', 12: 'Q', 13: 'K', 14: 'A'};
+            final rankStr = rankNames[highestUnflushed] ?? highestUnflushed.toString();
+            parts.add(l10n.trickEventGirudaDepletionFail('$girudaSymbol$rankStr'));
+          }
+        }
       }
     } else {
       final isTop = leadCard.rankValue >= 14 || isTopOfSuit(leadCard.suit!, leadCard.rankValue);
@@ -5411,13 +5550,52 @@ class _GameScreenState extends State<GameScreen> {
           girudaCutDescribed = true;
         } else if (!isAttack(leadId) && trick.winnerId != null && !isAttack(trick.winnerId!)) {
           // 수비팀 비기루다 최상위 선공 → 점수 방어
-          parts.add(l10n.trickEventDefenseTopCardDefend);
+          // 주공 기루다 컷 시도 → 수비 상위 기루다 방어 체크
+          bool declarerCutFailed = false;
+          int defGirudaCount = 0;
+          if (giruda != null && state.declarerId != null) {
+            final declIdx = trick.playerOrder.indexOf(state.declarerId!);
+            if (declIdx >= 0 && declIdx < trick.cards.length) {
+              final declCard = trick.cards[declIdx];
+              if (!declCard.isJoker && declCard.suit == giruda) {
+                final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
+                if (winIdx >= 0 && winIdx < trick.cards.length) {
+                  final winCard = trick.cards[winIdx];
+                  if (!winCard.isJoker && winCard.suit == giruda) {
+                    declarerCutFailed = true;
+                    for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+                      if (i == leadIdx) continue;
+                      if (!isAttack(trick.playerOrder[i]) && !trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
+                        defGirudaCount++;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          if (declarerCutFailed && defGirudaCount >= 2) {
+            parts.add(l10n.trickEventDefenseTopDeclarerCutTeamDefense);
+            girudaCutDescribed = true;
+          } else if (declarerCutFailed) {
+            parts.add(l10n.trickEventDefenseTopDeclarerCutDefense);
+            girudaCutDescribed = true;
+          } else {
+            parts.add(l10n.trickEventDefenseTopCardDefend);
+          }
         } else {
           parts.add(l10n.trickEventTopNonGirudaLead);
         }
       } else if (trick.trickNumber == 1) {
         if (trick.winnerId != null && isAttack(trick.winnerId!)) {
-          parts.add(l10n.trickEventFirstTrickFriendBait);
+          // 마이티 프렌드는 초구 사용 가능 → 의도적 유도, 그 외는 행운
+          final isMightyFriend = state.friendDeclaration?.card != null &&
+              state.friendDeclaration!.card!.isMightyWith(giruda);
+          if (isMightyFriend) {
+            parts.add(l10n.trickEventFirstTrickMightyBait);
+          } else {
+            parts.add(l10n.trickEventFirstTrickFriendBait);
+          }
         } else {
           parts.add(l10n.trickEventFirstTrickWaste);
         }
@@ -5465,6 +5643,29 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
+        // 프렌드 물패 → 주공 기루다 컷 시도 → 수비 기루다 재역전
+        bool isFriendWasteDeclarerCutDefenseOvercut = false;
+        if (isAttack(leadId) && leadId != state.declarerId &&
+            leadCard.suit != giruda &&
+            trick.winnerId != null && !isAttack(trick.winnerId!)) {
+          final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
+          if (winIdx >= 0 && winIdx < trick.cards.length) {
+            final winCard = trick.cards[winIdx];
+            if (!winCard.isJoker && winCard.suit == giruda) {
+              // 주공이 기루다를 냈는지 확인 (기루다 컷 시도)
+              if (state.declarerId != null) {
+                final declIdx = trick.playerOrder.indexOf(state.declarerId!);
+                if (declIdx >= 0 && declIdx < trick.cards.length) {
+                  final declCard = trick.cards[declIdx];
+                  if (!declCard.isJoker && declCard.suit == giruda) {
+                    isFriendWasteDeclarerCutDefenseOvercut = true;
+                  }
+                }
+              }
+            }
+          }
+        }
+
         // 프렌드 선공 → 수비 역전 → 주공 기루다 컷 재역전
         bool isFriendLeadDefenseBeatDeclarerCut = false;
         if (isAttack(leadId) && leadId != state.declarerId && trick.winnerId == state.declarerId) {
@@ -5487,7 +5688,15 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
-        if (isFriendLeadDefenseBeatDeclarerCut) {
+        if (isFriendWasteDeclarerCutDefenseOvercut) {
+          final ptCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
+          if (ptCount > 0) {
+            parts.add(l10n.trickEventFriendWasteDeclarerCutDefenseOvercutPoints(ptCount));
+          } else {
+            parts.add(l10n.trickEventFriendWasteDeclarerCutDefenseOvercut);
+          }
+          girudaCutDescribed = true;
+        } else if (isFriendLeadDefenseBeatDeclarerCut) {
           parts.add(l10n.trickEventFriendLeadDefenseBeatDeclarerCut);
           girudaCutDescribed = true;
         // 수비팀이 마이티 무늬를 내서 마이티 소진 유도
@@ -5538,6 +5747,27 @@ class _GameScreenState extends State<GameScreen> {
             parts.add(l10n.trickEventAttackGirudaCut);
           } else {
             parts.add(l10n.trickEventDefenseGirudaCut);
+            // 공격팀 기루다 소진 상태에서 수비만 기루다 보유 → 특이 상황
+            bool attackHasGirudaLeft = false;
+            for (final ft in state.tricks) {
+              if (ft.trickNumber <= trick.trickNumber) continue;
+              for (int i = 0; i < ft.cards.length && i < ft.playerOrder.length; i++) {
+                if (isAttack(ft.playerOrder[i]) && !ft.cards[i].isJoker && ft.cards[i].suit == giruda) {
+                  attackHasGirudaLeft = true;
+                }
+              }
+            }
+            if (!attackHasGirudaLeft) {
+              bool attackPlayedGirudaHere = false;
+              for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+                if (isAttack(trick.playerOrder[i]) && !trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
+                  attackPlayedGirudaHere = true;
+                }
+              }
+              if (!attackPlayedGirudaHere) {
+                parts.add(l10n.trickEventAttackNoGirudaDefenseHas);
+              }
+            }
           }
         }
       }
@@ -5567,20 +5797,34 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
 
-    // Outcome: 마이티 소멸 후 수비팀 조커 반격 (비선공 조커가 트릭 승리)
+    // Outcome: 수비팀 조커 반격 / 런 저지 (비선공 조커가 트릭 승리)
     {
-      final bool mightyAlreadyPlayed = mighty.suit != null &&
-          playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}');
-      if (mightyAlreadyPlayed) {
-        for (int i = 0; i < trick.cards.length; i++) {
-          if (i == leadIdx) continue;
-          if (trick.cards[i].isJoker &&
-              i < trick.playerOrder.length &&
-              trick.winnerId == trick.playerOrder[i] &&
-              !isAttack(trick.playerOrder[i])) {
-            parts.add(l10n.trickEventDefenseJokerCounterattack);
-            break;
+      bool defenseJokerWin = false;
+      for (int i = 0; i < trick.cards.length; i++) {
+        if (i == leadIdx) continue;
+        if (trick.cards[i].isJoker &&
+            i < trick.playerOrder.length &&
+            trick.winnerId == trick.playerOrder[i] &&
+            !isAttack(trick.playerOrder[i])) {
+          defenseJokerWin = true;
+          break;
+        }
+      }
+      if (defenseJokerWin) {
+        // 이전 트릭 모두 공격팀 승리 → 수비 조커로 런 저지
+        if (trick.trickNumber >= 2) {
+          final allPrevAttackWin = state.tricks
+              .where((t) => t.trickNumber < trick.trickNumber)
+              .every((t) => t.winnerId != null && isAttack(t.winnerId!));
+          if (allPrevAttackWin) {
+            parts.add(l10n.trickEventDefenseJokerRunBlock);
           }
+        }
+        // 마이티 소멸 후 조커 반격
+        final bool mightyAlreadyPlayed = mighty.suit != null &&
+            playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}');
+        if (mightyAlreadyPlayed) {
+          parts.add(l10n.trickEventDefenseJokerCounterattack);
         }
       }
     }

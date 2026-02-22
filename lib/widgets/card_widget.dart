@@ -226,6 +226,7 @@ class CardWidget extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   letterSpacing: 1.2,
+                  fontFamily: 'Roboto',
                   shadows: const [Shadow(color: Colors.black54, blurRadius: 2)],
                 ),
               ),
@@ -268,7 +269,7 @@ class MiniCardWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.auto_awesome, color: Colors.yellowAccent, size: size * 0.35),
-              Text('JK', style: TextStyle(fontSize: size * 0.2, fontWeight: FontWeight.bold, color: Colors.white)),
+              Text('JK', style: TextStyle(fontSize: size * 0.2, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Roboto')),
             ],
           ),
         ),

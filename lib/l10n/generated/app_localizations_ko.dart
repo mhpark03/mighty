@@ -1647,6 +1647,15 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get kittyScoreChange => '예상 점수 변화';
+
+  @override
+  String get kittyBeforeExchange => '교체 전';
+
+  @override
+  String get kittyAfterExchange => '교체 후';
+
+  @override
   String get friendExpected => '프렌드 예상';
 
   @override
@@ -1999,6 +2008,41 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventGameDefeat => '공격 패배 확정';
 
   @override
+  String trickEventSummaryRun(int points, int bid) {
+    return '총평: 전승 런 $points/$bid점 대승';
+  }
+
+  @override
+  String trickEventSummaryBackRun(int bid) {
+    return '총평: 전패 백런 0/$bid점 완패';
+  }
+
+  @override
+  String trickEventSummaryBigWin(int wins, int losses, int points, int bid) {
+    return '총평: $wins승$losses패 $points/$bid점 대승';
+  }
+
+  @override
+  String trickEventSummaryWin(int wins, int losses, int points, int bid) {
+    return '총평: $wins승$losses패 $points/$bid점 승리';
+  }
+
+  @override
+  String trickEventSummaryNarrowLoss(
+    int wins,
+    int losses,
+    int points,
+    int bid,
+  ) {
+    return '총평: $wins승$losses패 $points/$bid점 석패';
+  }
+
+  @override
+  String trickEventSummaryBigLoss(int wins, int losses, int points, int bid) {
+    return '총평: $wins승$losses패 $points/$bid점 대패';
+  }
+
+  @override
   String trickEventLastCardDefenseWin(int count) {
     return '수비 상위 카드 $count점 방어';
   }
@@ -2042,6 +2086,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventMidGirudaPassLead => '기루다 중간으로 선 넘김';
 
   @override
+  String trickEventGirudaDepletionFail(String card) {
+    return '$card 소진 실패';
+  }
+
+  @override
   String get trickEventDefenderGirudaWin => '수비팀 기루다 승리';
 
   @override
@@ -2057,13 +2106,24 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventDefenseTopCardDefend => '수비 최상위 카드 점수 방어';
 
   @override
+  String get trickEventDefenseTopDeclarerCutDefense =>
+      '수비 최상위 선공 → 주공 기루다 컷 → 수비 상위 기루다 방어';
+
+  @override
+  String get trickEventDefenseTopDeclarerCutTeamDefense =>
+      '수비 최상위 선공 → 주공 기루다 컷 → 수비 팀워크 기루다 방어';
+
+  @override
   String get trickEventDefenseLeadAttackCut => '수비 비기루다 최상위 선공 → 공격 기루다 컷 선 탈환';
 
   @override
   String get trickEventAttackLeadDefenseCut => '공격 비기루다 최상위 선공 → 수비 기루다 컷';
 
   @override
-  String get trickEventFirstTrickFriendBait => '초구 부재 / 물패로 프렌드 유도';
+  String get trickEventFirstTrickMightyBait => '초구 부재 / 물패로 마이티 프렌드 유도';
+
+  @override
+  String get trickEventFirstTrickFriendBait => '초구 부재 / 물패 소진 → 행운의 프렌드 승리';
 
   @override
   String get trickEventFirstTrickWaste => '초구 부재 / 물패 처리';
@@ -2093,6 +2153,15 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get trickEventFriendWasteDeclarerCutDefenseOvercut =>
+      '프렌드 물패 → 주공 기루다 컷 → 수비 기루다 재역전';
+
+  @override
+  String trickEventFriendWasteDeclarerCutDefenseOvercutPoints(int count) {
+    return '프렌드 물패 → 주공 기루다 컷 → 수비 기루다 재역전 $count점 방어';
+  }
+
+  @override
   String get trickEventFriendLeadDefenseBeatDeclarerCut =>
       '프렌드 선공 → 수비 역전 → 주공 기루다 컷 재역전';
 
@@ -2111,6 +2180,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventDefenseGirudaCut => '수비 기루다 컷';
 
   @override
+  String get trickEventAttackNoGirudaDefenseHas => '공격팀 기루다 소진 / 수비만 기루다 보유';
+
+  @override
   String get trickEventNonGirudaExhaust => '비기루다 소진';
 
   @override
@@ -2118,6 +2190,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trickEventGirudaKQExhaustSuccess => 'K/Q 동시 소진 대성공';
+
+  @override
+  String get trickEventDefenseJokerRunBlock => '수비 조커 런 저지';
 
   @override
   String get trickEventDefenseJokerCounterattack => '마이티 소멸 → 수비 조커 반격';

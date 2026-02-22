@@ -3868,7 +3868,7 @@ class AIPlayer {
             // 상대 기루다 소진 + void 보유: 물패 우선(dump-first) 교대
             // 기루다 선공 → 상대 저가 카드 follow (점수 적음)
             // 물패 → 상대 선공 → 기루다 컷 (상대 고가 카드 획득, 점수 많음)
-            shouldDump = remainingTricks % 2 == 0;
+            shouldDump = remainingTricks % 2 == 1;
           } else {
             // 상대 기루다 존재: 기루다 실효 최상위 보유 시 기루다 선공 우선
             final bool hasTopGirudaWin = remainingOpponentGiruda > 0 &&

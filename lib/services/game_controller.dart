@@ -754,6 +754,24 @@ class GameController extends ChangeNotifier {
       // 각 버릴 카드의 이유 생성
       final reasons = _generateDiscardReasons(discardCards, newGiruda, declarer);
 
+      // 교체 전 예상 점수 (배팅 시 10장 기준, 원래 기루다 무늬의 점수)
+      final beforeEval = _aiPlayer.evaluateForBidding(declarer.hand);
+      // 원래 기루다의 점수를 suitComparison에서 추출 (bestGiruda와 다를 수 있음)
+      int beforeMin = beforeEval.minPoints;
+      int beforeMax = beforeEval.maxPoints;
+      int beforeOptimal = beforeEval.optimalPoints;
+      if (originalGiruda != null) {
+        final origEntry = beforeEval.suitComparison.where((e) => e.$1 == originalGiruda);
+        if (origEntry.isNotEmpty) {
+          beforeMin = origEntry.first.$2;
+          beforeMax = origEntry.first.$3;
+          beforeOptimal = origEntry.first.$4;
+        }
+      }
+
+      // 교체 후 예상 점수: 기루다 비교에서 선택 기루다의 값을 추출
+      final afterEntry = girudaComp.firstWhere((e) => e.$1 == newGiruda);
+
       _kittyExplanation = KittyExplanation(
         kittyCards: kittyCards,
         discardCards: discardCards,
@@ -762,6 +780,12 @@ class GameController extends ChangeNotifier {
         newGiruda: newGiruda,
         girudaChanged: girudaChanged,
         discardReasons: reasons,
+        beforeMinPoints: beforeMin,
+        beforeMaxPoints: beforeMax,
+        beforeOptimalPoints: beforeOptimal,
+        afterMinPoints: afterEntry.$2,
+        afterMaxPoints: afterEntry.$3,
+        afterOptimalPoints: afterEntry.$4,
         girudaComparison: girudaComp,
       );
 
@@ -1339,6 +1363,12 @@ class KittyExplanation {
   final Suit? newGiruda;                   // 변경된 기루다 (변경 없으면 동일)
   final bool girudaChanged;                // 기루다 변경 여부
   final List<String> discardReasons;       // 각 버릴 카드의 이유
+  final int beforeMinPoints;
+  final int beforeMaxPoints;
+  final int beforeOptimalPoints;
+  final int afterMinPoints;
+  final int afterMaxPoints;
+  final int afterOptimalPoints;
   final List<(Suit?, int, int, int)> girudaComparison; // (suit, min, max, optimal)
 
   KittyExplanation({
@@ -1349,6 +1379,12 @@ class KittyExplanation {
     required this.newGiruda,
     required this.girudaChanged,
     required this.discardReasons,
+    this.beforeMinPoints = 0,
+    this.beforeMaxPoints = 0,
+    this.beforeOptimalPoints = 0,
+    this.afterMinPoints = 0,
+    this.afterMaxPoints = 0,
+    this.afterOptimalPoints = 0,
     this.girudaComparison = const [],
   });
 }
