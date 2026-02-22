@@ -1068,6 +1068,7 @@
   "trickEventDefenseGirudaCut": "Defense trump cut",
   "trickEventAttackNoGirudaDefenseHas": "Attack out of trump / Defense still has trump",
   "trickEventNonGirudaExhaust": "Non-trump exhausted",
+  "trickEventJokerCallDeclared": "Joker Call",
   "trickEventGirudaKExhaustSuccess": "K exhausted",
   "trickEventGirudaKQExhaustSuccess": "K/Q both exhausted!",
   "trickEventDefenseJokerRunBlock": "Defense Joker blocks run",

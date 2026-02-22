@@ -132,6 +132,34 @@ class FriendDeclaration {
   );
 }
 
+enum LeadIntent {
+  jokerAfterFriend,
+  jokerLeadSuit,
+  jokerGirudaExhaust,
+  mightyLead,
+  mightyTrick9,
+  topGirudaLead,
+  midGirudaMightyBait,
+  midGirudaLead,
+  midGirudaPassLead,
+  soleGirudaLeadMaintain,
+  lowGirudaFriendPass,
+  highCardAttack,
+  topNonGirudaLead,
+  defenseTopCard,
+  firstTrickMightyBait,
+  firstTrickFriendBait,
+  firstTrickWaste,
+  declarerFriendLure,
+  defenseMightyExhaust,
+  friendVoidPass,
+  friendTopCardLead,
+  defenseJokerLead,
+  defenseHighCard,
+  defenseLowCard,
+  waste,
+}
+
 class Trick {
   final int trickNumber;
   final List<PlayingCard> cards;
@@ -142,6 +170,7 @@ class Trick {
   JokerCallType jokerCall;
   Suit? jokerCallSuit;  // 조커 콜로 지정된 무늬
   Suit? jokerLeadSuit;  // 조커 선공 시 지정된 무늬
+  LeadIntent? leadIntent;
 
   Trick({
     required this.trickNumber,
@@ -153,6 +182,7 @@ class Trick {
     this.jokerCall = JokerCallType.none,
     this.jokerCallSuit,
     this.jokerLeadSuit,
+    this.leadIntent,
   })  : cards = cards ?? [],
         playerOrder = playerOrder ?? [];
 
@@ -184,6 +214,7 @@ class Trick {
     'jokerCall': jokerCall.index,
     'jokerCallSuit': jokerCallSuit?.index,
     'jokerLeadSuit': jokerLeadSuit?.index,
+    if (leadIntent != null) 'leadIntent': leadIntent!.index,
   };
 
   factory Trick.fromJson(Map<String, dynamic> json) => Trick(
@@ -196,6 +227,7 @@ class Trick {
     jokerCall: JokerCallType.values[json['jokerCall']],
     jokerCallSuit: json['jokerCallSuit'] != null ? Suit.values[json['jokerCallSuit']] : null,
     jokerLeadSuit: json['jokerLeadSuit'] != null ? Suit.values[json['jokerLeadSuit']] : null,
+    leadIntent: json['leadIntent'] != null ? LeadIntent.values[json['leadIntent']] : null,
   );
 }
 

@@ -2262,6 +2262,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventNonGirudaExhaust => '非将牌消耗';
 
   @override
+  String get trickEventJokerCallDeclared => '小丑召唤宣言';
+
+  @override
   String get trickEventGirudaKExhaustSuccess => 'K消耗成功';
 
   @override

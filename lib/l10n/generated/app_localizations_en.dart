@@ -2307,6 +2307,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventNonGirudaExhaust => 'Non-trump exhausted';
 
   @override
+  String get trickEventJokerCallDeclared => 'Joker Call';
+
+  @override
   String get trickEventGirudaKExhaustSuccess => 'K exhausted';
 
   @override

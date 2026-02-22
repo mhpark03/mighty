@@ -933,6 +933,7 @@ class GameController extends ChangeNotifier {
     final currentPlayer = _state.players[_state.currentPlayer];
     PlayingCard card;
     Suit? jokerLeadSuit;
+    LeadIntent? leadIntent;
 
     // AI 조커 콜 결정 (선공 시에만)
     if (_state.currentTrick != null && _state.currentTrick!.cards.isEmpty) {
@@ -944,7 +945,9 @@ class GameController extends ChangeNotifier {
         // 조커 콜 시 조커 콜 카드를 냄
         card = _state.jokerCall;
       } else {
-        card = _aiPlayer.selectCard(currentPlayer, _state);
+        final selection = _aiPlayer.selectCard(currentPlayer, _state);
+        card = selection.card;
+        leadIntent = selection.intent;
         // 조커 선공 시 무늬 결정
         if (card.isJoker) {
           jokerLeadSuit = _aiPlayer.selectJokerLeadSuit(currentPlayer, _state);
@@ -966,8 +969,13 @@ class GameController extends ChangeNotifier {
           }
         }
       }
+      // Store lead intent
+      if (_state.currentTrick != null && _state.currentTrick!.cards.isEmpty) {
+        _state.currentTrick!.leadIntent = leadIntent;
+      }
     } else {
-      card = _aiPlayer.selectCard(currentPlayer, _state);
+      final selection = _aiPlayer.selectCard(currentPlayer, _state);
+      card = selection.card;
     }
 
     // 트릭 완료 여부 확인을 위해 현재 트릭 수 저장
@@ -1036,6 +1044,11 @@ class GameController extends ChangeNotifier {
       _state.declareJokerCall(jokerCallSuit);
     }
 
+    // 사람 플레이어 의도 추론 (선공 시)
+    if (isLeadingTrick) {
+      _state.currentTrick?.leadIntent = _inferHumanLeadIntent(card, jokerLeadSuit);
+    }
+
     // 트릭 완료 여부 확인을 위해 현재 트릭 수 저장
     final trickCountBefore = _state.tricks.length;
 
@@ -1090,6 +1103,14 @@ class GameController extends ChangeNotifier {
   bool get isLeadingTrick =>
       _state.currentTrick != null && _state.currentTrick!.cards.isEmpty;
 
+  LeadIntent _inferHumanLeadIntent(PlayingCard card, Suit? jokerLeadSuit) {
+    if (card.isJoker) return LeadIntent.jokerLeadSuit;
+    if (card.isMightyWith(_state.giruda)) return LeadIntent.mightyLead;
+    if (_state.giruda != null && card.suit == _state.giruda) return LeadIntent.midGirudaLead;
+    if (_state.currentTrickNumber == 1) return LeadIntent.firstTrickWaste;
+    return LeadIntent.waste;
+  }
+
   // 조커 콜이 가능한지 확인 (첫 트릭이 아니고, 선공이고, 조커가 아직 플레이되지 않은 경우)
   bool get canDeclareJokerCall =>
       _state.currentTrickNumber > 1 &&
@@ -1122,7 +1143,7 @@ class GameController extends ChangeNotifier {
     if (playableCards.length == 1) return playableCards.first;
 
     // AI 로직을 사용하여 추천 카드 선택
-    return _aiPlayer.selectCard(humanPlayer, _state);
+    return _aiPlayer.selectCard(humanPlayer, _state).card;
   }
 
   /// 사용자에게 추천할 배팅을 반환

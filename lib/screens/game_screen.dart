@@ -5553,6 +5553,19 @@ class _GameScreenState extends State<GameScreen> {
     final parts = <String>[];
 
     // Lead card description
+    bool leadDescribed = false;
+    if (trick.leadIntent != null) {
+      final leadDesc = _describeLeadFromIntent(trick, state, l10n);
+      if (leadDesc != null) {
+        parts.add(leadDesc);
+        leadDescribed = true;
+        if (trick.leadIntent == LeadIntent.defenseMightyExhaust ||
+            trick.leadIntent == LeadIntent.midGirudaMightyBait) {
+          mightyExhaustDescribed = true;
+        }
+      }
+    }
+    if (!leadDescribed) {
     if (leadCard.isJoker) {
       const suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
       final declaredSuit = trick.leadSuit;
@@ -5644,7 +5657,7 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
         // Check for high giruda card depletion failure
-        if (!hasMightyInTrick && isAttack(leadId) && giruda != null) {
+        if (isAttack(leadId) && giruda != null) {
           const suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
           final girudaSymbol = suitSymbols[giruda] ?? '';
           // Collect giruda ranks seen up to and including this trick
@@ -5933,6 +5946,12 @@ class _GameScreenState extends State<GameScreen> {
         }
       }
     }
+    } // end if (!leadDescribed)
+
+    // 조커콜 선언
+    if (trick.jokerCall == JokerCallType.jokerCall) {
+      parts.add(l10n.trickEventJokerCallDeclared);
+    }
 
     // Outcome: 기루다 컷 (리드 설명에서 이미 기술된 경우 생략)
     if (!girudaCutDescribed && trick.leadSuit != giruda && giruda != null) {
@@ -5970,8 +5989,9 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
 
-    // Outcome: K/Q 소진 성공 (기루다 K, Q가 비선공으로 출현)
-    if (giruda != null && girudaKInTrick) {
+    // Outcome: K/Q 소진 성공 (기루다 K, Q가 비선공으로 출현, 공격팀 승리 시만)
+    final attackWonTrick = trick.winnerId != null && isAttack(trick.winnerId!);
+    if (giruda != null && girudaKInTrick && attackWonTrick) {
       final kIdx = trick.cards.indexWhere((c) =>
           !c.isJoker && c.suit == giruda && c.rank == Rank.king);
       final qIdx = trick.cards.indexWhere((c) =>
@@ -6126,6 +6146,81 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     return parts.isNotEmpty ? parts.join(' / ') : null;
+  }
+
+  String? _describeLeadFromIntent(Trick trick, GameState state, AppLocalizations l10n) {
+    final intent = trick.leadIntent;
+    if (intent == null) return null;
+
+    final giruda = state.giruda;
+    const suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
+    final declaredSuit = trick.leadSuit;
+    final suitStr = declaredSuit != null ? suitSymbols[declaredSuit] ?? '' : '';
+
+    switch (intent) {
+      case LeadIntent.jokerAfterFriend:
+        return suitStr.isNotEmpty
+            ? l10n.trickEventJokerAfterFriend(suitStr)
+            : l10n.trickEventJokerAfterFriendGeneral;
+      case LeadIntent.jokerLeadSuit:
+        String desc = suitStr.isNotEmpty
+            ? l10n.trickEventJokerLeadSuit(suitStr)
+            : l10n.trickEventJokerLead;
+        if (declaredSuit != null && declaredSuit == giruda) {
+          desc += ' / ${l10n.trickEventJokerGirudaExhaust}';
+        }
+        return desc;
+      case LeadIntent.jokerGirudaExhaust:
+        String desc = suitStr.isNotEmpty
+            ? l10n.trickEventJokerLeadSuit(suitStr)
+            : l10n.trickEventJokerLead;
+        desc += ' / ${l10n.trickEventJokerGirudaExhaust}';
+        return desc;
+      case LeadIntent.mightyLead:
+        return l10n.trickEventMightyLead;
+      case LeadIntent.mightyTrick9:
+        return l10n.trickEventMightyLead;
+      case LeadIntent.topGirudaLead:
+        return l10n.trickEventTopGirudaLead;
+      case LeadIntent.midGirudaMightyBait:
+        return l10n.trickEventMidGirudaMightyBait;
+      case LeadIntent.midGirudaLead:
+        return l10n.trickEventMidGirudaLead;
+      case LeadIntent.midGirudaPassLead:
+        return l10n.trickEventMidGirudaPassLead;
+      case LeadIntent.soleGirudaLeadMaintain:
+        return l10n.trickEventSoleGirudaLeadMaintain;
+      case LeadIntent.lowGirudaFriendPass:
+        return l10n.trickEventMidGirudaPassLead;
+      case LeadIntent.highCardAttack:
+        return l10n.trickEventHighCardAttack;
+      case LeadIntent.topNonGirudaLead:
+        return l10n.trickEventTopNonGirudaLead;
+      case LeadIntent.defenseTopCard:
+        return l10n.trickEventDefenseTopCardDefend;
+      case LeadIntent.firstTrickMightyBait:
+        return l10n.trickEventFirstTrickMightyBait;
+      case LeadIntent.firstTrickFriendBait:
+        return l10n.trickEventFirstTrickFriendBait;
+      case LeadIntent.firstTrickWaste:
+        return l10n.trickEventFirstTrickWaste;
+      case LeadIntent.declarerFriendLure:
+        return l10n.trickEventDeclarerFriendLure;
+      case LeadIntent.defenseMightyExhaust:
+        return l10n.trickEventDefenseMightyExhaust;
+      case LeadIntent.friendVoidPass:
+        return l10n.trickEventWaste;
+      case LeadIntent.friendTopCardLead:
+        return l10n.trickEventTopNonGirudaLead;
+      case LeadIntent.defenseJokerLead:
+        return l10n.trickEventJokerLead;
+      case LeadIntent.defenseHighCard:
+        return l10n.trickEventDefenseTopCardDefend;
+      case LeadIntent.defenseLowCard:
+        return l10n.trickEventWaste;
+      case LeadIntent.waste:
+        return l10n.trickEventWaste;
+    }
   }
 
   Widget _buildTrickDetailsScreen(GameController controller) {

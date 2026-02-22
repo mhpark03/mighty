@@ -1067,6 +1067,7 @@
   "trickEventDefenseGirudaCut": "守備切り札カット",
   "trickEventAttackNoGirudaDefenseHas": "攻撃側切り札枯渇 / 守備のみ切り札保有",
   "trickEventNonGirudaExhaust": "非切り札消耗",
+  "trickEventJokerCallDeclared": "ジョーカーコール宣言",
   "trickEventGirudaKExhaustSuccess": "K消耗成功",
   "trickEventGirudaKQExhaustSuccess": "K/Q同時消耗 大成功",
   "trickEventDefenseJokerRunBlock": "守備ジョーカーでラン阻止",

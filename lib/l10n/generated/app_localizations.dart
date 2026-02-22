@@ -4018,6 +4018,12 @@ abstract class AppLocalizations {
   /// **'비기루다 소진'**
   String get trickEventNonGirudaExhaust;
 
+  /// No description provided for @trickEventJokerCallDeclared.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커콜 선언'**
+  String get trickEventJokerCallDeclared;
+
   /// No description provided for @trickEventGirudaKExhaustSuccess.
   ///
   /// In ko, this message translates to:

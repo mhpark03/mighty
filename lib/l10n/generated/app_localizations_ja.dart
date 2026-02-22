@@ -2269,6 +2269,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventNonGirudaExhaust => '非切り札消耗';
 
   @override
+  String get trickEventJokerCallDeclared => 'ジョーカーコール宣言';
+
+  @override
   String get trickEventGirudaKExhaustSuccess => 'K消耗成功';
 
   @override

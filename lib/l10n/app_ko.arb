@@ -1227,6 +1227,7 @@
   "trickEventDefenseGirudaCut": "수비 기루다 컷",
   "trickEventAttackNoGirudaDefenseHas": "공격팀 기루다 소진 / 수비만 기루다 보유",
   "trickEventNonGirudaExhaust": "비기루다 소진",
+  "trickEventJokerCallDeclared": "조커콜 선언",
   "trickEventGirudaKExhaustSuccess": "K 소진 성공",
   "trickEventGirudaKQExhaustSuccess": "K/Q 동시 소진 대성공",
   "trickEventDefenseJokerRunBlock": "수비 조커 런 저지",

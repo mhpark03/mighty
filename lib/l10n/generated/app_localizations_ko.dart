@@ -2275,6 +2275,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventNonGirudaExhaust => '비기루다 소진';
 
   @override
+  String get trickEventJokerCallDeclared => '조커콜 선언';
+
+  @override
   String get trickEventGirudaKExhaustSuccess => 'K 소진 성공';
 
   @override

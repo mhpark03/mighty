@@ -1067,6 +1067,7 @@
   "trickEventDefenseGirudaCut": "守方将牌切入",
   "trickEventAttackNoGirudaDefenseHas": "进攻方将牌耗尽 / 仅守方持有将牌",
   "trickEventNonGirudaExhaust": "非将牌消耗",
+  "trickEventJokerCallDeclared": "小丑召唤宣言",
   "trickEventGirudaKExhaustSuccess": "K消耗成功",
   "trickEventGirudaKQExhaustSuccess": "K/Q同时消耗 大成功",
   "trickEventDefenseJokerRunBlock": "守方Joker阻止全胜",
