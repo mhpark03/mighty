@@ -3640,6 +3640,102 @@ abstract class AppLocalizations {
   /// **'총평: {wins}승{losses}패 {points}/{bid}점 대패'**
   String trickEventSummaryBigLoss(int wins, int losses, int points, int bid);
 
+  /// No description provided for @summaryJokerCounter.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} 조커 반격'**
+  String summaryJokerCounter(String name);
+
+  /// No description provided for @summaryJokerUse.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} 조커 활용'**
+  String summaryJokerUse(String name);
+
+  /// No description provided for @summaryWasteExploit.
+  ///
+  /// In ko, this message translates to:
+  /// **'물패 공략 성공'**
+  String get summaryWasteExploit;
+
+  /// No description provided for @summaryTrumpDominate.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 지배'**
+  String get summaryTrumpDominate;
+
+  /// No description provided for @summaryFriendContrib.
+  ///
+  /// In ko, this message translates to:
+  /// **'{name} 프렌드 활약'**
+  String summaryFriendContrib(String name);
+
+  /// No description provided for @summaryLateDefense.
+  ///
+  /// In ko, this message translates to:
+  /// **'후반 점수 방어'**
+  String get summaryLateDefense;
+
+  /// No description provided for @summaryDefenseCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 기루다 컷'**
+  String get summaryDefenseCut;
+
+  /// No description provided for @summaryMightyImpact.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 활용'**
+  String get summaryMightyImpact;
+
+  /// No description provided for @summaryNarrative.
+  ///
+  /// In ko, this message translates to:
+  /// **'총평: {events} → {points}/{bid}점 {result}'**
+  String summaryNarrative(String events, int points, int bid, String result);
+
+  /// No description provided for @summaryResultBigWin.
+  ///
+  /// In ko, this message translates to:
+  /// **'대승'**
+  String get summaryResultBigWin;
+
+  /// No description provided for @summaryResultWin.
+  ///
+  /// In ko, this message translates to:
+  /// **'승리'**
+  String get summaryResultWin;
+
+  /// No description provided for @summaryResultNarrowLoss.
+  ///
+  /// In ko, this message translates to:
+  /// **'석패'**
+  String get summaryResultNarrowLoss;
+
+  /// No description provided for @summaryResultBigLoss.
+  ///
+  /// In ko, this message translates to:
+  /// **'대패'**
+  String get summaryResultBigLoss;
+
+  /// No description provided for @summaryAnd.
+  ///
+  /// In ko, this message translates to:
+  /// **'과 '**
+  String get summaryAnd;
+
+  /// No description provided for @summaryFallback.
+  ///
+  /// In ko, this message translates to:
+  /// **'총평: {wins}승{losses}패 → {points}/{bid}점 {result}'**
+  String summaryFallback(
+    int wins,
+    int losses,
+    int points,
+    int bid,
+    String result,
+  );
+
   /// No description provided for @trickEventLastCardDefenseWin.
   ///
   /// In ko, this message translates to:
@@ -3687,6 +3783,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'기루다 최상위 선공'**
   String get trickEventTopGirudaLead;
+
+  /// No description provided for @trickEventTopGirudaLeadOpponentExhausted.
+  ///
+  /// In ko, this message translates to:
+  /// **'상대 기루다 소진 → 비기루다 공략, 기루다는 간용 보존'**
+  String get trickEventTopGirudaLeadOpponentExhausted;
 
   /// No description provided for @trickEventMidGirudaMightyBait.
   ///
@@ -3837,6 +3939,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'프렌드 선공 → 수비 역전 → 주공 기루다 컷 재역전'**
   String get trickEventFriendLeadDefenseBeatDeclarerCut;
+
+  /// No description provided for @trickEventDeclarerFriendLure.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 유도'**
+  String get trickEventDeclarerFriendLure;
+
+  /// No description provided for @trickEventDeclarerFriendLureFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 유도 실패'**
+  String get trickEventDeclarerFriendLureFailed;
 
   /// No description provided for @trickEventWasteFriendRescue.
   ///

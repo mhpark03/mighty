@@ -2030,6 +2030,67 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String summaryJokerCounter(String name) {
+    return '$name小丑反击';
+  }
+
+  @override
+  String summaryJokerUse(String name) {
+    return '$name小丑发挥';
+  }
+
+  @override
+  String get summaryWasteExploit => '弃牌攻略成功';
+
+  @override
+  String get summaryTrumpDominate => '将牌支配';
+
+  @override
+  String summaryFriendContrib(String name) {
+    return '$name朋友活跃';
+  }
+
+  @override
+  String get summaryLateDefense => '后半得分防御';
+
+  @override
+  String get summaryDefenseCut => '守方将牌切入';
+
+  @override
+  String get summaryMightyImpact => 'Mighty发挥';
+
+  @override
+  String summaryNarrative(String events, int points, int bid, String result) {
+    return '总评: $events → $points/$bid分 $result';
+  }
+
+  @override
+  String get summaryResultBigWin => '大胜';
+
+  @override
+  String get summaryResultWin => '胜利';
+
+  @override
+  String get summaryResultNarrowLoss => '惜败';
+
+  @override
+  String get summaryResultBigLoss => '大败';
+
+  @override
+  String get summaryAnd => '与';
+
+  @override
+  String summaryFallback(
+    int wins,
+    int losses,
+    int points,
+    int bid,
+    String result,
+  ) {
+    return '总评: $wins胜$losses负 → $points/$bid分 $result';
+  }
+
+  @override
   String trickEventLastCardDefenseWin(int count) {
     return '守方高牌$count分防御';
   }
@@ -2060,6 +2121,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickEventTopGirudaLead => '将牌最高首攻';
+
+  @override
+  String get trickEventTopGirudaLeadOpponentExhausted =>
+      '对方无将牌 → 出非将牌攻略，将牌留作切入用';
 
   @override
   String get trickEventMidGirudaMightyBait => '中位将牌诱导Mighty';
@@ -2151,6 +2216,12 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get trickEventFriendLeadDefenseBeatDeclarerCut =>
       '朋友先攻 → 守方逆转 → 庄家将牌再逆转';
+
+  @override
+  String get trickEventDeclarerFriendLure => '朋友诱导';
+
+  @override
+  String get trickEventDeclarerFriendLureFailed => '朋友诱导失败';
 
   @override
   String get trickEventWasteFriendRescue => '弃牌 → 朋友救场!';

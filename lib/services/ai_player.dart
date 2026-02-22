@@ -4005,15 +4005,14 @@ class AIPlayer {
             return jokerForLead.first;
           }
 
-          // (C) 기루다 연속 승리: winCards > D (승리 여유)
-          // 충분히 이기므로 기루다 먼저, 물패는 후반
-          if (winCards > dCount && myGirudaForLead.isNotEmpty) {
+          // (C-trick9) 트릭 9: 트릭 10 선공권 확보를 위해 기루다 우선 (조커 보유 시 제외)
+          if (state.currentTrickNumber == 9 && myGirudaForLead.isNotEmpty && !hasJokerForLead) {
             myGirudaForLead.sort((a, b) => a.rankValue.compareTo(b.rankValue));
             return myGirudaForLead.first;
           }
 
-          // (C-2) 비기루다 최상위 카드 우선: 상대 기루다 소진 → 컷 불가 → 확정 승리
-          // 물패 전략(D)보다 우선: 비기루다 최상위 카드는 확정 승리이므로 먼저 사용
+          // (C) 비기루다 최상위 카드 우선: 상대 기루다 소진 → 컷 불가 → 확정 승리
+          // 기루다는 간용으로 보존, 비기루다 최상위로 점수 공략
           // 예: ♣J가 클로버 최상위(A,K,Q 소진)이면 ♣4(물패) 대신 ♣J 선공
           {
             final topNonGiruda = nonGirudaDump.where((c) =>
@@ -4029,6 +4028,12 @@ class AIPlayer {
               });
               return topNonGiruda.first;
             }
+          }
+
+          // (C-2) 기루다 연속 승리: 비기루다 최상위 없으면 기루다로 승리
+          if (winCards > dCount && myGirudaForLead.isNotEmpty) {
+            myGirudaForLead.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            return myGirudaForLead.first;
           }
 
           // (D) 물패/기루다 교대: D ≥ 2 AND (G ≥ 2 OR (G ≥ 1 AND voidSuits ≥ 1))

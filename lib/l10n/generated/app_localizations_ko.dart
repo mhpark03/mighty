@@ -2043,6 +2043,67 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String summaryJokerCounter(String name) {
+    return '$name 조커 반격';
+  }
+
+  @override
+  String summaryJokerUse(String name) {
+    return '$name 조커 활용';
+  }
+
+  @override
+  String get summaryWasteExploit => '물패 공략 성공';
+
+  @override
+  String get summaryTrumpDominate => '기루다 지배';
+
+  @override
+  String summaryFriendContrib(String name) {
+    return '$name 프렌드 활약';
+  }
+
+  @override
+  String get summaryLateDefense => '후반 점수 방어';
+
+  @override
+  String get summaryDefenseCut => '수비 기루다 컷';
+
+  @override
+  String get summaryMightyImpact => '마이티 활용';
+
+  @override
+  String summaryNarrative(String events, int points, int bid, String result) {
+    return '총평: $events → $points/$bid점 $result';
+  }
+
+  @override
+  String get summaryResultBigWin => '대승';
+
+  @override
+  String get summaryResultWin => '승리';
+
+  @override
+  String get summaryResultNarrowLoss => '석패';
+
+  @override
+  String get summaryResultBigLoss => '대패';
+
+  @override
+  String get summaryAnd => '과 ';
+
+  @override
+  String summaryFallback(
+    int wins,
+    int losses,
+    int points,
+    int bid,
+    String result,
+  ) {
+    return '총평: $wins승$losses패 → $points/$bid점 $result';
+  }
+
+  @override
   String trickEventLastCardDefenseWin(int count) {
     return '수비 상위 카드 $count점 방어';
   }
@@ -2073,6 +2134,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trickEventTopGirudaLead => '기루다 최상위 선공';
+
+  @override
+  String get trickEventTopGirudaLeadOpponentExhausted =>
+      '상대 기루다 소진 → 비기루다 공략, 기루다는 간용 보존';
 
   @override
   String get trickEventMidGirudaMightyBait => '기루다 중간으로 마이티 유도';
@@ -2164,6 +2229,12 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get trickEventFriendLeadDefenseBeatDeclarerCut =>
       '프렌드 선공 → 수비 역전 → 주공 기루다 컷 재역전';
+
+  @override
+  String get trickEventDeclarerFriendLure => '프렌드 유도';
+
+  @override
+  String get trickEventDeclarerFriendLureFailed => '프렌드 유도 실패';
 
   @override
   String get trickEventWasteFriendRescue => '물패 → 프렌드 기사회생!';

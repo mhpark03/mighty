@@ -237,21 +237,119 @@ class MightyTrackingService {
         lastParts.add('공격 패배 확정');
       }
 
-      // 총평
+      // 총평 - 이벤트 기반
       final attackTrickWins = state.tricks.where((t) => t.winnerId != null && isAttack(t.winnerId!)).length;
       final defenseTrickWins = 10 - attackTrickWins;
       if (attackTrickWins == 10) {
         lastParts.add('총평: 전승 런 $attackPoints/${bidTricks}점 대승');
       } else if (defenseTrickWins == 10) {
         lastParts.add('총평: 전패 백런 0/${bidTricks}점 완패');
-      } else if (attackWins && attackPoints >= bidTricks + 5) {
-        lastParts.add('총평: ${attackTrickWins}승${defenseTrickWins}패 $attackPoints/${bidTricks}점 대승');
-      } else if (attackWins) {
-        lastParts.add('총평: ${attackTrickWins}승${defenseTrickWins}패 $attackPoints/${bidTricks}점 승리');
-      } else if (attackPoints >= bidTricks - 3) {
-        lastParts.add('총평: ${attackTrickWins}승${defenseTrickWins}패 $attackPoints/${bidTricks}점 석패');
       } else {
-        lastParts.add('총평: ${attackTrickWins}승${defenseTrickWins}패 $attackPoints/${bidTricks}점 대패');
+        final keyEvents = <String>[];
+
+        // 1. 조커 활용/반격
+        for (final t in state.tricks) {
+          for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+            if (t.cards[i].isJoker && t.winnerId == t.playerOrder[i]) {
+              final name = t.playerOrder[i] >= 0 && t.playerOrder[i] < _playerNamesKo.length ? _playerNamesKo[t.playerOrder[i]] : '?';
+              if (isAttack(t.playerOrder[i])) {
+                keyEvents.add('$name 조커 활용');
+              } else {
+                keyEvents.add('$name 조커 반격');
+              }
+              break;
+            }
+          }
+          if (keyEvents.isNotEmpty) break;
+        }
+
+        // 2. 수비 물패 공략 (공격 비기루다 비최상위 선공 → 수비 승리)
+        if (!attackWins) {
+          int defWasteWins = 0;
+          for (final t in state.tricks) {
+            if (t.winnerId == null) continue;
+            final tLead = t.leadPlayerId;
+            if (!isAttack(tLead) || isAttack(t.winnerId!)) continue;
+            final tLeadIdx = t.playerOrder.indexOf(tLead);
+            if (tLeadIdx < 0 || tLeadIdx >= t.cards.length) continue;
+            final tLeadCard = t.cards[tLeadIdx];
+            if (!tLeadCard.isJoker && !isMighty(tLeadCard) && tLeadCard.suit != giruda) {
+              defWasteWins++;
+            }
+          }
+          if (defWasteWins >= 2) keyEvents.add('물패 공략 성공');
+        }
+
+        // 3. 기루다 지배 (공격 기루다 승리 3회 이상)
+        if (attackWins && giruda != null) {
+          int girudaWins = 0;
+          for (final t in state.tricks) {
+            if (t.winnerId == null || !isAttack(t.winnerId!)) continue;
+            final winIdx = t.playerOrder.indexOf(t.winnerId!);
+            if (winIdx >= 0 && winIdx < t.cards.length && isGiruda(t.cards[winIdx])) girudaWins++;
+          }
+          if (girudaWins >= 3) keyEvents.add('기루다 지배');
+        }
+
+        // 4. 프렌드 활약 (2승 이상)
+        if (state.friendId != null && state.friendId != state.declarerId) {
+          final friendWins = state.tricks.where((t) => t.winnerId == state.friendId).length;
+          if (friendWins >= 2) {
+            final friendName = state.friendId! >= 0 && state.friendId! < _playerNamesKo.length ? _playerNamesKo[state.friendId!] : '?';
+            keyEvents.add('$friendName 프렌드 활약');
+          }
+        }
+
+        // 5. 후반 점수 방어 (7-10트릭 중 수비 3승 이상)
+        if (!attackWins) {
+          final lateDefWins = state.tricks.where((t) =>
+              t.trickNumber >= 7 && t.winnerId != null && !isAttack(t.winnerId!)).length;
+          if (lateDefWins >= 3) keyEvents.add('후반 점수 방어');
+        }
+
+        // 6. 수비 기루다 컷 (2회 이상)
+        if (!attackWins && giruda != null) {
+          int defCutCount = 0;
+          for (final t in state.tricks) {
+            if (t.winnerId == null || isAttack(t.winnerId!)) continue;
+            final winIdx = t.playerOrder.indexOf(t.winnerId!);
+            if (winIdx >= 0 && winIdx < t.cards.length) {
+              final wc = t.cards[winIdx];
+              if (isGiruda(wc) && t.leadSuit != giruda) defCutCount++;
+            }
+          }
+          if (defCutCount >= 2) keyEvents.add('수비 기루다 컷');
+        }
+
+        // 7. 마이티 활용 (마이티 트릭에서 공격 3점 이상 획득)
+        if (attackWins) {
+          for (final t in state.tricks) {
+            if (t.winnerId == null || !isAttack(t.winnerId!)) continue;
+            final hasMightyCard = t.cards.any((c) => isMighty(c));
+            if (hasMightyCard) {
+              final pts = t.cards.where((c) => !c.isJoker && c.isPointCard).length;
+              if (pts >= 3) { keyEvents.add('마이티 활용'); break; }
+            }
+          }
+        }
+
+        // 결과 라벨
+        final resultLabel = attackWins && attackPoints >= bidTricks + 5
+            ? '대승'
+            : attackWins
+                ? '승리'
+                : attackPoints >= bidTricks - 3
+                    ? '석패'
+                    : '대패';
+
+        if (keyEvents.isNotEmpty) {
+          final events = keyEvents.length >= 2
+              ? '${keyEvents[0]}과 ${keyEvents[1]}'
+              : keyEvents[0];
+          lastParts.add('총평: $events → $attackPoints/${bidTricks}점 $resultLabel');
+        } else {
+          lastParts.add('총평: ${attackTrickWins}승${defenseTrickWins}패 → $attackPoints/${bidTricks}점 $resultLabel');
+        }
       }
 
       return lastParts.join(' / ');
@@ -343,6 +441,21 @@ class MightyTrackingService {
       final isTop = leadCard.rankValue >= 14 || isTopOfSuit(leadCard.suit!, leadCard.rankValue);
       if (isTop) {
         parts.add('기루다 최상위 선공');
+        // 상대 기루다 소진 시: 비기루다 공략, 기루다는 간용 보존
+        {
+          bool noOpponentGiruda = true;
+          for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+            if (i == leadIdx) continue;
+            if (isAttack(trick.playerOrder[i]) != isAttack(leadId) &&
+                !trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
+              noOpponentGiruda = false;
+              break;
+            }
+          }
+          if (noOpponentGiruda) {
+            parts.add('상대 기루다 소진 → 비기루다 공략, 기루다는 간용 보존');
+          }
+        }
       } else {
         if (hasMightyInTrick) {
           if (isAutoPlay && isDeclarerLead && topRemainingGirudaStr != null) {
@@ -506,6 +619,40 @@ class MightyTrackingService {
           }
         }
 
+        // 주공 프렌드 유도
+        bool isDeclarerFriendLure = false;
+        if (leadId == state.declarerId && state.friendDeclaration?.card != null) {
+          final fCard = state.friendDeclaration!.card!;
+          final fSuit = fCard.isJoker ? null : fCard.suit;
+          if (fSuit != null && leadCard.suit == fSuit) {
+            bool friendCardInTrick = false;
+            for (int i = 0; i < trick.cards.length; i++) {
+              if (i == leadIdx) continue;
+              final c = trick.cards[i];
+              if (!c.isJoker && c.suit == fCard.suit && c.rank == fCard.rank) {
+                friendCardInTrick = true;
+                break;
+              }
+            }
+            if (friendCardInTrick) {
+              bool alreadyRevealed = false;
+              for (final t in state.tricks) {
+                if (t.trickNumber >= trick.trickNumber) break;
+                for (final c in t.cards) {
+                  if (!fCard.isJoker && !c.isJoker && c.suit == fCard.suit && c.rank == fCard.rank) {
+                    alreadyRevealed = true;
+                    break;
+                  }
+                }
+                if (alreadyRevealed) break;
+              }
+              if (!alreadyRevealed) {
+                isDeclarerFriendLure = true;
+              }
+            }
+          }
+        }
+
         // 프렌드 물패 → 주공 기루다 컷 시도 → 수비 기루다 재역전
         bool isFriendWasteDeclarerCutDefenseOvercut = false;
         if (isAttack(leadId) && leadId != state.declarerId &&
@@ -547,7 +694,13 @@ class MightyTrackingService {
           }
         }
 
-        if (isFriendWasteDeclarerCutDefenseOvercut) {
+        if (isDeclarerFriendLure) {
+          if (trick.winnerId != null && isAttack(trick.winnerId!)) {
+            parts.add('프렌드 유도');
+          } else {
+            parts.add('프렌드 유도 실패');
+          }
+        } else if (isFriendWasteDeclarerCutDefenseOvercut) {
           final ptCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
           if (ptCount > 0) {
             parts.add('프렌드 물패 → 주공 기루다 컷 → 수비 기루다 재역전 ${ptCount}점 방어');

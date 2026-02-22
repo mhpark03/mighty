@@ -2066,6 +2066,67 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String summaryJokerCounter(String name) {
+    return '$name\'s Joker counter';
+  }
+
+  @override
+  String summaryJokerUse(String name) {
+    return '$name\'s Joker play';
+  }
+
+  @override
+  String get summaryWasteExploit => 'Waste exploit success';
+
+  @override
+  String get summaryTrumpDominate => 'Trump domination';
+
+  @override
+  String summaryFriendContrib(String name) {
+    return '$name friend MVP';
+  }
+
+  @override
+  String get summaryLateDefense => 'Late-game defense';
+
+  @override
+  String get summaryDefenseCut => 'Defense trump cuts';
+
+  @override
+  String get summaryMightyImpact => 'Mighty impact';
+
+  @override
+  String summaryNarrative(String events, int points, int bid, String result) {
+    return 'Review: $events → $points/${bid}pts $result';
+  }
+
+  @override
+  String get summaryResultBigWin => 'dominant win';
+
+  @override
+  String get summaryResultWin => 'victory';
+
+  @override
+  String get summaryResultNarrowLoss => 'narrow loss';
+
+  @override
+  String get summaryResultBigLoss => 'big loss';
+
+  @override
+  String get summaryAnd => ' & ';
+
+  @override
+  String summaryFallback(
+    int wins,
+    int losses,
+    int points,
+    int bid,
+    String result,
+  ) {
+    return 'Review: ${wins}W${losses}L → $points/${bid}pts $result';
+  }
+
+  @override
   String trickEventLastCardDefenseWin(int count) {
     return 'Defense higher card ${count}pt guard';
   }
@@ -2096,6 +2157,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trickEventTopGirudaLead => 'Top trump lead';
+
+  @override
+  String get trickEventTopGirudaLeadOpponentExhausted =>
+      'Opponents out of trumps → lead non-trump, save trump for cutting';
 
   @override
   String get trickEventMidGirudaMightyBait => 'Mid trump to bait Mighty';
@@ -2193,6 +2258,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get trickEventFriendLeadDefenseBeatDeclarerCut =>
       'Friend lead → Defense beats → Declarer trump cut reversal';
+
+  @override
+  String get trickEventDeclarerFriendLure => 'Friend lure';
+
+  @override
+  String get trickEventDeclarerFriendLureFailed => 'Friend lure failed';
 
   @override
   String get trickEventWasteFriendRescue => 'Waste → Friend rescue!';

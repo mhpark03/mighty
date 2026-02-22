@@ -1367,24 +1367,20 @@ class _GameScreenState extends State<GameScreen> {
               Suit.spade => '♠', Suit.heart => '♥',
               Suit.diamond => '♦', Suit.club => '♣', _ => ''
             };
-            final suitColor = _getSuitColorOnDark(suit!);
+            final suitColor = _getSuitColorForInfo(suit!);
 
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: isCurrent
-                    ? Colors.teal[800]!.withValues(alpha: 0.5)
-                    : isBest
-                        ? Colors.amber[800]!.withValues(alpha: 0.3)
-                        : Colors.black26,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
                   color: isCurrent
                       ? Colors.teal[400]!
                       : isBest
-                          ? Colors.amber[400]!
-                          : Colors.white24,
-                  width: isCurrent || isBest ? 1.5 : 0.5,
+                          ? Colors.amber[600]!
+                          : Colors.grey[300]!,
+                  width: isCurrent || isBest ? 2 : 1,
                 ),
               ),
               child: Column(
@@ -1397,20 +1393,20 @@ class _GameScreenState extends State<GameScreen> {
                       if (isCurrent)
                         Padding(
                           padding: const EdgeInsets.only(left: 2),
-                          child: Icon(Icons.check_circle, color: Colors.teal[300], size: 12),
+                          child: Icon(Icons.check_circle, color: Colors.teal[600], size: 12),
                         ),
                       if (isBest)
                         Padding(
                           padding: const EdgeInsets.only(left: 2),
-                          child: Icon(Icons.star, color: Colors.amber[400], size: 12),
+                          child: Icon(Icons.star, color: Colors.amber[700], size: 12),
                         ),
                     ],
                   ),
-                  Text('$min~$max', style: TextStyle(color: Colors.grey[400], fontSize: 10)),
+                  Text('$min~$max', style: TextStyle(color: Colors.grey[600], fontSize: 10)),
                   Text(
                     '$optimal점',
                     style: TextStyle(
-                      color: isCurrent ? Colors.teal[200] : isBest ? Colors.amber[200] : Colors.white70,
+                      color: isCurrent ? Colors.teal[700] : isBest ? Colors.amber[800] : Colors.grey[800],
                       fontSize: 13,
                       fontWeight: isCurrent || isBest ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -5353,21 +5349,119 @@ class _GameScreenState extends State<GameScreen> {
         lastParts.add(l10n.trickEventGameDefeat);
       }
 
-      // 총평
+      // 총평 - 이벤트 기반
       final attackTrickWins = state.tricks.where((t) => t.winnerId != null && isAttack(t.winnerId!)).length;
       final defenseTrickWins = 10 - attackTrickWins;
       if (attackTrickWins == 10) {
         lastParts.add(l10n.trickEventSummaryRun(attackPoints, bidTricks));
       } else if (defenseTrickWins == 10) {
         lastParts.add(l10n.trickEventSummaryBackRun(bidTricks));
-      } else if (attackWins && attackPoints >= bidTricks + 5) {
-        lastParts.add(l10n.trickEventSummaryBigWin(attackTrickWins, defenseTrickWins, attackPoints, bidTricks));
-      } else if (attackWins) {
-        lastParts.add(l10n.trickEventSummaryWin(attackTrickWins, defenseTrickWins, attackPoints, bidTricks));
-      } else if (attackPoints >= bidTricks - 3) {
-        lastParts.add(l10n.trickEventSummaryNarrowLoss(attackTrickWins, defenseTrickWins, attackPoints, bidTricks));
       } else {
-        lastParts.add(l10n.trickEventSummaryBigLoss(attackTrickWins, defenseTrickWins, attackPoints, bidTricks));
+        final keyEvents = <String>[];
+
+        // 1. 조커 활용/반격
+        for (final t in state.tricks) {
+          for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+            if (t.cards[i].isJoker && t.winnerId == t.playerOrder[i]) {
+              final name = _getLocalizedPlayerName(state.players[t.playerOrder[i]], l10n);
+              if (isAttack(t.playerOrder[i])) {
+                keyEvents.add(l10n.summaryJokerUse(name));
+              } else {
+                keyEvents.add(l10n.summaryJokerCounter(name));
+              }
+              break;
+            }
+          }
+          if (keyEvents.isNotEmpty) break;
+        }
+
+        // 2. 수비 물패 공략 (공격 비기루다 비최상위 선공 → 수비 승리)
+        if (!attackWins) {
+          int defWasteWins = 0;
+          for (final t in state.tricks) {
+            if (t.winnerId == null) continue;
+            final tLead = t.leadPlayerId;
+            if (!isAttack(tLead) || isAttack(t.winnerId!)) continue;
+            final tLeadIdx = t.playerOrder.indexOf(tLead);
+            if (tLeadIdx < 0 || tLeadIdx >= t.cards.length) continue;
+            final tLeadCard = t.cards[tLeadIdx];
+            if (!tLeadCard.isJoker && !isMighty(tLeadCard) && tLeadCard.suit != giruda) {
+              defWasteWins++;
+            }
+          }
+          if (defWasteWins >= 2) keyEvents.add(l10n.summaryWasteExploit);
+        }
+
+        // 3. 기루다 지배 (공격 기루다 승리 3회 이상)
+        if (attackWins && giruda != null) {
+          int girudaWins = 0;
+          for (final t in state.tricks) {
+            if (t.winnerId == null || !isAttack(t.winnerId!)) continue;
+            final winIdx = t.playerOrder.indexOf(t.winnerId!);
+            if (winIdx >= 0 && winIdx < t.cards.length && isGiruda(t.cards[winIdx])) girudaWins++;
+          }
+          if (girudaWins >= 3) keyEvents.add(l10n.summaryTrumpDominate);
+        }
+
+        // 4. 프렌드 활약 (2승 이상)
+        if (state.friendId != null && state.friendId != state.declarerId) {
+          final friendWins = state.tricks.where((t) => t.winnerId == state.friendId).length;
+          if (friendWins >= 2) {
+            keyEvents.add(l10n.summaryFriendContrib(
+                _getLocalizedPlayerName(state.players[state.friendId!], l10n)));
+          }
+        }
+
+        // 5. 후반 점수 방어 (7-10트릭 중 수비 3승 이상)
+        if (!attackWins) {
+          final lateDefWins = state.tricks.where((t) =>
+              t.trickNumber >= 7 && t.winnerId != null && !isAttack(t.winnerId!)).length;
+          if (lateDefWins >= 3) keyEvents.add(l10n.summaryLateDefense);
+        }
+
+        // 6. 수비 기루다 컷 (2회 이상)
+        if (!attackWins && giruda != null) {
+          int defCutCount = 0;
+          for (final t in state.tricks) {
+            if (t.winnerId == null || isAttack(t.winnerId!)) continue;
+            final winIdx = t.playerOrder.indexOf(t.winnerId!);
+            if (winIdx >= 0 && winIdx < t.cards.length) {
+              final wc = t.cards[winIdx];
+              if (isGiruda(wc) && t.leadSuit != giruda) defCutCount++;
+            }
+          }
+          if (defCutCount >= 2) keyEvents.add(l10n.summaryDefenseCut);
+        }
+
+        // 7. 마이티 활용 (마이티 트릭에서 공격 3점 이상 획득)
+        if (attackWins) {
+          for (final t in state.tricks) {
+            if (t.winnerId == null || !isAttack(t.winnerId!)) continue;
+            final hasMighty = t.cards.any((c) => isMighty(c));
+            if (hasMighty) {
+              final pts = t.cards.where((c) => !c.isJoker && c.isPointCard).length;
+              if (pts >= 3) { keyEvents.add(l10n.summaryMightyImpact); break; }
+            }
+          }
+        }
+
+        // 결과 라벨
+        final result = attackWins && attackPoints >= bidTricks + 5
+            ? l10n.summaryResultBigWin
+            : attackWins
+                ? l10n.summaryResultWin
+                : attackPoints >= bidTricks - 3
+                    ? l10n.summaryResultNarrowLoss
+                    : l10n.summaryResultBigLoss;
+
+        if (keyEvents.isNotEmpty) {
+          final events = keyEvents.length >= 2
+              ? '${keyEvents[0]}${l10n.summaryAnd}${keyEvents[1]}'
+              : keyEvents[0];
+          lastParts.add(l10n.summaryNarrative(events, attackPoints, bidTricks, result));
+        } else {
+          lastParts.add(l10n.summaryFallback(attackTrickWins, defenseTrickWins, attackPoints, bidTricks, result));
+        }
       }
 
       return lastParts.join(' / ');
@@ -5463,6 +5557,21 @@ class _GameScreenState extends State<GameScreen> {
       final isTop = leadCard.rankValue >= 14 || isTopOfSuit(leadCard.suit!, leadCard.rankValue);
       if (isTop) {
         parts.add(l10n.trickEventTopGirudaLead);
+        // 상대 기루다 소진 시: 비기루다 공략, 기루다는 간용 보존
+        {
+          bool noOpponentGiruda = true;
+          for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+            if (i == leadIdx) continue;
+            if (isAttack(trick.playerOrder[i]) != isAttack(leadId) &&
+                !trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
+              noOpponentGiruda = false;
+              break;
+            }
+          }
+          if (noOpponentGiruda) {
+            parts.add(l10n.trickEventTopGirudaLeadOpponentExhausted);
+          }
+        }
       } else {
         if (hasMightyInTrick) {
           if (isAutoPlay && isDeclarerLead && topRemainingGirudaStr != null) {
@@ -5643,6 +5752,40 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
+        // 주공 프렌드 유도: 주공이 프렌드 카드 무늬에 저카드 선공 → 프렌드 카드 등장
+        bool isDeclarerFriendLure = false;
+        if (leadId == state.declarerId && state.friendDeclaration?.card != null) {
+          final fCard = state.friendDeclaration!.card!;
+          final fSuit = fCard.isJoker ? null : fCard.suit;
+          if (fSuit != null && leadCard.suit == fSuit) {
+            bool friendCardInTrick = false;
+            for (int i = 0; i < trick.cards.length; i++) {
+              if (i == leadIdx) continue;
+              final c = trick.cards[i];
+              if (!c.isJoker && c.suit == fCard.suit && c.rank == fCard.rank) {
+                friendCardInTrick = true;
+                break;
+              }
+            }
+            if (friendCardInTrick) {
+              bool alreadyRevealed = false;
+              for (final t in state.tricks) {
+                if (t.trickNumber >= trick.trickNumber) break;
+                for (final c in t.cards) {
+                  if (!fCard.isJoker && !c.isJoker && c.suit == fCard.suit && c.rank == fCard.rank) {
+                    alreadyRevealed = true;
+                    break;
+                  }
+                }
+                if (alreadyRevealed) break;
+              }
+              if (!alreadyRevealed) {
+                isDeclarerFriendLure = true;
+              }
+            }
+          }
+        }
+
         // 프렌드 물패 → 주공 기루다 컷 시도 → 수비 기루다 재역전
         bool isFriendWasteDeclarerCutDefenseOvercut = false;
         if (isAttack(leadId) && leadId != state.declarerId &&
@@ -5688,7 +5831,13 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
-        if (isFriendWasteDeclarerCutDefenseOvercut) {
+        if (isDeclarerFriendLure) {
+          if (trick.winnerId != null && isAttack(trick.winnerId!)) {
+            parts.add(l10n.trickEventDeclarerFriendLure);
+          } else {
+            parts.add(l10n.trickEventDeclarerFriendLureFailed);
+          }
+        } else if (isFriendWasteDeclarerCutDefenseOvercut) {
           final ptCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
           if (ptCount > 0) {
             parts.add(l10n.trickEventFriendWasteDeclarerCutDefenseOvercutPoints(ptCount));

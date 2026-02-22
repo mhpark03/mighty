@@ -2037,6 +2037,67 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String summaryJokerCounter(String name) {
+    return '$nameジョーカー反撃';
+  }
+
+  @override
+  String summaryJokerUse(String name) {
+    return '$nameジョーカー活用';
+  }
+
+  @override
+  String get summaryWasteExploit => '捨て札攻略成功';
+
+  @override
+  String get summaryTrumpDominate => '切り札支配';
+
+  @override
+  String summaryFriendContrib(String name) {
+    return '$nameフレンド活躍';
+  }
+
+  @override
+  String get summaryLateDefense => '後半得点防御';
+
+  @override
+  String get summaryDefenseCut => '守備切り札カット';
+
+  @override
+  String get summaryMightyImpact => 'マイティ活用';
+
+  @override
+  String summaryNarrative(String events, int points, int bid, String result) {
+    return '総評: $events → $points/$bid点 $result';
+  }
+
+  @override
+  String get summaryResultBigWin => '大勝';
+
+  @override
+  String get summaryResultWin => '勝利';
+
+  @override
+  String get summaryResultNarrowLoss => '惜敗';
+
+  @override
+  String get summaryResultBigLoss => '大敗';
+
+  @override
+  String get summaryAnd => 'と';
+
+  @override
+  String summaryFallback(
+    int wins,
+    int losses,
+    int points,
+    int bid,
+    String result,
+  ) {
+    return '総評: $wins勝$losses敗 → $points/$bid点 $result';
+  }
+
+  @override
   String trickEventLastCardDefenseWin(int count) {
     return '守備上位カード$count点防御';
   }
@@ -2067,6 +2128,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trickEventTopGirudaLead => '切り札最上位リード';
+
+  @override
+  String get trickEventTopGirudaLeadOpponentExhausted =>
+      '相手切り札なし → 非切り札で攻略、切り札はカット用に温存';
 
   @override
   String get trickEventMidGirudaMightyBait => '切り札中位でマイティ誘導';
@@ -2158,6 +2223,12 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get trickEventFriendLeadDefenseBeatDeclarerCut =>
       'フレンド先攻 → 守備逆転 → 宣言者切り札再逆転';
+
+  @override
+  String get trickEventDeclarerFriendLure => 'フレンド誘導';
+
+  @override
+  String get trickEventDeclarerFriendLureFailed => 'フレンド誘導失敗';
 
   @override
   String get trickEventWasteFriendRescue => '捨て札 → フレンド救出!';
