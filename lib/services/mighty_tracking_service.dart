@@ -221,6 +221,8 @@ class MightyTrackingService {
         return '물패 처리';
       case LeadIntent.waste:
         return '물패 처리';
+      case LeadIntent.girudaPreExchange:
+        return '선교환 (기루다 보존)';
       case LeadIntent.jokerCallLead:
         String jcDesc = '조커콜 선언';
         final jcLeadId = trick.leadPlayerId;

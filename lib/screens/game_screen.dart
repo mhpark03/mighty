@@ -6540,6 +6540,10 @@ class _GameScreenState extends State<GameScreen> {
         final wasteAttackWon = trick.winnerId != null &&
             (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
         return wasteAttackWon ? l10n.trickEventWaste : l10n.trickEventWasteAttackFailed;
+      case LeadIntent.girudaPreExchange:
+        final peAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        return peAttackWon ? l10n.trickEventWaste : l10n.trickEventWasteAttackFailed;
       case LeadIntent.jokerCallLead:
         String jcDesc = l10n.trickEventJokerCallDeclared;
         final jcLeadId = trick.leadPlayerId;

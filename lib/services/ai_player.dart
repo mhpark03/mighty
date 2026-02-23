@@ -3657,10 +3657,12 @@ class AIPlayer {
 
       if (isAttackTeam && player.isDeclarer) {
         final friendCard = state.friendDeclaration?.card;
+        // ★ 마이티 프렌드 미공개 시 조커 기루다콜 방지: 마이티가 소진되므로
         bool friendIsSpecialCard = friendCard == null ||
-            friendCard.isJoker || friendCard.isMightyWith(state.giruda);
+            friendCard.isJoker ||
+            (friendCard.isMightyWith(state.giruda) && state.friendRevealed);
 
-        // 프렌드가 마이티/조커이거나 이미 공개된 경우 조커로 기루다 콜
+        // 프렌드가 조커이거나 이미 공개된 경우 조커로 기루다 콜
         // (프렌드 공개 후에는 선 넘기기보다 기루다 최상위가 아닐 때 조커로 승리가 유리)
         if (friendIsSpecialCard || state.friendRevealed) {
           final joker = playableCards.where((c) => c.isJoker).toList();
@@ -3803,6 +3805,29 @@ class AIPlayer {
       // 기루다 저액 선공으로 수비팀 기루다 소진 → 마이티 프렌드가 기루다 void이면 마이티로 승리
       // 마이티 무늬(♠) 선공은 상대 고액 스페이드에 선을 빼앗길 위험이 높음
       if (friendCard.isMightyWith(state.giruda)) {
+        // ★ 마이티 프렌드 미공개 시: 물패로 프렌드 유도 (조커 기루다콜 대신)
+        // 조커로 기루다를 부르면 마이티가 소진되므로, 물패로 먼저 유도
+        if (!state.friendRevealed && !canMaintainLead) {
+          // 비기루다, 비마이티무늬 물패로 선공
+          final wasteForLure = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) &&
+              c.suit != state.giruda && c.suit != mightySuit &&
+              !c.isPointCard).toList();
+          if (wasteForLure.isNotEmpty) {
+            wasteForLure.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            _lastLeadIntent = LeadIntent.declarerFriendLure;
+            return wasteForLure.first;
+          }
+          // 물패 없으면 비기루다 비포인트 카드 (마이티무늬 포함)
+          final nonGirudaLure = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) &&
+              c.suit != state.giruda && !c.isPointCard).toList();
+          if (nonGirudaLure.isNotEmpty) {
+            nonGirudaLure.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            _lastLeadIntent = LeadIntent.declarerFriendLure;
+            return nonGirudaLure.first;
+          }
+        }
         if (!canMaintainLead && !hasMighty && !hasJoker) {
           // ★ 기루다만 남았을때 → 최상위부터 순서대로 (프렌드 유도 불필요)
           // 비기루다 카드가 없으면 선택의 여지가 없으므로 최상위 기루다로 직접 승리 시도
@@ -4221,6 +4246,24 @@ class AIPlayer {
             }
           }
 
+          // (F-pre) 선교환: 비기루다 물패가 남아있으면 기루다 보존
+          // (D) 조건 미충족(dCount < 2 등)이지만 물패 1장이라도 있으면 기루다 대신 사용
+          if (nonGirudaDump.isNotEmpty && state.currentTrickNumber < 10) {
+            final hasRecapturePE3 = hasJokerForLead ||
+                (myGirudaForLead.isNotEmpty && voidSuits >= 1);
+            if (hasRecapturePE3) {
+              final nonPointPE3 = nonGirudaDump.where((c) => !c.isPointCard).toList();
+              if (nonPointPE3.isNotEmpty) {
+                nonPointPE3.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                _lastLeadIntent = LeadIntent.girudaPreExchange;
+                return nonPointPE3.first;
+              }
+              nonGirudaDump.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              _lastLeadIntent = LeadIntent.girudaPreExchange;
+              return nonGirudaDump.first;
+            }
+          }
+
           // (F) Fallback: 기루다 최저 리드
           if (myGirudaForLead.isNotEmpty) {
             myGirudaForLead.sort((a, b) => a.rankValue.compareTo(b.rankValue));
@@ -4569,7 +4612,6 @@ class AIPlayer {
 
         if (highestOpponentGiruda == null) {
           // 상대에게 기루다가 없음 → 비기루다 중 이길 수 있는 카드가 있으면 사용
-          // 비기루다가 약하면(실효가치 < 12) 기루다로 확실히 이기는 것이 나음
           final nonGirudaCards = cardsToConsider.where((c) =>
               !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
 
@@ -4581,9 +4623,42 @@ class AIPlayer {
               _lastLeadIntent = LeadIntent.highCardAttack;
               return nonGirudaCards.first;
             }
+
+            // ★ 선교환 모드: 상대 기루다 없음 → 기루다 보존, 비기루다 물패 우선
+            // 기루다를 지금 내도 상대에서 빼낼 기루다가 없어 무의미
+            // 비기루다 물패로 선 넘기고, 나중에 기루다 컷으로 선 탈환 + 점수 확보
+            if (state.currentTrickNumber < 10) {
+              // 선 탈환 수단 확인: 조커/마이티/기루다 컷(void 무늬)
+              final hasJokerPE = playableCards.any((c) => c.isJoker);
+              final hasMightyPE = playableCards.any((c) => c.isMightyWith(state.giruda));
+              Set<Suit> myNonGirudaSuitsPE = {};
+              for (final c in player.hand) {
+                if (!c.isJoker && c.suit != null && c.suit != state.giruda) {
+                  myNonGirudaSuitsPE.add(c.suit!);
+                }
+              }
+              final nonGirudaSuitTotalPE = Suit.values.where((s) => s != state.giruda!).length;
+              final voidSuitsPE = nonGirudaSuitTotalPE - myNonGirudaSuitsPE.length;
+              final hasRecapturePE = hasJokerPE || hasMightyPE ||
+                  (myGirudaCards.isNotEmpty && voidSuitsPE >= 1);
+
+              if (hasRecapturePE) {
+                // 비점수 최저 카드 우선 → 점수 카드는 후순위
+                final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
+                if (nonPointCards.isNotEmpty) {
+                  nonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                  _lastLeadIntent = LeadIntent.girudaPreExchange;
+                  return nonPointCards.first;
+                }
+                // 비점수 카드 없으면 점수 카드 중 최저
+                nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                _lastLeadIntent = LeadIntent.girudaPreExchange;
+                return nonGirudaCards.first;
+              }
+            }
           }
 
-          // 비기루다가 없거나 약하면 기루다 사용 (확실한 승리)
+          // 비기루다가 없거나 탈환 수단 없으면 기루다 사용 (확실한 승리)
           _lastLeadIntent = LeadIntent.topGirudaLead;
           return myHighestGiruda;
         } else if (myHighestGiruda.rankValue > highestOpponentGiruda.rankValue) {
@@ -4594,8 +4669,13 @@ class AIPlayer {
           // 내 기루다가 상대 최상위보다 낮음
           // ★ 조커가 있으면 조커로 기루다 콜 (확실히 이기면서 상대 기루다 소진)
           // 낮은 기루다를 내면 트릭+선공을 잃지만, 조커는 확실히 이김
+          // ★ 마이티 프렌드 미공개 시 조커 기루다콜 방지 (마이티 소진 방지)
           final jokerForGirudaCall = playableCards.where((c) => c.isJoker).toList();
-          if (jokerForGirudaCall.isNotEmpty && state.currentTrickNumber >= 2) {
+          final friendCardFB = state.friendDeclaration?.card;
+          final isMightyFriendUnrevealed = friendCardFB != null &&
+              friendCardFB.isMightyWith(state.giruda) && !state.friendRevealed;
+          if (jokerForGirudaCall.isNotEmpty && state.currentTrickNumber >= 2 &&
+              !isMightyFriendUnrevealed) {
             _lastLeadIntent = LeadIntent.jokerGirudaExhaust;
             return jokerForGirudaCall.first;
           }
@@ -4644,6 +4724,43 @@ class AIPlayer {
                 partialWinCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
                 _lastLeadIntent = LeadIntent.midGirudaLead;
                 return partialWinCards.first;
+              }
+            }
+          }
+          // ★ 선교환 모드: 상대 기루다 1장 이하 → 기루다 보존, 비기루다 물패 우선
+          // 상대 기루다가 거의 없으면 기루다 선공으로 소진시킬 효과 미미
+          // 비기루다 물패 → 나중에 기루다 컷으로 선 탈환 + 점수 확보가 유리
+          {
+            final remainingOppGirudaPE = _getRemainingGirudaCount(state, player);
+            if (remainingOppGirudaPE <= 1 && state.currentTrickNumber < 10) {
+              final nonGirudaForPE = cardsToConsider.where((c) =>
+                  !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
+              if (nonGirudaForPE.isNotEmpty) {
+                // 선 탈환 수단 확인
+                final hasJokerPE2 = playableCards.any((c) => c.isJoker);
+                final hasMightyPE2 = playableCards.any((c) => c.isMightyWith(state.giruda));
+                Set<Suit> myNonGirudaSuitsPE2 = {};
+                for (final c in player.hand) {
+                  if (!c.isJoker && c.suit != null && c.suit != state.giruda) {
+                    myNonGirudaSuitsPE2.add(c.suit!);
+                  }
+                }
+                final nonGirudaSuitTotalPE2 = Suit.values.where((s) => s != state.giruda!).length;
+                final voidSuitsPE2 = nonGirudaSuitTotalPE2 - myNonGirudaSuitsPE2.length;
+                final hasRecapturePE2 = hasJokerPE2 || hasMightyPE2 ||
+                    (myGirudaCards.isNotEmpty && voidSuitsPE2 >= 1);
+
+                if (hasRecapturePE2) {
+                  final nonPointPE2 = nonGirudaForPE.where((c) => !c.isPointCard).toList();
+                  if (nonPointPE2.isNotEmpty) {
+                    nonPointPE2.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                    _lastLeadIntent = LeadIntent.girudaPreExchange;
+                    return nonPointPE2.first;
+                  }
+                  nonGirudaForPE.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                  _lastLeadIntent = LeadIntent.girudaPreExchange;
+                  return nonGirudaForPE.first;
+                }
               }
             }
           }
