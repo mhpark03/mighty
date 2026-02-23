@@ -246,29 +246,7 @@ class MightyTrackingService {
       final bidTricks = state.currentBid?.tricks ?? 13;
       final attackWins = attackPoints >= bidTricks;
 
-      // 수비 최상위 카드 보호 승리 but 방어 실패 판정
-      bool defenseTopProtect = false;
-      if (trick.winnerId != null && !isAttack(trick.winnerId!) && pointCount > 0 && attackWins) {
-        final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
-        if (winIdx >= 0 && winIdx < trick.cards.length) {
-          final winCard = trick.cards[winIdx];
-          if (!winCard.isJoker && winCard.suit != null && !isMighty(winCard)) {
-            bool isWinTop = winCard.rankValue >= 14;
-            if (!isWinTop) {
-              isWinTop = true;
-              for (int r = 14; r > winCard.rankValue; r--) {
-                if (winCard.suit == mighty.suit && r == mighty.rankValue) continue;
-                if (!playedCards.contains('${winCard.suit!.index}-$r')) { isWinTop = false; break; }
-              }
-            }
-            if (isWinTop) defenseTopProtect = true;
-          }
-        }
-      }
-
-      if (defenseTopProtect) {
-        lastParts.add('수비 최상위 카드 보호 방어하나 방어 실패');
-      } else {
+      {
         String? lastLabel;
         if (trick.winnerId != null) {
           final winIdx = trick.playerOrder.indexOf(trick.winnerId!);

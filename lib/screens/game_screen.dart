@@ -5325,29 +5325,7 @@ class _GameScreenState extends State<GameScreen> {
       final bidTricks = state.currentBid?.tricks ?? 13;
       final attackWins = attackPoints >= bidTricks;
 
-      // 수비 최상위 카드 보호 승리 but 방어 실패 판정
-      bool defenseTopProtect = false;
-      if (trick.winnerId != null && !isAttack(trick.winnerId!) && pointCount > 0 && attackWins) {
-        final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
-        if (winIdx >= 0 && winIdx < trick.cards.length) {
-          final winCard = trick.cards[winIdx];
-          if (!winCard.isJoker && winCard.suit != null && !isMighty(winCard)) {
-            bool isWinTop = winCard.rankValue >= 14;
-            if (!isWinTop) {
-              isWinTop = true;
-              for (int r = 14; r > winCard.rankValue; r--) {
-                if (winCard.suit == mighty.suit && r == mighty.rankValue) continue;
-                if (!playedCards.contains('${winCard.suit!.index}-$r')) { isWinTop = false; break; }
-              }
-            }
-            if (isWinTop) defenseTopProtect = true;
-          }
-        }
-      }
-
-      if (defenseTopProtect) {
-        lastParts.add(l10n.trickEventLastDefenseTopProtectFail);
-      } else {
+      {
         // 승리 카드 유형에 따른 마지막 트릭 설명
         String? lastLabel;
         bool winDescribed = false;
@@ -6639,6 +6617,10 @@ class _GameScreenState extends State<GameScreen> {
 
     final friendCard = state.friendDeclaration?.card;
 
+    // 주공 기준 시계방향 플레이 순서
+    final declarerIdx = state.declarerId ?? 0;
+    final displayOrder = List.generate(5, (i) => (declarerIdx + i) % 5);
+
     // 트릭별 데이터 계산
     final playedCards = <String>{};
     final rows = <_TrickRowData>[];
@@ -6812,21 +6794,21 @@ class _GameScreenState extends State<GameScreen> {
                 ),
                 children: [
                   _trickHeaderCell('#', fontSize),
-                  for (int i = 0; i < 5; i++)
+                  for (final pid in displayOrder)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                       child: Column(
                         children: [
                           Text(
-                            playerNames[i] ?? '',
+                            playerNames[pid] ?? '',
                             style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold, color: Colors.grey[700]),
                           ),
-                          if (playerRoles[i] != null)
+                          if (playerRoles[pid] != null)
                             Text(
-                              playerRoles[i]!,
+                              playerRoles[pid]!,
                               style: TextStyle(
                                 fontSize: fontSize - 2,
-                                color: state.players[i].isDeclarer ? Colors.red[600] : Colors.blue[600],
+                                color: state.players[pid].isDeclarer ? Colors.red[600] : Colors.blue[600],
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -6850,15 +6832,15 @@ class _GameScreenState extends State<GameScreen> {
                         style: TextStyle(fontSize: fontSize, color: Colors.grey[500], fontFamily: 'monospace'),
                       ),
                     ),
-                    // 5명의 플레이어 카드
-                    for (int i = 0; i < 5; i++)
+                    // 5명의 플레이어 카드 (주공 기준 시계방향)
+                    for (final pid in displayOrder)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-                        color: row.winnerId == i ? Colors.blue[50] : null,
-                        child: row.cardsByPlayer[i] != null
-                            ? _buildTrickCardCell(row.cardsByPlayer[i]!, i == row.leadPlayerId, fontSize,
-                                jokerLeadSuit: i == row.leadPlayerId ? row.jokerLeadSuit : null,
-                                isFriendCard: friendCard != null && row.cardsByPlayer[i] == friendCard)
+                        color: row.winnerId == pid ? Colors.blue[50] : null,
+                        child: row.cardsByPlayer[pid] != null
+                            ? _buildTrickCardCell(row.cardsByPlayer[pid]!, pid == row.leadPlayerId, fontSize,
+                                jokerLeadSuit: pid == row.leadPlayerId ? row.jokerLeadSuit : null,
+                                isFriendCard: friendCard != null && row.cardsByPlayer[pid] == friendCard)
                             : Text('-', textAlign: TextAlign.center, style: TextStyle(fontSize: fontSize, color: Colors.grey[300])),
                       ),
                     // 득실
