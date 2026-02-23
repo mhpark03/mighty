@@ -3787,20 +3787,20 @@ abstract class AppLocalizations {
   /// No description provided for @trickEventLastCardDefenseWin.
   ///
   /// In ko, this message translates to:
-  /// **'수비 상위 카드 {count}점 방어'**
-  String trickEventLastCardDefenseWin(int count);
+  /// **'수비 상위 카드 방어'**
+  String get trickEventLastCardDefenseWin;
 
   /// No description provided for @trickEventLastDefenseTopProtectFail.
   ///
   /// In ko, this message translates to:
-  /// **'수비 최상위 카드 보호 {count}점 방어하나 방어 실패'**
-  String trickEventLastDefenseTopProtectFail(int count);
+  /// **'수비 최상위 카드 보호 방어하나 방어 실패'**
+  String get trickEventLastDefenseTopProtectFail;
 
   /// No description provided for @trickEventLastCardAttackWin.
   ///
   /// In ko, this message translates to:
-  /// **'공격 {count}점 획득'**
-  String trickEventLastCardAttackWin(int count);
+  /// **'공격 점수 획득'**
+  String get trickEventLastCardAttackWin;
 
   /// No description provided for @trickEventJokerLead.
   ///
@@ -3963,6 +3963,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'초구 비기루다 최상위 선공'**
   String get trickEventFirstTrickTopAttack;
+
+  /// No description provided for @trickEventFirstTrickTopTeamRescue.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구 비기루다 최상위 → 팀 역전'**
+  String get trickEventFirstTrickTopTeamRescue;
+
+  /// No description provided for @trickEventFirstTrickTopAttackFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'초구 비기루다 최상위 선공 실패'**
+  String get trickEventFirstTrickTopAttackFailed;
 
   /// No description provided for @trickEventFirstTrickMightyBait.
   ///

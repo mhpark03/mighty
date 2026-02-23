@@ -182,7 +182,16 @@ class MightyTrackingService {
       case LeadIntent.defenseTopCard:
         return '수비 최상위 카드 점수 방어';
       case LeadIntent.firstTrickTopAttack:
-        return '초구 비기루다 최상위 선공';
+        // 선공 플레이어가 직접 이겼는지 구분
+        if (trick.winnerId == trick.leadPlayerId) {
+          return '초구 비기루다 최상위 선공';
+        }
+        final ftaIsAttack = (int id) => id == state.declarerId || id == state.friendId;
+        final ftaAttackWon = trick.winnerId != null && ftaIsAttack(trick.winnerId!);
+        if (ftaAttackWon) {
+          return '초구 비기루다 최상위 → 팀 역전';
+        }
+        return '초구 비기루다 최상위 선공 실패';
       case LeadIntent.firstTrickMightyBait:
         return '초구 부재 / 물패로 마이티 프렌드 유도';
       case LeadIntent.firstTrickFriendBait:
@@ -258,7 +267,7 @@ class MightyTrackingService {
       }
 
       if (defenseTopProtect) {
-        lastParts.add('수비 최상위 카드 보호 ${pointCount}점 방어하나 방어 실패');
+        lastParts.add('수비 최상위 카드 보호 방어하나 방어 실패');
       } else {
         String? lastLabel;
         if (trick.winnerId != null) {
@@ -288,9 +297,9 @@ class MightyTrackingService {
 
         if (trick.winnerId != null && pointCount > 0) {
           if (!isAttack(trick.winnerId!)) {
-            lastParts.add('수비 상위 카드 ${pointCount}점 방어');
+            lastParts.add('수비 상위 카드 방어');
           } else {
-            lastParts.add('공격 ${pointCount}점 획득');
+            lastParts.add('공격 점수 획득');
           }
         }
       }
@@ -1049,7 +1058,8 @@ class MightyTrackingService {
       if (giruda != null && !playedCards.contains('${giruda.index}-14') &&
           !trick.cards.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace)) {
         final girudaAHolder = findCardHolder((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
-        if (girudaAHolder != null) {
+        // 초구에서 선공자는 기루다를 리드할 수 없으므로 제외
+        if (girudaAHolder != null && !(trick.trickNumber == 1 && girudaAHolder == leadId)) {
           final name = girudaAHolder >= 0 && girudaAHolder < _playerNamesKo.length ? _playerNamesKo[girudaAHolder] : '?';
           final mightyPlayed = mighty.suit != null &&
               (playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}') ||

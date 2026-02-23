@@ -2109,19 +2109,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String trickEventLastCardDefenseWin(int count) {
-    return '守方高牌$count分防御';
-  }
+  String get trickEventLastCardDefenseWin => '守方高牌防御';
 
   @override
-  String trickEventLastDefenseTopProtectFail(int count) {
-    return '守方最高牌保护$count分防御但防守失败';
-  }
+  String get trickEventLastDefenseTopProtectFail => '守方最高牌保护防御但防守失败';
 
   @override
-  String trickEventLastCardAttackWin(int count) {
-    return '攻方$count分获取';
-  }
+  String get trickEventLastCardAttackWin => '攻方得分获取';
 
   @override
   String get trickEventJokerLead => 'Joker首攻';
@@ -2215,6 +2209,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickEventFirstTrickTopAttack => '首墩 非将牌最高出牌';
+
+  @override
+  String get trickEventFirstTrickTopTeamRescue => '首墩 非将牌最高 → 队友逆转';
+
+  @override
+  String get trickEventFirstTrickTopAttackFailed => '首墩 非将牌最高出牌 失败';
 
   @override
   String get trickEventFirstTrickMightyBait => '首墩缺牌 / Mighty搭档诱导';

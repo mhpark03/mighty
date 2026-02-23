@@ -2122,19 +2122,13 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String trickEventLastCardDefenseWin(int count) {
-    return '수비 상위 카드 $count점 방어';
-  }
+  String get trickEventLastCardDefenseWin => '수비 상위 카드 방어';
 
   @override
-  String trickEventLastDefenseTopProtectFail(int count) {
-    return '수비 최상위 카드 보호 $count점 방어하나 방어 실패';
-  }
+  String get trickEventLastDefenseTopProtectFail => '수비 최상위 카드 보호 방어하나 방어 실패';
 
   @override
-  String trickEventLastCardAttackWin(int count) {
-    return '공격 $count점 획득';
-  }
+  String get trickEventLastCardAttackWin => '공격 점수 획득';
 
   @override
   String get trickEventJokerLead => '조커 선공';
@@ -2228,6 +2222,12 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trickEventFirstTrickTopAttack => '초구 비기루다 최상위 선공';
+
+  @override
+  String get trickEventFirstTrickTopTeamRescue => '초구 비기루다 최상위 → 팀 역전';
+
+  @override
+  String get trickEventFirstTrickTopAttackFailed => '초구 비기루다 최상위 선공 실패';
 
   @override
   String get trickEventFirstTrickMightyBait => '초구 부재 / 물패로 마이티 프렌드 유도';

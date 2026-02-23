@@ -5346,7 +5346,7 @@ class _GameScreenState extends State<GameScreen> {
       }
 
       if (defenseTopProtect) {
-        lastParts.add(l10n.trickEventLastDefenseTopProtectFail(pointCount));
+        lastParts.add(l10n.trickEventLastDefenseTopProtectFail);
       } else {
         // 승리 카드 유형에 따른 마지막 트릭 설명
         String? lastLabel;
@@ -5394,9 +5394,9 @@ class _GameScreenState extends State<GameScreen> {
         // 점수
         if (!winDescribed && trick.winnerId != null && pointCount > 0) {
           if (!isAttack(trick.winnerId!)) {
-            lastParts.add(l10n.trickEventLastCardDefenseWin(pointCount));
+            lastParts.add(l10n.trickEventLastCardDefenseWin);
           } else {
-            lastParts.add(l10n.trickEventLastCardAttackWin(pointCount));
+            lastParts.add(l10n.trickEventLastCardAttackWin);
           }
         }
       }
@@ -6359,6 +6359,10 @@ class _GameScreenState extends State<GameScreen> {
           final holderIdx = trick.playerOrder.indexOf(girudaAHolder);
           // 선행 무늬를 따라야 해서 기루다 A를 낼 수 없었는지 확인
           bool couldPlayGirudaA = true;
+          // 초구에서 선공자는 기루다를 리드할 수 없음
+          if (trick.trickNumber == 1 && girudaAHolder == leadId) {
+            couldPlayGirudaA = false;
+          }
           if (holderIdx > 0 && trick.leadSuit != null && trick.leadSuit != giruda) {
             final holderCard = holderIdx < trick.cards.length ? trick.cards[holderIdx] : null;
             if (holderCard != null && !holderCard.isJoker && holderCard.suit == trick.leadSuit) {
@@ -6471,7 +6475,16 @@ class _GameScreenState extends State<GameScreen> {
         }
         return l10n.trickEventDefenseTopCardDefend;
       case LeadIntent.firstTrickTopAttack:
-        return l10n.trickEventFirstTrickTopAttack;
+        // 선공 플레이어가 직접 이겼는지 구분
+        if (trick.winnerId == trick.leadPlayerId) {
+          return l10n.trickEventFirstTrickTopAttack;
+        }
+        final ftaAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        if (ftaAttackWon) {
+          return l10n.trickEventFirstTrickTopTeamRescue;
+        }
+        return l10n.trickEventFirstTrickTopAttackFailed;
       case LeadIntent.firstTrickMightyBait:
         return l10n.trickEventFirstTrickMightyBait;
       case LeadIntent.firstTrickFriendBait:

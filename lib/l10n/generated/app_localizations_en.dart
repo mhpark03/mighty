@@ -2149,19 +2149,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String trickEventLastCardDefenseWin(int count) {
-    return 'Defense higher card ${count}pt guard';
-  }
+  String get trickEventLastCardDefenseWin => 'Defense higher card guard';
 
   @override
-  String trickEventLastDefenseTopProtectFail(int count) {
-    return 'Defense top card saved, ${count}pts guarded but defense failed';
-  }
+  String get trickEventLastDefenseTopProtectFail =>
+      'Defense top card saved but defense failed';
 
   @override
-  String trickEventLastCardAttackWin(int count) {
-    return 'Attack ${count}pt gained';
-  }
+  String get trickEventLastCardAttackWin => 'Attack points gained';
 
   @override
   String get trickEventJokerLead => 'Joker lead';
@@ -2259,6 +2254,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trickEventFirstTrickTopAttack => '1st trick top non-trump lead';
+
+  @override
+  String get trickEventFirstTrickTopTeamRescue =>
+      '1st trick top non-trump → team rescue';
+
+  @override
+  String get trickEventFirstTrickTopAttackFailed =>
+      '1st trick top non-trump lead failed';
 
   @override
   String get trickEventFirstTrickMightyBait =>
