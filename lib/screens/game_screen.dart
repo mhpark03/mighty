@@ -5537,17 +5537,38 @@ class _GameScreenState extends State<GameScreen> {
         if (!attackWins) {
           bool attackPlayedJoker = false;
           bool attackPlayedMighty = false;
+          int jokerMightyTrickPoints = 0; // 공격이 조커/마이티를 낸 트릭에서 획득한 점수
           for (final t in state.tricks) {
+            bool attackUsedSpecial = false;
             for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
               if (isAttack(t.playerOrder[i])) {
-                if (t.cards[i].isJoker) attackPlayedJoker = true;
-                if (isMighty(t.cards[i])) attackPlayedMighty = true;
+                if (t.cards[i].isJoker) { attackPlayedJoker = true; attackUsedSpecial = true; }
+                if (isMighty(t.cards[i])) { attackPlayedMighty = true; attackUsedSpecial = true; }
               }
+            }
+            // 공격이 조커/마이티를 사용한 트릭에서 공격이 승리 → 점수 합산
+            if (attackUsedSpecial && t.winnerId != null && isAttack(t.winnerId!)) {
+              jokerMightyTrickPoints += t.cards.where((c) => !c.isJoker && c.isPointCard).length;
             }
           }
           if (attackPlayedJoker && attackPlayedMighty) {
+            final earlyDefWins = state.tricks.where((t) =>
+                t.trickNumber <= 5 && t.winnerId != null && !isAttack(t.winnerId!)).length;
+            final lateDefWins = state.tricks.where((t) =>
+                t.trickNumber >= 7 && t.winnerId != null && !isAttack(t.winnerId!)).length;
             keyEvents.clear();
-            keyEvents.add(l10n.summaryJokerMightyLost);
+            if (jokerMightyTrickPoints <= 2) {
+              // 조커/마이티 트릭에서 2점 이하 → 점수 획득 실패
+              keyEvents.add(l10n.summaryJokerMightyLost);
+            } else if (earlyDefWins >= 3) {
+              // 초반(1-5트릭) 수비 승리 3회 이상 → 선 빼앗김이 주원인
+              keyEvents.add(l10n.summaryEarlyLeadLostLate);
+            } else if (lateDefWins >= 3 && earlyDefWins <= 2) {
+              // 후반(7-10트릭) 수비 승리 3회 이상 + 초반은 선전 → 기루다/프렌드 조기 소진
+              keyEvents.add(l10n.summaryLateLeadLostGirudaExhaust);
+            } else {
+              keyEvents.add(l10n.summaryJokerMightyLost);
+            }
           }
         }
 
@@ -5868,10 +5889,11 @@ class _GameScreenState extends State<GameScreen> {
         }
       } else if (trick.trickNumber == 1) {
         if (trick.winnerId != null && isAttack(trick.winnerId!)) {
-          // 마이티 프렌드는 초구 사용 가능 → 의도적 유도, 그 외는 행운
-          final isMightyFriend = state.friendDeclaration?.card != null &&
-              state.friendDeclaration!.card!.isMightyWith(giruda);
-          if (isMightyFriend) {
+          // 실제 승리 카드가 마이티인지 확인 (선언 타입이 아닌 실제 카드)
+          final winIdx1 = trick.playerOrder.indexOf(trick.winnerId!);
+          final winCard1 = (winIdx1 >= 0 && winIdx1 < trick.cards.length) ? trick.cards[winIdx1] : null;
+          final wonWithMighty = winCard1 != null && isMighty(winCard1);
+          if (wonWithMighty) {
             parts.add(l10n.trickEventFirstTrickMightyBait);
           } else {
             parts.add(l10n.trickEventFirstTrickFriendBait);
@@ -6400,7 +6422,9 @@ class _GameScreenState extends State<GameScreen> {
       case LeadIntent.midGirudaMightyBait:
         return l10n.trickEventMidGirudaMightyBait;
       case LeadIntent.midGirudaLead:
-        return l10n.trickEventMidGirudaLead;
+        final mgAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        return mgAttackWon ? l10n.trickEventMidGirudaLead : l10n.trickEventMidGirudaExhaust;
       case LeadIntent.midGirudaPassLead:
         return l10n.trickEventMidGirudaPassLead;
       case LeadIntent.soleGirudaLeadMaintain:
@@ -6410,7 +6434,9 @@ class _GameScreenState extends State<GameScreen> {
         if (trick.leadPlayerId == state.declarerId) {
           return l10n.trickEventDeclarerFriendLure;
         }
-        return l10n.trickEventMidGirudaPassLead;
+        final lgfpAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        return lgfpAttackWon ? l10n.trickEventMidGirudaPassLead : l10n.trickEventFriendPassLeadFailed;
       case LeadIntent.highCardAttack:
         final attackWon = trick.winnerId != null &&
             (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
@@ -6429,6 +6455,20 @@ class _GameScreenState extends State<GameScreen> {
             return l10n.trickEventDefenseMightyExhaust;
           }
         }
+        // 공격팀이 조커/마이티로 선 탈환했는지 확인
+        final dtcAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        if (dtcAttackWon) {
+          final dtcWinIdx = trick.playerOrder.indexOf(trick.winnerId!);
+          final dtcWinCard = (dtcWinIdx >= 0 && dtcWinIdx < trick.cards.length) ? trick.cards[dtcWinIdx] : null;
+          if (dtcWinCard != null && dtcWinCard.isJoker) {
+            return l10n.trickEventJokerAttackReclaim;
+          }
+          if (dtcWinCard != null && dtcWinCard.isMightyWith(state.giruda)) {
+            return l10n.trickEventMightyAttackReclaim;
+          }
+          return l10n.trickEventAttackReclaim;
+        }
         return l10n.trickEventDefenseTopCardDefend;
       case LeadIntent.firstTrickTopAttack:
         return l10n.trickEventFirstTrickTopAttack;
@@ -6445,13 +6485,26 @@ class _GameScreenState extends State<GameScreen> {
       case LeadIntent.friendVoidPass:
         final fvpAttackWon = trick.winnerId != null &&
             (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
-        return fvpAttackWon ? l10n.trickEventWaste : l10n.trickEventWasteAttackFailed;
+        return fvpAttackWon ? l10n.trickEventWaste : l10n.trickEventFriendPassLeadFailed;
       case LeadIntent.friendTopCardLead:
         return l10n.trickEventTopNonGirudaLead;
       case LeadIntent.defenseJokerLead:
         return l10n.trickEventJokerLead;
       case LeadIntent.defenseHighCard:
-        return l10n.trickEventDefenseTopCardDefend;
+        final dhcAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        if (dhcAttackWon) {
+          final dhcWinIdx = trick.playerOrder.indexOf(trick.winnerId!);
+          final dhcWinCard = (dhcWinIdx >= 0 && dhcWinIdx < trick.cards.length) ? trick.cards[dhcWinIdx] : null;
+          if (dhcWinCard != null && dhcWinCard.isJoker) {
+            return l10n.trickEventJokerAttackReclaim;
+          }
+          if (dhcWinCard != null && dhcWinCard.isMightyWith(state.giruda)) {
+            return l10n.trickEventMightyAttackReclaim;
+          }
+          return l10n.trickEventAttackReclaim;
+        }
+        return l10n.trickEventDefenseHighCardDefend;
       case LeadIntent.defenseLowCard:
         final dlcAttackWon = trick.winnerId != null &&
             (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);

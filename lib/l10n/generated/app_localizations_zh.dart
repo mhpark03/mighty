@@ -2063,6 +2063,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get summaryJokerMightyLost => '小丑/至尊仍得分不足';
 
   @override
+  String get summaryEarlyLeadLostLate => '前期失去先手，夺回延迟，小丑/至尊效果受限';
+
+  @override
+  String get summaryLateLeadLostGirudaExhaust => '将牌/盟友过早耗尽，后期失去先手';
+
+  @override
   String get summaryEarlyCutMightyExtract => '早期切牌+至尊被迫出牌致命损失';
 
   @override
@@ -2165,6 +2171,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventMidGirudaLead => '中位将牌首攻';
 
   @override
+  String get trickEventMidGirudaExhaust => '将牌消耗诱导';
+
+  @override
   String get trickEventSoleGirudaLeadMaintain => '进攻独占将牌，保持先手';
 
   @override
@@ -2172,6 +2181,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickEventDefenseTopCardDefend => '守方最高牌得分防御';
+
+  @override
+  String get trickEventDefenseHighCardDefend => '守方高牌得分防御';
+
+  @override
+  String get trickEventJokerAttackReclaim => '小丑夺回攻击方先手';
+
+  @override
+  String get trickEventMightyAttackReclaim => '王牌夺回攻击方先手';
+
+  @override
+  String get trickEventAttackReclaim => '攻击方夺回先手';
 
   @override
   String get trickEventDefenseTopDeclarerCutDefense =>
@@ -2199,7 +2220,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventFirstTrickMightyBait => '首墩缺牌 / Mighty搭档诱导';
 
   @override
-  String get trickEventFirstTrickFriendBait => '首墩缺牌 / 花色消耗 → 幸运的搭档胜利';
+  String get trickEventFirstTrickFriendBait => '首墩缺牌弃牌 → 幸好盟友获胜';
 
   @override
   String get trickEventFirstTrickWaste => '首墩缺牌 / 弃牌';
@@ -2217,6 +2238,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickEventWasteAttackFailed => '弃牌攻击失败';
+
+  @override
+  String get trickEventFriendPassLeadFailed => '传递先手失败';
 
   @override
   String get trickEventDefenseLead => '防守先攻';

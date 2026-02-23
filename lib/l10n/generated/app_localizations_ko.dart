@@ -2076,6 +2076,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get summaryJokerMightyLost => '조커/마이티로도 점수 획득 실패';
 
   @override
+  String get summaryEarlyLeadLostLate => '초반 선 빼앗김, 선 탈환 지연으로 조커/마이티 효과 제한';
+
+  @override
+  String get summaryLateLeadLostGirudaExhaust => '기루다/프렌드 조기 소진으로 후반 선 빼앗김';
+
+  @override
   String get summaryEarlyCutMightyExtract => '초반 간 + 마이티 강제 추출 치명적 손실';
 
   @override
@@ -2178,6 +2184,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventMidGirudaLead => '기루다 중간 선공';
 
   @override
+  String get trickEventMidGirudaExhaust => '기루다 소진 유도';
+
+  @override
   String get trickEventSoleGirudaLeadMaintain => '공격 단독 기루다 보유, 선 유지';
 
   @override
@@ -2185,6 +2194,18 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trickEventDefenseTopCardDefend => '수비 최상위 카드 점수 방어';
+
+  @override
+  String get trickEventDefenseHighCardDefend => '수비 상위 카드 점수 방어';
+
+  @override
+  String get trickEventJokerAttackReclaim => '조커로 공격팀 선 탈환';
+
+  @override
+  String get trickEventMightyAttackReclaim => '마이티로 공격팀 선 탈환';
+
+  @override
+  String get trickEventAttackReclaim => '공격팀 선 탈환';
 
   @override
   String get trickEventDefenseTopDeclarerCutDefense =>
@@ -2212,7 +2233,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventFirstTrickMightyBait => '초구 부재 / 물패로 마이티 프렌드 유도';
 
   @override
-  String get trickEventFirstTrickFriendBait => '초구 부재 / 물패 소진 → 행운의 프렌드 승리';
+  String get trickEventFirstTrickFriendBait => '초구 부재 물패 → 다행히 프렌드 승리';
 
   @override
   String get trickEventFirstTrickWaste => '초구 부재 / 물패 처리';
@@ -2230,6 +2251,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trickEventWasteAttackFailed => '물패로 공격 실패';
+
+  @override
+  String get trickEventFriendPassLeadFailed => '선 넘기기 실패';
 
   @override
   String get trickEventDefenseLead => '수비 선공';

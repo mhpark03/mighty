@@ -3706,6 +3706,18 @@ abstract class AppLocalizations {
   /// **'조커/마이티로도 점수 획득 실패'**
   String get summaryJokerMightyLost;
 
+  /// No description provided for @summaryEarlyLeadLostLate.
+  ///
+  /// In ko, this message translates to:
+  /// **'초반 선 빼앗김, 선 탈환 지연으로 조커/마이티 효과 제한'**
+  String get summaryEarlyLeadLostLate;
+
+  /// No description provided for @summaryLateLeadLostGirudaExhaust.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다/프렌드 조기 소진으로 후반 선 빼앗김'**
+  String get summaryLateLeadLostGirudaExhaust;
+
   /// No description provided for @summaryEarlyCutMightyExtract.
   ///
   /// In ko, this message translates to:
@@ -3868,6 +3880,12 @@ abstract class AppLocalizations {
   /// **'기루다 중간 선공'**
   String get trickEventMidGirudaLead;
 
+  /// No description provided for @trickEventMidGirudaExhaust.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 소진 유도'**
+  String get trickEventMidGirudaExhaust;
+
   /// No description provided for @trickEventSoleGirudaLeadMaintain.
   ///
   /// In ko, this message translates to:
@@ -3885,6 +3903,30 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'수비 최상위 카드 점수 방어'**
   String get trickEventDefenseTopCardDefend;
+
+  /// No description provided for @trickEventDefenseHighCardDefend.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 상위 카드 점수 방어'**
+  String get trickEventDefenseHighCardDefend;
+
+  /// No description provided for @trickEventJokerAttackReclaim.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커로 공격팀 선 탈환'**
+  String get trickEventJokerAttackReclaim;
+
+  /// No description provided for @trickEventMightyAttackReclaim.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티로 공격팀 선 탈환'**
+  String get trickEventMightyAttackReclaim;
+
+  /// No description provided for @trickEventAttackReclaim.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격팀 선 탈환'**
+  String get trickEventAttackReclaim;
 
   /// No description provided for @trickEventDefenseTopDeclarerCutDefense.
   ///
@@ -3931,7 +3973,7 @@ abstract class AppLocalizations {
   /// No description provided for @trickEventFirstTrickFriendBait.
   ///
   /// In ko, this message translates to:
-  /// **'초구 부재 / 물패 소진 → 행운의 프렌드 승리'**
+  /// **'초구 부재 물패 → 다행히 프렌드 승리'**
   String get trickEventFirstTrickFriendBait;
 
   /// No description provided for @trickEventFirstTrickWaste.
@@ -3963,6 +4005,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'물패로 공격 실패'**
   String get trickEventWasteAttackFailed;
+
+  /// No description provided for @trickEventFriendPassLeadFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'선 넘기기 실패'**
+  String get trickEventFriendPassLeadFailed;
 
   /// No description provided for @trickEventDefenseLead.
   ///
