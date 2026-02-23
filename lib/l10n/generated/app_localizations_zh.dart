@@ -2329,6 +2329,12 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get trickEventDefenseCutAttackOvercut => '守方首次切入 → 攻方高阶将牌反切';
+
+  @override
+  String get trickEventAttackCutDefenseOvercut => '攻方首次切入 → 守方高阶将牌防御';
+
+  @override
   String get trickEventAttackNoGirudaDefenseHas => '进攻方将牌耗尽 / 仅守方持有将牌';
 
   @override

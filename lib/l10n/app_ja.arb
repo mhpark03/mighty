@@ -1088,6 +1088,8 @@
   "trickEventDefenseGirudaCut": "守備切り札カット",
   "trickEventDefenseGirudaCutCount": "守備切り札カット {count}回",
   "@trickEventDefenseGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventDefenseCutAttackOvercut": "守備1次カット → 攻撃上位切り札で逆転",
+  "trickEventAttackCutDefenseOvercut": "攻撃1次カット → 守備上位切り札で防御",
   "trickEventAttackNoGirudaDefenseHas": "攻撃側切り札枯渇 / 守備のみ切り札保有",
   "trickEventNonGirudaExhaust": "非切り札消耗",
   "trickEventJokerCallDeclared": "ジョーカーコール宣言",

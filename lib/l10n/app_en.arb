@@ -1089,6 +1089,8 @@
   "trickEventDefenseGirudaCut": "Defense trump cut",
   "trickEventDefenseGirudaCutCount": "Defense trump cut x{count}",
   "@trickEventDefenseGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventDefenseCutAttackOvercut": "Defense 1st cut → Attack higher trump overcut",
+  "trickEventAttackCutDefenseOvercut": "Attack 1st cut → Defense higher trump defense",
   "trickEventAttackNoGirudaDefenseHas": "Attack out of trump / Defense still has trump",
   "trickEventNonGirudaExhaust": "Non-trump exhausted",
   "trickEventJokerCallDeclared": "Joker Call",

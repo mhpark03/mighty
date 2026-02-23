@@ -1248,6 +1248,8 @@
   "trickEventDefenseGirudaCut": "수비 기루다 컷",
   "trickEventDefenseGirudaCutCount": "수비 기루다 컷 {count}회",
   "@trickEventDefenseGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventDefenseCutAttackOvercut": "수비 1차 간 → 공격 상위 기루다 컷",
+  "trickEventAttackCutDefenseOvercut": "공격 1차 간 → 수비 상위 기루다 방어",
   "trickEventAttackNoGirudaDefenseHas": "공격팀 기루다 소진 / 수비만 기루다 보유",
   "trickEventNonGirudaExhaust": "비기루다 소진",
   "trickEventJokerCallDeclared": "조커콜 선언",

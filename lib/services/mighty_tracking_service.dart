@@ -946,10 +946,17 @@ class MightyTrackingService {
           }
         }
       }
-      if (attackCuts > 0) {
+      // 양 팀 모두 기루다 간 → 상위 기루다 역전/방어 설명
+      if (attackCuts > 0 && defenseCuts > 0) {
+        final attackWonThisTrick = trick.winnerId != null && isAttack(trick.winnerId!);
+        if (attackWonThisTrick) {
+          parts.add('수비 1차 간 → 공격 상위 기루다 컷');
+        } else {
+          parts.add('공격 1차 간 → 수비 상위 기루다 방어');
+        }
+      } else if (attackCuts > 0) {
         parts.add(attackCuts > 1 ? '공격 기루다 컷 ${attackCuts}회' : '공격 기루다 컷');
-      }
-      if (defenseCuts > 0) {
+      } else if (defenseCuts > 0) {
         parts.add(defenseCuts > 1 ? '수비 기루다 컷 ${defenseCuts}회' : '수비 기루다 컷');
         bool attackHasGirudaLeft = false;
         for (final ft in state.tricks) {

@@ -4156,6 +4156,18 @@ abstract class AppLocalizations {
   /// **'수비 기루다 컷 {count}회'**
   String trickEventDefenseGirudaCutCount(int count);
 
+  /// No description provided for @trickEventDefenseCutAttackOvercut.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 1차 간 → 공격 상위 기루다 컷'**
+  String get trickEventDefenseCutAttackOvercut;
+
+  /// No description provided for @trickEventAttackCutDefenseOvercut.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격 1차 간 → 수비 상위 기루다 방어'**
+  String get trickEventAttackCutDefenseOvercut;
+
   /// No description provided for @trickEventAttackNoGirudaDefenseHas.
   ///
   /// In ko, this message translates to:

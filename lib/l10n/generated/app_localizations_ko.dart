@@ -2342,6 +2342,12 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get trickEventDefenseCutAttackOvercut => '수비 1차 간 → 공격 상위 기루다 컷';
+
+  @override
+  String get trickEventAttackCutDefenseOvercut => '공격 1차 간 → 수비 상위 기루다 방어';
+
+  @override
   String get trickEventAttackNoGirudaDefenseHas => '공격팀 기루다 소진 / 수비만 기루다 보유';
 
   @override

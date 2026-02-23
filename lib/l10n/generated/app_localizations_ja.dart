@@ -2336,6 +2336,12 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get trickEventDefenseCutAttackOvercut => '守備1次カット → 攻撃上位切り札で逆転';
+
+  @override
+  String get trickEventAttackCutDefenseOvercut => '攻撃1次カット → 守備上位切り札で防御';
+
+  @override
   String get trickEventAttackNoGirudaDefenseHas => '攻撃側切り札枯渇 / 守備のみ切り札保有';
 
   @override
