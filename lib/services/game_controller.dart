@@ -930,6 +930,7 @@ class GameController extends ChangeNotifier {
       final jokerCallSuit = _aiPlayer.decideJokerCall(currentPlayer, _state);
       if (jokerCallSuit != null) {
         _state.declareJokerCall(jokerCallSuit);
+        leadIntent = LeadIntent.jokerCallLead;
         notifyListeners();
         await Future.delayed(Duration(milliseconds: _isAutoPlayMode ? 300 : 500));
         // 조커 콜 시 조커 콜 카드를 냄
@@ -954,10 +955,20 @@ class GameController extends ChangeNotifier {
           if (!hasJoker && !_state.isJokerPlayed && _state.currentTrickNumber > 1 &&
               !(isJokerFriend && isAttackTeam)) {
             _state.declareJokerCall(jokerCallCard.suit!);
+            leadIntent = LeadIntent.jokerCallLead;
             notifyListeners();
             await Future.delayed(Duration(milliseconds: _isAutoPlayMode ? 300 : 500));
           }
         }
+      }
+      // 수비 마이티 무늬 선공 → 마이티 유도 의도 감지
+      if (leadIntent != LeadIntent.jokerCallLead &&
+          leadIntent != LeadIntent.defenseMightyExhaust &&
+          !card.isJoker && !card.isMightyWith(_state.giruda) &&
+          _state.mighty.suit != null && card.suit == _state.mighty.suit &&
+          !(currentPlayer.isDeclarer || currentPlayer.isFriend) &&
+          !_state.isMightyPlayed) {
+        leadIntent = LeadIntent.defenseMightySuitBait;
       }
       // Store lead intent
       if (_state.currentTrick != null && _state.currentTrick!.cards.isEmpty) {
@@ -1036,7 +1047,11 @@ class GameController extends ChangeNotifier {
 
     // 사람 플레이어 의도 추론 (선공 시)
     if (isLeadingTrick) {
-      _state.currentTrick?.leadIntent = _inferHumanLeadIntent(card, jokerLeadSuit);
+      if (jokerCallSuit != null) {
+        _state.currentTrick?.leadIntent = LeadIntent.jokerCallLead;
+      } else {
+        _state.currentTrick?.leadIntent = _inferHumanLeadIntent(card, jokerLeadSuit);
+      }
     }
 
     // 트릭 완료 여부 확인을 위해 현재 트릭 수 저장
@@ -1097,6 +1112,13 @@ class GameController extends ChangeNotifier {
     if (card.isJoker) return LeadIntent.jokerLeadSuit;
     if (card.isMightyWith(_state.giruda)) return LeadIntent.mightyLead;
     if (_state.giruda != null && card.suit == _state.giruda) return LeadIntent.midGirudaLead;
+    // 수비 마이티 무늬 선공 → 마이티 유도
+    final humanPlayer = _state.players[0];
+    if (!(humanPlayer.isDeclarer || humanPlayer.isFriend) &&
+        _state.mighty.suit != null && card.suit == _state.mighty.suit &&
+        !_state.isMightyPlayed) {
+      return LeadIntent.defenseMightySuitBait;
+    }
     if (_state.currentTrickNumber == 1) {
       final mightySuit = _state.mighty.suit;
       if (!card.isMightyWith(_state.giruda) && card.suit != _state.giruda &&

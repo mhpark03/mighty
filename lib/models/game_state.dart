@@ -153,12 +153,14 @@ enum LeadIntent {
   firstTrickWaste,
   declarerFriendLure,
   defenseMightyExhaust,
+  defenseMightySuitBait,
   friendVoidPass,
   friendTopCardLead,
   defenseJokerLead,
   defenseHighCard,
   defenseLowCard,
   waste,
+  jokerCallLead,
 }
 
 class Trick {

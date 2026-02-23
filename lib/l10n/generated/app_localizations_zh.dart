@@ -2310,7 +2310,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventAttackGirudaCut => '攻方将牌切入';
 
   @override
+  String trickEventAttackGirudaCutCount(int count) {
+    return '攻方将牌切入 $count次';
+  }
+
+  @override
   String get trickEventDefenseGirudaCut => '守方将牌切入';
+
+  @override
+  String trickEventDefenseGirudaCutCount(int count) {
+    return '守方将牌切入 $count次';
+  }
 
   @override
   String get trickEventAttackNoGirudaDefenseHas => '进攻方将牌耗尽 / 仅守方持有将牌';
@@ -2320,6 +2330,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickEventJokerCallDeclared => '小丑召唤宣言';
+
+  @override
+  String get trickEventJokerCallAllyJoker => '己方小丑献出';
+
+  @override
+  String get trickEventJokerCallEnemyJoker => '对方小丑消耗';
 
   @override
   String get trickEventGirudaKExhaustSuccess => 'K消耗成功';
@@ -2335,6 +2351,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickEventDefenseMightyExhaust => '防守逼出Mighty成功';
+
+  @override
+  String get trickEventDefenseMightySuitBait => 'Mighty花色出牌 (Mighty诱导)';
+
+  @override
+  String get trickEventDefenseMightySuitBaitSuccess =>
+      'Mighty花色出牌 / Mighty诱导成功';
 
   @override
   String trickEventDefenseMightyExhaustPoints(int count) {
@@ -2376,6 +2399,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickMightyAppeared => 'Mighty出现';
+
+  @override
+  String get trickJokerAppeared => '小丑出现';
 
   @override
   String get trickFriendJoined => '朋友合流';

@@ -2317,7 +2317,17 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventAttackGirudaCut => '攻撃切り札カット';
 
   @override
+  String trickEventAttackGirudaCutCount(int count) {
+    return '攻撃切り札カット $count回';
+  }
+
+  @override
   String get trickEventDefenseGirudaCut => '守備切り札カット';
+
+  @override
+  String trickEventDefenseGirudaCutCount(int count) {
+    return '守備切り札カット $count回';
+  }
 
   @override
   String get trickEventAttackNoGirudaDefenseHas => '攻撃側切り札枯渇 / 守備のみ切り札保有';
@@ -2327,6 +2337,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trickEventJokerCallDeclared => 'ジョーカーコール宣言';
+
+  @override
+  String get trickEventJokerCallAllyJoker => '味方ジョーカー献上';
+
+  @override
+  String get trickEventJokerCallEnemyJoker => '相手ジョーカー消耗';
 
   @override
   String get trickEventGirudaKExhaustSuccess => 'K消耗成功';
@@ -2342,6 +2358,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trickEventDefenseMightyExhaust => '守備マイティ消耗成功';
+
+  @override
+  String get trickEventDefenseMightySuitBait => 'マイティスート先攻 (マイティ誘導)';
+
+  @override
+  String get trickEventDefenseMightySuitBaitSuccess => 'マイティスート先攻 / マイティ誘導成功';
 
   @override
   String trickEventDefenseMightyExhaustPoints(int count) {
@@ -2383,6 +2405,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trickMightyAppeared => 'マイティ出現';
+
+  @override
+  String get trickJokerAppeared => 'ジョーカー出現';
 
   @override
   String get trickFriendJoined => 'フレンド合流';

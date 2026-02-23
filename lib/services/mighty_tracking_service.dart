@@ -202,6 +202,13 @@ class MightyTrackingService {
         return '프렌드 유도';
       case LeadIntent.defenseMightyExhaust:
         return '수비 마이티 소진 유도 성공';
+      case LeadIntent.defenseMightySuitBait:
+        final dmbMightyAppeared = trick.cards.asMap().entries.any((e) {
+          final idx = trick.playerOrder.indexOf(trick.leadPlayerId);
+          return e.key != idx && !e.value.isJoker &&
+              e.value.suit == state.mighty.suit && e.value.rank == state.mighty.rank;
+        });
+        return dmbMightyAppeared ? '마이티 무늬 선공 / 마이티 유도 성공' : '마이티 무늬 선공 (마이티 유도)';
       case LeadIntent.friendVoidPass:
         return '물패 처리';
       case LeadIntent.friendTopCardLead:
@@ -214,6 +221,23 @@ class MightyTrackingService {
         return '물패 처리';
       case LeadIntent.waste:
         return '물패 처리';
+      case LeadIntent.jokerCallLead:
+        String jcDesc = '조커콜 선언';
+        final jcLeadId = trick.leadPlayerId;
+        final jcLeadIsAttack = jcLeadId == state.declarerId || jcLeadId == state.friendId;
+        for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+          if (trick.cards[i].isJoker) {
+            final jokerId = trick.playerOrder[i];
+            final jokerIsAttack = jokerId == state.declarerId || jokerId == state.friendId;
+            if (jcLeadIsAttack == jokerIsAttack) {
+              jcDesc += ' → 아군 조커 헌납';
+            } else {
+              jcDesc += ' → 상대 조커 소진';
+            }
+            break;
+          }
+        }
+        return jcDesc;
     }
   }
 
@@ -501,7 +525,8 @@ class MightyTrackingService {
         parts.add(leadDesc);
         leadDescribed = true;
         if (trick.leadIntent == LeadIntent.defenseMightyExhaust ||
-            trick.leadIntent == LeadIntent.midGirudaMightyBait) {
+            trick.leadIntent == LeadIntent.midGirudaMightyBait ||
+            trick.leadIntent == LeadIntent.defenseMightySuitBait) {
           mightyExhaustDescribed = true;
         }
       }
@@ -863,41 +888,48 @@ class MightyTrackingService {
     }
     } // end if (!leadDescribed)
 
-    // 조커콜 선언
-    if (trick.jokerCall == JokerCallType.jokerCall) {
+    // 조커콜 선언 (leadIntent로 리드 설명에 포함되지 않은 경우만)
+    if (trick.jokerCall == JokerCallType.jokerCall && trick.leadIntent != LeadIntent.jokerCallLead) {
       parts.add('조커콜 선언');
     }
 
-    // Outcome: 기루다 컷
-    if (!girudaCutDescribed && trick.leadSuit != giruda && giruda != null && trick.winnerId != null) {
-      final winIdx = trick.playerOrder.indexOf(trick.winnerId!);
-      if (winIdx >= 0 && winIdx < trick.cards.length) {
-        final winCard = trick.cards[winIdx];
-        if (isGiruda(winCard) && trick.winnerId != leadId) {
-          if (isAttack(trick.winnerId!)) {
-            parts.add('공격 기루다 컷');
+    // Outcome: 기루다 컷 - 모든 컷 카운트
+    if (!girudaCutDescribed && trick.leadSuit != giruda && giruda != null) {
+      int attackCuts = 0;
+      int defenseCuts = 0;
+      for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+        if (i == leadIdx) continue;
+        if (!trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
+          if (isAttack(trick.playerOrder[i])) {
+            attackCuts++;
           } else {
-            parts.add('수비 기루다 컷');
-            bool attackHasGirudaLeft = false;
-            for (final ft in state.tricks) {
-              if (ft.trickNumber <= trick.trickNumber) continue;
-              for (int i = 0; i < ft.cards.length && i < ft.playerOrder.length; i++) {
-                if (isAttack(ft.playerOrder[i]) && !ft.cards[i].isJoker && ft.cards[i].suit == giruda) {
-                  attackHasGirudaLeft = true;
-                }
-              }
+            defenseCuts++;
+          }
+        }
+      }
+      if (attackCuts > 0) {
+        parts.add(attackCuts > 1 ? '공격 기루다 컷 ${attackCuts}회' : '공격 기루다 컷');
+      }
+      if (defenseCuts > 0) {
+        parts.add(defenseCuts > 1 ? '수비 기루다 컷 ${defenseCuts}회' : '수비 기루다 컷');
+        bool attackHasGirudaLeft = false;
+        for (final ft in state.tricks) {
+          if (ft.trickNumber <= trick.trickNumber) continue;
+          for (int i = 0; i < ft.cards.length && i < ft.playerOrder.length; i++) {
+            if (isAttack(ft.playerOrder[i]) && !ft.cards[i].isJoker && ft.cards[i].suit == giruda) {
+              attackHasGirudaLeft = true;
             }
-            if (!attackHasGirudaLeft) {
-              bool attackPlayedGirudaHere = false;
-              for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
-                if (isAttack(trick.playerOrder[i]) && !trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
-                  attackPlayedGirudaHere = true;
-                }
-              }
-              if (!attackPlayedGirudaHere) {
-                parts.add('공격팀 기루다 소진 / 수비만 기루다 보유');
-              }
+          }
+        }
+        if (!attackHasGirudaLeft) {
+          bool attackPlayedGirudaHere = false;
+          for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+            if (isAttack(trick.playerOrder[i]) && !trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
+              attackPlayedGirudaHere = true;
             }
+          }
+          if (!attackPlayedGirudaHere) {
+            parts.add('공격팀 기루다 소진 / 수비만 기루다 보유');
           }
         }
       }
@@ -954,6 +986,27 @@ class MightyTrackingService {
             playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}');
         if (mightyAlreadyPlayed) {
           parts.add('마이티 소멸 → 수비 조커 반격');
+        }
+      }
+    }
+
+    // Outcome: 조커 출현 (비선공 조커, 위에서 이미 기술되지 않은 경우)
+    {
+      bool jokerDescribedAbove = (trick.leadIntent == LeadIntent.jokerCallLead) ||
+          (trick.leadIntent == LeadIntent.jokerLeadSuit) ||
+          (trick.leadIntent == LeadIntent.jokerAfterFriend) ||
+          (trick.leadIntent == LeadIntent.jokerGirudaExhaust) ||
+          (trick.leadIntent == LeadIntent.defenseJokerLead);
+      if (!jokerDescribedAbove) {
+        for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+          if (i == leadIdx) continue;
+          if (trick.cards[i].isJoker) {
+            final jokerWon = trick.winnerId == trick.playerOrder[i];
+            if (!jokerWon || isAttack(trick.playerOrder[i])) {
+              parts.add('조커 출현');
+            }
+            break;
+          }
         }
       }
     }

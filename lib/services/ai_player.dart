@@ -3804,6 +3804,20 @@ class AIPlayer {
       // 마이티 무늬(♠) 선공은 상대 고액 스페이드에 선을 빼앗길 위험이 높음
       if (friendCard.isMightyWith(state.giruda)) {
         if (!canMaintainLead && !hasMighty && !hasJoker) {
+          // ★ 기루다만 남았을때 → 최상위부터 순서대로 (프렌드 유도 불필요)
+          // 비기루다 카드가 없으면 선택의 여지가 없으므로 최상위 기루다로 직접 승리 시도
+          final nonGirudaCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
+          if (nonGirudaCards.isEmpty && state.giruda != null) {
+            final girudaOnly = playableCards.where((c) =>
+                !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
+            if (girudaOnly.isNotEmpty) {
+              girudaOnly.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+              _lastLeadIntent = LeadIntent.topGirudaLead;
+              return girudaOnly.first;
+            }
+          }
+
           final opponentGirudaMF = _getRemainingGirudaCount(state, player);
           if (opponentGirudaMF > 0) {
             // ★ 기루다 카드 있으면 중간 기루다 선공 (마이티 무늬 대신)

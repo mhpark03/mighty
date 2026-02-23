@@ -4126,11 +4126,23 @@ abstract class AppLocalizations {
   /// **'공격 기루다 컷'**
   String get trickEventAttackGirudaCut;
 
+  /// No description provided for @trickEventAttackGirudaCutCount.
+  ///
+  /// In ko, this message translates to:
+  /// **'공격 기루다 컷 {count}회'**
+  String trickEventAttackGirudaCutCount(int count);
+
   /// No description provided for @trickEventDefenseGirudaCut.
   ///
   /// In ko, this message translates to:
   /// **'수비 기루다 컷'**
   String get trickEventDefenseGirudaCut;
+
+  /// No description provided for @trickEventDefenseGirudaCutCount.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 기루다 컷 {count}회'**
+  String trickEventDefenseGirudaCutCount(int count);
 
   /// No description provided for @trickEventAttackNoGirudaDefenseHas.
   ///
@@ -4149,6 +4161,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'조커콜 선언'**
   String get trickEventJokerCallDeclared;
+
+  /// No description provided for @trickEventJokerCallAllyJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'아군 조커 헌납'**
+  String get trickEventJokerCallAllyJoker;
+
+  /// No description provided for @trickEventJokerCallEnemyJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'상대 조커 소진'**
+  String get trickEventJokerCallEnemyJoker;
 
   /// No description provided for @trickEventGirudaKExhaustSuccess.
   ///
@@ -4179,6 +4203,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'수비 마이티 소진 유도 성공'**
   String get trickEventDefenseMightyExhaust;
+
+  /// No description provided for @trickEventDefenseMightySuitBait.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 무늬 선공 (마이티 유도)'**
+  String get trickEventDefenseMightySuitBait;
+
+  /// No description provided for @trickEventDefenseMightySuitBaitSuccess.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 무늬 선공 / 마이티 유도 성공'**
+  String get trickEventDefenseMightySuitBaitSuccess;
 
   /// No description provided for @trickEventDefenseMightyExhaustPoints.
   ///
@@ -4245,6 +4281,12 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'마이티 출현'**
   String get trickMightyAppeared;
+
+  /// No description provided for @trickJokerAppeared.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 출현'**
+  String get trickJokerAppeared;
 
   /// No description provided for @trickFriendJoined.
   ///
