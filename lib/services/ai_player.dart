@@ -1686,6 +1686,26 @@ class AIPlayer {
     final hasMightyQ = hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.queen);
     final mightySuitSynergy = hasMightyInHand && hasMightyQ;
 
+    // 완전 보이드 무늬 계획: 비기루다 무늬에서 A 없이 카드 수 == 3이면
+    // 해당 무늬를 통째로 버려 보이드 생성 (선 유지가 어려울 때 무늬 수 축소 우선)
+    Suit? completeVoidSuit;
+    {
+      int bestPointCards = -1;
+      for (final entry in effectiveSuitCount.entries) {
+        final suit = entry.key;
+        final count = entry.value;
+        if (count != 3) continue;
+        if (suit == finalGiruda) continue;
+        if (topSuits.contains(suit)) continue;
+        if (effectiveHand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace)) continue;
+        final pointCards = effectiveHand.where((c) => !c.isJoker && c.suit == suit && c.isPointCard).length;
+        if (pointCards > bestPointCards) {
+          bestPointCards = pointCards;
+          completeVoidSuit = suit;
+        }
+      }
+    }
+
     hand.sort((a, b) {
       // 1. 조커/마이티는 절대 버리지 않음
       if (a.isJoker || isMightyCard(a)) return 1;
@@ -1695,6 +1715,15 @@ class AIPlayer {
       if (firstTrickCard != null) {
         if (identical(a, firstTrickCard)) return 1;
         if (identical(b, firstTrickCard)) return -1;
+      }
+
+      // 1.7. 완전 보이드 무늬: A 없이 3장인 비기루다 무늬를 통째로 버려 무늬 수 축소
+      // 선을 유지하기 어려운 무늬(A 없음)는 K가 있더라도 보이드 생성이 유리
+      if (completeVoidSuit != null) {
+        bool aIsCV = a.suit == completeVoidSuit;
+        bool bIsCV = b.suit == completeVoidSuit;
+        if (aIsCV && !bIsCV) return -1;
+        if (!aIsCV && bIsCV) return 1;
       }
 
       // 2. 조커콜 카드 처리
