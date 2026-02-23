@@ -3712,6 +3712,12 @@ abstract class AppLocalizations {
   /// **'초반 간 + 마이티 강제 추출 치명적 손실'**
   String get summaryEarlyCutMightyExtract;
 
+  /// No description provided for @summaryDefenseJokerGirudaCounter.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 조커 공세 → 기루다 반격'**
+  String get summaryDefenseJokerGirudaCounter;
+
   /// No description provided for @summaryNarrative.
   ///
   /// In ko, this message translates to:
@@ -3898,6 +3904,12 @@ abstract class AppLocalizations {
   /// **'수비 비기루다 최상위 선공 → 공격 기루다 컷 선 탈환'**
   String get trickEventDefenseLeadAttackCut;
 
+  /// No description provided for @trickEventDefenseTopAttackCutPointsFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 최상위 선공 → 주공 기루다 컷 {count}점 방어 실패'**
+  String trickEventDefenseTopAttackCutPointsFailed(int count);
+
   /// No description provided for @trickEventAttackLeadDefenseCut.
   ///
   /// In ko, this message translates to:
@@ -3987,6 +3999,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'프렌드 물패 → 주공 기루다 컷 → 수비 기루다 재역전 {count}점 방어'**
   String trickEventFriendWasteDeclarerCutDefenseOvercutPoints(int count);
+
+  /// No description provided for @trickEventFriendWasteDeclarerHighDefenseReversal.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드 물패 → 주공 하이카드 → 수비 역전'**
+  String get trickEventFriendWasteDeclarerHighDefenseReversal;
+
+  /// No description provided for @trickEventDefenseWasteAttackReverseDefenseCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 물패 → 공격 역전 → 수비 간 재역전'**
+  String get trickEventDefenseWasteAttackReverseDefenseCut;
 
   /// No description provided for @trickEventFriendLeadDefenseBeatDeclarerCut.
   ///

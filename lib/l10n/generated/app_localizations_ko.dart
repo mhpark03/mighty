@@ -2079,6 +2079,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get summaryEarlyCutMightyExtract => '초반 간 + 마이티 강제 추출 치명적 손실';
 
   @override
+  String get summaryDefenseJokerGirudaCounter => '수비 조커 공세 → 기루다 반격';
+
+  @override
   String summaryNarrative(String events, String result) {
     return '총평 : $events으로 $result';
   }
@@ -2195,6 +2198,11 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventDefenseLeadAttackCut => '수비 비기루다 최상위 선공 → 공격 기루다 컷 선 탈환';
 
   @override
+  String trickEventDefenseTopAttackCutPointsFailed(int count) {
+    return '수비 최상위 선공 → 주공 기루다 컷 $count점 방어 실패';
+  }
+
+  @override
   String get trickEventAttackLeadDefenseCut => '공격 비기루다 최상위 선공 → 수비 기루다 컷';
 
   @override
@@ -2247,6 +2255,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String trickEventFriendWasteDeclarerCutDefenseOvercutPoints(int count) {
     return '프렌드 물패 → 주공 기루다 컷 → 수비 기루다 재역전 $count점 방어';
   }
+
+  @override
+  String get trickEventFriendWasteDeclarerHighDefenseReversal =>
+      '프렌드 물패 → 주공 하이카드 → 수비 역전';
+
+  @override
+  String get trickEventDefenseWasteAttackReverseDefenseCut =>
+      '수비 물패 → 공격 역전 → 수비 간 재역전';
 
   @override
   String get trickEventFriendLeadDefenseBeatDeclarerCut =>

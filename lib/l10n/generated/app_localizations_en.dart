@@ -2103,6 +2103,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Early cut + mighty forced out critical loss';
 
   @override
+  String get summaryDefenseJokerGirudaCounter =>
+      'Defense joker assault → trump counterattack';
+
+  @override
   String summaryNarrative(String events, String result) {
     return 'Review: $events → $result';
   }
@@ -2221,6 +2225,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Defense non-trump top lead → Attack trump cut reclaim';
 
   @override
+  String trickEventDefenseTopAttackCutPointsFailed(int count) {
+    return 'Defense top lead → Declarer trump cut, ${count}pts defense failed';
+  }
+
+  @override
   String get trickEventAttackLeadDefenseCut =>
       'Attack non-trump top lead → Defense trump cut';
 
@@ -2277,6 +2286,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String trickEventFriendWasteDeclarerCutDefenseOvercutPoints(int count) {
     return 'Friend waste → Declarer trump cut → Defense higher trump reversal, ${count}pts defended';
   }
+
+  @override
+  String get trickEventFriendWasteDeclarerHighDefenseReversal =>
+      'Friend waste → Declarer high card → Defense reversal';
+
+  @override
+  String get trickEventDefenseWasteAttackReverseDefenseCut =>
+      'Defense waste → Attack reversal → Defense cut re-reversal';
 
   @override
   String get trickEventFriendLeadDefenseBeatDeclarerCut =>

@@ -2073,6 +2073,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get summaryEarlyCutMightyExtract => '序盤カット+マイティ強制抽出で致命的損失';
 
   @override
+  String get summaryDefenseJokerGirudaCounter => '守備ジョーカー攻勢 → 切り札反撃';
+
+  @override
   String summaryNarrative(String events, String result) {
     return '総評 : $events → $result';
   }
@@ -2189,6 +2192,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventDefenseLeadAttackCut => '守備非切り札最上位先攻 → 攻撃切り札カット奪還';
 
   @override
+  String trickEventDefenseTopAttackCutPointsFailed(int count) {
+    return '守備最上位先攻 → 宣言者切り札カット $count点防御失敗';
+  }
+
+  @override
   String get trickEventAttackLeadDefenseCut => '攻撃非切り札最上位先攻 → 守備切り札カット';
 
   @override
@@ -2241,6 +2249,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String trickEventFriendWasteDeclarerCutDefenseOvercutPoints(int count) {
     return 'フレンド捨て札 → 宣言者切り札カット → 守備上位切り札逆転 $count点防御';
   }
+
+  @override
+  String get trickEventFriendWasteDeclarerHighDefenseReversal =>
+      'フレンド捨て札 → 宣言者ハイカード → 守備逆転';
+
+  @override
+  String get trickEventDefenseWasteAttackReverseDefenseCut =>
+      '守備捨て札 → 攻撃逆転 → 守備カット再逆転';
 
   @override
   String get trickEventFriendLeadDefenseBeatDeclarerCut =>

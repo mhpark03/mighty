@@ -2066,6 +2066,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get summaryEarlyCutMightyExtract => '早期切牌+至尊被迫出牌致命损失';
 
   @override
+  String get summaryDefenseJokerGirudaCounter => '防守小丑攻势 → 将牌反击';
+
+  @override
   String summaryNarrative(String events, String result) {
     return '总评 : $events → $result';
   }
@@ -2182,6 +2185,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventDefenseLeadAttackCut => '守方非将牌最高出牌 → 进攻将牌切入夺先';
 
   @override
+  String trickEventDefenseTopAttackCutPointsFailed(int count) {
+    return '守方最高首攻 → 庄家将牌切 $count分防御失败';
+  }
+
+  @override
   String get trickEventAttackLeadDefenseCut => '进攻非将牌最高出牌 → 守方将牌切入';
 
   @override
@@ -2234,6 +2242,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String trickEventFriendWasteDeclarerCutDefenseOvercutPoints(int count) {
     return '朋友垫牌 → 庄家将牌切 → 守方高将牌逆转 防御$count分';
   }
+
+  @override
+  String get trickEventFriendWasteDeclarerHighDefenseReversal =>
+      '盟友垫牌 → 庄家高牌 → 防守逆转';
+
+  @override
+  String get trickEventDefenseWasteAttackReverseDefenseCut =>
+      '防守垫牌 → 进攻逆转 → 防守切牌再逆转';
 
   @override
   String get trickEventFriendLeadDefenseBeatDeclarerCut =>
