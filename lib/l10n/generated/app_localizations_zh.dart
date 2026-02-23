@@ -2089,10 +2089,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get summaryResultWin => '攻方成功';
 
   @override
-  String get summaryResultNarrowLoss => '惜败';
+  String get summaryResultNarrowLoss => '守方胜利';
 
   @override
-  String get summaryResultBigLoss => '大败';
+  String get summaryResultBigLoss => '守方大胜';
 
   @override
   String get summaryAnd => '与';

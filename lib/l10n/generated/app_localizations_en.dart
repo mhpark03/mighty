@@ -2129,10 +2129,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryResultWin => 'attack success';
 
   @override
-  String get summaryResultNarrowLoss => 'narrow loss';
+  String get summaryResultNarrowLoss => 'defense wins';
 
   @override
-  String get summaryResultBigLoss => 'big loss';
+  String get summaryResultBigLoss => 'defense dominates';
 
   @override
   String get summaryAnd => ' & ';

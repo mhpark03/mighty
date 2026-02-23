@@ -2096,10 +2096,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get summaryResultWin => '攻撃成功';
 
   @override
-  String get summaryResultNarrowLoss => '惜敗';
+  String get summaryResultNarrowLoss => '守備勝利';
 
   @override
-  String get summaryResultBigLoss => '大敗';
+  String get summaryResultBigLoss => '守備大勝';
 
   @override
   String get summaryAnd => 'と';

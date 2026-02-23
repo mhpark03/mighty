@@ -2102,10 +2102,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get summaryResultWin => '공격 성공';
 
   @override
-  String get summaryResultNarrowLoss => '석패';
+  String get summaryResultNarrowLoss => '수비 승리';
 
   @override
-  String get summaryResultBigLoss => '대패';
+  String get summaryResultBigLoss => '수비 대승';
 
   @override
   String get summaryAnd => '과 ';

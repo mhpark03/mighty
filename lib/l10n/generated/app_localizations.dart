@@ -3757,13 +3757,13 @@ abstract class AppLocalizations {
   /// No description provided for @summaryResultNarrowLoss.
   ///
   /// In ko, this message translates to:
-  /// **'석패'**
+  /// **'수비 승리'**
   String get summaryResultNarrowLoss;
 
   /// No description provided for @summaryResultBigLoss.
   ///
   /// In ko, this message translates to:
-  /// **'대패'**
+  /// **'수비 대승'**
   String get summaryResultBigLoss;
 
   /// No description provided for @summaryAnd.
