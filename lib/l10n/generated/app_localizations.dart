@@ -3700,6 +3700,18 @@ abstract class AppLocalizations {
   /// **'조커/마이티 추가 득점 부족'**
   String get summaryJokerMightyNoExtra;
 
+  /// No description provided for @summaryJokerMightyLost.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커/마이티로도 점수 획득 실패'**
+  String get summaryJokerMightyLost;
+
+  /// No description provided for @summaryEarlyCutMightyExtract.
+  ///
+  /// In ko, this message translates to:
+  /// **'초반 간 + 마이티 강제 추출 치명적 손실'**
+  String get summaryEarlyCutMightyExtract;
+
   /// No description provided for @summaryNarrative.
   ///
   /// In ko, this message translates to:
@@ -3933,6 +3945,18 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'물패로 선 넘김'**
   String get trickEventWaste;
+
+  /// No description provided for @trickEventWasteAttackFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'물패로 공격 실패'**
+  String get trickEventWasteAttackFailed;
+
+  /// No description provided for @trickEventDefenseLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 선공'**
+  String get trickEventDefenseLead;
 
   /// No description provided for @trickEventWasteWithTop.
   ///

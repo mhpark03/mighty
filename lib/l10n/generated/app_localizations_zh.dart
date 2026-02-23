@@ -2060,6 +2060,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get summaryJokerMightyNoExtra => '小丑/至尊追加得分不足';
 
   @override
+  String get summaryJokerMightyLost => '小丑/至尊仍得分不足';
+
+  @override
+  String get summaryEarlyCutMightyExtract => '早期切牌+至尊被迫出牌致命损失';
+
+  @override
   String summaryNarrative(String events, String result) {
     return '总评 : $events → $result';
   }
@@ -2200,6 +2206,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trickEventWaste => '弃牌让先手';
+
+  @override
+  String get trickEventWasteAttackFailed => '弃牌攻击失败';
+
+  @override
+  String get trickEventDefenseLead => '防守先攻';
 
   @override
   String trickEventWasteWithTop(String topCard) {

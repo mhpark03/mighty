@@ -2073,6 +2073,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get summaryJokerMightyNoExtra => '조커/마이티 추가 득점 부족';
 
   @override
+  String get summaryJokerMightyLost => '조커/마이티로도 점수 획득 실패';
+
+  @override
+  String get summaryEarlyCutMightyExtract => '초반 간 + 마이티 강제 추출 치명적 손실';
+
+  @override
   String summaryNarrative(String events, String result) {
     return '총평 : $events으로 $result';
   }
@@ -2213,6 +2219,12 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trickEventWaste => '물패로 선 넘김';
+
+  @override
+  String get trickEventWasteAttackFailed => '물패로 공격 실패';
+
+  @override
+  String get trickEventDefenseLead => '수비 선공';
 
   @override
   String trickEventWasteWithTop(String topCard) {

@@ -2854,6 +2854,34 @@ class AIPlayer {
         // ★ 마이티 미출 여부 확인: 미출 시 리드 무늬의 점수카드 노출 최소화
         final bool mightyStillInPlay = !_getPlayedCards(state).any((c) => c.isMightyWith(state.giruda));
 
+        // === 후반 (트릭 6+): 수비팀도 최상위 카드로 적극 선공 (점수카드 포함) ===
+        // 후반에는 남은 트릭이 적으므로 점수카드 포함 최상위 카드로 승리 시도
+        if (state.currentTrickNumber >= 6) {
+          Map<Suit, List<PlayingCard>> allGroups = {};
+          for (final c in defLeadCards) {
+            if (c.suit != null) {
+              allGroups.putIfAbsent(c.suit!, () => []).add(c);
+            }
+          }
+          Suit? bestSuitLate;
+          double bestScoreLate = -1;
+          for (final entry in allGroups.entries) {
+            double declarerProb = declarerHoldings[entry.key] ?? 0.5;
+            if (declarerProb < 0.3) continue;
+            double score = declarerProb + entry.value.length * 0.1;
+            if (score > bestScoreLate) {
+              bestScoreLate = score;
+              bestSuitLate = entry.key;
+            }
+          }
+          if (bestSuitLate != null && allGroups[bestSuitLate]!.isNotEmpty) {
+            final suitCards = allGroups[bestSuitLate]!;
+            suitCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+            _lastLeadIntent = LeadIntent.defenseHighCard;
+            return suitCards.first;
+          }
+        }
+
         // 1. 비점수카드 중 리드
         final nonPointCards = defLeadCards.where((c) => !c.isPointCard).toList();
         if (nonPointCards.isNotEmpty) {
@@ -2890,7 +2918,7 @@ class AIPlayer {
             }
           }
 
-          // 후반 또는 초반 공격 무늬 없는 경우: 기존 안전 전략
+          // 초반 공격 무늬 없는 경우: 안전 전략 (최저 비점수카드)
           // ★ 마이티 미출 시: 잔여 점수카드가 적은 무늬 우선 (마이티 캡처 피해 최소화)
           // ★ 주공 보유 확률 높은 무늬 우선 (기루다 컷 방지)
           nonPointCards.sort((a, b) {
@@ -3598,17 +3626,23 @@ class AIPlayer {
       }
     }
 
-    // === 주공 조커 선공: 수비팀 기루다 소진 시 확정 승리 ===
-    // 수비팀에 기루다가 없으면 조커 + 기루다 콜 → 아무도 기루다를 낼 수 없어 확정 승리
-    // 기루다와 한 무늬만 남아 비기루다로 이길 수 없을 때 특히 유리
-    // (기루다 카드를 아끼면서 선공권 유지)
+    // === 주공: 수비팀 기루다 없음 → 비기루다 최상위 카드 선공 ===
+    // 수비 기루다 없음 → 컷 불가 → 비기루다 최상위 카드로 확정 승리
+    // ★ 조커는 선 탈환/트릭9 수비 잔여 무늬 소진용으로 보존
     if (state.giruda != null && state.currentTrickNumber >= 2) {
       bool isAttackTeam = !_isPlayerOnDefenseTeam(player, state);
       if (isAttackTeam && player.isDeclarer) {
-        final hasJoker = playableCards.any((c) => c.isJoker);
-        if (hasJoker && !_estimateDefenseTeamHasGiruda(player, state)) {
-          _lastLeadIntent = LeadIntent.jokerGirudaExhaust;
-          return playableCards.firstWhere((c) => c.isJoker);
+        if (!_estimateDefenseTeamHasGiruda(player, state)) {
+          final topNonGiruda = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda &&
+              _isHighestRemainingCard(c, state, player.hand)).toList();
+          if (topNonGiruda.isNotEmpty) {
+            topNonGiruda.sort((a, b) =>
+                _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+            _lastLeadIntent = LeadIntent.topNonGirudaLead;
+            return topNonGiruda.first;
+          }
+          // 최상위 카드 없음 → 조커 보존, 아래 일반 전략으로 진행
         }
       }
     }

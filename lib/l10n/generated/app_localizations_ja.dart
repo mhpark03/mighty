@@ -2067,6 +2067,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get summaryJokerMightyNoExtra => 'ジョーカー/マイティ追加得点不足';
 
   @override
+  String get summaryJokerMightyLost => 'ジョーカー/マイティでも得点不足';
+
+  @override
+  String get summaryEarlyCutMightyExtract => '序盤カット+マイティ強制抽出で致命的損失';
+
+  @override
   String summaryNarrative(String events, String result) {
     return '総評 : $events → $result';
   }
@@ -2207,6 +2213,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trickEventWaste => '捨て札で先手譲り';
+
+  @override
+  String get trickEventWasteAttackFailed => '捨て札攻撃失敗';
+
+  @override
+  String get trickEventDefenseLead => '守備先攻';
 
   @override
   String trickEventWasteWithTop(String topCard) {

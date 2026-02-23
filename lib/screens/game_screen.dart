@@ -5513,6 +5513,48 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
+        // 9. 조커/마이티 모두 사용했지만 패배
+        if (!attackWins) {
+          bool attackPlayedJoker = false;
+          bool attackPlayedMighty = false;
+          for (final t in state.tricks) {
+            for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+              if (isAttack(t.playerOrder[i])) {
+                if (t.cards[i].isJoker) attackPlayedJoker = true;
+                if (isMighty(t.cards[i])) attackPlayedMighty = true;
+              }
+            }
+          }
+          if (attackPlayedJoker && attackPlayedMighty) {
+            keyEvents.clear();
+            keyEvents.add(l10n.summaryJokerMightyLost);
+          }
+        }
+
+        // 10. 초반 간 + 마이티 강제 추출로 치명적 손실
+        if (!attackWins && (bidTricks - attackPoints) >= 3) {
+          bool earlyMightyLowYield = false;
+          bool earlyCut = false;
+          final giruda = state.giruda;
+          for (int tIdx = 0; tIdx < state.tricks.length && tIdx < 3; tIdx++) {
+            final t = state.tricks[tIdx];
+            // 초반 트릭에서 마이티가 나왔으나 추가 점수 없음 (마이티 자체 1점 외 없음)
+            if (t.cards.any((c) => isMighty(c))) {
+              final pts = t.cards.where((c) => !c.isJoker && c.isPointCard).length;
+              if (pts <= 1) earlyMightyLowYield = true;
+            }
+            // 초반 간: 수비가 비기루다 리드 트릭을 이김
+            if (giruda != null && t.winnerId != null && !isAttack(t.winnerId!) &&
+                t.leadSuit != null && t.leadSuit != giruda) {
+              earlyCut = true;
+            }
+          }
+          if (earlyMightyLowYield && earlyCut) {
+            keyEvents.clear();
+            keyEvents.add(l10n.summaryEarlyCutMightyExtract);
+          }
+        }
+
         // 결과 라벨
         final result = attackWins && attackPoints >= bidTricks + 5
             ? l10n.summaryResultBigWin
@@ -5610,6 +5652,12 @@ class _GameScreenState extends State<GameScreen> {
         leadDescribed = true;
         if (trick.leadIntent == LeadIntent.defenseMightyExhaust ||
             trick.leadIntent == LeadIntent.midGirudaMightyBait) {
+          mightyExhaustDescribed = true;
+        }
+        // defenseTopCard가 마이티 소진 유도로 변환된 경우에도 중복 방지
+        if (trick.leadIntent == LeadIntent.defenseTopCard &&
+            !leadCard.isJoker && leadCard.suit == mighty.suit &&
+            trick.cards.asMap().entries.any((e) => e.key != leadIdx && isMighty(e.value))) {
           mightyExhaustDescribed = true;
         }
       }
@@ -6045,9 +6093,11 @@ class _GameScreenState extends State<GameScreen> {
           !c.isJoker && c.suit == giruda && c.rank == Rank.king);
       final qIdx = trick.cards.indexWhere((c) =>
           !c.isJoker && c.suit == giruda && c.rank == Rank.queen);
-      if (kIdx >= 0 && kIdx != leadIdx && qIdx >= 0 && qIdx != leadIdx) {
+      final kIsDefense = kIdx >= 0 && kIdx != leadIdx && !isAttack(trick.playerOrder[kIdx]);
+      final qIsDefense = qIdx >= 0 && qIdx != leadIdx && !isAttack(trick.playerOrder[qIdx]);
+      if (kIsDefense && qIsDefense) {
         parts.add(l10n.trickEventGirudaKQExhaustSuccess);
-      } else if (kIdx >= 0 && kIdx != leadIdx) {
+      } else if (kIsDefense) {
         parts.add(l10n.trickEventGirudaKExhaustSuccess);
       }
     }
@@ -6077,7 +6127,17 @@ class _GameScreenState extends State<GameScreen> {
       for (int i = 0; i < trick.cards.length; i++) {
         if (i == leadIdx) continue;
         if (isMighty(trick.cards[i])) {
-          parts.add(l10n.trickMightyAppeared);
+          // 수비팀이 마이티 무늬로 선공하여 마이티 조기 소진 유도 성공
+          if (!isAttack(leadId) && !leadCard.isJoker && leadCard.suit == mighty.suit) {
+            final ptCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
+            if (ptCount <= 1) {
+              parts.add(l10n.trickEventDefenseMightyExhaust);
+            } else {
+              parts.add(l10n.trickEventDefenseMightyExhaustPoints(ptCount));
+            }
+          } else {
+            parts.add(l10n.trickMightyAppeared);
+          }
           break;
         }
       }
@@ -6244,7 +6304,9 @@ class _GameScreenState extends State<GameScreen> {
         String desc = suitStr.isNotEmpty
             ? l10n.trickEventJokerLeadSuit(suitStr)
             : l10n.trickEventJokerLead;
-        desc += ' / ${l10n.trickEventJokerGirudaExhaust}';
+        if (declaredSuit != null && declaredSuit == giruda) {
+          desc += ' / ${l10n.trickEventJokerGirudaExhaust}';
+        }
         return desc;
       case LeadIntent.mightyLead:
         return l10n.trickEventMightyLead;
@@ -6273,6 +6335,17 @@ class _GameScreenState extends State<GameScreen> {
       case LeadIntent.topNonGirudaLead:
         return l10n.trickEventTopNonGirudaLead;
       case LeadIntent.defenseTopCard:
+        // 마이티 무늬 선공 + 마이티 출현 → 마이티 소진 유도로 표시
+        final dtcLeadIdx = trick.playerOrder.indexOf(trick.leadPlayerId!);
+        final dtcLeadCard = dtcLeadIdx >= 0 && dtcLeadIdx < trick.cards.length ? trick.cards[dtcLeadIdx] : null;
+        if (dtcLeadCard != null && !dtcLeadCard.isJoker && dtcLeadCard.suit == state.mighty.suit) {
+          final mightyInTrick = trick.cards.asMap().entries.any((e) =>
+              e.key != dtcLeadIdx && !e.value.isJoker &&
+              e.value.suit == state.mighty.suit && e.value.rank == state.mighty.rank);
+          if (mightyInTrick) {
+            return l10n.trickEventDefenseMightyExhaust;
+          }
+        }
         return l10n.trickEventDefenseTopCardDefend;
       case LeadIntent.firstTrickTopAttack:
         return l10n.trickEventFirstTrickTopAttack;
@@ -6287,7 +6360,9 @@ class _GameScreenState extends State<GameScreen> {
       case LeadIntent.defenseMightyExhaust:
         return l10n.trickEventDefenseMightyExhaust;
       case LeadIntent.friendVoidPass:
-        return l10n.trickEventWaste;
+        final fvpAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        return fvpAttackWon ? l10n.trickEventWaste : l10n.trickEventWasteAttackFailed;
       case LeadIntent.friendTopCardLead:
         return l10n.trickEventTopNonGirudaLead;
       case LeadIntent.defenseJokerLead:
@@ -6295,9 +6370,13 @@ class _GameScreenState extends State<GameScreen> {
       case LeadIntent.defenseHighCard:
         return l10n.trickEventDefenseTopCardDefend;
       case LeadIntent.defenseLowCard:
-        return l10n.trickEventWaste;
+        final dlcAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        return dlcAttackWon ? l10n.trickEventDefenseLead : l10n.trickEventWaste;
       case LeadIntent.waste:
-        return l10n.trickEventWaste;
+        final wasteAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        return wasteAttackWon ? l10n.trickEventWaste : l10n.trickEventWasteAttackFailed;
     }
   }
 
