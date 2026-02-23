@@ -3805,10 +3805,23 @@ class AIPlayer {
       // 기루다 저액 선공으로 수비팀 기루다 소진 → 마이티 프렌드가 기루다 void이면 마이티로 승리
       // 마이티 무늬(♠) 선공은 상대 고액 스페이드에 선을 빼앗길 위험이 높음
       if (friendCard.isMightyWith(state.giruda)) {
-        // ★ 마이티 프렌드 미공개 시: 물패로 프렌드 유도 (조커 기루다콜 대신)
-        // 조커로 기루다를 부르면 마이티가 소진되므로, 물패로 먼저 유도
+        // ★ 마이티 프렌드 미공개 시: 프렌드 유도
+        // 마이티는 언제나 낼 수 있으므로, 기루다 선공 → 수비팀 기루다 소비 + 마이티 승리
         if (!state.friendRevealed && !canMaintainLead) {
-          // 비기루다, 비마이티무늬 물패로 선공
+          // ★ 수비팀 기루다 소진 목표: 낮은 기루다로 마이티 유도
+          // 기루다 선공 시 수비팀은 기루다를 따라내야 하고, 마이티는 항상 승리
+          final remainingGirudaFL = _getRemainingGirudaCount(state, player);
+          if (remainingGirudaFL > 0 && state.giruda != null) {
+            final lowGirudaForLure = playableCards.where((c) =>
+                !c.isJoker && !c.isMightyWith(state.giruda) &&
+                c.suit == state.giruda && !c.isPointCard).toList();
+            if (lowGirudaForLure.isNotEmpty) {
+              lowGirudaForLure.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              _lastLeadIntent = LeadIntent.declarerFriendLure;
+              return lowGirudaForLure.first;
+            }
+          }
+          // 수비팀 기루다 없거나 낮은 기루다 없으면 물패로 선공
           final wasteForLure = playableCards.where((c) =>
               !c.isJoker && !c.isMightyWith(state.giruda) &&
               c.suit != state.giruda && c.suit != mightySuit &&
@@ -4203,25 +4216,25 @@ class AIPlayer {
                     c.rankValue <= 9 && !c.isPointCard).toList();
                 if (lowNonPoint.isNotEmpty) {
                   lowNonPoint.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-                  _lastLeadIntent = LeadIntent.waste;
+                  _lastLeadIntent = LeadIntent.girudaPreExchange;
                   return lowNonPoint.first;
                 }
                 final tens = suitCards.where((c) => c.rankValue == 10).toList();
-                if (tens.isNotEmpty) { _lastLeadIntent = LeadIntent.waste; return tens.first; }
+                if (tens.isNotEmpty) { _lastLeadIntent = LeadIntent.girudaPreExchange; return tens.first; }
                 final jacks = suitCards.where((c) => c.rankValue == 11).toList();
-                if (jacks.isNotEmpty) { _lastLeadIntent = LeadIntent.waste; return jacks.first; }
+                if (jacks.isNotEmpty) { _lastLeadIntent = LeadIntent.girudaPreExchange; return jacks.first; }
               } else {
                 // 프렌드 공개 → 비점수 최저
                 final nonPoint = suitCards.where((c) => !c.isPointCard).toList();
                 if (nonPoint.isNotEmpty) {
                   nonPoint.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-                  _lastLeadIntent = LeadIntent.waste;
+                  _lastLeadIntent = LeadIntent.girudaPreExchange;
                   return nonPoint.first;
                 }
               }
               // 최저 카드
               suitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-              _lastLeadIntent = LeadIntent.waste;
+              _lastLeadIntent = LeadIntent.girudaPreExchange;
               return suitCards.first;
             }
           }

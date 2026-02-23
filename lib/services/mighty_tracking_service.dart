@@ -138,7 +138,7 @@ class MightyTrackingService {
   static const _suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
   static const _rankSymbols = {14: 'A', 13: 'K', 12: 'Q', 11: 'J', 10: '10', 9: '9', 8: '8', 7: '7', 6: '6', 5: '5', 4: '4', 3: '3', 2: '2'};
 
-  static String? _describeLeadFromIntentKo(Trick trick, GameState state) {
+  static String? _describeLeadFromIntentKo(Trick trick, GameState state, {Set<String>? playedCards}) {
     final intent = trick.leadIntent;
     if (intent == null) return null;
 
@@ -170,17 +170,33 @@ class MightyTrackingService {
       case LeadIntent.midGirudaLead:
         return '기루다 중간 선공';
       case LeadIntent.midGirudaPassLead:
+      case LeadIntent.lowGirudaFriendPass: {
+        // 선 넘김 의도: 실제로 팀원이 이겼는지 확인
+        final passWinnerId = trick.winnerId;
+        if (passWinnerId != null && passWinnerId != trick.leadPlayerId) {
+          final leaderIsAttack = trick.leadPlayerId == state.declarerId || trick.leadPlayerId == state.friendId;
+          final winnerIsAttack = passWinnerId == state.declarerId || passWinnerId == state.friendId;
+          if (leaderIsAttack != winnerIsAttack) {
+            return '기루다 중간으로 선 넘김 실패';
+          }
+        }
         return '기루다 중간으로 선 넘김';
+      }
       case LeadIntent.soleGirudaLeadMaintain:
         return '공격 단독 기루다 보유, 선 유지';
-      case LeadIntent.lowGirudaFriendPass:
-        return '기루다 중간으로 선 넘김';
       case LeadIntent.highCardAttack:
         return '추가 점수 공격';
       case LeadIntent.topNonGirudaLead:
         return '비기루다 최상위 선공';
-      case LeadIntent.defenseTopCard:
+      case LeadIntent.defenseTopCard: {
+        // 공격팀이 컷 등으로 이겼으면 방어 실패
+        final dtcWinnerId = trick.winnerId;
+        if (dtcWinnerId != null && dtcWinnerId != trick.leadPlayerId) {
+          final winnerIsAttack = dtcWinnerId == state.declarerId || dtcWinnerId == state.friendId;
+          if (winnerIsAttack) return '수비 최상위 카드 선공';
+        }
         return '수비 최상위 카드 점수 방어';
+      }
       case LeadIntent.firstTrickTopAttack:
         // 선공 플레이어가 직접 이겼는지 구분
         if (trick.winnerId == trick.leadPlayerId) {
@@ -215,8 +231,20 @@ class MightyTrackingService {
         return '비기루다 최상위 선공';
       case LeadIntent.defenseJokerLead:
         return '조커 선공';
-      case LeadIntent.defenseHighCard:
+      case LeadIntent.defenseHighCard: {
+        // 해당 무늬의 최상위 카드가 아니면 수비 물패 공격으로 표시
+        final dhcLeadCard = trick.leadCard;
+        if (dhcLeadCard != null && !dhcLeadCard.isJoker && dhcLeadCard.suit != null && playedCards != null) {
+          bool isTop = true;
+          final mighty = state.mighty;
+          for (int r = 14; r > dhcLeadCard.rankValue; r--) {
+            if (dhcLeadCard.suit == mighty.suit && r == mighty.rankValue) continue;
+            if (!playedCards.contains('${dhcLeadCard.suit!.index}-$r')) { isTop = false; break; }
+          }
+          if (!isTop) return '수비 물패 공격';
+        }
         return '수비 최상위 카드 점수 방어';
+      }
       case LeadIntent.defenseLowCard:
         return '물패 처리';
       case LeadIntent.waste:
@@ -299,12 +327,8 @@ class MightyTrackingService {
         }
         if (lastLabel != null) lastParts.add(lastLabel);
 
-        if (trick.winnerId != null && pointCount > 0) {
-          if (!isAttack(trick.winnerId!)) {
-            lastParts.add('수비 상위 카드 방어');
-          } else {
-            lastParts.add('공격 점수 획득');
-          }
+        if (trick.winnerId != null && pointCount > 0 && !isAttack(trick.winnerId!)) {
+          lastParts.add('수비 상위 카드 방어');
         }
       }
 
@@ -316,8 +340,6 @@ class MightyTrackingService {
         } else {
           lastParts.add('공격 승리 확정');
         }
-      } else {
-        lastParts.add('공격 패배 확정');
       }
 
       // 총평 - 이벤트 기반
@@ -344,6 +366,21 @@ class MightyTrackingService {
             }
           }
           if (keyEvents.isNotEmpty) break;
+        }
+
+        // 1b. 아군 조커 헌납 (조커콜로 공격팀 조커가 강제 출전 → 수비 승리)
+        if (!attackWins) {
+          for (final t in state.tricks) {
+            if (t.jokerCall == JokerCallType.none) continue;
+            for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+              if (t.cards[i].isJoker && isAttack(t.playerOrder[i]) &&
+                  t.winnerId != null && !isAttack(t.winnerId!)) {
+                keyEvents.add('아군 조커 헌납');
+                break;
+              }
+            }
+            if (keyEvents.any((e) => e == '아군 조커 헌납')) break;
+          }
         }
 
         // 2. 수비 물패 공략 (공격 비기루다 비최상위 선공 → 수비 승리)
@@ -522,7 +559,7 @@ class MightyTrackingService {
     // Lead card description
     bool leadDescribed = false;
     if (trick.leadIntent != null) {
-      final leadDesc = _describeLeadFromIntentKo(trick, state);
+      final leadDesc = _describeLeadFromIntentKo(trick, state, playedCards: playedCards);
       if (leadDesc != null) {
         parts.add(leadDesc);
         leadDescribed = true;
@@ -1093,14 +1130,29 @@ class MightyTrackingService {
         final girudaAHolder = findCardHolder((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
         // 초구에서 선공자는 기루다를 리드할 수 없으므로 제외
         if (girudaAHolder != null && !(trick.trickNumber == 1 && girudaAHolder == leadId)) {
-          final name = girudaAHolder >= 0 && girudaAHolder < _playerNamesKo.length ? _playerNamesKo[girudaAHolder] : '?';
-          final mightyPlayed = mighty.suit != null &&
-              (playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}') ||
-               trick.cards.any((c) => isMighty(c)));
-          if (!mightyPlayed && !isAttack(girudaAHolder)) {
-            parts.add('$name: 기루다 A 보유, 마이티 경계로 미사용');
-          } else if (mightyPlayed) {
-            parts.add('$name: 기루다 A 보유, 미사용');
+          // ★ 선행 무늬를 보유하여 기루다 A를 낼 수 없는 경우 제외
+          // 선공자가 아니고, 선행 무늬가 기루다가 아니며, 선행 무늬를 따라냈으면
+          // 기루다 A를 낼 수 있는 상황이 아니었으므로 "미사용" 표시 불필요
+          bool couldPlayGirudaA = true;
+          if (girudaAHolder != leadId && trick.leadSuit != null && trick.leadSuit != giruda) {
+            final holderIdx = trick.playerOrder.indexOf(girudaAHolder);
+            if (holderIdx >= 0 && holderIdx < trick.cards.length) {
+              final holderCard = trick.cards[holderIdx];
+              if (!holderCard.isJoker && holderCard.suit == trick.leadSuit) {
+                couldPlayGirudaA = false;
+              }
+            }
+          }
+          if (couldPlayGirudaA) {
+            final name = girudaAHolder >= 0 && girudaAHolder < _playerNamesKo.length ? _playerNamesKo[girudaAHolder] : '?';
+            final mightyPlayed = mighty.suit != null &&
+                (playedCards.contains('${mighty.suit!.index}-${mighty.rankValue}') ||
+                 trick.cards.any((c) => isMighty(c)));
+            if (!mightyPlayed && !isAttack(girudaAHolder)) {
+              parts.add('$name: 기루다 A 보유, 마이티 경계로 미사용');
+            } else if (mightyPlayed) {
+              parts.add('$name: 기루다 A 보유, 미사용');
+            }
           }
         }
       }
