@@ -2290,6 +2290,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventWasteAttackFailed => 'Waste attack failed';
 
   @override
+  String get trickEventPreExchange => 'Lead exchange (preserve trump)';
+
+  @override
+  String get trickEventPreExchangeKept =>
+      'Lead exchange (preserve trump) → lead kept';
+
+  @override
   String get trickEventFriendPassLeadFailed => 'Lead pass failed';
 
   @override

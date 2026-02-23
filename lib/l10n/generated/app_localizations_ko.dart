@@ -2253,6 +2253,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventWasteAttackFailed => '물패로 공격 실패';
 
   @override
+  String get trickEventPreExchange => '선교환 (기루다 보존)';
+
+  @override
+  String get trickEventPreExchangeKept => '선교환 (기루다 보존) → 선 유지';
+
+  @override
   String get trickEventFriendPassLeadFailed => '선 넘기기 실패';
 
   @override

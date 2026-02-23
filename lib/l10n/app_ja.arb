@@ -1057,6 +1057,8 @@
   "@trickEventAttackFailedWithTop": { "placeholders": { "topCard": { "type": "String" } } },
   "trickEventWaste": "捨て札で先手譲り",
   "trickEventWasteAttackFailed": "捨て札攻撃失敗",
+  "trickEventPreExchange": "先手交換 (切札温存)",
+  "trickEventPreExchangeKept": "先手交換 (切札温存) → 先手維持",
   "trickEventFriendPassLeadFailed": "リード渡し失敗",
   "trickEventDefenseLead": "守備先攻",
   "trickEventWasteWithTop": "捨て札 ({topCard} 最上位)",

@@ -1217,6 +1217,8 @@
   "@trickEventAttackFailedWithTop": { "placeholders": { "topCard": { "type": "String" } } },
   "trickEventWaste": "물패로 선 넘김",
   "trickEventWasteAttackFailed": "물패로 공격 실패",
+  "trickEventPreExchange": "선교환 (기루다 보존)",
+  "trickEventPreExchangeKept": "선교환 (기루다 보존) → 선 유지",
   "trickEventFriendPassLeadFailed": "선 넘기기 실패",
   "trickEventDefenseLead": "수비 선공",
   "trickEventWasteWithTop": "물패 ({topCard} 최상위)",

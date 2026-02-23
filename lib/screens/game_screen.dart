@@ -6543,7 +6543,7 @@ class _GameScreenState extends State<GameScreen> {
       case LeadIntent.girudaPreExchange:
         final peAttackWon = trick.winnerId != null &&
             (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
-        return peAttackWon ? l10n.trickEventWaste : l10n.trickEventWasteAttackFailed;
+        return peAttackWon ? l10n.trickEventPreExchangeKept : l10n.trickEventPreExchange;
       case LeadIntent.jokerCallLead:
         String jcDesc = l10n.trickEventJokerCallDeclared;
         final jcLeadId = trick.leadPlayerId;

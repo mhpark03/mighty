@@ -1058,6 +1058,8 @@
   "@trickEventAttackFailedWithTop": { "placeholders": { "topCard": { "type": "String" } } },
   "trickEventWaste": "Passing lead with waste",
   "trickEventWasteAttackFailed": "Waste attack failed",
+  "trickEventPreExchange": "Lead exchange (preserve trump)",
+  "trickEventPreExchangeKept": "Lead exchange (preserve trump) → lead kept",
   "trickEventFriendPassLeadFailed": "Lead pass failed",
   "trickEventDefenseLead": "Defense lead",
   "trickEventWasteWithTop": "Waste ({topCard} is top)",

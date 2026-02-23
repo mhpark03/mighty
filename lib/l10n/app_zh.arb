@@ -1057,6 +1057,8 @@
   "@trickEventAttackFailedWithTop": { "placeholders": { "topCard": { "type": "String" } } },
   "trickEventWaste": "弃牌让先手",
   "trickEventWasteAttackFailed": "弃牌攻击失败",
+  "trickEventPreExchange": "先手交换 (保留王牌)",
+  "trickEventPreExchangeKept": "先手交换 (保留王牌) → 先手维持",
   "trickEventFriendPassLeadFailed": "传递先手失败",
   "trickEventDefenseLead": "防守先攻",
   "trickEventWasteWithTop": "弃牌 ({topCard} 最高)",

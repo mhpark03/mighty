@@ -2247,6 +2247,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventWasteAttackFailed => '捨て札攻撃失敗';
 
   @override
+  String get trickEventPreExchange => '先手交換 (切札温存)';
+
+  @override
+  String get trickEventPreExchangeKept => '先手交換 (切札温存) → 先手維持';
+
+  @override
   String get trickEventFriendPassLeadFailed => 'リード渡し失敗';
 
   @override

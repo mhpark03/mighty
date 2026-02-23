@@ -4018,6 +4018,18 @@ abstract class AppLocalizations {
   /// **'물패로 공격 실패'**
   String get trickEventWasteAttackFailed;
 
+  /// No description provided for @trickEventPreExchange.
+  ///
+  /// In ko, this message translates to:
+  /// **'선교환 (기루다 보존)'**
+  String get trickEventPreExchange;
+
+  /// No description provided for @trickEventPreExchangeKept.
+  ///
+  /// In ko, this message translates to:
+  /// **'선교환 (기루다 보존) → 선 유지'**
+  String get trickEventPreExchangeKept;
+
   /// No description provided for @trickEventFriendPassLeadFailed.
   ///
   /// In ko, this message translates to:

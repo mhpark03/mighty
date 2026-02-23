@@ -2240,6 +2240,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventWasteAttackFailed => '弃牌攻击失败';
 
   @override
+  String get trickEventPreExchange => '先手交换 (保留王牌)';
+
+  @override
+  String get trickEventPreExchangeKept => '先手交换 (保留王牌) → 先手维持';
+
+  @override
   String get trickEventFriendPassLeadFailed => '传递先手失败';
 
   @override
