@@ -4144,6 +4144,12 @@ abstract class AppLocalizations {
   /// **'공격 기루다 컷 {count}회'**
   String trickEventAttackGirudaCutCount(int count);
 
+  /// No description provided for @trickEventSameTeamGirudaCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'같은팀 기루다 간 (불가피)'**
+  String get trickEventSameTeamGirudaCut;
+
   /// No description provided for @trickEventDefenseGirudaCut.
   ///
   /// In ko, this message translates to:

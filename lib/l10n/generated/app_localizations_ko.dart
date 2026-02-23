@@ -2334,6 +2334,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get trickEventSameTeamGirudaCut => '같은팀 기루다 간 (불가피)';
+
+  @override
   String get trickEventDefenseGirudaCut => '수비 기루다 컷';
 
   @override

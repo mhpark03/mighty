@@ -2373,6 +2373,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get trickEventSameTeamGirudaCut => 'Same-team trump cut (forced)';
+
+  @override
   String get trickEventDefenseGirudaCut => 'Defense trump cut';
 
   @override

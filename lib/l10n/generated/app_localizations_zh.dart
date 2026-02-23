@@ -2321,6 +2321,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get trickEventSameTeamGirudaCut => '同队将牌切入（不可避免）';
+
+  @override
   String get trickEventDefenseGirudaCut => '守方将牌切入';
 
   @override

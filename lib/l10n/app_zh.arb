@@ -1085,6 +1085,7 @@
   "trickEventAttackGirudaCut": "攻方将牌切入",
   "trickEventAttackGirudaCutCount": "攻方将牌切入 {count}次",
   "@trickEventAttackGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventSameTeamGirudaCut": "同队将牌切入（不可避免）",
   "trickEventDefenseGirudaCut": "守方将牌切入",
   "trickEventDefenseGirudaCutCount": "守方将牌切入 {count}次",
   "@trickEventDefenseGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },

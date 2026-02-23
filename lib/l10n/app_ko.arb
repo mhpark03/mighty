@@ -1245,6 +1245,7 @@
   "trickEventAttackGirudaCut": "공격 기루다 컷",
   "trickEventAttackGirudaCutCount": "공격 기루다 컷 {count}회",
   "@trickEventAttackGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventSameTeamGirudaCut": "같은팀 기루다 간 (불가피)",
   "trickEventDefenseGirudaCut": "수비 기루다 컷",
   "trickEventDefenseGirudaCutCount": "수비 기루다 컷 {count}회",
   "@trickEventDefenseGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },

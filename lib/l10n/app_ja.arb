@@ -1085,6 +1085,7 @@
   "trickEventAttackGirudaCut": "攻撃切り札カット",
   "trickEventAttackGirudaCutCount": "攻撃切り札カット {count}回",
   "@trickEventAttackGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventSameTeamGirudaCut": "味方切り札カット（やむを得ず）",
   "trickEventDefenseGirudaCut": "守備切り札カット",
   "trickEventDefenseGirudaCutCount": "守備切り札カット {count}回",
   "@trickEventDefenseGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },

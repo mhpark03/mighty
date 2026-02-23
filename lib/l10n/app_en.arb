@@ -1086,6 +1086,7 @@
   "trickEventAttackGirudaCut": "Attack trump cut",
   "trickEventAttackGirudaCutCount": "Attack trump cut x{count}",
   "@trickEventAttackGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "trickEventSameTeamGirudaCut": "Same-team trump cut (forced)",
   "trickEventDefenseGirudaCut": "Defense trump cut",
   "trickEventDefenseGirudaCutCount": "Defense trump cut x{count}",
   "@trickEventDefenseGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
