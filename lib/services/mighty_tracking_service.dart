@@ -506,7 +506,25 @@ class MightyTrackingService {
           } else if (atkJoker && atkMighty) {
             summary = '조커/마이티 활용 실패 → 수비 승리';
           } else {
-            summary = '수비 승리';
+            // 수비 소수 트릭 고득점 집중 체크
+            int defTricks = 0, defPoints = 0, defLatePoints = 0;
+            for (final t in state.tricks) {
+              if (t.winnerId != null && !isAttack(t.winnerId!)) {
+                defTricks++;
+                final pts = t.cards.where((c) => !c.isJoker && c.isPointCard).length;
+                defPoints += pts;
+                if (t.trickNumber >= 6) defLatePoints += pts;
+              }
+            }
+            if (defTricks > 0 && defTricks <= 4 && defPoints / defTricks >= 2.5) {
+              if (defLatePoints > defPoints * 0.5) {
+                summary = '후반 물패 공격 고득점 집중으로 수비 승리';
+              } else {
+                summary = '수비 소수 트릭 고득점 집중으로 수비 승리';
+              }
+            } else {
+              summary = '수비 승리';
+            }
           }
         }
         lastParts.add('총평: $summary');
