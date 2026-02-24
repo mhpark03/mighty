@@ -138,6 +138,23 @@ class MightyTrackingService {
   static const _suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
   static const _rankSymbols = {14: 'A', 13: 'K', 12: 'Q', 11: 'J', 10: '10', 9: '9', 8: '8', 7: '7', 6: '6', 5: '5', 4: '4', 3: '3', 2: '2'};
 
+  /// 수비팀이 이 트릭에서 기루다를 실제로 냈는지 확인
+  static bool _defensePlayedGiruda(Trick trick, GameState state) {
+    final giruda = state.giruda;
+    if (giruda == null) return false;
+    final leadId = trick.leadPlayerId;
+    final isLeaderAttack = leadId == state.declarerId || leadId == state.friendId;
+    for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+      if (trick.playerOrder[i] == leadId) continue;
+      final isPlayerAttack = trick.playerOrder[i] == state.declarerId || trick.playerOrder[i] == state.friendId;
+      if (isLeaderAttack != isPlayerAttack &&
+          !trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   static String? _describeLeadFromIntentKo(Trick trick, GameState state, {Set<String>? playedCards}) {
     final intent = trick.leadIntent;
     if (intent == null) return null;
@@ -151,13 +168,16 @@ class MightyTrackingService {
         return suitStr.isNotEmpty ? '프렌드 합류 후 조커 ($suitStr) → 점수 획득' : '프렌드 합류 후 조커 → 점수 획득';
       case LeadIntent.jokerLeadSuit:
         String desc = suitStr.isNotEmpty ? '조커 선공 ($suitStr)' : '조커 선공';
-        if (declaredSuit != null && declaredSuit == giruda) {
+        if (declaredSuit != null && declaredSuit == giruda &&
+            _defensePlayedGiruda(trick, state)) {
           desc += ' / 수비팀 기루다 소진 유도';
         }
         return desc;
       case LeadIntent.jokerGirudaExhaust:
         String desc = suitStr.isNotEmpty ? '조커 선공 ($suitStr)' : '조커 선공';
-        desc += ' / 수비팀 기루다 소진 유도';
+        if (_defensePlayedGiruda(trick, state)) {
+          desc += ' / 수비팀 기루다 소진 유도';
+        }
         return desc;
       case LeadIntent.mightyLead:
         return '마이티 선공';
@@ -587,7 +607,8 @@ class MightyTrackingService {
         String jokerDesc = suitStr.isNotEmpty
             ? '조커 선공 ($suitStr)'
             : '조커 선공';
-        if (declaredSuit != null && declaredSuit == giruda) {
+        if (declaredSuit != null && declaredSuit == giruda &&
+            _defensePlayedGiruda(trick, state)) {
           jokerDesc += ' / 수비팀 기루다 소진 유도';
         }
         parts.add(jokerDesc);
@@ -959,18 +980,39 @@ class MightyTrackingService {
           parts.add('공격 1차 간 → 수비 상위 기루다 방어');
         }
       } else if (attackCuts > 0) {
-        // 선공자도 공격팀이면 같은팀 간 (기루다밖에 없어서 강제 컷)
         final leadIsAttack = isAttack(leadId);
         if (leadIsAttack) {
-          parts.add(attackCuts > 1 ? '공격 기루다 소진 (같은팀 간 ${attackCuts}회)' : '공격 기루다 소진 (같은팀 간)');
+          // 같은팀 간: 선공자가 비기루다 최상위로 이기려 했는데 같은팀이 기루다 간한 경우만
+          // 물패(선 넘기기 의도)일 때는 표시하지 않음
+          bool leadWasTopOfSuit = false;
+          if (!leadCard.isJoker && leadCard.suit != null && leadCard.suit != giruda) {
+            leadWasTopOfSuit = true;
+            for (int r = 14; r > leadCard.rankValue; r--) {
+              if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
+              if (!playedCards.contains('${leadCard.suit!.index}-$r')) { leadWasTopOfSuit = false; break; }
+            }
+          }
+          if (leadWasTopOfSuit) {
+            parts.add(attackCuts > 1 ? '공격 기루다 소진 (같은팀 간 ${attackCuts}회)' : '같은팀 기루다 간 (불가피)');
+          }
         } else {
           parts.add(attackCuts > 1 ? '공격 기루다 컷 ${attackCuts}회' : '공격 기루다 컷');
         }
       } else if (defenseCuts > 0) {
-        // 선공자도 수비팀이면 같은팀 간 (기루다밖에 없어서 강제 컷)
         final leadIsDefense = !isAttack(leadId);
         if (leadIsDefense) {
-          parts.add(defenseCuts > 1 ? '수비 기루다 소진 (같은팀 간 ${defenseCuts}회)' : '수비 기루다 소진 (같은팀 간)');
+          // 같은팀 간: 선공자가 비기루다 최상위로 이기려 했는데 같은팀이 기루다 간한 경우만
+          bool leadWasTopOfSuit = false;
+          if (!leadCard.isJoker && leadCard.suit != null && leadCard.suit != giruda) {
+            leadWasTopOfSuit = true;
+            for (int r = 14; r > leadCard.rankValue; r--) {
+              if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
+              if (!playedCards.contains('${leadCard.suit!.index}-$r')) { leadWasTopOfSuit = false; break; }
+            }
+          }
+          if (leadWasTopOfSuit) {
+            parts.add(defenseCuts > 1 ? '수비 기루다 소진 (같은팀 간 ${defenseCuts}회)' : '같은팀 기루다 간 (불가피)');
+          }
         } else {
           parts.add(defenseCuts > 1 ? '수비 기루다 컷 ${defenseCuts}회' : '수비 기루다 컷');
         }

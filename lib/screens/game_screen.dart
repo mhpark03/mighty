@@ -6149,18 +6149,39 @@ class _GameScreenState extends State<GameScreen> {
           parts.add(l10n.trickEventAttackCutDefenseOvercut);
         }
       } else if (attackCuts > 0) {
-        // 선공자가 같은 공격팀이면 같은팀 간 (불가피)
         final leadIsAttack = leadId != null && isAttack(leadId);
         if (leadIsAttack) {
-          parts.add(l10n.trickEventSameTeamGirudaCut);
+          // 같은팀 간: 선공자가 비기루다 최상위로 이기려 했는데 같은팀이 기루다 간한 경우만
+          // 물패(선 넘기기 의도)일 때는 표시하지 않음
+          bool leadWasTopOfSuit = false;
+          if (!leadCard.isJoker && leadCard.suit != null && leadCard.suit != giruda) {
+            leadWasTopOfSuit = true;
+            for (int r = 14; r > leadCard.rankValue; r--) {
+              if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
+              if (!playedCards.contains('${leadCard.suit!.index}-$r')) { leadWasTopOfSuit = false; break; }
+            }
+          }
+          if (leadWasTopOfSuit) {
+            parts.add(l10n.trickEventSameTeamGirudaCut);
+          }
         } else {
           parts.add(attackCuts > 1 ? l10n.trickEventAttackGirudaCutCount(attackCuts) : l10n.trickEventAttackGirudaCut);
         }
       } else if (defenseCuts > 0) {
-        // 선공자가 같은 수비팀이면 같은팀 간 (불가피)
         final leadIsDefense = leadId != null && !isAttack(leadId);
         if (leadIsDefense) {
-          parts.add(l10n.trickEventSameTeamGirudaCut);
+          // 같은팀 간: 선공자가 비기루다 최상위로 이기려 했는데 같은팀이 기루다 간한 경우만
+          bool leadWasTopOfSuit = false;
+          if (!leadCard.isJoker && leadCard.suit != null && leadCard.suit != giruda) {
+            leadWasTopOfSuit = true;
+            for (int r = 14; r > leadCard.rankValue; r--) {
+              if (leadCard.suit == mighty.suit && r == mighty.rankValue) continue;
+              if (!playedCards.contains('${leadCard.suit!.index}-$r')) { leadWasTopOfSuit = false; break; }
+            }
+          }
+          if (leadWasTopOfSuit) {
+            parts.add(l10n.trickEventSameTeamGirudaCut);
+          }
         } else {
           parts.add(defenseCuts > 1 ? l10n.trickEventDefenseGirudaCutCount(defenseCuts) : l10n.trickEventDefenseGirudaCut);
         }
