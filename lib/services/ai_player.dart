@@ -4185,19 +4185,41 @@ class AIPlayer {
           // (F-pre) 선교환: 비기루다 물패가 남아있으면 기루다 보존
           // (D) 조건 미충족(dCount < 2 등)이지만 물패 1장이라도 있으면 기루다 대신 사용
           if (nonGirudaDump.isNotEmpty && state.currentTrickNumber < 10) {
-            final hasRecapturePE3 = hasJokerForLead ||
-                (myGirudaForLead.isNotEmpty && voidSuits >= 1);
-            if (hasRecapturePE3) {
-              final nonPointPE3 = nonGirudaDump.where((c) => !c.isPointCard).toList();
-              if (nonPointPE3.isNotEmpty) {
-                nonPointPE3.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            // 프렌드 공개 시 조커 우선 사용 (확실한 선 탈환)
+            // 프렌드 미공개 시 선 넘김 우선 (프렌드 노출 방지)
+            if (state.friendRevealed && hasJokerForLead) {
+              final jokerPE3 = playableCards.where((c) => c.isJoker).toList();
+              if (jokerPE3.isNotEmpty) {
                 _lastLeadIntent = LeadIntent.girudaPreExchange;
-                return nonPointPE3.first;
+                return jokerPE3.first;
               }
-              nonGirudaDump.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-              _lastLeadIntent = LeadIntent.girudaPreExchange;
-              return nonGirudaDump.first;
             }
+            // 차상위 카드 보유 무늬에서 9이하로 수비 최상위 유도
+            final nearTopSuitsPE3 = <Suit>{};
+            for (final c in nonGirudaDump) {
+              if (c.suit != null) {
+                final ev = _getEffectiveCardValue(c, state);
+                if (ev >= 12 && ev < 14) nearTopSuitsPE3.add(c.suit!);
+              }
+            }
+            if (nearTopSuitsPE3.isNotEmpty) {
+              final baitPE3 = nonGirudaDump.where((c) =>
+                  c.rankValue <= 9 && nearTopSuitsPE3.contains(c.suit)).toList();
+              if (baitPE3.isNotEmpty) {
+                baitPE3.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                _lastLeadIntent = LeadIntent.girudaPreExchange;
+                return baitPE3.first;
+              }
+            }
+            final nonPointPE3 = nonGirudaDump.where((c) => !c.isPointCard).toList();
+            if (nonPointPE3.isNotEmpty) {
+              nonPointPE3.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              _lastLeadIntent = LeadIntent.girudaPreExchange;
+              return nonPointPE3.first;
+            }
+            nonGirudaDump.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+            _lastLeadIntent = LeadIntent.girudaPreExchange;
+            return nonGirudaDump.first;
           }
 
           // (F) Fallback: 기루다 최저 리드
@@ -4554,43 +4576,50 @@ class AIPlayer {
           if (nonGirudaCards.isNotEmpty) {
             nonGirudaCards.sort((a, b) =>
                 _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
-            // 비기루다 최고 카드가 이길 가능성이 있을 때만 사용
-            if (_getEffectiveCardValue(nonGirudaCards.first, state) >= 12) {
+            // 비기루다 실효 최상위(≥14)만 공격 사용 (차상위는 선교환으로 보존)
+            if (_getEffectiveCardValue(nonGirudaCards.first, state) >= 14) {
               _lastLeadIntent = LeadIntent.highCardAttack;
               return nonGirudaCards.first;
             }
 
             // ★ 선교환 모드: 상대 기루다 없음 → 기루다 보존, 비기루다 물패 우선
             // 기루다를 지금 내도 상대에서 빼낼 기루다가 없어 무의미
-            // 비기루다 물패로 선 넘기고, 나중에 기루다 컷으로 선 탈환 + 점수 확보
+            // 물패 소진 → void 생성 → 나중에 기루다 컷으로 선 탈환 + 점수 확보
             if (state.currentTrickNumber < 10) {
-              // 선 탈환 수단 확인: 조커/마이티/기루다 컷(void 무늬)
-              final hasJokerPE = playableCards.any((c) => c.isJoker);
-              final hasMightyPE = playableCards.any((c) => c.isMightyWith(state.giruda));
-              Set<Suit> myNonGirudaSuitsPE = {};
-              for (final c in player.hand) {
-                if (!c.isJoker && c.suit != null && c.suit != state.giruda) {
-                  myNonGirudaSuitsPE.add(c.suit!);
-                }
-              }
-              final nonGirudaSuitTotalPE = Suit.values.where((s) => s != state.giruda!).length;
-              final voidSuitsPE = nonGirudaSuitTotalPE - myNonGirudaSuitsPE.length;
-              final hasRecapturePE = hasJokerPE || hasMightyPE ||
-                  (myGirudaCards.isNotEmpty && voidSuitsPE >= 1);
-
-              if (hasRecapturePE) {
-                // 비점수 최저 카드 우선 → 점수 카드는 후순위
-                final nonPointCards = nonGirudaCards.where((c) => !c.isPointCard).toList();
-                if (nonPointCards.isNotEmpty) {
-                  nonPointCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-                  _lastLeadIntent = LeadIntent.girudaPreExchange;
-                  return nonPointCards.first;
-                }
-                // 비점수 카드 없으면 점수 카드 중 최저
-                nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              // 조커 보유 시 우선 사용 (확실한 선 탈환)
+              final jokerPE = playableCards.where((c) => c.isJoker).toList();
+              if (jokerPE.isNotEmpty) {
                 _lastLeadIntent = LeadIntent.girudaPreExchange;
-                return nonGirudaCards.first;
+                return jokerPE.first;
               }
+              // 차상위 카드 보유 무늬에서 9이하로 수비 최상위 유도
+              final nearTopSuits = <Suit>{};
+              for (final c in nonGirudaCards) {
+                if (c.suit != null) {
+                  final ev = _getEffectiveCardValue(c, state);
+                  if (ev >= 12 && ev < 14) nearTopSuits.add(c.suit!);
+                }
+              }
+              if (nearTopSuits.isNotEmpty) {
+                final baitCards = nonGirudaCards.where((c) =>
+                    c.rankValue <= 9 && nearTopSuits.contains(c.suit)).toList();
+                if (baitCards.isNotEmpty) {
+                  baitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                  _lastLeadIntent = LeadIntent.girudaPreExchange;
+                  return baitCards.first;
+                }
+              }
+              // 9이하 최저 카드 우선 → 점수 카드는 후순위
+              final lowCards = nonGirudaCards.where((c) => c.rankValue <= 9).toList();
+              if (lowCards.isNotEmpty) {
+                lowCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                _lastLeadIntent = LeadIntent.girudaPreExchange;
+                return lowCards.first;
+              }
+              // 9이하 없으면 점수 카드 중 최저
+              nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              _lastLeadIntent = LeadIntent.girudaPreExchange;
+              return nonGirudaCards.first;
             }
           }
 
@@ -4665,38 +4694,46 @@ class AIPlayer {
           }
           // ★ 선교환 모드: 상대 기루다 1장 이하 → 기루다 보존, 비기루다 물패 우선
           // 상대 기루다가 거의 없으면 기루다 선공으로 소진시킬 효과 미미
-          // 비기루다 물패 → 나중에 기루다 컷으로 선 탈환 + 점수 확보가 유리
+          // 물패 소진 → void 생성 → 나중에 기루다 컷으로 선 탈환 + 점수 확보
           {
             final remainingOppGirudaPE = _getRemainingGirudaCount(state, player);
             if (remainingOppGirudaPE <= 1 && state.currentTrickNumber < 10) {
               final nonGirudaForPE = cardsToConsider.where((c) =>
                   !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
               if (nonGirudaForPE.isNotEmpty) {
-                // 선 탈환 수단 확인
-                final hasJokerPE2 = playableCards.any((c) => c.isJoker);
-                final hasMightyPE2 = playableCards.any((c) => c.isMightyWith(state.giruda));
-                Set<Suit> myNonGirudaSuitsPE2 = {};
-                for (final c in player.hand) {
-                  if (!c.isJoker && c.suit != null && c.suit != state.giruda) {
-                    myNonGirudaSuitsPE2.add(c.suit!);
-                  }
-                }
-                final nonGirudaSuitTotalPE2 = Suit.values.where((s) => s != state.giruda!).length;
-                final voidSuitsPE2 = nonGirudaSuitTotalPE2 - myNonGirudaSuitsPE2.length;
-                final hasRecapturePE2 = hasJokerPE2 || hasMightyPE2 ||
-                    (myGirudaCards.isNotEmpty && voidSuitsPE2 >= 1);
-
-                if (hasRecapturePE2) {
-                  final nonPointPE2 = nonGirudaForPE.where((c) => !c.isPointCard).toList();
-                  if (nonPointPE2.isNotEmpty) {
-                    nonPointPE2.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-                    _lastLeadIntent = LeadIntent.girudaPreExchange;
-                    return nonPointPE2.first;
-                  }
-                  nonGirudaForPE.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                // 조커 보유 시 우선 사용 (확실한 선 탈환)
+                final jokerPE2 = playableCards.where((c) => c.isJoker).toList();
+                if (jokerPE2.isNotEmpty) {
                   _lastLeadIntent = LeadIntent.girudaPreExchange;
-                  return nonGirudaForPE.first;
+                  return jokerPE2.first;
                 }
+                // 차상위 카드 보유 무늬에서 9이하로 수비 최상위 유도
+                final nearTopSuitsPE2 = <Suit>{};
+                for (final c in nonGirudaForPE) {
+                  if (c.suit != null) {
+                    final ev = _getEffectiveCardValue(c, state);
+                    if (ev >= 12 && ev < 14) nearTopSuitsPE2.add(c.suit!);
+                  }
+                }
+                if (nearTopSuitsPE2.isNotEmpty) {
+                  final baitPE2 = nonGirudaForPE.where((c) =>
+                      c.rankValue <= 9 && nearTopSuitsPE2.contains(c.suit)).toList();
+                  if (baitPE2.isNotEmpty) {
+                    baitPE2.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                    _lastLeadIntent = LeadIntent.girudaPreExchange;
+                    return baitPE2.first;
+                  }
+                }
+                // 9이하 최저 카드 우선 → 점수 카드는 후순위
+                final lowPE2 = nonGirudaForPE.where((c) => c.rankValue <= 9).toList();
+                if (lowPE2.isNotEmpty) {
+                  lowPE2.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                  _lastLeadIntent = LeadIntent.girudaPreExchange;
+                  return lowPE2.first;
+                }
+                nonGirudaForPE.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                _lastLeadIntent = LeadIntent.girudaPreExchange;
+                return nonGirudaForPE.first;
               }
             }
           }

@@ -241,7 +241,7 @@ class MightyTrackingService {
         final ftaIsAttack = (int id) => id == state.declarerId || id == state.friendId;
         final ftaAttackWon = trick.winnerId != null && ftaIsAttack(trick.winnerId!);
         if (ftaAttackWon) {
-          return '초구 비기루다 최상위 → 팀 역전';
+          return '초구 비기루다 최상위 선공';
         }
         return '초구 비기루다 최상위 선공 실패';
       case LeadIntent.firstTrickMightyBait:
@@ -1066,7 +1066,13 @@ class MightyTrackingService {
       for (int i = 0; i < trick.cards.length; i++) {
         if (i == leadIdx) continue;
         if (isMighty(trick.cards[i])) {
-          parts.add('마이티 출현');
+          // 마이티 무늬가 선공 무늬와 같으면 유일 보유로 불가피하게 낸 것
+          final mightyFollowedSuit = mighty.suit != null && trick.leadSuit == mighty.suit;
+          if (mightyFollowedSuit) {
+            parts.add('마이티 유일 보유, 불가피한 출현');
+          } else {
+            parts.add('마이티 출현');
+          }
           break;
         }
       }
@@ -1217,6 +1223,11 @@ class MightyTrackingService {
               }
             }
           }
+          // 같은팀 조커가 기루다를 호출한 경우, A를 아끼는 것은 당연한 전략이므로 제외
+          if (leadCard.isJoker && trick.leadSuit == giruda &&
+              isAttack(leadId) == isAttack(girudaAHolder)) {
+            couldPlayGirudaA = false;
+          }
           if (couldPlayGirudaA) {
             final name = girudaAHolder >= 0 && girudaAHolder < _playerNamesKo.length ? _playerNamesKo[girudaAHolder] : '?';
             final mightyPlayed = mighty.suit != null &&
@@ -1229,6 +1240,17 @@ class MightyTrackingService {
             }
           }
         }
+      }
+    }
+
+    // 수동게임 플레이어 선공: 선공 의도는 생략하되 트릭 결과는 표시
+    if (parts.isEmpty && skipLeadDesc && trick.winnerId != null) {
+      final leadIsAttack = isAttack(leadId);
+      final winnerIsAttack = isAttack(trick.winnerId!);
+      if (leadIsAttack) {
+        parts.add(winnerIsAttack ? '공격팀 최상위 카드로 승리' : '공격팀 선공 실패');
+      } else {
+        parts.add(winnerIsAttack ? '수비팀 선공 실패' : '수비팀 최상위 카드로 승리');
       }
     }
 
