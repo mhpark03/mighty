@@ -26,6 +26,7 @@ class GameController extends ChangeNotifier {
   final List<BidEvaluationSnapshot> _bidSnapshots = [];
   KittySnapshot? _kittySnapshot;
   String _gameUuid = '';
+  bool _trackingPending = false;
 
   GameController() {
     _initializePlayers();
@@ -384,6 +385,7 @@ class GameController extends ChangeNotifier {
     _showKittySummary = false;
     _friendExplanation = null;
     _showFriendSummary = false;
+    _trackingPending = false;
     _bidSnapshots.clear();
     _kittySnapshot = null;
     _gameUuid = MightyTrackingService.generateUuid();
@@ -1014,7 +1016,7 @@ class GameController extends ChangeNotifier {
 
     // 게임 종료
     if (_state.phase == GamePhase.gameEnd) {
-      _sendTrackingData();
+      _trackingPending = true;
       if (_isAutoPlayMode) {
         notifyListeners();
         return;
@@ -1075,7 +1077,7 @@ class GameController extends ChangeNotifier {
 
     // 게임 종료 시 저장 삭제
     if (_state.phase == GamePhase.gameEnd) {
-      _sendTrackingData();
+      _trackingPending = true;
       clearSavedGame();
     }
 
@@ -1407,6 +1409,20 @@ class GameController extends ChangeNotifier {
     return (bestFirstCard, strategy);
   }
 
+
+  void sendTrackingWithDescriptions(List<String?> trickDescriptions) {
+    if (!_trackingPending) return;
+    _trackingPending = false;
+    if (_state.allPassed) return;
+    MightyTrackingService.sendGameResult(
+      gameUuid: _gameUuid,
+      state: _state,
+      bidSnapshots: _bidSnapshots,
+      kittySnapshot: _kittySnapshot,
+      isAutoPlay: _isAutoPlayMode,
+      trickDescriptions: trickDescriptions,
+    );
+  }
 
   void _sendTrackingData() {
     // 올패스 게임은 서버로 보내지 않음

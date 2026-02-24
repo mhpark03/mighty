@@ -4207,7 +4207,7 @@ class AIPlayer {
 
           // (F-pre) 선교환: 비기루다 물패가 남아있으면 기루다 보존
           // (D) 조건 미충족(dCount < 2 등)이지만 물패 1장이라도 있으면 기루다 대신 사용
-          if (nonGirudaDump.isNotEmpty && state.currentTrickNumber < 10) {
+          if (nonGirudaDump.isNotEmpty && gCount >= 1 && state.currentTrickNumber < 10) {
             // 프렌드 공개 시 조커 우선 사용 (확실한 선 탈환)
             // 프렌드 미공개 시 선 넘김 우선 (프렌드 노출 방지)
             if (state.friendRevealed && hasJokerForLead) {

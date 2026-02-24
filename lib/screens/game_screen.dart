@@ -33,6 +33,7 @@ class _GameScreenState extends State<GameScreen> {
   bool _timerRunning = false;
   bool _showHint = false;
   bool _statsRecorded = false;
+  bool _trackingSent = false;
   bool _bidInitialized = false;
   bool _showGameResult = false;
   bool _showTrickDetails = true;
@@ -169,6 +170,7 @@ class _GameScreenState extends State<GameScreen> {
               AdService().showRewardedAd(
                 onRewarded: () {
                   _statsRecorded = false;
+                  _trackingSent = false;
                   _allPassedDialogShown = false;
                   _bidInitialized = false;
                   _showGameResult = true;
@@ -178,6 +180,7 @@ class _GameScreenState extends State<GameScreen> {
                 },
                 onAdNotAvailable: () {
                   _statsRecorded = false;
+                  _trackingSent = false;
                   _allPassedDialogShown = false;
                   _bidInitialized = false;
                   _showGameResult = true;
@@ -2016,7 +2019,7 @@ class _GameScreenState extends State<GameScreen> {
           const SizedBox(height: 3),
           if (explanation.scoreBreakdown.isNotEmpty) ...[
             _buildSuitColoredText(
-              '${explanation.scoreBreakdown} ${l10n.estimatedMinWins(explanation.totalMinTricks)}',
+              '${_formatBreakdownParts(explanation.scoreBreakdown, l10n)} ${l10n.estimatedMinWins(explanation.totalMinTricks)}',
               const TextStyle(color: Colors.white38, fontSize: 9),
             ),
             const SizedBox(height: 2),
@@ -3306,6 +3309,7 @@ class _GameScreenState extends State<GameScreen> {
                         onPressed: () {
                           setState(() {
                             _statsRecorded = false;
+                            _trackingSent = false;
                             _showGameResult = true;
                             _showTrickDetails = false;
                             _showHint = false;
@@ -5111,6 +5115,26 @@ class _GameScreenState extends State<GameScreen> {
       });
     }
 
+    // 트릭 설명을 포함하여 서버 전송 (한 번만)
+    if (!_trackingSent) {
+      _trackingSent = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final descriptions = <String?>[];
+        final playedCards = <String>{};
+        for (final trick in state.tricks) {
+          descriptions.add(_describeTrick(trick, state, l10n, playedCards, isAutoPlay: widget.isAutoPlay));
+          for (final c in trick.cards) {
+            if (c.isJoker) {
+              playedCards.add('joker');
+            } else if (c.suit != null) {
+              playedCards.add('${c.suit!.index}-${c.rankValue}');
+            }
+          }
+        }
+        controller.sendTrackingWithDescriptions(descriptions);
+      });
+    }
+
     final screenHeight = MediaQuery.of(context).size.height;
     final compact = screenHeight < 700;
     final maxDialogHeight = screenHeight * (compact ? 0.92 : 0.85);
@@ -5255,6 +5279,7 @@ class _GameScreenState extends State<GameScreen> {
                   onPressed: () {
                     setState(() {
                       _statsRecorded = false;
+                      _trackingSent = false;
                       _showGameResult = true;
                     });
                     controller.startNextAutoGame();
@@ -5295,6 +5320,7 @@ class _GameScreenState extends State<GameScreen> {
                     onPressed: () {
                       setState(() {
                         _statsRecorded = false;
+                        _trackingSent = false;
                         _showGameResult = true;
                         _showTrickDetails = false;
                         _showHint = false;
@@ -6712,6 +6738,7 @@ class _GameScreenState extends State<GameScreen> {
                     onPressed: () {
                       setState(() {
                         _statsRecorded = false;
+                        _trackingSent = false;
                         _showGameResult = true;
                         _showTrickDetails = false;
                         _showHint = false;
