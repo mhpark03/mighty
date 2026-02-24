@@ -285,8 +285,29 @@ class MightyTrackingService {
         return '물패 처리';
       case LeadIntent.waste:
         return '물패 처리';
-      case LeadIntent.girudaPreExchange:
+      case LeadIntent.girudaPreExchange: {
+        final gpeCard = trick.leadCard;
+        if (gpeCard != null && !gpeCard.isJoker && gpeCard.suit != null && playedCards != null) {
+          bool gpeIsTop = true;
+          final gpeMighty = state.mighty;
+          for (int r = 14; r > gpeCard.rankValue; r--) {
+            if (gpeCard.suit == gpeMighty.suit && r == gpeMighty.rankValue) continue;
+            if (!playedCards.contains('${gpeCard.suit!.index}-$r')) { gpeIsTop = false; break; }
+          }
+          if (gpeIsTop) return '비기루다 최상위 선공';
+        }
+        // 선교환 결과: 상대팀이 이겼으면 선 넘김 성공
+        final gpeLeadId = trick.leadPlayerId;
+        final gpeWinnerId = trick.winnerId;
+        if (gpeWinnerId != null && gpeWinnerId != gpeLeadId) {
+          final gpeLeadIsAttack = gpeLeadId == state.declarerId || gpeLeadId == state.friendId;
+          final gpeWinnerIsAttack = gpeWinnerId == state.declarerId || gpeWinnerId == state.friendId;
+          if (gpeLeadIsAttack != gpeWinnerIsAttack) {
+            return '선교환 (기루다 보존) → 수비팀 선 획득';
+          }
+        }
         return '선교환 (기루다 보존)';
+      }
       case LeadIntent.jokerCallLead:
         String jcDesc = '조커콜 선언';
         final jcLeadId = trick.leadPlayerId;
@@ -395,7 +416,13 @@ class MightyTrackingService {
         if (lastLabel != null) lastParts.add(lastLabel);
 
         if (trick.winnerId != null && pointCount > 0 && !isAttack(trick.winnerId!)) {
-          lastParts.add('수비 상위 카드 방어');
+          final defWinIdx = trick.playerOrder.indexOf(trick.winnerId!);
+          final defWinCard = (defWinIdx >= 0 && defWinIdx < trick.cards.length) ? trick.cards[defWinIdx] : null;
+          if (defWinCard != null && isGiruda(defWinCard) && isGiruda(leadCard)) {
+            lastParts.add('수비 상위 기루다 카드 방어');
+          } else {
+            lastParts.add('수비 상위 카드 방어');
+          }
         }
       }
 
@@ -504,7 +531,31 @@ class MightyTrackingService {
           } else if (lateDefWins >= 3) {
             summary = '후반 수비 점수 방어로 수비 승리';
           } else if (atkJoker && atkMighty) {
-            summary = '조커/마이티 활용 실패 → 수비 승리';
+            // 마이티/조커가 실제로 공격팀 승리 트릭에서 활용되었는지 확인
+            bool mightyWonByAttack = false;
+            bool jokerWonByAttack = false;
+            for (final t in state.tricks) {
+              if (t.winnerId == null || !isAttack(t.winnerId!)) continue;
+              for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+                if (isAttack(t.playerOrder[i])) {
+                  if (isMighty(t.cards[i])) mightyWonByAttack = true;
+                  if (t.cards[i].isJoker) jokerWonByAttack = true;
+                }
+              }
+            }
+            if (mightyWonByAttack && jokerWonByAttack) {
+              if (lateDefWins >= 2) {
+                summary = '후반 선 유지 실패 → 수비 승리';
+              } else {
+                summary = '수비 점수 방어 → 수비 승리';
+              }
+            } else if (mightyWonByAttack) {
+              summary = '조커 활용 실패 → 수비 승리';
+            } else if (jokerWonByAttack) {
+              summary = '마이티 활용 실패 → 수비 승리';
+            } else {
+              summary = '조커/마이티 활용 실패 → 수비 승리';
+            }
           } else {
             // 수비 소수 트릭 고득점 집중 체크
             int defTricks = 0, defPoints = 0, defLatePoints = 0;
@@ -829,40 +880,6 @@ class MightyTrackingService {
           }
         }
 
-        // 주공 프렌드 유도
-        bool isDeclarerFriendLure = false;
-        if (leadId == state.declarerId && state.friendDeclaration?.card != null) {
-          final fCard = state.friendDeclaration!.card!;
-          final fSuit = fCard.isJoker ? null : fCard.suit;
-          if (fSuit != null && leadCard.suit == fSuit) {
-            bool friendCardInTrick = false;
-            for (int i = 0; i < trick.cards.length; i++) {
-              if (i == leadIdx) continue;
-              final c = trick.cards[i];
-              if (!c.isJoker && c.suit == fCard.suit && c.rank == fCard.rank) {
-                friendCardInTrick = true;
-                break;
-              }
-            }
-            if (friendCardInTrick) {
-              bool alreadyRevealed = false;
-              for (final t in state.tricks) {
-                if (t.trickNumber >= trick.trickNumber) break;
-                for (final c in t.cards) {
-                  if (!fCard.isJoker && !c.isJoker && c.suit == fCard.suit && c.rank == fCard.rank) {
-                    alreadyRevealed = true;
-                    break;
-                  }
-                }
-                if (alreadyRevealed) break;
-              }
-              if (!alreadyRevealed) {
-                isDeclarerFriendLure = true;
-              }
-            }
-          }
-        }
-
         // 프렌드 물패 → 주공 기루다 컷 시도 → 수비 기루다 재역전
         bool isFriendWasteDeclarerCutDefenseOvercut = false;
         if (isAttack(leadId) && leadId != state.declarerId &&
@@ -904,13 +921,7 @@ class MightyTrackingService {
           }
         }
 
-        if (isDeclarerFriendLure) {
-          if (trick.winnerId != null && isAttack(trick.winnerId!)) {
-            parts.add('프렌드 유도');
-          } else {
-            parts.add('프렌드 유도 실패');
-          }
-        } else if (isFriendWasteDeclarerCutDefenseOvercut) {
+        if (isFriendWasteDeclarerCutDefenseOvercut) {
           final ptCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
           if (ptCount > 0) {
             parts.add('프렌드 물패 → 주공 기루다 컷 → 수비 기루다 재역전 ${ptCount}점 방어');
@@ -1057,6 +1068,35 @@ class MightyTrackingService {
       }
     }
 
+    // Outcome: 같은 무늬 상위 카드 역전 (기루다/비기루다 공통)
+    if (trick.winnerId != null && trick.winnerId != leadId && !leadCard.isJoker && leadCard.suit != null) {
+      final overtakeWinIdx = trick.playerOrder.indexOf(trick.winnerId!);
+      if (overtakeWinIdx >= 0 && overtakeWinIdx < trick.cards.length) {
+        final winCard = trick.cards[overtakeWinIdx];
+        if (!winCard.isJoker && winCard.suit == leadCard.suit && winCard.rankValue > leadCard.rankValue) {
+          final leadIsAttack = isAttack(leadId);
+          final winnerIsAttack = isAttack(trick.winnerId!);
+          if (leadIsAttack != winnerIsAttack) {
+            final suitStr = _suitSymbols[winCard.suit] ?? '';
+            final winRankStr = _rankSymbols[winCard.rankValue] ?? '${winCard.rankValue}';
+            if (isGiruda(winCard)) {
+              if (leadIsAttack) {
+                parts.add('수비 $suitStr$winRankStr 상위 기루다 방어');
+              } else {
+                parts.add('공격 $suitStr$winRankStr 상위 기루다 역전');
+              }
+            } else {
+              if (leadIsAttack) {
+                parts.add('수비 $suitStr$winRankStr 역전');
+              } else {
+                parts.add('공격 $suitStr$winRankStr 역전');
+              }
+            }
+          }
+        }
+      }
+    }
+
     // Outcome: K/Q 소진 성공 (공격팀 승리 시만)
     // 기루다 K가 프렌드 카드인 경우, K는 프렌드 합류이므로 소진이 아님
     final attackWonTrick = trick.winnerId != null && isAttack(trick.winnerId!);
@@ -1148,7 +1188,7 @@ class MightyTrackingService {
       }
     }
 
-    // Outcome: 프렌드 합류
+    // Outcome: 프렌드 합류 / 프렌드 유도
     if (friendCard != null && !friendAlreadyRevealed) {
       bool friendInTrick = false;
       if (friendCard.isJoker) {
@@ -1158,7 +1198,16 @@ class MightyTrackingService {
             !c.isJoker && c.suit == friendCard.suit && c.rank == friendCard.rank);
       }
       if (friendInTrick) {
-        parts.add('프렌드 합류');
+        if (isDeclarerLead && trick.leadIntent != LeadIntent.declarerFriendLure) {
+          // 주공 선공으로 프렌드가 출현: 프렌드 유도 (인텐트에서 이미 표시된 경우 제외)
+          if (trick.winnerId != null && isAttack(trick.winnerId!)) {
+            parts.add('프렌드 유도');
+          } else {
+            parts.add('프렌드 유도 실패');
+          }
+        } else if (!isDeclarerLead) {
+          parts.add('프렌드 합류');
+        }
       }
     }
 
