@@ -2778,6 +2778,25 @@ class AIPlayer {
     bool isDefenseTeam = _isPlayerOnDefenseTeam(player, state);
 
     if (isDefenseTeam && state.giruda != null) {
+      // === 수비팀 조커 선공: 마이티 출현 + 기루다 대량 소진 ===
+      // 마이티가 나온 상태에서 기루다 9장 이상 소진 → 조커가 가장 강력
+      // 조커로 기루다 호출하여 공격팀 잔여 기루다 소진 + 수비팀 점수카드 확보
+      {
+        final joker = playableCards.where((c) => c.isJoker).toList();
+        if (joker.isNotEmpty && state.currentTrickNumber < 10) {
+          final playedCards = _getPlayedCards(state);
+          bool mightyPlayed = playedCards.any((c) => c.isMightyWith(state.giruda)) ||
+              (state.currentTrick?.cards.any((c) => c.isMightyWith(state.giruda)) ?? false);
+          final playedGirudaCount = _getPlayedGirudaCount(state);
+          final remainingGiruda = _getRemainingGirudaCount(state, player);
+
+          if (mightyPlayed && playedGirudaCount >= 9 && remainingGiruda >= 1) {
+            _lastLeadIntent = LeadIntent.defenseJokerLead;
+            return joker.first;
+          }
+        }
+      }
+
       // === 수비팀 후반전 조커 선공 전략 ===
       // 후반전(트릭 7 이후)에 조커로 선공하여 공격팀 공격력 감소
       if (state.currentTrickNumber >= 7 && state.currentTrickNumber < 10) {
@@ -4718,9 +4737,12 @@ class AIPlayer {
           // ★ 선교환 모드: 상대 기루다 1장 이하 → 기루다 보존, 비기루다 물패 우선
           // 상대 기루다가 거의 없으면 기루다 선공으로 소진시킬 효과 미미
           // 물패 소진 → void 생성 → 나중에 기루다 컷으로 선 탈환 + 점수 확보
+          // ★ 예외: 수비 기루다 1장 + 주공 기루다 2장 이상 → 기루다 공격 유지
+          // 주공 기루다를 1장 소비해서라도 수비 마지막 기루다를 소진시켜 간을 막는 것이 유리
           {
             final remainingOppGirudaPE = _getRemainingGirudaCount(state, player);
-            if (remainingOppGirudaPE <= 1 && state.currentTrickNumber < 10) {
+            final shouldAttackGiruda = remainingOppGirudaPE == 1 && myGirudaCards.length >= 2;
+            if (remainingOppGirudaPE <= 1 && state.currentTrickNumber < 10 && !shouldAttackGiruda) {
               final nonGirudaForPE = cardsToConsider.where((c) =>
                   !c.isJoker && !c.isMightyWith(state.giruda) && c.suit != state.giruda).toList();
               if (nonGirudaForPE.isNotEmpty) {
