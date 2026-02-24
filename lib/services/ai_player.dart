@@ -5487,11 +5487,16 @@ class AIPlayer {
       // 팀원이 최상위 카드로 이기고 있으면 낮은 카드 버리기
       if (winningCardIsTop) {
         // 수비팀이고 조커를 가지고 있고 마이티에게 안전하면 점수카드 적극 사용
+        // ★ 마지막 순서: 뒤집힐 수 없으므로 무조건 점수카드 적극 사용
         bool aggressivePointDump = false;
-        if (isDefenseTeam && defenseWinning && player.hand.any((c) => c.isJoker)) {
-          bool mightyPlayed = _getPlayedCards(state).any((c) => c.isMightyWith(state.giruda));
-          bool mightyInMyHand = player.hand.any((c) => c.isMightyWith(state.giruda));
-          aggressivePointDump = mightyPlayed || mightyInMyHand;
+        if (isDefenseTeam && defenseWinning) {
+          if (isLastPlayer) {
+            aggressivePointDump = true;
+          } else if (player.hand.any((c) => c.isJoker)) {
+            bool mightyPlayed = _getPlayedCards(state).any((c) => c.isMightyWith(state.giruda));
+            bool mightyInMyHand = player.hand.any((c) => c.isMightyWith(state.giruda));
+            aggressivePointDump = mightyPlayed || mightyInMyHand;
+          }
         }
 
         // 리드 무늬가 있으면 리드 무늬 중 낮은 카드

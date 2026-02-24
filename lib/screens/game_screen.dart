@@ -5389,7 +5389,7 @@ class _GameScreenState extends State<GameScreen> {
       } else {
         final keyEvents = <String>[];
 
-        // 1. 조커 활용/반격
+        // 1. 조커/마이티 활용 (특수 카드 → 같은 레벨)
         for (final t in state.tricks) {
           for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
             if (t.cards[i].isJoker && t.winnerId == t.playerOrder[i]) {
@@ -5403,22 +5403,43 @@ class _GameScreenState extends State<GameScreen> {
           }
           if (keyEvents.isNotEmpty) break;
         }
-
-        // 2. 수비 물패 공략 (공격 비기루다 비최상위 선공 → 수비 승리)
-        if (!attackWins) {
-          int defWasteWins = 0;
-          for (final t in state.tricks) {
-            if (t.winnerId == null) continue;
-            final tLead = t.leadPlayerId;
-            if (!isAttack(tLead) || isAttack(t.winnerId!)) continue;
-            final tLeadIdx = t.playerOrder.indexOf(tLead);
-            if (tLeadIdx < 0 || tLeadIdx >= t.cards.length) continue;
-            final tLeadCard = t.cards[tLeadIdx];
-            if (!tLeadCard.isJoker && !isMighty(tLeadCard) && tLeadCard.suit != giruda) {
-              defWasteWins++;
+        for (final t in state.tricks) {
+          if (t.winnerId == null) continue;
+          for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+            if (isMighty(t.cards[i])) {
+              if (isAttack(t.playerOrder[i]) && isAttack(t.winnerId!) && attackWins) {
+                keyEvents.add(l10n.summaryMightyImpact);
+              }
+              break;
             }
           }
-          if (defWasteWins >= 2) keyEvents.add(l10n.summaryWasteExploit);
+          if (keyEvents.any((e) => e == l10n.summaryMightyImpact)) break;
+        }
+
+        // 2. 프렌드 활약 (트릭수 + 획득/지원 점수 종합 평가, 공격 승리 시만)
+        if (attackWins && state.friendId != null && state.friendId != state.declarerId) {
+          final friendId = state.friendId!;
+          final friendWins = state.tricks.where((t) => t.winnerId == friendId).length;
+          int friendPoints = 0;
+          for (final t in state.tricks) {
+            if (t.winnerId == friendId) {
+              friendPoints += t.cards.where((c) => !c.isJoker && c.isPointCard).length;
+            }
+          }
+          int friendSupportPoints = 0;
+          for (final t in state.tricks) {
+            if (t.winnerId != null && isAttack(t.winnerId!) && t.winnerId != friendId) {
+              final fIdx = t.playerOrder.indexOf(friendId);
+              if (fIdx >= 0 && fIdx < t.cards.length) {
+                final fc = t.cards[fIdx];
+                if (!fc.isJoker && fc.isPointCard) friendSupportPoints++;
+              }
+            }
+          }
+          final friendScore = friendWins * 2 + friendPoints + friendSupportPoints;
+          if (friendScore >= 6) {
+            keyEvents.add(l10n.summaryFriendContrib);
+          }
         }
 
         // 3. 기루다 지배 (공격 기루다 승리 3회 이상)
@@ -5432,22 +5453,14 @@ class _GameScreenState extends State<GameScreen> {
           if (girudaWins >= 3) keyEvents.add(l10n.summaryTrumpDominate);
         }
 
-        // 4. 프렌드 활약 (2승 이상)
-        if (attackWins && state.friendId != null && state.friendId != state.declarerId) {
-          final friendWins = state.tricks.where((t) => t.winnerId == state.friendId).length;
-          if (friendWins >= 2) {
-            keyEvents.add(l10n.summaryFriendContrib);
-          }
-        }
-
-        // 5. 후반 점수 방어 (7-10트릭 중 수비 3승 이상)
+        // 4. 후반 점수 방어 (7-10트릭 중 수비 3승 이상)
         if (!attackWins) {
           final lateDefWins = state.tricks.where((t) =>
               t.trickNumber >= 7 && t.winnerId != null && !isAttack(t.winnerId!)).length;
           if (lateDefWins >= 3) keyEvents.add(l10n.summaryLateDefense);
         }
 
-        // 6. 수비 기루다 컷 (2회 이상)
+        // 5. 수비 기루다 컷 (2회 이상)
         if (!attackWins && giruda != null) {
           int defCutCount = 0;
           for (final t in state.tricks) {
@@ -5461,19 +5474,7 @@ class _GameScreenState extends State<GameScreen> {
           if (defCutCount >= 2) keyEvents.add(l10n.summaryDefenseCut);
         }
 
-        // 7. 마이티 활용 (마이티 트릭에서 공격 3점 이상 획득)
-        if (attackWins) {
-          for (final t in state.tricks) {
-            if (t.winnerId == null || !isAttack(t.winnerId!)) continue;
-            final hasMighty = t.cards.any((c) => isMighty(c));
-            if (hasMighty) {
-              final pts = t.cards.where((c) => !c.isJoker && c.isPointCard).length;
-              if (pts >= 3) { keyEvents.add(l10n.summaryMightyImpact); break; }
-            }
-          }
-        }
-
-        // 8. 최소 점수 달성 시 특수 총평
+        // 6. 최소 점수 달성 시 특수 총평
         if (attackWins && attackPoints == bidTricks) {
           // 수비 조커 공세 + 기루다 반격 체크
           bool defenseJokerWon = false;
@@ -5511,7 +5512,7 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
-        // 9. 조커/마이티 모두 사용했지만 패배
+        // 7. 조커/마이티 모두 사용했지만 패배
         if (!attackWins) {
           bool attackPlayedJoker = false;
           bool attackPlayedMighty = false;
@@ -5550,7 +5551,7 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
-        // 10. 초반 간 + 마이티 강제 추출로 치명적 손실
+        // 8. 초반 간 + 마이티 강제 추출로 치명적 손실
         if (!attackWins && (bidTricks - attackPoints) >= 3) {
           bool earlyMightyLowYield = false;
           bool earlyCut = false;

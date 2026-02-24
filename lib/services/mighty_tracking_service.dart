@@ -177,6 +177,22 @@ class MightyTrackingService {
           final leaderIsAttack = trick.leadPlayerId == state.declarerId || trick.leadPlayerId == state.friendId;
           final winnerIsAttack = passWinnerId == state.declarerId || passWinnerId == state.friendId;
           if (leaderIsAttack != winnerIsAttack) {
+            // 프렌드 공개 후 수비가 이긴 경우: 선 넘김 실패가 아니라 수비 기루다 소진 물패
+            bool friendRevealed = false;
+            final fc = state.friendDeclaration?.card;
+            if (fc != null && playedCards != null) {
+              if (fc.isMightyWith(giruda)) {
+                final m = state.mighty;
+                friendRevealed = m.suit != null && playedCards.contains('${m.suit!.index}-${m.rankValue}');
+              } else if (fc.isJoker) {
+                friendRevealed = playedCards.contains('joker');
+              } else if (fc.suit != null) {
+                friendRevealed = playedCards.contains('${fc.suit!.index}-${fc.rankValue}');
+              }
+            }
+            if (friendRevealed) {
+              return '기루다 물패 (수비 기루다 소진)';
+            }
             return '기루다 중간으로 선 넘김 실패';
           }
         }
@@ -332,13 +348,11 @@ class MightyTrackingService {
         }
       }
 
-      // 게임 결과
+      // 게임 결과 (런만 별도 표기, 일반 승리는 총평에 포함되므로 생략)
       if (attackWins) {
         final isRun = state.tricks.every((t) => t.winnerId != null && isAttack(t.winnerId!));
         if (isRun) {
           lastParts.add('공격 런(풀) 대승 확정');
-        } else {
-          lastParts.add('공격 승리 확정');
         }
       }
 
@@ -352,7 +366,7 @@ class MightyTrackingService {
       } else {
         final keyEvents = <String>[];
 
-        // 1. 조커 활용/반격
+        // 1. 조커/마이티 활용 (특수 카드 → 같은 레벨)
         for (final t in state.tricks) {
           for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
             if (t.cards[i].isJoker && t.winnerId == t.playerOrder[i]) {
@@ -366,6 +380,19 @@ class MightyTrackingService {
             }
           }
           if (keyEvents.isNotEmpty) break;
+        }
+        for (final t in state.tricks) {
+          if (t.winnerId == null) continue;
+          for (int i = 0; i < t.cards.length && i < t.playerOrder.length; i++) {
+            if (isMighty(t.cards[i])) {
+              if (isAttack(t.playerOrder[i]) && isAttack(t.winnerId!)) {
+                final name = t.playerOrder[i] >= 0 && t.playerOrder[i] < _playerNamesKo.length ? _playerNamesKo[t.playerOrder[i]] : '?';
+                keyEvents.add('$name 마이티 활용');
+              }
+              break;
+            }
+          }
+          if (keyEvents.any((e) => e.contains('마이티 활용'))) break;
         }
 
         // 1b. 아군 조커 헌납 (조커콜로 공격팀 조커가 강제 출전 → 수비 승리)
@@ -383,21 +410,31 @@ class MightyTrackingService {
           }
         }
 
-        // 2. 수비 물패 공략 (공격 비기루다 비최상위 선공 → 수비 승리)
-        if (!attackWins) {
-          int defWasteWins = 0;
+        // 2. 프렌드 활약 (트릭수 + 획득/지원 점수 종합 평가, 공격 승리 시만)
+        if (attackWins && state.friendId != null && state.friendId != state.declarerId) {
+          final friendId = state.friendId!;
+          final friendWins = state.tricks.where((t) => t.winnerId == friendId).length;
+          int friendPoints = 0;
           for (final t in state.tricks) {
-            if (t.winnerId == null) continue;
-            final tLead = t.leadPlayerId;
-            if (!isAttack(tLead) || isAttack(t.winnerId!)) continue;
-            final tLeadIdx = t.playerOrder.indexOf(tLead);
-            if (tLeadIdx < 0 || tLeadIdx >= t.cards.length) continue;
-            final tLeadCard = t.cards[tLeadIdx];
-            if (!tLeadCard.isJoker && !isMighty(tLeadCard) && tLeadCard.suit != giruda) {
-              defWasteWins++;
+            if (t.winnerId == friendId) {
+              friendPoints += t.cards.where((c) => !c.isJoker && c.isPointCard).length;
             }
           }
-          if (defWasteWins >= 2) keyEvents.add('물패 공략 성공');
+          int friendSupportPoints = 0;
+          for (final t in state.tricks) {
+            if (t.winnerId != null && isAttack(t.winnerId!) && t.winnerId != friendId) {
+              final fIdx = t.playerOrder.indexOf(friendId);
+              if (fIdx >= 0 && fIdx < t.cards.length) {
+                final fc = t.cards[fIdx];
+                if (!fc.isJoker && fc.isPointCard) friendSupportPoints++;
+              }
+            }
+          }
+          final friendScore = friendWins * 2 + friendPoints + friendSupportPoints;
+          if (friendScore >= 6) {
+            final friendName = friendId >= 0 && friendId < _playerNamesKo.length ? _playerNamesKo[friendId] : '?';
+            keyEvents.add('$friendName 프렌드 활약');
+          }
         }
 
         // 3. 기루다 지배 (공격 기루다 승리 3회 이상)
@@ -411,23 +448,14 @@ class MightyTrackingService {
           if (girudaWins >= 3) keyEvents.add('기루다 지배');
         }
 
-        // 4. 프렌드 활약 (2승 이상)
-        if (state.friendId != null && state.friendId != state.declarerId) {
-          final friendWins = state.tricks.where((t) => t.winnerId == state.friendId).length;
-          if (friendWins >= 2) {
-            final friendName = state.friendId! >= 0 && state.friendId! < _playerNamesKo.length ? _playerNamesKo[state.friendId!] : '?';
-            keyEvents.add('$friendName 프렌드 활약');
-          }
-        }
-
-        // 5. 후반 점수 방어 (7-10트릭 중 수비 3승 이상)
+        // 4. 후반 점수 방어 (7-10트릭 중 수비 3승 이상)
         if (!attackWins) {
           final lateDefWins = state.tricks.where((t) =>
               t.trickNumber >= 7 && t.winnerId != null && !isAttack(t.winnerId!)).length;
           if (lateDefWins >= 3) keyEvents.add('후반 점수 방어');
         }
 
-        // 6. 수비 기루다 컷 (2회 이상)
+        // 5. 수비 기루다 컷 (2회 이상)
         if (!attackWins && giruda != null) {
           int defCutCount = 0;
           for (final t in state.tricks) {
@@ -439,18 +467,6 @@ class MightyTrackingService {
             }
           }
           if (defCutCount >= 2) keyEvents.add('수비 기루다 컷');
-        }
-
-        // 7. 마이티 활용 (마이티 트릭에서 공격 3점 이상 획득)
-        if (attackWins) {
-          for (final t in state.tricks) {
-            if (t.winnerId == null || !isAttack(t.winnerId!)) continue;
-            final hasMightyCard = t.cards.any((c) => isMighty(c));
-            if (hasMightyCard) {
-              final pts = t.cards.where((c) => !c.isJoker && c.isPointCard).length;
-              if (pts >= 3) { keyEvents.add('마이티 활용'); break; }
-            }
-          }
         }
 
         // 8. 조커/마이티 보유 추가 점수 실패 (최소 점수 달성 시)
@@ -982,13 +998,21 @@ class MightyTrackingService {
     }
 
     // Outcome: K/Q 소진 성공 (공격팀 승리 시만)
+    // 기루다 K가 프렌드 카드인 경우, K는 프렌드 합류이므로 소진이 아님
     final attackWonTrick = trick.winnerId != null && isAttack(trick.winnerId!);
+    final girudaKIsFriend = friendCard != null && !friendCard.isJoker &&
+        friendCard.suit == giruda && friendCard.rank == Rank.king;
     if (giruda != null && girudaKInTrick && attackWonTrick) {
       final kIdx = trick.cards.indexWhere((c) =>
           !c.isJoker && c.suit == giruda && c.rank == Rank.king);
       final qIdx = trick.cards.indexWhere((c) =>
           !c.isJoker && c.suit == giruda && c.rank == Rank.queen);
-      if (kIdx >= 0 && kIdx != leadIdx && qIdx >= 0 && qIdx != leadIdx) {
+      if (girudaKIsFriend) {
+        // K는 프렌드 합류이므로 Q 소진만 표기
+        if (qIdx >= 0 && qIdx != leadIdx) {
+          parts.add('Q 소진 성공');
+        }
+      } else if (kIdx >= 0 && kIdx != leadIdx && qIdx >= 0 && qIdx != leadIdx) {
         parts.add('K/Q 동시 소진 대성공');
       } else if (kIdx >= 0 && kIdx != leadIdx) {
         parts.add('K 소진 성공');
@@ -1135,8 +1159,8 @@ class MightyTrackingService {
       if (giruda != null && !playedCards.contains('${giruda.index}-14') &&
           !trick.cards.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace)) {
         final girudaAHolder = findCardHolder((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
-        // 초구에서 선공자는 기루다를 리드할 수 없으므로 제외
-        if (girudaAHolder != null && !(trick.trickNumber == 1 && girudaAHolder == leadId)) {
+        // 선공자가 A를 쓰지 않은 것은 의도적 선택이므로 제외
+        if (girudaAHolder != null && girudaAHolder != leadId) {
           // ★ 선행 무늬를 보유하여 기루다 A를 낼 수 없는 경우 제외
           // 선공자가 아니고, 선행 무늬가 기루다가 아니며, 선행 무늬를 따라냈으면
           // 기루다 A를 낼 수 있는 상황이 아니었으므로 "미사용" 표시 불필요
