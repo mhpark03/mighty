@@ -7,6 +7,7 @@ import '../models/card.dart';
 import '../models/player.dart';
 import '../models/game_state.dart';
 import '../services/ad_service.dart';
+import '../services/ai_player.dart' show BreakdownPart, BreakdownType;
 import '../services/game_controller.dart';
 import '../services/mighty_tracking_service.dart';
 import '../services/stats_service.dart';
@@ -1333,6 +1334,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Widget _buildGirudaComparisonContent(KittyExplanation explanation) {
+    final l10n = AppLocalizations.of(context)!;
     final comp = explanation.girudaComparison;
     if (comp.isEmpty) return const SizedBox.shrink();
 
@@ -1405,7 +1407,7 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                   Text('$min~$max', style: TextStyle(color: Colors.grey[600], fontSize: 10)),
                   Text(
-                    '$optimal점',
+                    l10n.points(optimal),
                     style: TextStyle(
                       color: isCurrent ? Colors.teal[700] : isBest ? Colors.amber[800] : Colors.grey[800],
                       fontSize: 13,
@@ -1429,8 +1431,8 @@ class _GameScreenState extends State<GameScreen> {
             ),
             child: Text(
               bestOptimal >= currentOptimal + 3
-                  ? '${switch (bestSuit) { Suit.spade => '♠', Suit.heart => '♥', Suit.diamond => '♦', Suit.club => '♣', _ => '' }} +${bestOptimal - currentOptimal}점 (변경 시 패널티 +2)'
-                  : '${switch (bestSuit) { Suit.spade => '♠', Suit.heart => '♥', Suit.diamond => '♦', Suit.club => '♣', _ => '' }} +${bestOptimal - currentOptimal}점 (변경 패널티 감안 시 유지 적절)',
+                  ? l10n.suitChangeRecommend(_getSuitSymbol(bestSuit!), bestOptimal - currentOptimal)
+                  : l10n.suitKeepRecommend(_getSuitSymbol(bestSuit!), bestOptimal - currentOptimal),
               style: TextStyle(
                 color: bestOptimal >= currentOptimal + 3 ? Colors.amber[200] : Colors.grey[400],
                 fontSize: 11,
@@ -1980,7 +1982,7 @@ class _GameScreenState extends State<GameScreen> {
             const SizedBox(height: 3),
             if (explanation.scoreBreakdown.isNotEmpty) ...[
               _buildSuitColoredText(
-                '${explanation.scoreBreakdown} ${l10n.estimatedMinWins(explanation.totalMinTricks)}',
+                '${_formatBreakdownParts(explanation.scoreBreakdown, l10n)} ${l10n.estimatedMinWins(explanation.totalMinTricks)}',
                 const TextStyle(color: Colors.white38, fontSize: 9),
               ),
               const SizedBox(height: 2),
@@ -3749,6 +3751,29 @@ class _GameScreenState extends State<GameScreen> {
       case Suit.diamond:
         return Colors.red[300]!;
     }
+  }
+
+  /// BreakdownPart 리스트를 현재 로캘에 맞는 문자열로 변환
+  String _formatBreakdownParts(List<BreakdownPart> parts, AppLocalizations l10n) {
+    return parts.map((p) {
+      switch (p.type) {
+        case BreakdownType.giruda:
+          final top = p.topCards.isNotEmpty ? p.topCards : l10n.breakdownLowCards;
+          return l10n.breakdownGirudaPart(p.suitSymbol, top, p.cardCount, p.tricksStr);
+        case BreakdownType.mightyJoker:
+          return l10n.breakdownMightyJokerPart(p.tricksStr);
+        case BreakdownType.mighty:
+          return l10n.breakdownMightyPart(p.tricksStr);
+        case BreakdownType.joker:
+          return l10n.breakdownJokerPart(p.tricksStr);
+        case BreakdownType.nonGirudaAce:
+          return l10n.breakdownAcePart(p.suitSymbol, p.tricksStr);
+        case BreakdownType.friendMighty:
+          return l10n.breakdownFriendMightyPart(p.suitSymbol, p.tricksStr);
+        case BreakdownType.friendJoker:
+          return l10n.breakdownFriendJokerPart(p.tricksStr);
+      }
+    }).join(' | ');
   }
 
   // 무늬 기호가 포함된 텍스트를 흰색 배경 미니 카드로 렌더링 (어두운 배경용)

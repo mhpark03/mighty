@@ -2570,4 +2570,57 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get stepEndgameScoring => '간(間)을 통해 최대한 많은 점수 획득 시도';
+
+  @override
+  String get breakdownLowCards => '하위';
+
+  @override
+  String breakdownGirudaPart(
+    String suit,
+    String top,
+    int count,
+    String tricks,
+  ) {
+    return '$suit$top($count장) $tricks트릭';
+  }
+
+  @override
+  String breakdownMightyJokerPart(String tricks) {
+    return '마이티+조커 $tricks트릭';
+  }
+
+  @override
+  String breakdownMightyPart(String tricks) {
+    return '마이티 $tricks트릭';
+  }
+
+  @override
+  String breakdownJokerPart(String tricks) {
+    return '조커 $tricks트릭';
+  }
+
+  @override
+  String breakdownAcePart(String suit, String tricks) {
+    return '${suit}A $tricks트릭';
+  }
+
+  @override
+  String breakdownFriendMightyPart(String suit, String tricks) {
+    return '프렌드(${suit}A) $tricks트릭';
+  }
+
+  @override
+  String breakdownFriendJokerPart(String tricks) {
+    return '프렌드(조커) $tricks트릭';
+  }
+
+  @override
+  String suitChangeRecommend(String suit, int diff) {
+    return '$suit +$diff점 (변경 시 패널티 +2)';
+  }
+
+  @override
+  String suitKeepRecommend(String suit, int diff) {
+    return '$suit +$diff점 (변경 패널티 감안 시 유지 적절)';
+  }
 }

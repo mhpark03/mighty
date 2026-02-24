@@ -3,6 +3,24 @@ import '../models/card.dart';
 import '../models/player.dart';
 import '../models/game_state.dart';
 
+enum BreakdownType { giruda, mightyJoker, mighty, joker, nonGirudaAce, friendMighty, friendJoker }
+
+class BreakdownPart {
+  final BreakdownType type;
+  final String suitSymbol;
+  final String topCards; // 'AKQ', 'AK', 'A', '' (low)
+  final int cardCount;
+  final String tricksStr; // pre-formatted: '2~3', '1', '0.7'
+
+  const BreakdownPart({
+    required this.type,
+    this.suitSymbol = '',
+    this.topCards = '',
+    this.cardCount = 0,
+    this.tricksStr = '',
+  });
+}
+
 class BidEvaluation {
   final Suit? bestGiruda;
   final int minPoints;
@@ -1059,9 +1077,9 @@ class AIPlayer {
     return (minPoints, maxPoints);
   }
 
-  /// 예상 점수 계산 근거를 간략 텍스트로 반환
-  (String, int) getPointBreakdownText(List<PlayingCard> hand, Suit? giruda) {
-    if (giruda == null) return ('', 0);
+  /// 예상 점수 계산 근거를 구조화된 데이터로 반환
+  (List<BreakdownPart>, int) getPointBreakdownParts(List<PlayingCard> hand, Suit? giruda) {
+    if (giruda == null) return (const [], 0);
     const suitSymbols = {Suit.spade: '♠', Suit.heart: '♥', Suit.diamond: '♦', Suit.club: '♣'};
     final mightySuit = (giruda == Suit.spade) ? Suit.diamond : Suit.spade;
     final hasMighty = hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.ace);
@@ -1069,7 +1087,7 @@ class AIPlayer {
     final gc = hand.where((c) => !c.isJoker && c.suit == giruda).toList();
     final girudaLen = gc.length;
 
-    final parts = <String>[];
+    final parts = <BreakdownPart>[];
     int totalMin = 0;
 
     // 기루다 트릭 계산
@@ -1111,18 +1129,23 @@ class AIPlayer {
     if (gA) topCards.add('A');
     if (gK) topCards.add('K');
     if (gQ) topCards.add('Q');
-    final topStr = topCards.isNotEmpty ? topCards.join('') : '하위';
-    parts.add('${suitSymbols[giruda]}$topStr(${girudaLen}장) ${gMin == gMax ? '$gMin' : '$gMin~$gMax'}트릭');
+    parts.add(BreakdownPart(
+      type: BreakdownType.giruda,
+      suitSymbol: suitSymbols[giruda]!,
+      topCards: topCards.join(''),
+      cardCount: girudaLen,
+      tricksStr: gMin == gMax ? '$gMin' : '$gMin~$gMax',
+    ));
 
     // 마이티/조커
     if (hasMighty && hasJoker) {
-      parts.add('마이티+조커 2트릭');
+      parts.add(const BreakdownPart(type: BreakdownType.mightyJoker, tricksStr: '2'));
       totalMin += 2;
     } else if (hasMighty) {
-      parts.add('마이티 1트릭');
+      parts.add(const BreakdownPart(type: BreakdownType.mighty, tricksStr: '1'));
       totalMin += 1;
     } else if (hasJoker) {
-      parts.add('조커 0.7트릭');
+      parts.add(const BreakdownPart(type: BreakdownType.joker, tricksStr: '0.7'));
     }
 
     // 비기루다 에이스
@@ -1130,20 +1153,20 @@ class AIPlayer {
       if (suit == giruda) continue;
       if (hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace &&
           !(c.suit == mightySuit && c.rank == Rank.ace))) {
-        parts.add('${suitSymbols[suit]}A 1트릭');
+        parts.add(BreakdownPart(type: BreakdownType.nonGirudaAce, suitSymbol: suitSymbols[suit]!, tricksStr: '1'));
         totalMin += 1;
       }
     }
 
     // 프렌드 예상 (마이티 프렌드는 확실, 조커 프렌드는 조커콜 위험으로 최소 제외)
     if (!hasMighty) {
-      parts.add('프렌드(${suitSymbols[mightySuit]}A) 1트릭');
+      parts.add(BreakdownPart(type: BreakdownType.friendMighty, suitSymbol: suitSymbols[mightySuit]!, tricksStr: '1'));
       totalMin += 1;
     } else if (!hasJoker) {
-      parts.add('프렌드(조커) 1트릭');
+      parts.add(const BreakdownPart(type: BreakdownType.friendJoker, tricksStr: '1'));
     }
 
-    return (parts.join(' | '), totalMin);
+    return (parts, totalMin);
   }
 
   // Public method for debugging

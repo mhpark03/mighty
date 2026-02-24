@@ -549,7 +549,7 @@ class GameController extends ChangeNotifier {
         }
       }
 
-      final (breakdownText, breakdownMinTricks) = _aiPlayer.getPointBreakdownText(currentPlayer.hand, effectiveSuit);
+      final (breakdownParts, breakdownMinTricks) = _aiPlayer.getPointBreakdownParts(currentPlayer.hand, effectiveSuit);
       _lastBidExplanation = BidExplanation(
         playerId: currentPlayer.id,
         playerName: currentPlayer.name,
@@ -564,7 +564,7 @@ class GameController extends ChangeNotifier {
         friendType: friendType,
         friendSuit: friendSuit,
         friendHolderName: friendHolderName,
-        scoreBreakdown: breakdownText,
+        scoreBreakdown: breakdownParts,
         totalMinTricks: breakdownMinTricks,
         suitComparison: evaluation.suitComparison,
       );
@@ -1493,7 +1493,7 @@ class BidExplanation {
   final String? friendType; // 'MIGHTY', 'JOKER', 'ACE' (배팅 시 예상 프렌드)
   final Suit? friendSuit;  // 프렌드 카드 무늬 (ACE일 때)
   final String? friendHolderName; // 프렌드 카드 보유자 (null이면 키티)
-  final String scoreBreakdown;
+  final List<BreakdownPart> scoreBreakdown;
   final int totalMinTricks;
   final List<(Suit, int, int, int)> suitComparison; // (suit, min, max, optimal)
 
@@ -1511,7 +1511,7 @@ class BidExplanation {
     this.friendType,
     this.friendSuit,
     this.friendHolderName,
-    this.scoreBreakdown = '',
+    this.scoreBreakdown = const [],
     this.totalMinTricks = 0,
     this.suitComparison = const [],
   });

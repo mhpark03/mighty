@@ -2563,4 +2563,57 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get stepEndgameScoring => '間（カン）を通じて最大限の得点獲得を試みる';
+
+  @override
+  String get breakdownLowCards => '下位';
+
+  @override
+  String breakdownGirudaPart(
+    String suit,
+    String top,
+    int count,
+    String tricks,
+  ) {
+    return '$suit$top($count枚) $tricksトリック';
+  }
+
+  @override
+  String breakdownMightyJokerPart(String tricks) {
+    return 'マイティ+ジョーカー $tricksトリック';
+  }
+
+  @override
+  String breakdownMightyPart(String tricks) {
+    return 'マイティ $tricksトリック';
+  }
+
+  @override
+  String breakdownJokerPart(String tricks) {
+    return 'ジョーカー $tricksトリック';
+  }
+
+  @override
+  String breakdownAcePart(String suit, String tricks) {
+    return '${suit}A $tricksトリック';
+  }
+
+  @override
+  String breakdownFriendMightyPart(String suit, String tricks) {
+    return 'フレンド(${suit}A) $tricksトリック';
+  }
+
+  @override
+  String breakdownFriendJokerPart(String tricks) {
+    return 'フレンド(ジョーカー) $tricksトリック';
+  }
+
+  @override
+  String suitChangeRecommend(String suit, int diff) {
+    return '$suit +$diff点 (変更時ペナルティ +2)';
+  }
+
+  @override
+  String suitKeepRecommend(String suit, int diff) {
+    return '$suit +$diff点 (変更ペナルティ考慮で維持が適切)';
+  }
 }

@@ -2621,4 +2621,57 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get stepEndgameScoring =>
       'Maximize point collection through endgame play';
+
+  @override
+  String get breakdownLowCards => 'low';
+
+  @override
+  String breakdownGirudaPart(
+    String suit,
+    String top,
+    int count,
+    String tricks,
+  ) {
+    return '$suit$top($count cards) $tricks tricks';
+  }
+
+  @override
+  String breakdownMightyJokerPart(String tricks) {
+    return 'Mighty+Joker $tricks tricks';
+  }
+
+  @override
+  String breakdownMightyPart(String tricks) {
+    return 'Mighty $tricks trick';
+  }
+
+  @override
+  String breakdownJokerPart(String tricks) {
+    return 'Joker $tricks trick';
+  }
+
+  @override
+  String breakdownAcePart(String suit, String tricks) {
+    return '${suit}A $tricks trick';
+  }
+
+  @override
+  String breakdownFriendMightyPart(String suit, String tricks) {
+    return 'Friend(${suit}A) $tricks trick';
+  }
+
+  @override
+  String breakdownFriendJokerPart(String tricks) {
+    return 'Friend(Joker) $tricks trick';
+  }
+
+  @override
+  String suitChangeRecommend(String suit, int diff) {
+    return '$suit +$diff pts (penalty +2 on change)';
+  }
+
+  @override
+  String suitKeepRecommend(String suit, int diff) {
+    return '$suit +$diff pts (keep is better considering penalty)';
+  }
 }

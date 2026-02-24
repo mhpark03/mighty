@@ -4513,6 +4513,66 @@ abstract class AppLocalizations {
   /// In ko, this message translates to:
   /// **'간(間)을 통해 최대한 많은 점수 획득 시도'**
   String get stepEndgameScoring;
+
+  /// No description provided for @breakdownLowCards.
+  ///
+  /// In ko, this message translates to:
+  /// **'하위'**
+  String get breakdownLowCards;
+
+  /// No description provided for @breakdownGirudaPart.
+  ///
+  /// In ko, this message translates to:
+  /// **'{suit}{top}({count}장) {tricks}트릭'**
+  String breakdownGirudaPart(String suit, String top, int count, String tricks);
+
+  /// No description provided for @breakdownMightyJokerPart.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티+조커 {tricks}트릭'**
+  String breakdownMightyJokerPart(String tricks);
+
+  /// No description provided for @breakdownMightyPart.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 {tricks}트릭'**
+  String breakdownMightyPart(String tricks);
+
+  /// No description provided for @breakdownJokerPart.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 {tricks}트릭'**
+  String breakdownJokerPart(String tricks);
+
+  /// No description provided for @breakdownAcePart.
+  ///
+  /// In ko, this message translates to:
+  /// **'{suit}A {tricks}트릭'**
+  String breakdownAcePart(String suit, String tricks);
+
+  /// No description provided for @breakdownFriendMightyPart.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드({suit}A) {tricks}트릭'**
+  String breakdownFriendMightyPart(String suit, String tricks);
+
+  /// No description provided for @breakdownFriendJokerPart.
+  ///
+  /// In ko, this message translates to:
+  /// **'프렌드(조커) {tricks}트릭'**
+  String breakdownFriendJokerPart(String tricks);
+
+  /// No description provided for @suitChangeRecommend.
+  ///
+  /// In ko, this message translates to:
+  /// **'{suit} +{diff}점 (변경 시 패널티 +2)'**
+  String suitChangeRecommend(String suit, int diff);
+
+  /// No description provided for @suitKeepRecommend.
+  ///
+  /// In ko, this message translates to:
+  /// **'{suit} +{diff}점 (변경 패널티 감안 시 유지 적절)'**
+  String suitKeepRecommend(String suit, int diff);
 }
 
 class _AppLocalizationsDelegate

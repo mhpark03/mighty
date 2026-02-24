@@ -2557,4 +2557,57 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get stepEndgameScoring => '通过间（カン）尽量获得更多分数';
+
+  @override
+  String get breakdownLowCards => '低牌';
+
+  @override
+  String breakdownGirudaPart(
+    String suit,
+    String top,
+    int count,
+    String tricks,
+  ) {
+    return '$suit$top($count张) $tricks墩';
+  }
+
+  @override
+  String breakdownMightyJokerPart(String tricks) {
+    return '王牌+小丑 $tricks墩';
+  }
+
+  @override
+  String breakdownMightyPart(String tricks) {
+    return '王牌 $tricks墩';
+  }
+
+  @override
+  String breakdownJokerPart(String tricks) {
+    return '小丑 $tricks墩';
+  }
+
+  @override
+  String breakdownAcePart(String suit, String tricks) {
+    return '${suit}A $tricks墩';
+  }
+
+  @override
+  String breakdownFriendMightyPart(String suit, String tricks) {
+    return '盟友(${suit}A) $tricks墩';
+  }
+
+  @override
+  String breakdownFriendJokerPart(String tricks) {
+    return '盟友(小丑) $tricks墩';
+  }
+
+  @override
+  String suitChangeRecommend(String suit, int diff) {
+    return '$suit +$diff分 (变更罚分 +2)';
+  }
+
+  @override
+  String suitKeepRecommend(String suit, int diff) {
+    return '$suit +$diff分 (考虑罚分后维持更合适)';
+  }
 }
