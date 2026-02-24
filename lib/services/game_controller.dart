@@ -1111,7 +1111,17 @@ class GameController extends ChangeNotifier {
   LeadIntent _inferHumanLeadIntent(PlayingCard card, Suit? jokerLeadSuit) {
     if (card.isJoker) return LeadIntent.jokerLeadSuit;
     if (card.isMightyWith(_state.giruda)) return LeadIntent.mightyLead;
-    if (_state.giruda != null && card.suit == _state.giruda) return LeadIntent.midGirudaLead;
+    if (_state.giruda != null && card.suit == _state.giruda) {
+      // 기루다 A는 최상위 카드 (마이티 체크는 위에서 이미 완료)
+      if (card.rankValue >= 14) {
+        return LeadIntent.topGirudaLead;
+      }
+      // A가 이미 나간 상태에서 K가 현재 최상위인지도 확인
+      if (_isTopOfSuit(card)) {
+        return LeadIntent.topGirudaLead;
+      }
+      return LeadIntent.midGirudaLead;
+    }
     // 수비 마이티 무늬 선공 → 마이티 유도
     final humanPlayer = _state.players[0];
     if (!(humanPlayer.isDeclarer || humanPlayer.isFriend) &&
@@ -1128,7 +1138,39 @@ class GameController extends ChangeNotifier {
       }
       return LeadIntent.firstTrickWaste;
     }
+    // 비기루다 최상위 카드 확인 (Ace 또는 상위 카드 소진 후 현재 최상위)
+    if (card.rankValue >= 14 || _isTopOfSuit(card)) {
+      final humanPlayer = _state.players[0];
+      final isAttack = humanPlayer.isDeclarer || humanPlayer.isFriend;
+      if (isAttack) {
+        return LeadIntent.topNonGirudaLead;
+      } else {
+        return LeadIntent.defenseTopCard;
+      }
+    }
     return LeadIntent.waste;
+  }
+
+  /// 현재 카드가 해당 무늬의 최상위(나간 카드 제외)인지 확인
+  bool _isTopOfSuit(PlayingCard card) {
+    if (card.suit == null) return false;
+    final mightyRankValue = _state.mighty.rankValue;
+    final mightySuit = _state.mighty.suit;
+    // 이전 트릭에서 나간 카드 수집
+    final playedRanks = <int>{};
+    for (final trick in _state.tricks) {
+      for (final c in trick.cards) {
+        if (!c.isJoker && c.suit == card.suit) {
+          playedRanks.add(c.rankValue);
+        }
+      }
+    }
+    // card.rankValue보다 높은 랭크 중 아직 나가지 않은 것이 있는지 확인
+    for (int r = 14; r > card.rankValue; r--) {
+      if (card.suit == mightySuit && r == mightyRankValue) continue; // 마이티는 별도 취급
+      if (!playedRanks.contains(r)) return false;
+    }
+    return true;
   }
 
   // 조커 콜이 가능한지 확인 (첫 트릭이 아니고, 선공이고, 조커가 아직 플레이되지 않은 경우)

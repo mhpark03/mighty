@@ -2011,9 +2011,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventGameDefeat => '공격 패배 확정';
 
   @override
-  String trickEventSummaryRun(int points, int bid) {
-    return '총평: 전승 런 $points/$bid점 대승';
-  }
+  String get trickEventSummaryRun => '총평: 전승 런 대승';
 
   @override
   String trickEventSummaryBackRun(int bid) {

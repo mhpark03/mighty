@@ -2005,9 +2005,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventGameDefeat => '攻撃敗北確定';
 
   @override
-  String trickEventSummaryRun(int points, int bid) {
-    return '総評: 全勝ラン $points/$bid点 大勝';
-  }
+  String get trickEventSummaryRun => '総評: 全勝ラン 大勝';
 
   @override
   String trickEventSummaryBackRun(int bid) {

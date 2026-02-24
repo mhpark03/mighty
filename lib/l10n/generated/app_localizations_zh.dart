@@ -1998,9 +1998,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventGameDefeat => '进攻败北确定';
 
   @override
-  String trickEventSummaryRun(int points, int bid) {
-    return '总评: 全胜Run $points/$bid分 大胜';
-  }
+  String get trickEventSummaryRun => '总评: 全胜Run 大胜';
 
   @override
   String trickEventSummaryBackRun(int bid) {

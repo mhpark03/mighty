@@ -2034,9 +2034,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventGameDefeat => 'Attack defeat';
 
   @override
-  String trickEventSummaryRun(int points, int bid) {
-    return 'Review: Sweep run $points/${bid}pts, dominant win';
-  }
+  String get trickEventSummaryRun => 'Review: Sweep run, dominant win';
 
   @override
   String trickEventSummaryBackRun(int bid) {

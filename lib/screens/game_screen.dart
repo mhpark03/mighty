@@ -5383,7 +5383,7 @@ class _GameScreenState extends State<GameScreen> {
       final attackTrickWins = state.tricks.where((t) => t.winnerId != null && isAttack(t.winnerId!)).length;
       final defenseTrickWins = 10 - attackTrickWins;
       if (attackTrickWins == 10) {
-        lastParts.add(l10n.trickEventSummaryRun(attackPoints, bidTricks));
+        lastParts.add(l10n.trickEventSummaryRun);
       } else if (defenseTrickWins == 10) {
         lastParts.add(l10n.trickEventSummaryBackRun(bidTricks));
       } else {
@@ -6372,11 +6372,11 @@ class _GameScreenState extends State<GameScreen> {
 
       final pointCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
 
-      // 조커 보유자가 이 트릭에서 조커를 내지 않았을 때 (무득점 트릭)
+      // 조커 보유자가 이 트릭에서 조커를 내지 않았을 때 (무득점 트릭, 수비팀만)
       if (trick.trickNumber > 1 && !playedCards.contains('joker') &&
           !trick.cards.any((c) => c.isJoker) && pointCount == 0) {
         final jokerHolder = findCardHolder((c) => c.isJoker);
-        if (jokerHolder != null) {
+        if (jokerHolder != null && !isAttack(jokerHolder)) {
           final name = _getLocalizedPlayerName(state.players[jokerHolder], l10n);
           parts.add(l10n.trickEventJokerSkipNoPoints(name));
         }

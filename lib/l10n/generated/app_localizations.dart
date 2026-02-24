@@ -3613,8 +3613,8 @@ abstract class AppLocalizations {
   /// No description provided for @trickEventSummaryRun.
   ///
   /// In ko, this message translates to:
-  /// **'총평: 전승 런 {points}/{bid}점 대승'**
-  String trickEventSummaryRun(int points, int bid);
+  /// **'총평: 전승 런 대승'**
+  String get trickEventSummaryRun;
 
   /// No description provided for @trickEventSummaryBackRun.
   ///

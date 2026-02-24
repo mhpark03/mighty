@@ -4792,6 +4792,13 @@ class AIPlayer {
           // 프렌드 카드로 이길 수 있으면 사용
           if (currentWinningCard != null &&
               state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
+            // ★ 마이티와 조커를 모두 보유 시 조커 우선 (마이티는 트릭10 승리 가능하므로 보존)
+            if (friendCard.isMightyWith(state.giruda) && state.currentTrickNumber > 1) {
+              final jokerAlt = playableCards.where((c) => c.isJoker).toList();
+              if (jokerAlt.isNotEmpty && state.currentTrick?.jokerCall != JokerCallType.jokerCall) {
+                return jokerAlt.first;
+              }
+            }
             return friendCard;
           }
         }
@@ -4801,6 +4808,13 @@ class AIPlayer {
           // 프렌드 카드로 이길 수 있는지 확인
           if (currentWinningCard != null &&
               state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
+            // ★ 마이티와 조커를 모두 보유 시 조커 우선 (마이티는 트릭10 승리 가능하므로 보존)
+            if (friendCard.isMightyWith(state.giruda) && state.currentTrickNumber > 1) {
+              final jokerAlt = playableCards.where((c) => c.isJoker).toList();
+              if (jokerAlt.isNotEmpty && state.currentTrick?.jokerCall != JokerCallType.jokerCall) {
+                return jokerAlt.first;
+              }
+            }
             return friendCard;
           }
         }
@@ -4930,6 +4944,13 @@ class AIPlayer {
           if ((!attackTeamWinning || !isLastInTrick) && !declarerWinSecure &&
               currentWinningCard != null &&
               state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
+            // ★ 마이티와 조커를 모두 보유 시 조커 우선 (마이티는 트릭10 승리 가능하므로 보존)
+            if (friendCard.isMightyWith(state.giruda) && state.currentTrickNumber > 1) {
+              final jokerAlt = playableCards.where((c) => c.isJoker).toList();
+              if (jokerAlt.isNotEmpty && state.currentTrick?.jokerCall != JokerCallType.jokerCall) {
+                return jokerAlt.first;
+              }
+            }
             return friendCard;
           }
         }
@@ -5181,18 +5202,19 @@ class AIPlayer {
             }
           }
 
-          // 기루다가 없거나 더 높은 기루다가 없으면 마이티/조커 사용
-          final mighty = playableCards.where((c) => c.isMightyWith(state.giruda)).toList();
-          if (mighty.isNotEmpty) {
-            return mighty.first;
-          }
-
+          // 기루다가 없거나 더 높은 기루다가 없으면 조커/마이티 사용
+          // ★ 조커 우선 (마이티는 트릭10 승리 가능하므로 보존)
           bool jokerCalled = state.currentTrick?.jokerCall == JokerCallType.jokerCall;
-          if (!jokerCalled) {
+          if (!jokerCalled && state.currentTrickNumber > 1) {
             final joker = playableCards.where((c) => c.isJoker).toList();
             if (joker.isNotEmpty) {
               return joker.first;
             }
+          }
+
+          final mighty = playableCards.where((c) => c.isMightyWith(state.giruda)).toList();
+          if (mighty.isNotEmpty) {
+            return mighty.first;
           }
         }
       }
@@ -5818,18 +5840,18 @@ class AIPlayer {
                     }
                   }
                 }
-                // 마이티가 있으면 사용 (조커보다 강함)
-                final mighty = playableCards.where((c) => c.isMightyWith(state.giruda)).toList();
-                if (mighty.isNotEmpty) {
-                  return mighty.first;
-                }
-                // 조커가 있으면 사용 (조커콜 상태가 아닐 때만)
+                // ★ 조커 우선 사용 (마이티는 트릭10 승리 가능하므로 보존)
                 bool jokerCalled = state.currentTrick?.jokerCall == JokerCallType.jokerCall;
-                if (!jokerCalled) {
+                if (!jokerCalled && state.currentTrickNumber > 1) {
                   final joker = playableCards.where((c) => c.isJoker).toList();
                   if (joker.isNotEmpty) {
                     return joker.first;
                   }
+                }
+                // 조커가 없으면 마이티 사용
+                final mighty = playableCards.where((c) => c.isMightyWith(state.giruda)).toList();
+                if (mighty.isNotEmpty) {
+                  return mighty.first;
                 }
               }
 
