@@ -1205,6 +1205,7 @@
   "trickEventDefenseTopAttackCutPointsFailed": "수비 최상위 선공 → 주공 기루다 컷 {count}점 방어 실패",
   "@trickEventDefenseTopAttackCutPointsFailed": { "placeholders": { "count": { "type": "int" } } },
   "trickEventAttackLeadDefenseCut": "공격 비기루다 최상위 선공 → 수비 기루다 컷",
+  "trickEventTopNonGirudaLeadDefended": "비기루다 선공 → 수비 상위 카드 방어",
   "trickEventFirstTrickTopAttack": "초구 비기루다 최상위 선공",
   "trickEventFirstTrickTopTeamRescue": "초구 비기루다 최상위 → 팀 역전",
   "trickEventFirstTrickTopAttackFailed": "초구 비기루다 최상위 선공 실패",

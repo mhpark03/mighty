@@ -6559,7 +6559,15 @@ class _GameScreenState extends State<GameScreen> {
             (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
         return attackWon ? l10n.trickEventHighCardAttack : l10n.trickEventHighCardAttackFailed;
       case LeadIntent.topNonGirudaLead:
-        return l10n.trickEventTopNonGirudaLead;
+        final tnglAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        if (tnglAttackWon) return l10n.trickEventTopNonGirudaLead;
+        final tnglWinIdx = trick.playerOrder.indexOf(trick.winnerId!);
+        final tnglWinCard = (tnglWinIdx >= 0 && tnglWinIdx < trick.cards.length) ? trick.cards[tnglWinIdx] : null;
+        if (tnglWinCard != null && !tnglWinCard.isJoker && tnglWinCard.suit == state.giruda) {
+          return l10n.trickEventAttackLeadDefenseCut;
+        }
+        return l10n.trickEventTopNonGirudaLeadDefended;
       case LeadIntent.defenseTopCard:
         // 마이티 무늬 선공 + 마이티 출현 → 마이티 소진 유도로 표시
         final dtcLeadIdx = trick.playerOrder.indexOf(trick.leadPlayerId!);
@@ -6627,7 +6635,16 @@ class _GameScreenState extends State<GameScreen> {
             (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
         return fvpAttackWon ? l10n.trickEventWaste : l10n.trickEventFriendPassLeadFailed;
       case LeadIntent.friendTopCardLead:
-        return l10n.trickEventTopNonGirudaLead;
+        final ftcAttackWon = trick.winnerId != null &&
+            (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+        if (ftcAttackWon) return l10n.trickEventTopNonGirudaLead;
+        // 수비 승리: 기루다 컷인지 확인
+        final ftcWinIdx = trick.playerOrder.indexOf(trick.winnerId!);
+        final ftcWinCard = (ftcWinIdx >= 0 && ftcWinIdx < trick.cards.length) ? trick.cards[ftcWinIdx] : null;
+        if (ftcWinCard != null && !ftcWinCard.isJoker && ftcWinCard.suit == state.giruda) {
+          return l10n.trickEventAttackLeadDefenseCut;
+        }
+        return l10n.trickEventTopNonGirudaLeadDefended;
       case LeadIntent.defenseJokerLead:
         return l10n.trickEventJokerLead;
       case LeadIntent.defenseHighCard:

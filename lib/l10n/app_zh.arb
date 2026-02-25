@@ -1045,6 +1045,7 @@
   "trickEventDefenseTopAttackCutPointsFailed": "守方最高首攻 → 庄家将牌切 {count}分防御失败",
   "@trickEventDefenseTopAttackCutPointsFailed": { "placeholders": { "count": { "type": "int" } } },
   "trickEventAttackLeadDefenseCut": "进攻非将牌最高出牌 → 守方将牌切入",
+  "trickEventTopNonGirudaLeadDefended": "非将牌出牌 → 守方高牌防御",
   "trickEventFirstTrickTopAttack": "首墩 非将牌最高出牌",
   "trickEventFirstTrickTopTeamRescue": "首墩 非将牌最高 → 队友逆转",
   "trickEventFirstTrickTopAttackFailed": "首墩 非将牌最高出牌 失败",

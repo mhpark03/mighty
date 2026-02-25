@@ -3958,6 +3958,12 @@ abstract class AppLocalizations {
   /// **'공격 비기루다 최상위 선공 → 수비 기루다 컷'**
   String get trickEventAttackLeadDefenseCut;
 
+  /// No description provided for @trickEventTopNonGirudaLeadDefended.
+  ///
+  /// In ko, this message translates to:
+  /// **'비기루다 선공 → 수비 상위 카드 방어'**
+  String get trickEventTopNonGirudaLeadDefended;
+
   /// No description provided for @trickEventFirstTrickTopAttack.
   ///
   /// In ko, this message translates to:

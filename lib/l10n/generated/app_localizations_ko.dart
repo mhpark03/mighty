@@ -2219,6 +2219,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventAttackLeadDefenseCut => '공격 비기루다 최상위 선공 → 수비 기루다 컷';
 
   @override
+  String get trickEventTopNonGirudaLeadDefended => '비기루다 선공 → 수비 상위 카드 방어';
+
+  @override
   String get trickEventFirstTrickTopAttack => '초구 비기루다 최상위 선공';
 
   @override

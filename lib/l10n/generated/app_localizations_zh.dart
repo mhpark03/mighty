@@ -2206,6 +2206,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventAttackLeadDefenseCut => '进攻非将牌最高出牌 → 守方将牌切入';
 
   @override
+  String get trickEventTopNonGirudaLeadDefended => '非将牌出牌 → 守方高牌防御';
+
+  @override
   String get trickEventFirstTrickTopAttack => '首墩 非将牌最高出牌';
 
   @override

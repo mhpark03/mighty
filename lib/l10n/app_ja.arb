@@ -1045,6 +1045,7 @@
   "trickEventDefenseTopAttackCutPointsFailed": "守備最上位先攻 → 宣言者切り札カット {count}点防御失敗",
   "@trickEventDefenseTopAttackCutPointsFailed": { "placeholders": { "count": { "type": "int" } } },
   "trickEventAttackLeadDefenseCut": "攻撃非切り札最上位先攻 → 守備切り札カット",
+  "trickEventTopNonGirudaLeadDefended": "非切り札先攻 → 守備上位カード防御",
   "trickEventFirstTrickTopAttack": "初手 非切り札最上位先攻",
   "trickEventFirstTrickTopTeamRescue": "初手 非切り札最上位 → チーム逆転",
   "trickEventFirstTrickTopAttackFailed": "初手 非切り札最上位先攻 失敗",

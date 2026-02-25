@@ -1046,6 +1046,7 @@
   "trickEventDefenseTopAttackCutPointsFailed": "Defense top lead → Declarer trump cut, {count}pts defense failed",
   "@trickEventDefenseTopAttackCutPointsFailed": { "placeholders": { "count": { "type": "int" } } },
   "trickEventAttackLeadDefenseCut": "Attack non-trump top lead → Defense trump cut",
+  "trickEventTopNonGirudaLeadDefended": "Non-trump lead → defense higher card",
   "trickEventFirstTrickTopAttack": "1st trick top non-trump lead",
   "trickEventFirstTrickTopTeamRescue": "1st trick top non-trump → team rescue",
   "trickEventFirstTrickTopAttackFailed": "1st trick top non-trump lead failed",

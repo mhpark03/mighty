@@ -4951,12 +4951,14 @@ class AIPlayer {
                   player.hand.any((c) => c.isMightyWith(state.giruda));
             }
             if (opposingSpecialGone) {
-              // 기루다 A (최상위 기루다): 특수 카드 외 이길 카드 없으므로 확실 승리
-              final girudaAce = nonFriendWinners.where((c) =>
-                  c.suit == state.giruda && c.rankValue == 14 &&
-                  !c.isMightyWith(state.giruda)).toList();
-              if (girudaAce.isNotEmpty) {
-                return girudaAce.first;
+              // 기루다 실효 최상위: 특수 카드 외 이길 카드 없으므로 확실 승리
+              final girudaTop = nonFriendWinners.where((c) =>
+                  c.suit == state.giruda &&
+                  !c.isMightyWith(state.giruda) &&
+                  _getEffectiveCardValue(c, state) >= 14).toList();
+              if (girudaTop.isNotEmpty) {
+                girudaTop.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return girudaTop.first;
               }
               // 상대 기루다 소진 시 리드 무늬 A도 확실 승리 (기루다 컷 불가)
               if (state.giruda != null) {
@@ -4971,15 +4973,17 @@ class AIPlayer {
                 }
               }
             }
-            // ★ 기루다 리드 시 기루다 A가 있으면: 프렌드 카드(조커/마이티) 온존
-            // 기루다 A는 기루다 트릭에서 마이티 외에는 지지 않음 (조커와 동일한 위험)
+            // ★ 기루다 리드 시 기루다 실효 최상위가 있으면: 프렌드 카드(조커/마이티) 온존
+            // 실효 최상위 기루다는 마이티 외에는 지지 않음 (조커와 동일한 위험)
             // → 조커/마이티는 미래 트릭에서 범용적으로 사용 가능하므로 온존 가치가 높음
             if (leadSuit == state.giruda) {
-              final girudaAceAlt = nonFriendWinners.where((c) =>
-                  c.suit == state.giruda && c.rankValue == 14 &&
-                  !c.isMightyWith(state.giruda)).toList();
-              if (girudaAceAlt.isNotEmpty) {
-                return girudaAceAlt.first;
+              final girudaTopAlt = nonFriendWinners.where((c) =>
+                  c.suit == state.giruda &&
+                  !c.isMightyWith(state.giruda) &&
+                  _getEffectiveCardValue(c, state) >= 14).toList();
+              if (girudaTopAlt.isNotEmpty) {
+                girudaTopAlt.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return girudaTopAlt.first;
               }
             }
           }
@@ -7325,13 +7329,14 @@ class AIPlayer {
     int winnerIndex = 0;
     PlayingCard? winning;
     final leadSuit = state.currentTrick!.leadSuit;
+    final jokerCalled = state.currentTrick!.jokerCall == JokerCallType.jokerCall;
 
     for (int i = 0; i < state.currentTrick!.cards.length; i++) {
       final card = state.currentTrick!.cards[i];
       if (winning == null) {
         winning = card;
         winnerIndex = i;
-      } else if (state.isCardStronger(card, winning, leadSuit, false)) {
+      } else if (state.isCardStronger(card, winning, leadSuit, jokerCalled)) {
         winning = card;
         winnerIndex = i;
       }
@@ -7374,11 +7379,12 @@ class AIPlayer {
 
     PlayingCard? winning;
     final leadSuit = state.currentTrick!.leadSuit;
+    final jokerCalled = state.currentTrick!.jokerCall == JokerCallType.jokerCall;
 
     for (final card in state.currentTrick!.cards) {
       if (winning == null) {
         winning = card;
-      } else if (state.isCardStronger(card, winning, leadSuit, false)) {
+      } else if (state.isCardStronger(card, winning, leadSuit, jokerCalled)) {
         winning = card;
       }
     }
