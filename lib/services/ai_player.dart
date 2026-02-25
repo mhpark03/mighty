@@ -4901,7 +4901,20 @@ class AIPlayer {
           }
         }
 
-        // 조건 3: 주공 선공 + 프렌드 카드가 마이티/조커 → 선 확보 필수
+        // 조건 3: 주공 선공 + 프렌드 카드가 일반 카드 + 리드 무늬와 같음 → 프렌드 합류
+        // 주공이 프렌드 카드 무늬로 선공하면 프렌드를 유도하는 신호
+        if (state.currentTrick!.playerOrder.isNotEmpty &&
+            state.currentTrick!.playerOrder[0] == state.declarerId &&
+            !friendCard.isJoker && !friendCard.isMightyWith(state.giruda) &&
+            friendCard.suit == leadSuit) {
+          // 프렌드 카드로 이길 수 있으면 합류
+          if (currentWinningCard != null &&
+              state.isCardStronger(friendCard, currentWinningCard, leadSuit, false)) {
+            return friendCard;
+          }
+        }
+
+        // 조건 4: 주공 선공 + 프렌드 카드가 마이티/조커 → 선 확보 필수
         // 비프렌드 카드로 확실히 이기면 프렌드 카드 온존, 못 이기면 프렌드 카드 사용
         // 마이티/조커는 무늬 무관 강력 → 확실한 대안 없을 때의 최종 보장
         // ★ 마이티는 트릭 1에서도 사용 가능, 조커만 트릭 1 제한

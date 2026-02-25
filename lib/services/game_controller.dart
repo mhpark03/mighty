@@ -1136,6 +1136,14 @@ class GameController extends ChangeNotifier {
       if (_isTopOfSuit(card)) {
         return LeadIntent.topGirudaLead;
       }
+      // 주공이 중간 기루다로 프렌드 유도 (프렌드 카드가 기루다 무늬인 경우)
+      if (humanPlayer.isDeclarer && _state.friendDeclaration?.card != null &&
+          !_state.isFriendRevealed) {
+        final fCard = _state.friendDeclaration!.card!;
+        if (!fCard.isJoker && fCard.suit == _state.giruda) {
+          return LeadIntent.declarerFriendLure;
+        }
+      }
       return LeadIntent.midGirudaLead;
     }
 
@@ -1144,6 +1152,16 @@ class GameController extends ChangeNotifier {
         _state.mighty.suit != null && card.suit == _state.mighty.suit &&
         !_state.isMightyPlayed) {
       return LeadIntent.defenseMightySuitBait;
+    }
+
+    // 주공 프렌드 유도: 주공이 프렌드 카드 무늬로 선공 (프렌드 미공개 시)
+    // 초구 포함 모든 트릭에서 감지
+    if (humanPlayer.isDeclarer && _state.friendDeclaration?.card != null) {
+      final fCard = _state.friendDeclaration!.card!;
+      if (!fCard.isJoker && fCard.suit != null &&
+          card.suit == fCard.suit && !_state.isFriendRevealed) {
+        return LeadIntent.declarerFriendLure;
+      }
     }
 
     // 초구 처리
@@ -1155,15 +1173,6 @@ class GameController extends ChangeNotifier {
         return LeadIntent.firstTrickTopAttack;
       }
       return LeadIntent.firstTrickWaste;
-    }
-
-    // 주공 프렌드 유도: 주공이 프렌드 카드 무늬로 선공 (프렌드 미공개 시)
-    if (humanPlayer.isDeclarer && _state.friendDeclaration?.card != null) {
-      final fCard = _state.friendDeclaration!.card!;
-      if (!fCard.isJoker && fCard.suit != null &&
-          card.suit == fCard.suit && !_state.isFriendRevealed) {
-        return LeadIntent.declarerFriendLure;
-      }
     }
 
     // 비기루다 최상위 카드 확인 (Ace 또는 상위 카드 소진 후 현재 최상위)
