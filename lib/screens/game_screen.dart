@@ -5714,12 +5714,9 @@ class _GameScreenState extends State<GameScreen> {
 
     final parts = <String>[];
 
-    // 수동게임에서 플레이어 선공 트릭은 선공 의도를 정확히 알 수 없으므로 결과만 표시
-    final bool skipLeadDesc = !isAutoPlay && leadId == 0;
-
     // Lead card description
     bool leadDescribed = false;
-    if (!skipLeadDesc && trick.leadIntent != null) {
+    if (trick.leadIntent != null) {
       final leadDesc = _describeLeadFromIntent(trick, state, l10n);
       if (leadDesc != null) {
         parts.add(leadDesc);
@@ -5737,7 +5734,7 @@ class _GameScreenState extends State<GameScreen> {
         }
       }
     }
-    if (!leadDescribed && !skipLeadDesc) {
+    if (!leadDescribed) {
     if (leadCard.isJoker) {
       const suitSymbols = {Suit.spade: '\u2660', Suit.diamond: '\u2666', Suit.heart: '\u2665', Suit.club: '\u2663'};
       final declaredSuit = trick.leadSuit;
@@ -6173,7 +6170,7 @@ class _GameScreenState extends State<GameScreen> {
     } // end if (!leadDescribed)
 
     // 조커콜 선언 (leadIntent로 리드 설명에 포함되지 않은 경우만)
-    if (trick.jokerCall == JokerCallType.jokerCall && (skipLeadDesc || trick.leadIntent != LeadIntent.jokerCallLead)) {
+    if (trick.jokerCall == JokerCallType.jokerCall && trick.leadIntent != LeadIntent.jokerCallLead) {
       parts.add(l10n.trickEventJokerCallDeclared);
     }
 

@@ -1111,8 +1111,22 @@ class GameController extends ChangeNotifier {
       _state.currentTrick != null && _state.currentTrick!.cards.isEmpty;
 
   LeadIntent _inferHumanLeadIntent(PlayingCard card, Suit? jokerLeadSuit) {
-    if (card.isJoker) return LeadIntent.jokerLeadSuit;
+    final humanPlayer = _state.players[0];
+    final isAttack = humanPlayer.isDeclarer || humanPlayer.isFriend;
+
+    // 조커 선공
+    if (card.isJoker) {
+      // 프렌드 합류 후 조커 선공
+      if (isAttack && _state.isFriendRevealed) {
+        return LeadIntent.jokerAfterFriend;
+      }
+      return LeadIntent.jokerLeadSuit;
+    }
+
+    // 마이티 선공
     if (card.isMightyWith(_state.giruda)) return LeadIntent.mightyLead;
+
+    // 기루다 선공
     if (_state.giruda != null && card.suit == _state.giruda) {
       // 기루다 A는 최상위 카드 (마이티 체크는 위에서 이미 완료)
       if (card.rankValue >= 14) {
@@ -1124,13 +1138,15 @@ class GameController extends ChangeNotifier {
       }
       return LeadIntent.midGirudaLead;
     }
+
     // 수비 마이티 무늬 선공 → 마이티 유도
-    final humanPlayer = _state.players[0];
-    if (!(humanPlayer.isDeclarer || humanPlayer.isFriend) &&
+    if (!isAttack &&
         _state.mighty.suit != null && card.suit == _state.mighty.suit &&
         !_state.isMightyPlayed) {
       return LeadIntent.defenseMightySuitBait;
     }
+
+    // 초구 처리
     if (_state.currentTrickNumber == 1) {
       final mightySuit = _state.mighty.suit;
       if (!card.isMightyWith(_state.giruda) && card.suit != _state.giruda &&
@@ -1140,16 +1156,40 @@ class GameController extends ChangeNotifier {
       }
       return LeadIntent.firstTrickWaste;
     }
+
+    // 주공 프렌드 유도: 주공이 프렌드 카드 무늬로 선공 (프렌드 미공개 시)
+    if (humanPlayer.isDeclarer && _state.friendDeclaration?.card != null) {
+      final fCard = _state.friendDeclaration!.card!;
+      if (!fCard.isJoker && fCard.suit != null &&
+          card.suit == fCard.suit && !_state.isFriendRevealed) {
+        return LeadIntent.declarerFriendLure;
+      }
+    }
+
     // 비기루다 최상위 카드 확인 (Ace 또는 상위 카드 소진 후 현재 최상위)
     if (card.rankValue >= 14 || _isTopOfSuit(card)) {
-      final humanPlayer = _state.players[0];
-      final isAttack = humanPlayer.isDeclarer || humanPlayer.isFriend;
       if (isAttack) {
         return LeadIntent.topNonGirudaLead;
       } else {
         return LeadIntent.defenseTopCard;
       }
     }
+
+    // 수비 상위 카드 (K, Q, J 등 최상위는 아닌 비기루다)
+    if (!isAttack && card.rankValue >= 11) {
+      return LeadIntent.defenseHighCard;
+    }
+
+    // 수비 저카드
+    if (!isAttack) {
+      return LeadIntent.defenseLowCard;
+    }
+
+    // 공격 상위 카드 (최상위는 아닌 비기루다)
+    if (card.rankValue >= 11) {
+      return LeadIntent.highCardAttack;
+    }
+
     return LeadIntent.waste;
   }
 
