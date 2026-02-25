@@ -1102,6 +1102,7 @@
   "trickEventDefenseMightyExhaust": "防守逼出Mighty成功",
   "trickEventDefenseMightySuitBait": "Mighty花色出牌 (Mighty诱导)",
   "trickEventDefenseMightySuitBaitSuccess": "Mighty花色出牌 / Mighty诱导成功",
+  "trickEventDefenseMightySuitBaitFailed": "Mighty花色出牌 / Mighty诱导失败 (攻击方夺回先手)",
   "trickEventDefenseMightyExhaustPoints": "防守逼出Mighty，流失{count}分",
   "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerAfterFriend": "朋友合流后王牌 ({suit}) → 得分",

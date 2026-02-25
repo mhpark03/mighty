@@ -1103,6 +1103,7 @@
   "trickEventDefenseMightyExhaust": "Defense mighty exhaust success",
   "trickEventDefenseMightySuitBait": "Mighty suit lead (mighty bait)",
   "trickEventDefenseMightySuitBaitSuccess": "Mighty suit lead / mighty bait success",
+  "trickEventDefenseMightySuitBaitFailed": "Mighty suit lead / mighty bait failed (attack reclaimed)",
   "trickEventDefenseMightyExhaustPoints": "Defense mighty exhaust, {count}pts lost",
   "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerAfterFriend": "Joker after friend joined ({suit}) → score",

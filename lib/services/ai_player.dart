@@ -4929,13 +4929,16 @@ class AIPlayer {
               currentWinningCard != null &&
               state.isCardStronger(c, currentWinningCard, leadSuit, false)).toList();
 
-          if (isLastInTrick && nonFriendWinners.isNotEmpty) {
-            // 마지막 순서: 현재 승리 카드만 이기면 확실 → 최저 카드로 절약
+          if (isLastInTrick && nonFriendWinners.isNotEmpty && !attackTeamWinning) {
+            // 마지막 순서 + 공격팀 미승리: 비프렌드 카드로 확실히 이기기
             nonFriendWinners.sort((a, b) => a.rankValue.compareTo(b.rankValue));
             return nonFriendWinners.first;
           }
 
-          if (!isLastInTrick && nonFriendWinners.isNotEmpty) {
+          // 마지막 순서 + 공격팀 승리: 프렌드 카드 온존, 일반 로직으로 낮은 카드 버리기
+          if (isLastInTrick && attackTeamWinning) {
+            // 조건 4 블록 탈출 → 일반 팔로우 로직에서 낮은 카드 처리
+          } else if (!isLastInTrick && nonFriendWinners.isNotEmpty) {
             // 중간 순서: 후속 플레이어 위협 확인
             final allPlayed = _getPlayedCards(state);
             // 상대 특수 카드 소진 확인 (마이티 프렌드→조커, 조커 프렌드→마이티)

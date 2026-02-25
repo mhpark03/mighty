@@ -1262,6 +1262,7 @@
   "trickEventDefenseMightyExhaust": "수비 마이티 소진 유도 성공",
   "trickEventDefenseMightySuitBait": "마이티 무늬 선공 (마이티 유도)",
   "trickEventDefenseMightySuitBaitSuccess": "마이티 무늬 선공 / 마이티 유도 성공",
+  "trickEventDefenseMightySuitBaitFailed": "마이티 무늬 선공 / 마이티 유도 실패 (공격팀 선 탈환)",
   "trickEventDefenseMightyExhaustPoints": "수비 마이티 유도, {count}점 유출",
   "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerAfterFriend": "프렌드 합류 후 조커 ({suit}) → 점수 획득",

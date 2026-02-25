@@ -972,6 +972,20 @@ class GameController extends ChangeNotifier {
           !_state.isMightyPlayed) {
         leadIntent = LeadIntent.defenseMightySuitBait;
       }
+      // 주공 프렌드 유도 의도 감지
+      if (leadIntent != LeadIntent.jokerCallLead &&
+          leadIntent != LeadIntent.declarerFriendLure &&
+          leadIntent != LeadIntent.topGirudaLead &&
+          currentPlayer.isDeclarer &&
+          !card.isJoker && !card.isMightyWith(_state.giruda) &&
+          _state.friendDeclaration?.card != null &&
+          !_state.isFriendRevealed) {
+        final fCard = _state.friendDeclaration!.card!;
+        if (!fCard.isJoker && !fCard.isMightyWith(_state.giruda) &&
+            fCard.suit != null && card.suit == fCard.suit) {
+          leadIntent = LeadIntent.declarerFriendLure;
+        }
+      }
       // Store lead intent
       if (_state.currentTrick != null && _state.currentTrick!.cards.isEmpty) {
         _state.currentTrick!.leadIntent = leadIntent;

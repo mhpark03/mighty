@@ -2385,6 +2385,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventDefenseMightySuitBaitSuccess => '마이티 무늬 선공 / 마이티 유도 성공';
 
   @override
+  String get trickEventDefenseMightySuitBaitFailed =>
+      '마이티 무늬 선공 / 마이티 유도 실패 (공격팀 선 탈환)';
+
+  @override
   String trickEventDefenseMightyExhaustPoints(int count) {
     return '수비 마이티 유도, $count점 유출';
   }

@@ -1102,6 +1102,7 @@
   "trickEventDefenseMightyExhaust": "守備マイティ消耗成功",
   "trickEventDefenseMightySuitBait": "マイティスート先攻 (マイティ誘導)",
   "trickEventDefenseMightySuitBaitSuccess": "マイティスート先攻 / マイティ誘導成功",
+  "trickEventDefenseMightySuitBaitFailed": "マイティスート先攻 / マイティ誘導失敗 (攻撃チーム先奪還)",
   "trickEventDefenseMightyExhaustPoints": "守備マイティ消耗、{count}点流出",
   "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
   "trickEventJokerAfterFriend": "フレンド合流後ジョーカー ({suit}) → 得点",

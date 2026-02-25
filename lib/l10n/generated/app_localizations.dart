@@ -4246,6 +4246,12 @@ abstract class AppLocalizations {
   /// **'마이티 무늬 선공 / 마이티 유도 성공'**
   String get trickEventDefenseMightySuitBaitSuccess;
 
+  /// No description provided for @trickEventDefenseMightySuitBaitFailed.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 무늬 선공 / 마이티 유도 실패 (공격팀 선 탈환)'**
+  String get trickEventDefenseMightySuitBaitFailed;
+
   /// No description provided for @trickEventDefenseMightyExhaustPoints.
   ///
   /// In ko, this message translates to:

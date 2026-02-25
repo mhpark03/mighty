@@ -2373,6 +2373,10 @@ class AppLocalizationsZh extends AppLocalizations {
       'Mighty花色出牌 / Mighty诱导成功';
 
   @override
+  String get trickEventDefenseMightySuitBaitFailed =>
+      'Mighty花色出牌 / Mighty诱导失败 (攻击方夺回先手)';
+
+  @override
   String trickEventDefenseMightyExhaustPoints(int count) {
     return '防守逼出Mighty，流失$count分';
   }
