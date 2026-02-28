@@ -5962,18 +5962,28 @@ class AIPlayer {
                     }
                   }
                 }
+                // ★ 조커/마이티 낭비 방지: 공격팀 팀원이 이미 이기고 있으면 사용하지 않음
+                // (winningCardIsTop이 false여도 공격팀이 이기고 있으면 굳이 조커/마이티로 보조할 필요 없음)
+                bool currentWinnerIsAttackTeamMember = false;
+                if (currentWinnerId != null) {
+                  final cw = state.players[currentWinnerId];
+                  currentWinnerIsAttackTeamMember = cw.isDeclarer ||
+                      (state.friendRevealed && cw.isFriend);
+                }
                 // ★ 조커 우선 사용 (마이티는 트릭10 승리 가능하므로 보존)
                 bool jokerCalled = state.currentTrick?.jokerCall == JokerCallType.jokerCall;
-                if (!jokerCalled && state.currentTrickNumber > 1) {
+                if (!jokerCalled && state.currentTrickNumber > 1 && !currentWinnerIsAttackTeamMember) {
                   final joker = playableCards.where((c) => c.isJoker).toList();
                   if (joker.isNotEmpty) {
                     return joker.first;
                   }
                 }
-                // 조커가 없으면 마이티 사용
-                final mighty = playableCards.where((c) => c.isMightyWith(state.giruda)).toList();
-                if (mighty.isNotEmpty) {
-                  return mighty.first;
+                // 조커가 없으면 마이티 사용 (단, 공격팀이 이기고 있으면 마이티 낭비 방지)
+                if (!currentWinnerIsAttackTeamMember) {
+                  final mighty = playableCards.where((c) => c.isMightyWith(state.giruda)).toList();
+                  if (mighty.isNotEmpty) {
+                    return mighty.first;
+                  }
                 }
               }
 
