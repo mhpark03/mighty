@@ -1459,9 +1459,18 @@ class GameController extends ChangeNotifier {
       }
     }
 
-    // 킹도 없으면 적은 무늬의 낮은 카드 (초구 포기)
+    // 킹도 없으면 마이티 확인 (초구에 확실히 이김)
     if (bestFirstCard == null) {
-      final nonGirudaCards = hand.where((c) => !c.isJoker && c.suit != giruda).toList();
+      final mighty = hand.where((c) => c.isMightyWith(giruda)).toList();
+      if (mighty.isNotEmpty) {
+        bestFirstCard = mighty.first;
+        strategy = 'FIRST_MIGHTY';
+      }
+    }
+
+    // 마이티도 없으면 적은 무늬의 낮은 카드 (초구 포기, 마이티 제외)
+    if (bestFirstCard == null) {
+      final nonGirudaCards = hand.where((c) => !c.isJoker && !c.isMightyWith(giruda) && c.suit != giruda).toList();
       if (nonGirudaCards.isNotEmpty) {
         nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
         bestFirstCard = nonGirudaCards.first;

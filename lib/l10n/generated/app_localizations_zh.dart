@@ -1769,6 +1769,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get firstTrickKing => '用非王牌K领出，尝试获得一墩';
 
   @override
+  String get firstTrickMighty => '用Mighty领出，确保获得首墩';
+
+  @override
   String get firstTrickGiveUp => '没有强力领出牌，出小牌收集信息';
 
   @override

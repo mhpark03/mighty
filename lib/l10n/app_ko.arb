@@ -958,6 +958,7 @@
   "scoreStrategy": "점수 획득 전략",
   "firstTrickAce": "비기루다 A로 선공하여 확실한 트릭 획득",
   "firstTrickKing": "비기루다 K로 선공하여 트릭 획득 시도",
+  "firstTrickMighty": "마이티로 확실한 초구 트릭 획득",
   "firstTrickGiveUp": "강한 선공 카드 없음, 낮은 카드로 정보 수집",
   "strategyMighty": "마이티로 확실한 트릭 1개 보장",
   "strategyJoker": "조커로 원하는 타이밍에 트릭 획득 가능",

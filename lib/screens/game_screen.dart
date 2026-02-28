@@ -1699,6 +1699,8 @@ class _GameScreenState extends State<GameScreen> {
         return l10n.firstTrickAce;
       case 'FIRST_KING':
         return l10n.firstTrickKing;
+      case 'FIRST_MIGHTY':
+        return l10n.firstTrickMighty;
       case 'FIRST_GIVE_UP':
         return l10n.firstTrickGiveUp;
       default:

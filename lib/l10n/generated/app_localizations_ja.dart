@@ -1775,6 +1775,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get firstTrickKing => '非切り札Kでリードしトリック獲得を試みる';
 
   @override
+  String get firstTrickMighty => 'マイティでリードし初回トリックを確実に獲得';
+
+  @override
   String get firstTrickGiveUp => '強いリードカードなし、低いカードで情報収集';
 
   @override

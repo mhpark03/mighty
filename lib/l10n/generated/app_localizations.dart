@@ -3252,6 +3252,12 @@ abstract class AppLocalizations {
   /// **'비기루다 K로 선공하여 트릭 획득 시도'**
   String get firstTrickKing;
 
+  /// No description provided for @firstTrickMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티로 확실한 초구 트릭 획득'**
+  String get firstTrickMighty;
+
   /// No description provided for @firstTrickGiveUp.
   ///
   /// In ko, this message translates to:

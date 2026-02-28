@@ -798,6 +798,7 @@
   "scoreStrategy": "得点戦略",
   "firstTrickAce": "非切り札Aでリードし確実にトリック獲得",
   "firstTrickKing": "非切り札Kでリードしトリック獲得を試みる",
+  "firstTrickMighty": "マイティでリードし初回トリックを確実に獲得",
   "firstTrickGiveUp": "強いリードカードなし、低いカードで情報収集",
   "strategyMighty": "マイティで確実に1トリック確保",
   "strategyJoker": "ジョーカーで好きなタイミングでトリック獲得可能",

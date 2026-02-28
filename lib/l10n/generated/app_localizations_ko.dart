@@ -1781,6 +1781,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get firstTrickKing => '비기루다 K로 선공하여 트릭 획득 시도';
 
   @override
+  String get firstTrickMighty => '마이티로 확실한 초구 트릭 획득';
+
+  @override
   String get firstTrickGiveUp => '강한 선공 카드 없음, 낮은 카드로 정보 수집';
 
   @override

@@ -1797,6 +1797,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Lead with non-trump King to attempt a trick win';
 
   @override
+  String get firstTrickMighty =>
+      'Lead with Mighty for a guaranteed first trick';
+
+  @override
   String get firstTrickGiveUp => 'No strong lead card, play low to gather info';
 
   @override
