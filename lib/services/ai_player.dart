@@ -835,7 +835,16 @@ class AIPlayer {
       // 마이티 무늬의 K는 A가 마이티로 빠져 실질적 최상위 카드
       bool hasTopCard = hasAce || (suit == mightySuit && hasKing);
 
-      if (hasTopCard) { minTricks++; maxTricks++; }
+      if (hasTopCard) {
+        maxTricks++;
+        // 비기루다A 선 획득 확률: 마이티/조커 보유 시 ~86% → min 확정 트릭
+        // 마이티/조커 모두 없을 시 ~49% → 기루다컷/조커 낭비 위험으로 min 불확실 보정만
+        if (hasMighty || hasJoker) {
+          minTricks++;
+        } else {
+          minAdj += 0.5;
+        }
+      }
       if (hasAce && hasKing) { maxTricks++; }
       if (hasKing && !hasTopCard) { maxAdj += 0.6; }
     }
@@ -927,12 +936,15 @@ class AIPlayer {
       // 기루다 A-K-Q 체인: Q도 확실
       if (gA && gK && gQ) initTricks++;
 
-      // 비기루다 에이스: 초구/선공 가능
-      for (final suit in Suit.values) {
-        if (suit == giruda) continue;
-        if (hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace &&
-            !(c.suit == mightySuit && c.rank == Rank.ace))) {
-          initTricks++;
+      // 비기루다 에이스: 마이티/조커 보유 시에만 확정 선공 트릭으로 계산
+      // 마이티/조커 없으면 기루다컷 위험으로 선공 불확실 → initTricks 미반영
+      if (hasMighty || hasJoker) {
+        for (final suit in Suit.values) {
+          if (suit == giruda) continue;
+          if (hand.any((c) => !c.isJoker && c.suit == suit && c.rank == Rank.ace &&
+              !(c.suit == mightySuit && c.rank == Rank.ace))) {
+            initTricks++;
+          }
         }
       }
 
@@ -3979,7 +3991,15 @@ class AIPlayer {
             // 상대 기루다 소진 + void 보유: 물패 우선(dump-first) 교대
             // 기루다 선공 → 상대 저가 카드 follow (점수 적음)
             // 물패 → 상대 선공 → 기루다 컷 (상대 고가 카드 획득, 점수 많음)
-            shouldDump = remainingTricks % 2 == 1;
+            // ★ 단, 보증 승리 카드가 완전한 교대에 부족하면 물패 우선으로 기루다 컷 기회 확보
+            // 예: 남은 4트릭 + 보증 승리 1장 → 교대에 2장 필요 → 물패 먼저
+            //     (물패로 상대에게 선 넘김 → 상대 선 시 void 무늬에서 기루다 컷으로 탈환)
+            final int neededWins = (remainingTricks + 1) ~/ 2; // ceil(remainingTricks/2)
+            if (guaranteedWinCards.length >= neededWins) {
+              shouldDump = remainingTricks % 2 == 1;
+            } else {
+              shouldDump = true; // 승리 카드 부족: 물패 우선으로 기루다 컷 기회 확보
+            }
           } else {
             // 상대 기루다 존재: 기루다 실효 최상위 보유 시 기루다 선공 우선
             final bool hasTopGirudaWin = remainingOpponentGiruda > 0 &&
