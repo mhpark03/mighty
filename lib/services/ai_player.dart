@@ -2188,6 +2188,21 @@ class AIPlayer {
       hasGirudaKing = _handContainsCard(hand, state.giruda, Rank.king);
     }
 
+    // === ★ 런 가능성 기반 조커 프렌드 선언 우선 (노프렌드 조건 이전) ===
+    // 노프렌드(3배)보다 조커 프렌드+런(4배) 기대값이 높을 때 프렌드 우선 선언
+    // 런 HIGH 조건: 조커 없음 + 마이티 + 기루다A·K + 기루다 6장 이상 + 비기루다 에이스
+    // → 마이티(1) + 조커(프렌드)(1) + 기루다A(1) + 기루다K(1) + 기루다(4장+) + 비기루다A(1) ≥ 9
+    if (!hasJoker && hasMighty && hasGirudaAce && hasGirudaKing && nonGirudaAceCount >= 1) {
+      if (state.giruda != null) {
+        final girudaCountForRun = hand.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).length;
+        if (girudaCountForRun >= 6) {
+          // P(런) ≈ 70%+ → 기대값 0.7×4 + 0.3×1 = 3.1 > 노프렌드 3× → 조커 프렌드 선언
+          return FriendDeclaration.byCard(PlayingCard.joker());
+        }
+      }
+    }
+
     // === 노 프렌드 조건 체크 ===
 
     // 비기루다 K 개수 확인
@@ -2212,7 +2227,8 @@ class AIPlayer {
     }
 
     // 조건 2-1: 기루다 압도적 우위 (8장 이상) + 마이티 + 기루다 A + 기루다 K → 노 프렌드
-    // 상대에게 기루다가 거의 없어서 컷 불가능, 조커 1번 빼앗겨도 마이티로 탈환 가능
+    // ★ 런 가능성 체크 후 도달: 비기루다 에이스가 없거나 기루다 6장 미만인 경우에만
+    // (조커 없어도 비기루다에이스 없으면 런 가능성 낮음 → 노프렌드 3배가 유리)
     if (state.giruda != null) {
       int girudaCount = hand.where((c) =>
           !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).length;
