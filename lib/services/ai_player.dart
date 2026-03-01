@@ -1010,7 +1010,7 @@ class AIPlayer {
     // 트릭당 평균 점수카드 = 2.0, 최대 추정에 2.0 적용
     // 선공 확정 트릭이 많으면 고점수 트릭을 선택적으로 확보 → 1.8배
     final double minPpt = minTricks >= 5 ? 1.8 : 1.5;
-    int minPoints = ((minTricks + minAdj) * minPpt).round().clamp(0, 20);
+    int minPoints = ((minTricks + minAdj) * minPpt).floor().clamp(0, 20);
     int maxPoints = ((maxTricks + maxAdj) * 2.0).round().clamp(0, 20);
 
     // Initiative Floor가 min을 끌어올릴 때 max도 최소한 min 이상 보장
