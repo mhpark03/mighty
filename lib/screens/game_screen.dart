@@ -6698,6 +6698,11 @@ class _GameScreenState extends State<GameScreen> {
         }
         return l10n.trickEventDefenseHighCardDefend;
       case LeadIntent.defenseLowCard:
+        // 프렌드가 물패로 선공한 경우 '수비 선공' 표시 방지
+        if (isAttack(leadId)) {
+          final attackWon = trick.winnerId != null && isAttack(trick.winnerId!);
+          return attackWon ? l10n.trickEventWaste : l10n.trickEventWasteAttackFailed;
+        }
         final dlcAttackWon = trick.winnerId != null &&
             (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
         return dlcAttackWon ? l10n.trickEventDefenseLead : l10n.trickEventWaste;
