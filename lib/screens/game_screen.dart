@@ -173,8 +173,8 @@ class _GameScreenState extends State<GameScreen> {
                   _trackingSent = false;
                   _allPassedDialogShown = false;
                   _bidInitialized = false;
-                  _showGameResult = true;
-                  _showTrickDetails = false;
+                  _showGameResult = false;
+                  _showTrickDetails = true;
                   _showHint = false;
                   controller.startNewGame();
                 },
@@ -183,8 +183,8 @@ class _GameScreenState extends State<GameScreen> {
                   _trackingSent = false;
                   _allPassedDialogShown = false;
                   _bidInitialized = false;
-                  _showGameResult = true;
-                  _showTrickDetails = false;
+                  _showGameResult = false;
+                  _showTrickDetails = true;
                   _showHint = false;
                   controller.startNewGame();
                 },
@@ -3312,8 +3312,8 @@ class _GameScreenState extends State<GameScreen> {
                           setState(() {
                             _statsRecorded = false;
                             _trackingSent = false;
-                            _showGameResult = true;
-                            _showTrickDetails = false;
+                            _showGameResult = false;
+                            _showTrickDetails = true;
                             _showHint = false;
                           });
                           controller.reset();
@@ -5323,8 +5323,8 @@ class _GameScreenState extends State<GameScreen> {
                       setState(() {
                         _statsRecorded = false;
                         _trackingSent = false;
-                        _showGameResult = true;
-                        _showTrickDetails = false;
+                        _showGameResult = false;
+                        _showTrickDetails = true;
                         _showHint = false;
                       });
                       controller.reset();
@@ -5628,24 +5628,47 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
 
-        // 결과 라벨
-        final result = attackWins && attackPoints >= bidTricks + 5
-            ? l10n.summaryResultBigWin
-            : attackWins && attackPoints == bidTricks
-                ? l10n.summaryResultMinGoal
-                : attackWins
-                    ? l10n.summaryResultWin
-                    : attackPoints >= bidTricks - 3
-                        ? l10n.summaryResultNarrowLoss
-                        : l10n.summaryResultBigLoss;
+        // 9. 공격팀 9승: 런 달성 실패 (물패처리 실패 여부 감지)
+        // 런(10-0)을 1트릭 차이로 놓친 상황 → 별도 총평 표시
+        bool summaryHandled = false;
+        if (attackTrickWins == 9 && attackWins) {
+          final lostTricks = state.tricks
+              .where((t) => t.winnerId != null && !isAttack(t.winnerId!))
+              .toList();
+          bool wasWasteFail = false;
+          if (lostTricks.length == 1) {
+            final lost = lostTricks.first;
+            final isAttackLed = lost.leadPlayerId != null && isAttack(lost.leadPlayerId!);
+            wasWasteFail = isAttackLed &&
+                (lost.leadIntent == LeadIntent.waste ||
+                 lost.leadIntent == LeadIntent.firstTrickWaste);
+          }
+          lastParts.add(wasWasteFail
+              ? l10n.summaryNineWinWasteFail
+              : l10n.summaryNineWinRunMiss);
+          summaryHandled = true;
+        }
 
-        if (keyEvents.isNotEmpty) {
-          final events = keyEvents.length >= 2
-              ? '${keyEvents[0]}${l10n.summaryAnd}${keyEvents[1]}'
-              : keyEvents[0];
-          lastParts.add(l10n.summaryNarrative(events, result));
-        } else {
-          lastParts.add(l10n.summaryFallback(attackTrickWins, defenseTrickWins, attackPoints, bidTricks, result));
+        // 결과 라벨
+        if (!summaryHandled) {
+          final result = attackWins && attackPoints >= bidTricks + 5
+              ? l10n.summaryResultBigWin
+              : attackWins && attackPoints == bidTricks
+                  ? l10n.summaryResultMinGoal
+                  : attackWins
+                      ? l10n.summaryResultWin
+                      : attackPoints >= bidTricks - 3
+                          ? l10n.summaryResultNarrowLoss
+                          : l10n.summaryResultBigLoss;
+
+          if (keyEvents.isNotEmpty) {
+            final events = keyEvents.length >= 2
+                ? '${keyEvents[0]}${l10n.summaryAnd}${keyEvents[1]}'
+                : keyEvents[0];
+            lastParts.add(l10n.summaryNarrative(events, result));
+          } else {
+            lastParts.add(l10n.summaryFallback(attackTrickWins, defenseTrickWins, attackPoints, bidTricks, result));
+          }
         }
       }
 
@@ -6761,8 +6784,8 @@ class _GameScreenState extends State<GameScreen> {
                       setState(() {
                         _statsRecorded = false;
                         _trackingSent = false;
-                        _showGameResult = true;
-                        _showTrickDetails = false;
+                        _showGameResult = false;
+                        _showTrickDetails = true;
                         _showHint = false;
                       });
                       controller.reset();
