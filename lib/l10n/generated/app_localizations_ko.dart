@@ -2086,6 +2086,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get summaryEarlyCutMightyExtract => '초반 간 + 마이티 강제 추출 치명적 손실';
 
   @override
+  String get summaryNineWinWasteFail => '총평 : 9트릭 선방, 물패처리 실패로 런 달성 실패';
+
+  @override
+  String get summaryNineWinRunMiss => '총평 : 9트릭 선방 / 런 달성 1트릭 부족';
+
+  @override
+  String get summaryNineWinFirstTrickCut =>
+      '총평 : 9트릭 선방 / 초구 기루다 컷(저확률 불운)으로 런 달성 1트릭 부족';
+
+  @override
   String get summaryDefenseJokerGirudaCounter => '수비 조커 공세 → 기루다 반격';
 
   @override

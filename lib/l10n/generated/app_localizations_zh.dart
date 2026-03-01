@@ -2073,6 +2073,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get summaryEarlyCutMightyExtract => '早期切牌+至尊被迫出牌致命损失';
 
   @override
+  String get summaryNineWinWasteFail => '总评 : 9墩善战，弃牌处理失败未能完成横扫';
+
+  @override
+  String get summaryNineWinRunMiss => '总评 : 9墩善战 / 横扫差一墩';
+
+  @override
+  String get summaryNineWinFirstTrickCut => '总评 : 9墩善战 / 首墩将牌截断(低概率)差一墩横扫';
+
+  @override
   String get summaryDefenseJokerGirudaCounter => '防守小丑攻势 → 将牌反击';
 
   @override

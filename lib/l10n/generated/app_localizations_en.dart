@@ -2113,6 +2113,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Early cut + mighty forced out critical loss';
 
   @override
+  String get summaryNineWinWasteFail =>
+      'Review: 9 tricks secured, run missed due to failed dump handling';
+
+  @override
+  String get summaryNineWinRunMiss =>
+      'Review: 9 tricks secured / run missed by 1 trick';
+
+  @override
+  String get summaryNineWinFirstTrickCut =>
+      'Review: 9 tricks secured / run missed by 1 trick due to unlucky first-trick trump cut';
+
+  @override
   String get summaryDefenseJokerGirudaCounter =>
       'Defense joker assault → trump counterattack';
 

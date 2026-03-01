@@ -3730,6 +3730,24 @@ abstract class AppLocalizations {
   /// **'초반 간 + 마이티 강제 추출 치명적 손실'**
   String get summaryEarlyCutMightyExtract;
 
+  /// No description provided for @summaryNineWinWasteFail.
+  ///
+  /// In ko, this message translates to:
+  /// **'총평 : 9트릭 선방, 물패처리 실패로 런 달성 실패'**
+  String get summaryNineWinWasteFail;
+
+  /// No description provided for @summaryNineWinRunMiss.
+  ///
+  /// In ko, this message translates to:
+  /// **'총평 : 9트릭 선방 / 런 달성 1트릭 부족'**
+  String get summaryNineWinRunMiss;
+
+  /// No description provided for @summaryNineWinFirstTrickCut.
+  ///
+  /// In ko, this message translates to:
+  /// **'총평 : 9트릭 선방 / 초구 기루다 컷(저확률 불운)으로 런 달성 1트릭 부족'**
+  String get summaryNineWinFirstTrickCut;
+
   /// No description provided for @summaryDefenseJokerGirudaCounter.
   ///
   /// In ko, this message translates to:

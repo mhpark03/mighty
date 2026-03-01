@@ -2080,6 +2080,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get summaryEarlyCutMightyExtract => '序盤カット+マイティ強制抽出で致命的損失';
 
   @override
+  String get summaryNineWinWasteFail => '総評 : 9トリック善戦、捨て牌処理失敗でランを逃す';
+
+  @override
+  String get summaryNineWinRunMiss => '総評 : 9トリック善戦 / ランまであと1トリック';
+
+  @override
+  String get summaryNineWinFirstTrickCut =>
+      '総評 : 9トリック善戦 / 初回切り札カット(低確率)でランまであと1トリック';
+
+  @override
   String get summaryDefenseJokerGirudaCounter => '守備ジョーカー攻勢 → 切り札反撃';
 
   @override

@@ -2272,15 +2272,20 @@ class AIPlayer {
       }
     }
 
-    // 4. 기루다 외 에이스 체크 (본인이 없는 카드만)
-    for (final suit in Suit.values) {
-      if (suit == state.giruda) continue;
-      // 마이티가 아닌 경우에만
-      if (!(state.mighty.suit == suit && state.mighty.rank == Rank.ace)) {
-        if (!_handContainsCard(hand, suit, Rank.ace)) {
-          return FriendDeclaration.byCard(PlayingCard(suit: suit, rank: Rank.ace));
-        }
-      }
+    // 4. 기루다 외 에이스 체크 (본인이 없는 카드만, 보유 카드 많은 무늬 우선)
+    // 해당 무늬를 많이 보유할수록 에이스 보유자와 시너지가 높음 (♣Q 물패→♣A 프렌드 등)
+    final candidateSuits = Suit.values.where((suit) {
+      if (suit == state.giruda) return false;
+      if (state.mighty.suit == suit && state.mighty.rank == Rank.ace) return false;
+      return !_handContainsCard(hand, suit, Rank.ace);
+    }).toList()
+      ..sort((a, b) {
+        final aCount = hand.where((c) => !c.isJoker && c.suit == a).length;
+        final bCount = hand.where((c) => !c.isJoker && c.suit == b).length;
+        return bCount.compareTo(aCount); // 보유 많은 무늬 우선
+      });
+    if (candidateSuits.isNotEmpty) {
+      return FriendDeclaration.byCard(PlayingCard(suit: candidateSuits.first, rank: Rank.ace));
     }
 
     // 5. 기루다 Q-J-10 체크 (본인이 없는 카드만)
@@ -2966,8 +2971,19 @@ class AIPlayer {
           double bestScoreLate = -1;
           for (final entry in allGroups.entries) {
             double declarerProb = declarerHoldings[entry.key] ?? 0.5;
-            if (declarerProb < 0.3) continue;
-            double score = declarerProb + entry.value.length * 0.1;
+            // ★ 기루다 소진 시: 주공도 컷 불가 → declarerProb < 0.3 필터 무효
+            //    기루다 잔존 시에만 주공 void 무늬(컷 위험) 제외
+            if (opponentGiruda > 0 && declarerProb < 0.3) continue;
+            double score;
+            if (opponentGiruda == 0) {
+              // ★ 기루다 소진: 최고 실효가치 카드 우선 (K급 점수카드 포함)
+              // 수비팀 동료 A가 받아서 선 유지 가능 / 공격팀 A 소모 강제
+              final topCard = entry.value.reduce((a, b) =>
+                  _getEffectiveCardValue(a, state) > _getEffectiveCardValue(b, state) ? a : b);
+              score = _getEffectiveCardValue(topCard, state) * 0.1 + entry.value.length * 0.05;
+            } else {
+              score = declarerProb + entry.value.length * 0.1;
+            }
             if (score > bestScoreLate) {
               bestScoreLate = score;
               bestSuitLate = entry.key;
@@ -3106,26 +3122,19 @@ class AIPlayer {
         }
 
         if (defenseHasGiruda) {
-          // === 수비팀 기루다 보유: 기루다 소진 유도 ===
+          // === 수비팀 기루다 보유: 최고 기루다로 선공 ===
+          // ★ 항상 실효 최고 기루다 선공: 수비 기루다 소진 + 주공 최상위 카드(K/A) 보존
           if (myGirudaCards.isNotEmpty) {
-            final highGiruda = myGirudaCards.where((c) =>
-                _getEffectiveCardValue(c, state) >= 13).toList();
-            if (highGiruda.isNotEmpty) {
-              // 최상위 기루다(K+)로 수비 기루다 소진
-              _lastLeadIntent = LeadIntent.topGirudaLead;
-              return highGiruda.first;
-            }
+            myGirudaCards.sort((a, b) =>
+                _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+            _lastLeadIntent = LeadIntent.topGirudaLead;
+            return myGirudaCards.first;
           }
-          // 높은 기루다 없으면 조커 기루다콜
+          // 기루다 없으면 조커 기루다콜
           final joker = playableCards.where((c) => c.isJoker).toList();
           if (joker.isNotEmpty && remainingGiruda >= 3) {
             _lastLeadIntent = LeadIntent.jokerGirudaExhaust;
             return joker.first;
-          }
-          // 낮은 기루다 (주공에게 선 넘기기)
-          if (myGirudaCards.isNotEmpty) {
-            _lastLeadIntent = LeadIntent.lowGirudaFriendPass;
-            return myGirudaCards.last;
           }
         } else {
           // === 수비팀 기루다 없음: 기루다 리드 회피 ===
@@ -3773,7 +3782,10 @@ class AIPlayer {
       // ★★★ 프렌드가 기루다 카드인 경우 → 기루다 낮은 카드로 선 넘기기 ★★★
       // 기루다 낮은 카드로 선공 → 프렌드가 기루다 A로 받아서 선을 가져감
       // 수비팀 기루다도 빠지고, 프렌드에게 선을 넘길 수 있음
-      if (!friendCard.isJoker && !friendCard.isMightyWith(state.giruda) &&
+      // ★ 프렌드 공개 후에는 스킵: 프렌드 카드가 이미 소진됐으므로 선 넘기기 불필요
+      //    → 직접 최상위 기루다(K 등)로 선공하여 승리 시도
+      if (!state.friendRevealed &&
+          !friendCard.isJoker && !friendCard.isMightyWith(state.giruda) &&
           friendCard.suit == state.giruda && state.giruda != null) {
 
         // 기루다 카드 중 프렌드 카드보다 낮은 카드 찾기
@@ -4851,6 +4863,55 @@ class AIPlayer {
           _lastLeadIntent = LeadIntent.topGirudaLead;
           return girudaLeadCards.first;
         }
+      }
+    }
+
+    // === 미공개 프렌드: 주공 보유 가능 무늬 우선 선공 (T5~) ===
+    // 수비팀 기루다 보유 시, 주공이 void인 무늬 선공을 피하여
+    // 수비의 기루다 컷 기회를 줄임
+    if (!state.friendRevealed && !player.isDeclarer &&
+        state.giruda != null && state.currentTrickNumber >= 5 &&
+        state.friendDeclaration?.card != null) {
+      // 내가 미공개 프렌드인지 확인 (손패에 프렌드 카드 보유 여부)
+      final friendCardU = state.friendDeclaration!.card!;
+      bool iAmUnrevealedFriend;
+      if (friendCardU.isJoker) {
+        iAmUnrevealedFriend = player.hand.any((c) => c.isJoker);
+      } else {
+        iAmUnrevealedFriend = player.hand.any((c) =>
+            c.suit == friendCardU.suit && c.rank == friendCardU.rank);
+      }
+
+      if (iAmUnrevealedFriend && _estimateDefenseTeamHasGiruda(player, state)) {
+        final declarerVoidSuitsF = _getDeclarerVoidSuits(state);
+        final declarerHoldingsF = _inferDeclarerSuitHoldings(state);
+        // 주공이 보유할 가능성이 높은 비기루다 무늬의 카드만 추림
+        // (주공 확정 void + 보유확률 낮은 무늬 제외)
+        final safeCandidatesF = playableCards.where((c) {
+          if (c.isJoker || c.isMightyWith(state.giruda)) return false;
+          if (c.suit == state.giruda || c.suit == null) return false;
+          if (declarerVoidSuitsF.contains(c.suit)) return false;
+          double prob = declarerHoldingsF[c.suit] ?? 0.5;
+          return prob >= 0.3;
+        }).toList();
+
+        if (safeCandidatesF.isNotEmpty) {
+          safeCandidatesF.sort((a, b) =>
+              _getEffectiveCardValue(b, state).compareTo(
+                  _getEffectiveCardValue(a, state)));
+          // 실효가치 14+ (현재 최상위): 직접 승리 시도
+          final topSafeF = safeCandidatesF
+              .where((c) => _getEffectiveCardValue(c, state) >= 14).toList();
+          if (topSafeF.isNotEmpty) {
+            _lastLeadIntent = LeadIntent.friendTopCardLead;
+            return topSafeF.first;
+          }
+          // 최상위 없으면: 가장 낮은 카드로 주공에게 선 넘기기
+          safeCandidatesF.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          _lastLeadIntent = LeadIntent.waste;
+          return safeCandidatesF.first;
+        }
+        // 안전한 무늬 없으면 일반 로직으로 fall-through
       }
     }
 
