@@ -5002,6 +5002,64 @@ class AIPlayer {
                 return jokerAlt.first;
               }
             }
+            // ★ 주공 선공 + 조커콜 활성: 마이티 낭비 방지
+            // 조커콜 최상위 카드 또는 기루다 간 가능하면 사용, 아니면 비점수 버리기
+            if (friendCard.isMightyWith(state.giruda) &&
+                state.currentTrick!.playerOrder.isNotEmpty &&
+                state.currentTrick!.playerOrder[0] == state.declarerId) {
+              final jkCalled =
+                  state.currentTrick?.jokerCall == JokerCallType.jokerCall;
+              final jkPlayed =
+                  state.currentTrick?.cards.any((c) => c.isJoker) ?? false;
+              if (jkCalled || jkPlayed) {
+                // 1) 조커콜 최상위: 리드 무늬 실효 최상위 카드 (조커 무력화 반영)
+                if (leadSuit != null) {
+                  final topLead = playableCards
+                      .where((c) =>
+                          c != friendCard &&
+                          !c.isJoker &&
+                          c.suit == leadSuit &&
+                          state.isCardStronger(
+                              c, currentWinningCard!, leadSuit, jkCalled))
+                      .toList();
+                  if (topLead.isNotEmpty) {
+                    topLead.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                    return topLead.first;
+                  }
+                }
+                // 2) 기루다 간: 최저 비마이티 기루다
+                if (state.giruda != null && leadSuit != state.giruda) {
+                  final girudaCuts = playableCards
+                      .where((c) =>
+                          c != friendCard &&
+                          !c.isJoker &&
+                          c.suit == state.giruda &&
+                          !c.isMightyWith(state.giruda))
+                      .toList();
+                  if (girudaCuts.isNotEmpty) {
+                    girudaCuts
+                        .sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                    return girudaCuts.first;
+                  }
+                }
+                // 3) 비점수 버리기: 마이티 온존
+                final nonPoint = playableCards
+                    .where((c) => c != friendCard && !c.isPointCard)
+                    .toList();
+                if (nonPoint.isNotEmpty) {
+                  nonPoint.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                  return nonPoint.first;
+                }
+                // 4) 비점수 없으면 최저 non-friend 버리기
+                final nonFriendLowest =
+                    playableCards.where((c) => c != friendCard).toList();
+                if (nonFriendLowest.isNotEmpty) {
+                  nonFriendLowest
+                      .sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                  return nonFriendLowest.first;
+                }
+              }
+            }
             return friendCard;
           }
         }
@@ -5094,8 +5152,7 @@ class AIPlayer {
           }
 
           // ★ 조커콜 활성 시 마이티 온존: 조커가 현재 트릭에서 무력화됨
-          // → 마이티를 이길 카드(조커)가 이 트릭에서 효력을 잃으므로
-          //   낮은 기루다 간으로 충분히 선을 확보할 수 있음 → 마이티 온존
+          // → 조커콜 최상위 카드 또는 기루다 간, 아니면 비점수 버리기 우선 → 마이티 온존
           if (friendCard.isMightyWith(state.giruda) &&
               state.giruda != null &&
               leadSuit != state.giruda) {
@@ -5104,14 +5161,33 @@ class AIPlayer {
             final jokerPlayedThisTrick =
                 state.currentTrick?.cards.any((c) => c.isJoker) ?? false;
             if (jokerCalledThisTrick || jokerPlayedThisTrick) {
-              // 조커 위협 없음: 가장 낮은 기루다 간 사용
-              final lowGiruda = nonFriendWinners
+              // 1) 기루다 간: playableCards 기준 최저 비마이티 기루다
+              final lowGiruda = playableCards
                   .where((c) =>
-                      c.suit == state.giruda && !c.isMightyWith(state.giruda))
+                      c != friendCard &&
+                      !c.isJoker &&
+                      c.suit == state.giruda &&
+                      !c.isMightyWith(state.giruda))
                   .toList();
               if (lowGiruda.isNotEmpty) {
                 lowGiruda.sort((a, b) => a.rankValue.compareTo(b.rankValue));
                 return lowGiruda.first;
+              }
+              // 2) 비점수 버리기: 마이티 온존
+              final nonPoint = playableCards
+                  .where((c) => c != friendCard && !c.isPointCard)
+                  .toList();
+              if (nonPoint.isNotEmpty) {
+                nonPoint.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return nonPoint.first;
+              }
+              // 3) 비점수 없으면 최저 non-friend 버리기
+              final nonFriendLowest =
+                  playableCards.where((c) => c != friendCard).toList();
+              if (nonFriendLowest.isNotEmpty) {
+                nonFriendLowest
+                    .sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return nonFriendLowest.first;
               }
             }
           }
