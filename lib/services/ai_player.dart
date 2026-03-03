@@ -4092,9 +4092,13 @@ class AIPlayer {
             _lastLeadIntent = LeadIntent.mightyLead;
             return mightyWin.first;
           }
-          // 최후: 조커
-          _lastLeadIntent = LeadIntent.jokerLeadSuit;
-          return guaranteedWinCards.first;
+          // 최후: 조커가 있을 때만 jokerLeadSuit; 없으면 fall through
+          final jokerGW = guaranteedWinCards.where((c) => c.isJoker).toList();
+          if (jokerGW.isNotEmpty) {
+            _lastLeadIntent = LeadIntent.jokerLeadSuit;
+            return jokerGW.first;
+          }
+          // 조커 없이 여기까지 온 경우(기루다+마이티 모두 없음): 다음 전략으로 위임
         }
       }
     }
