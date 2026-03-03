@@ -5767,6 +5767,21 @@ class _GameScreenState extends State<GameScreen> {
             trick.cards.asMap().entries.any((e) => e.key != leadIdx && isMighty(e.value))) {
           mightyExhaustDescribed = true;
         }
+        // topGirudaLead인데 상대 기루다가 소진된 경우 경고 추가
+        if (trick.leadIntent == LeadIntent.topGirudaLead && giruda != null) {
+          bool noOppGiruda = true;
+          for (int i = 0; i < trick.cards.length && i < trick.playerOrder.length; i++) {
+            if (i == leadIdx) continue;
+            if (isAttack(trick.playerOrder[i]) != isAttack(leadId) &&
+                !trick.cards[i].isJoker && trick.cards[i].suit == giruda) {
+              noOppGiruda = false;
+              break;
+            }
+          }
+          if (noOppGiruda) {
+            parts.add(l10n.trickEventTopGirudaLeadOpponentExhausted);
+          }
+        }
       }
     }
     if (!leadDescribed) {
