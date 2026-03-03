@@ -5093,6 +5093,29 @@ class AIPlayer {
             }
           }
 
+          // ★ 조커콜 활성 시 마이티 온존: 조커가 현재 트릭에서 무력화됨
+          // → 마이티를 이길 카드(조커)가 이 트릭에서 효력을 잃으므로
+          //   낮은 기루다 간으로 충분히 선을 확보할 수 있음 → 마이티 온존
+          if (friendCard.isMightyWith(state.giruda) &&
+              state.giruda != null &&
+              leadSuit != state.giruda) {
+            final jokerCalledThisTrick =
+                state.currentTrick?.jokerCall == JokerCallType.jokerCall;
+            final jokerPlayedThisTrick =
+                state.currentTrick?.cards.any((c) => c.isJoker) ?? false;
+            if (jokerCalledThisTrick || jokerPlayedThisTrick) {
+              // 조커 위협 없음: 가장 낮은 기루다 간 사용
+              final lowGiruda = nonFriendWinners
+                  .where((c) =>
+                      c.suit == state.giruda && !c.isMightyWith(state.giruda))
+                  .toList();
+              if (lowGiruda.isNotEmpty) {
+                lowGiruda.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+                return lowGiruda.first;
+              }
+            }
+          }
+
           // 확실한 대안 없음 → 프렌드 카드(마이티/조커)로 선 확보
           // ★ 단, 주공이 이미 이기고 있고 마지막 순서면 확실히 이기므로 낭비 방지
           // 마지막이 아니면 뒤 플레이어가 뒤집을 수 있으므로 프렌드 카드로 확보
