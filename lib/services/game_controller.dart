@@ -834,6 +834,37 @@ class GameController extends ChangeNotifier {
     if (_state.declarerId != 0) return;
     if (discardCards.length != 3) return;
 
+    // Tracking: 키티 스냅샷 생성 (selectKitty 호출 전에 원본 키티 저장)
+    final originalGiruda = _state.giruda;
+    final kittyCards = List<PlayingCard>.from(_state.kitty);
+    final declarer = _state.players[0];
+    final allCards = [...declarer.hand, ...kittyCards];
+    final finalHand = allCards.where((c) => !discardCards.contains(c)).toList();
+    finalHand.sort((a, b) {
+      if (a.isJoker) return -1;
+      if (b.isJoker) return 1;
+      if (a.suit != b.suit) return a.suit!.index.compareTo(b.suit!.index);
+      return b.rankValue.compareTo(a.rankValue);
+    });
+    final kittyPointCards = kittyCards.where((c) => c.isPointCard).length;
+    final (postMin, postMax) = _aiPlayer.estimatePointRange(finalHand, newGiruda);
+    final postOptimal = (postMin * 0.3 + postMax * 0.7 + 1).round().clamp(postMin, postMax);
+    _kittySnapshot = KittySnapshot(
+      kittyCards: kittyCards.map((c) => c.toJson()).toList(),
+      kittyPointCards: kittyPointCards,
+      discardCards: discardCards.map((c) => c.toJson()).toList(),
+      finalHand: finalHand.map((c) => c.toJson()).toList(),
+      girudaChanged: newGiruda != originalGiruda,
+      originalGiruda: originalGiruda?.name,
+      newGiruda: newGiruda?.name,
+      postKittyMin: postMin,
+      postKittyMax: postMax,
+      postKittyOptimal: postOptimal,
+    );
+    for (var snap in _bidSnapshots) {
+      if (snap.playerId == _state.declarerId) snap.isDeclarer = true;
+    }
+
     _state.selectKitty(discardCards, newGiruda);
     if (isFull) {
       _state.declareFull();

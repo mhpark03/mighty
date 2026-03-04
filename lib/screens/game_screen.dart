@@ -5752,7 +5752,11 @@ class _GameScreenState extends State<GameScreen> {
     // Lead card description
     bool leadDescribed = false;
     if (trick.leadIntent != null) {
-      final leadDesc = _describeLeadFromIntent(trick, state, l10n);
+      // topGirudaLead 검증: AI가 설정했지만 실제로는 최상위가 아닐 수 있음
+      final bool topGirudaOverride = trick.leadIntent == LeadIntent.topGirudaLead &&
+          !leadCard.isJoker && leadCard.suit != null &&
+          leadCard.rankValue < 14 && !isTopOfSuit(leadCard.suit!, leadCard.rankValue);
+      final leadDesc = topGirudaOverride ? null : _describeLeadFromIntent(trick, state, l10n);
       if (leadDesc != null) {
         parts.add(leadDesc);
         leadDescribed = true;
