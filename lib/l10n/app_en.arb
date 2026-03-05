@@ -996,6 +996,7 @@
   "summaryMightyImpact": "Mighty impact",
   "summaryJokerMightyNoExtra": "Joker/Mighty extra score shortage",
   "summaryJokerMightyLost": "Joker/Mighty score failure",
+  "summaryDefenseHighValueBlock": "Defense blocked high-value tricks, attack score insufficient",
   "summaryEarlyLeadLostLate": "Early lead loss delayed reclaim, limited Joker/Mighty impact",
   "summaryLateLeadLostGirudaExhaust": "Early trump/friend exhaustion, lost lead in late game",
   "summaryEarlyCutMightyExtract": "Early cut + mighty forced out critical loss",

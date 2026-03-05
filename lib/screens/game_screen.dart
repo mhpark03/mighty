@@ -5368,13 +5368,15 @@ class _GameScreenState extends State<GameScreen> {
       final lastParts = <String>[];
       final pointCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
 
-      // 게임 결과 선계산
+      // 게임 결과 선계산 (키티 점수카드 포함)
       int attackPoints = 0;
       for (final t in state.tricks) {
         if (t.winnerId != null && isAttack(t.winnerId!)) {
           attackPoints += t.cards.where((c) => !c.isJoker && c.isPointCard).length;
         }
       }
+      // 키티(바닥패)에 버린 점수카드는 공격팀 점수에 포함
+      attackPoints += state.kitty.where((c) => c.isPointCard).length;
       final bidTricks = state.currentBid?.tricks ?? 13;
       final attackWins = attackPoints >= bidTricks;
 
@@ -5599,7 +5601,20 @@ class _GameScreenState extends State<GameScreen> {
               // 후반(7-10트릭) 수비 승리 3회 이상 + 초반은 선전 → 기루다/프렌드 조기 소진
               keyEvents.add(l10n.summaryLateLeadLostGirudaExhaust);
             } else {
-              keyEvents.add(l10n.summaryJokerMightyLost);
+              // 수비가 고점 트릭(3점+)을 선방했는지 확인
+              int defHighValueTricks = 0;
+              for (final t in state.tricks) {
+                if (t.winnerId != null && !isAttack(t.winnerId!)) {
+                  final trickPts = t.cards.where((c) => !c.isJoker && c.isPointCard).length;
+                  if (trickPts >= 3) defHighValueTricks++;
+                }
+              }
+              if (defHighValueTricks >= 1) {
+                // 수비가 고점 트릭을 1회 이상 선방 → 핵심 원인
+                keyEvents.add(l10n.summaryDefenseHighValueBlock);
+              } else {
+                keyEvents.add(l10n.summaryJokerMightyLost);
+              }
             }
           }
         }
@@ -6210,6 +6225,24 @@ class _GameScreenState extends State<GameScreen> {
     }
     } // end if (!leadDescribed)
 
+    // Outcome: 주공 기루다 선공 → 수비 상위 기루다로 방어 (leadDescribed인 경우 보완)
+    if (leadDescribed && giruda != null && isAttack(leadId) &&
+        !leadCard.isJoker && leadCard.suit == giruda &&
+        trick.winnerId != null && !isAttack(trick.winnerId!)) {
+      final defWinIdx = trick.playerOrder.indexOf(trick.winnerId!);
+      if (defWinIdx >= 0 && defWinIdx < trick.cards.length) {
+        final defWinCard = trick.cards[defWinIdx];
+        if (!defWinCard.isJoker && defWinCard.suit == giruda && defWinCard.rankValue > leadCard.rankValue) {
+          final ptCount = trick.cards.where((c) => !c.isJoker && c.isPointCard).length;
+          if (ptCount > 0) {
+            parts.add(l10n.trickEventDefenseTopCardDefend);
+          } else {
+            parts.add(l10n.trickEventDefenseHighCardDefend);
+          }
+        }
+      }
+    }
+
     // 조커콜 선언 (leadIntent로 리드 설명에 포함되지 않은 경우만)
     if (trick.jokerCall == JokerCallType.jokerCall && trick.leadIntent != LeadIntent.jokerCallLead) {
       parts.add(l10n.trickEventJokerCallDeclared);
@@ -6533,6 +6566,22 @@ class _GameScreenState extends State<GameScreen> {
     return parts.isNotEmpty ? parts.join(' / ') : null;
   }
 
+  /// 현재 트릭 이전에 프렌드 카드가 이미 출현했는지 확인
+  bool _isFriendRevealedBefore(Trick trick, GameState state) {
+    final fCard = state.friendDeclaration?.card;
+    if (fCard == null) return false;
+    for (final t in state.tricks) {
+      if (t.trickNumber >= trick.trickNumber) break;
+      for (final c in t.cards) {
+        if (!fCard.isJoker && !c.isJoker && c.suit == fCard.suit && c.rank == fCard.rank) {
+          return true;
+        }
+        if (fCard.isJoker && c.isJoker) return true;
+      }
+    }
+    return false;
+  }
+
   String? _describeLeadFromIntent(Trick trick, GameState state, AppLocalizations l10n) {
     final intent = trick.leadIntent;
     if (intent == null) return null;
@@ -6586,6 +6635,13 @@ class _GameScreenState extends State<GameScreen> {
       case LeadIntent.lowGirudaFriendPass:
         // 주공 선공이면 프렌드 유도, 프렌드 선공이면 선 넘김/유지
         if (trick.leadPlayerId == state.declarerId) {
+          // 프렌드가 이미 공개된 경우 "프렌드 유도"가 아닌 기루다 선공으로 표시
+          final lgfpFriendAlready = _isFriendRevealedBefore(trick, state);
+          if (lgfpFriendAlready) {
+            final lgfpAttWon = trick.winnerId != null &&
+                (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+            return lgfpAttWon ? l10n.trickEventMidGirudaLead : l10n.trickEventMidGirudaExhaust;
+          }
           return l10n.trickEventDeclarerFriendLure;
         }
         // 선공자가 직접 이기면 선 유지
@@ -6654,6 +6710,13 @@ class _GameScreenState extends State<GameScreen> {
       case LeadIntent.firstTrickWaste:
         return l10n.trickEventFirstTrickWaste;
       case LeadIntent.declarerFriendLure:
+        // 프렌드가 이미 공개된 경우 "프렌드 유도"가 아닌 기루다 선공으로 표시
+        final dflFriendAlready = _isFriendRevealedBefore(trick, state);
+        if (dflFriendAlready) {
+          final dflAttWon = trick.winnerId != null &&
+              (trick.winnerId == state.declarerId || trick.winnerId == state.friendId);
+          return dflAttWon ? l10n.trickEventMidGirudaLead : l10n.trickEventMidGirudaExhaust;
+        }
         return l10n.trickEventDeclarerFriendLure;
       case LeadIntent.defenseMightyExhaust:
         return l10n.trickEventDefenseMightyExhaust;

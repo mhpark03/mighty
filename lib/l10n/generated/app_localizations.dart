@@ -3712,6 +3712,12 @@ abstract class AppLocalizations {
   /// **'조커/마이티로도 점수 획득 실패'**
   String get summaryJokerMightyLost;
 
+  /// No description provided for @summaryDefenseHighValueBlock.
+  ///
+  /// In ko, this message translates to:
+  /// **'수비 고점 트릭 선방으로 공격 점수 부족'**
+  String get summaryDefenseHighValueBlock;
+
   /// No description provided for @summaryEarlyLeadLostLate.
   ///
   /// In ko, this message translates to:

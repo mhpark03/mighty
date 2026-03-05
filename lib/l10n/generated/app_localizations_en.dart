@@ -2101,6 +2101,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get summaryJokerMightyLost => 'Joker/Mighty score failure';
 
   @override
+  String get summaryDefenseHighValueBlock =>
+      'Defense blocked high-value tricks, attack score insufficient';
+
+  @override
   String get summaryEarlyLeadLostLate =>
       'Early lead loss delayed reclaim, limited Joker/Mighty impact';
 

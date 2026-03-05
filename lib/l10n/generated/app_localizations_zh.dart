@@ -2064,6 +2064,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get summaryJokerMightyLost => '小丑/至尊仍得分不足';
 
   @override
+  String get summaryDefenseHighValueBlock => '守方拦截高分墩，攻方得分不足';
+
+  @override
   String get summaryEarlyLeadLostLate => '前期失去先手，夺回延迟，小丑/至尊效果受限';
 
   @override

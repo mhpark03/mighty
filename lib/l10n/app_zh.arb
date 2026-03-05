@@ -995,6 +995,7 @@
   "summaryMightyImpact": "Mighty发挥",
   "summaryJokerMightyNoExtra": "小丑/至尊追加得分不足",
   "summaryJokerMightyLost": "小丑/至尊仍得分不足",
+  "summaryDefenseHighValueBlock": "守方拦截高分墩，攻方得分不足",
   "summaryEarlyLeadLostLate": "前期失去先手，夺回延迟，小丑/至尊效果受限",
   "summaryLateLeadLostGirudaExhaust": "将牌/盟友过早耗尽，后期失去先手",
   "summaryEarlyCutMightyExtract": "早期切牌+至尊被迫出牌致命损失",

@@ -3878,12 +3878,12 @@ class AIPlayer {
                 final midGiruda = girudaCards.where((c) => c.rankValue <= 9).toList();
                 if (midGiruda.isNotEmpty) {
                   midGiruda.sort((a, b) => b.rankValue.compareTo(a.rankValue));
-                  _lastLeadIntent = LeadIntent.declarerFriendLure;
+                  _lastLeadIntent = state.friendRevealed ? LeadIntent.midGirudaLead : LeadIntent.declarerFriendLure;
                   return midGiruda.first;
                 }
                 // 9 이하 없으면 최저 기루다
                 girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-                _lastLeadIntent = LeadIntent.declarerFriendLure;
+                _lastLeadIntent = state.friendRevealed ? LeadIntent.midGirudaLead : LeadIntent.declarerFriendLure;
                 return girudaCards.first;
               }
             }
@@ -3894,7 +3894,7 @@ class AIPlayer {
 
             if (mightySuitCards.isNotEmpty) {
               mightySuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
-              _lastLeadIntent = LeadIntent.declarerFriendLure;
+              _lastLeadIntent = state.friendRevealed ? LeadIntent.waste : LeadIntent.declarerFriendLure;
               return mightySuitCards.first;
             }
           }
@@ -3998,7 +3998,12 @@ class AIPlayer {
       }
       final int nonGirudaSuitTotal = Suit.values.where((s) => s != giruda).length;
       final int voidSuitCount = nonGirudaSuitTotal - myNonGirudaSuits.length;
-      final hasGirudaCutRecapture = myGirudaCards.isNotEmpty && voidSuitCount >= 1;
+      // ★ 기루다 컷 탈환: 기루다 1장 + 수비 고액 기루다 보유 시 오버컷 위험
+      // 기루다 2장 이상이거나, 내 최고 기루다가 수비 최고보다 높을 때만 신뢰
+      final int myHighestGirudaRV = myGirudaCards.isEmpty ? 0
+          : myGirudaCards.map((c) => c.rankValue).reduce((a, b) => a > b ? a : b);
+      final hasGirudaCutRecapture = myGirudaCards.isNotEmpty && voidSuitCount >= 1 &&
+          (myGirudaCards.length >= 2 || myHighestGirudaRV > opponentHighestGiruda);
       final hasRecaptureMeans = hasJokerForRecapture || hasGirudaCutRecapture || hasMightyForRecapture;
 
       // ★ 보증 승리 카드 수 기반 물패 타이밍 결정
@@ -7464,6 +7469,80 @@ class AIPlayer {
           girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
           return girudaCards.first;
         } else {
+          // === 수비팀 최상위 기루다 보존: 저가치 트릭에서 아끼고 후속 트릭에서 활용 ===
+          // 조건: 수비팀 + 확인된 최상위 기루다 + 주공에게 기루다 잔존 + 저가치 트릭 + 남은 트릭 2+
+          // 효과: 주공의 미래 기루다 컷을 차단하고 리드권 확보
+          if (isDefenseTeam && state.currentTrickNumber <= 8) {
+            final myNonMightyGiruda = girudaCards
+                .where((c) => !c.isMightyWith(state.giruda))
+                .toList();
+            if (myNonMightyGiruda.isNotEmpty) {
+              myNonMightyGiruda.sort((a, b) =>
+                  b.rankValue.compareTo(a.rankValue));
+              final myTopGiruda = myNonMightyGiruda.first;
+
+              // 내 최고 기루다가 남은 기루다 중 최상위인지 확인
+              final allPlayed = _getPlayedCards(state);
+              bool isTopRemainingGiruda = true;
+              for (int rv = myTopGiruda.rankValue + 1; rv <= 14; rv++) {
+                final rank = Rank.values[rv - 2];
+                bool gone = allPlayed.any((c) =>
+                        !c.isJoker &&
+                        c.suit == state.giruda &&
+                        c.rank == rank) ||
+                    state.currentTrick!.cards.any((c) =>
+                        !c.isJoker &&
+                        c.suit == state.giruda &&
+                        c.rank == rank) ||
+                    player.hand.any((c) =>
+                        !c.isJoker &&
+                        c.suit == state.giruda &&
+                        c.rank == rank);
+                if (!gone) {
+                  isTopRemainingGiruda = false;
+                  break;
+                }
+              }
+
+              if (isTopRemainingGiruda) {
+                // 주공에게 남은 기루다가 있는지 확인
+                final opponentGirudaCount =
+                    _getRemainingGirudaCount(state, player);
+                // 현재 트릭 점수카드 수 (저가치 판별)
+                int trickPointCards = state.currentTrick!.cards
+                    .where((c) => c.isPointCard || c.isJoker)
+                    .length;
+                int remainingTricks = 10 - state.currentTrickNumber;
+
+                // 주공에게 기루다 잔존 + 저가치 트릭 + 남은 트릭 2이상 → 보존
+                if (opponentGirudaCount > 0 &&
+                    trickPointCards <= 1 &&
+                    remainingTricks >= 2) {
+                  // 비기루다 물패로 대응
+                  final nonGirudaDump = playableCards
+                      .where((c) =>
+                          !c.isJoker &&
+                          !c.isMightyWith(state.giruda) &&
+                          c.suit != state.giruda)
+                      .toList();
+                  if (nonGirudaDump.isNotEmpty) {
+                    final nonPointDump = nonGirudaDump
+                        .where((c) => !c.isPointCard)
+                        .toList();
+                    if (nonPointDump.isNotEmpty) {
+                      nonPointDump.sort(
+                          (a, b) => a.rankValue.compareTo(b.rankValue));
+                      return nonPointDump.first;
+                    }
+                    nonGirudaDump.sort(
+                        (a, b) => a.rankValue.compareTo(b.rankValue));
+                    return nonGirudaDump.first;
+                  }
+                }
+              }
+            }
+          }
+
           // 내 팀이 지고 있으면 이길 수 있는 최소의 기루다로 컷
           girudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue)); // 낮은 순
 

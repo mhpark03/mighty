@@ -2077,6 +2077,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get summaryJokerMightyLost => '조커/마이티로도 점수 획득 실패';
 
   @override
+  String get summaryDefenseHighValueBlock => '수비 고점 트릭 선방으로 공격 점수 부족';
+
+  @override
   String get summaryEarlyLeadLostLate => '초반 선 빼앗김, 선 탈환 지연으로 조커/마이티 효과 제한';
 
   @override

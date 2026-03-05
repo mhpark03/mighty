@@ -995,6 +995,7 @@
   "summaryMightyImpact": "マイティ活用",
   "summaryJokerMightyNoExtra": "ジョーカー/マイティ追加得点不足",
   "summaryJokerMightyLost": "ジョーカー/マイティでも得点不足",
+  "summaryDefenseHighValueBlock": "守備の高得点トリック阻止で攻撃得点不足",
   "summaryEarlyLeadLostLate": "序盤のリード喪失で奪還が遅れ、ジョーカー/マイティ効果制限",
   "summaryLateLeadLostGirudaExhaust": "切り札/フレンド早期消耗で終盤リード喪失",
   "summaryEarlyCutMightyExtract": "序盤カット+マイティ強制抽出で致命的損失",
