@@ -2843,6 +2843,14 @@ class AIPlayer {
           final playedGirudaCount = _getPlayedGirudaCount(state);
           final remainingGiruda = _getRemainingGirudaCount(state, player);
 
+          // ★ 마이티 소멸 + 상대 기루다 완전 소진 → 무적 조커 선공
+          // 조커가 절대 무적이므로 선을 잡고 후속 비기루다 최상위로 연속 방어
+          if (mightyPlayed && remainingGiruda == 0) {
+            _lastLeadIntent = LeadIntent.defenseJokerLead;
+            return joker.first;
+          }
+
+          // 마이티 소멸 + 기루다 9장 이상 소진 + 상대 잔여 기루다 → 기루다 콜로 소진 유도
           if (mightyPlayed && playedGirudaCount >= 9 && remainingGiruda >= 1) {
             _lastLeadIntent = LeadIntent.defenseJokerLead;
             return joker.first;
@@ -2860,7 +2868,8 @@ class AIPlayer {
           bool mightyPlayed = playedCards.any((c) => c.isMightyWith(state.giruda)) ||
               (state.currentTrick?.cards.any((c) => c.isMightyWith(state.giruda)) ?? false);
 
-          // 조건: 공격팀 기루다가 남아있거나 마이티가 안 나왔으면 조커 선공
+          // 조건: 공격팀 기루다가 남아있거나, 마이티가 안 나왔거나,
+          // 마이티+기루다 모두 소진(무적 조커)이면 선공
           if (remainingGiruda >= 1 || !mightyPlayed) {
             _lastLeadIntent = LeadIntent.defenseJokerLead;
             return joker.first;
@@ -4070,6 +4079,63 @@ class AIPlayer {
                 guaranteedWinCards.any((c) =>
                     !c.isJoker && !c.isMightyWith(giruda) && c.suit == giruda);
             shouldDump = !hasTopGirudaWin && remainingTricks % 2 == 1;
+          }
+        }
+
+        // ★★★ 비기루다 승격 전략 (Elevation Strategy) ★★★
+        // 상대 기루다 소진 + 내 기루다 컷 수단 보유 시:
+        // 다량 보유(3+) 무늬의 차상위(Q/K)를 리드하여 상대 최상위(A/K) 유도
+        // → 상대 고점 소진 후 내 잔여 카드(J/10 등)가 최상위로 승격
+        // → 기루다 컷으로 선 탈환 후 승격된 카드로 연속 승리
+        // 예: ♦QJ10 보유, ♦A/♦K 미출현 → ♦Q 리드 → ♦A/♦K 소진
+        //     → ♣Q 컷 → ♦J(최상위) → ♦10(최상위) = 3트릭 승리
+        if (shouldDump && _getRemainingGirudaCount(state, player) == 0 &&
+            (hasGirudaCutRecapture || hasJokerForRecapture)) {
+          final allPlayedCards = _getPlayedCards(state);
+          PlayingCard? bestElevationCard;
+          int bestElevationCount = 0;
+
+          Map<Suit, List<PlayingCard>> elevSuitGroups = {};
+          for (final c in nonGirudaDumpCards) {
+            if (c.suit != null) {
+              elevSuitGroups.putIfAbsent(c.suit!, () => []).add(c);
+            }
+          }
+
+          for (final entry in elevSuitGroups.entries) {
+            final suit = entry.key;
+            final cards = entry.value;
+            if (cards.length < 3) continue;
+
+            // 이 무늬에서 내 최고 카드
+            final myHighestRV = cards.map((c) => c.rankValue).reduce(
+                (a, b) => a > b ? a : b);
+            // 아직 미출현 + 내 손에 없는 상위 카드 수
+            int higherUnknown = 0;
+            for (int rv = myHighestRV + 1; rv <= 14; rv++) {
+              bool isPlayed = allPlayedCards.any((c) =>
+                  !c.isJoker && c.suit == suit && c.rankValue == rv);
+              bool isInMyHand = player.hand.any((c) =>
+                  !c.isJoker && c.suit == suit && c.rankValue == rv);
+              if (!isPlayed && !isInMyHand) higherUnknown++;
+            }
+
+            // 1~2장 상위만 미출현 → 리드로 유도 가능
+            if (higherUnknown >= 1 && higherUnknown <= 2) {
+              // 희생 후 남은 카드 = 승격 후보 (최상위가 됨)
+              final elevationCount = cards.length - 1;
+              if (elevationCount > bestElevationCount) {
+                bestElevationCount = elevationCount;
+                bestElevationCard = cards.reduce(
+                    (a, b) => a.rankValue > b.rankValue ? a : b);
+              }
+            }
+          }
+
+          // 승격 카드 2장 이상 → void 생성보다 승격이 더 가치 있음
+          if (bestElevationCount >= 2 && bestElevationCard != null) {
+            _lastLeadIntent = LeadIntent.waste;
+            return bestElevationCard;
           }
         }
 
@@ -7160,7 +7226,25 @@ class AIPlayer {
                   return girudaAceForDef.first;
                 }
               }
-              return joker.first;
+              // ★ 조커 엔드게임 보존: 초중반 + 저가 포인트 + 후속 연속방어 카드 보유
+              // → 후반에 조커로 선 탈환 + 비기루다 최상위 연속 선공이 더 가치 높음
+              // (마이티 소멸 확인 후, 트릭 2~6에서 1점만 있을 때, 후속 최상위 2장 이상)
+              if (mightyPlayed && state.currentTrickNumber <= 6 && pointCardsInTrick <= 1) {
+                final endgameFollowUpCards = player.hand.where((c) =>
+                    !c.isMightyWith(state.giruda) && !c.isJoker &&
+                    c.suit != state.giruda &&
+                    _getEffectiveCardValue(c, state) >= 13).length;
+                if (endgameFollowUpCards >= 2) {
+                  // 조커 보존: 엔드게임 연속 방어 잠재력 > 1점 탈취
+                  // → return하지 않고 아래 일반 전략으로 진행
+                }
+                else {
+                  return joker.first;
+                }
+              }
+              else {
+                return joker.first;
+              }
             }
           }
         }
@@ -7204,7 +7288,26 @@ class AIPlayer {
                   return girudaAceForLead.first;
                 }
               }
-              return jokerForLead.first;
+              // ★ 조커 엔드게임 보존: 초중반에 선 탈환보다 엔드게임 연속 방어 우선
+              // 트릭 2~5에서 기루다가 아직 남아있으면 지금 선을 잡아도 컷당할 수 있음
+              // → 기루다 소진 후 조커 + 최상위 비기루다 연속 방어가 더 효율적
+              final remainingGirudaForLead = _getRemainingGirudaCount(state, player);
+              if (mightyPlayedForLead && state.currentTrickNumber <= 5 && remainingGirudaForLead >= 2) {
+                final endgameFollowUpForLead = player.hand.where((c) =>
+                    !c.isMightyWith(state.giruda) && !c.isJoker &&
+                    c.suit != state.giruda &&
+                    _getEffectiveCardValue(c, state) >= 13).length;
+                if (endgameFollowUpForLead >= 2) {
+                  // 조커 보존: 기루다 소진 후 연속 방어 잠재력 높음
+                  // → return하지 않고 아래 일반 전략으로 진행
+                }
+                else {
+                  return jokerForLead.first;
+                }
+              }
+              else {
+                return jokerForLead.first;
+              }
             }
           }
         }
