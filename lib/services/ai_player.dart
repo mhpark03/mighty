@@ -999,7 +999,8 @@ class AIPlayer {
       // ★ 저액 기루다(2-9)는 후반 지배력이 약함: 상대 고액 기루다에 패배 가능
       // DB 분석: 기루다 4장 중 고액 1장일 때 평균 7.18트릭 (고액 2장: 7.64)
       // extraGiruda 중 고액(J+) 카드 수를 기준으로 할인
-      final extraHighCount = gc.where((c) =>
+      final extraHighCount = hand.where((c) =>
+          !c.isJoker && c.suit == giruda &&
           c.rank != Rank.ace && c.rank != Rank.king && c.rank != Rank.queen &&
           c.rankValue >= 11).length; // J만 해당 (A/K/Q는 이미 체인에 포함)
       // 고액 extra가 없고 netExtra가 2+이면 1로 할인 (저액만으로 2트릭은 비현실적)
