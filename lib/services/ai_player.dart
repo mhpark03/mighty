@@ -793,8 +793,18 @@ class AIPlayer {
       }
 
       // 기루다 장수가 많으면 후반 지배 (최대)
+      // ★ 저액 기루다(2-9)는 후반 지배력이 약함: 상대 고액 기루다에 패배 위험
+      // DB 분석: 기루다 4장 중 고액(J+) 1장일 때 평균 7.18트릭, 2장 7.64트릭
+      // 저액 비율이 높으면 길이 보너스를 할인
+      final int girudaHighCount = gc.where((c) =>
+          c.rank == Rank.ace || c.rank == Rank.king ||
+          c.rank == Rank.queen || c.rank == Rank.jack).length;
+      final int girudaLowCount = gc.length - girudaHighCount;
+      // 저액 비율: 4장 중 3장 저액이면 0.75, 2장이면 0.5
+      final bool mostlyLowGiruda = gc.length >= 4 && girudaLowCount >= (gc.length * 0.7).ceil();
+
       // 5장+A: 상대 기루다 소진 후 남은 기루다가 전부 승리
-      if (gc.length >= 5 && gA) maxTricks += 2;
+      if (gc.length >= 5 && gA) maxTricks += mostlyLowGiruda ? 1 : 2;
       else if (gc.length >= 4 && gA) maxTricks++;
       if (gc.length >= 6 && gA) maxTricks++;
 
@@ -802,7 +812,7 @@ class AIPlayer {
       if (!gA && gK) {
         if (gc.length >= 5) {
           minTricks++;    // 5장+K: 상대 A 소진 후 K 거의 확실
-          maxTricks += 2; // 후반 기루다 지배
+          maxTricks += mostlyLowGiruda ? 1 : 2; // 저액 다수면 후반 지배 약화
         } else if (gc.length >= 4) {
           maxTricks++;    // 4장+K: 일부 후반 지배
         }
@@ -812,7 +822,7 @@ class AIPlayer {
       // A, K 없이 Q 최상위 기루다 (4장+ 부터 유효, 3장 Q는 너무 약함)
       if (!gA && !gK && gQ) {
         if (gc.length >= 5) {
-          maxTricks += 2; // Q가 AK 이후 1트릭 + 장수 우위 1트릭
+          maxTricks += mostlyLowGiruda ? 1 : 2; // Q가 AK 이후 1트릭 + 장수 우위
         } else if (gc.length >= 4) {
           maxTricks++; // Q가 AK 이후 1트릭
         }
@@ -986,7 +996,16 @@ class AIPlayer {
       int extraGiruda = girudaLen - girudaTopCount;
       bool hasFriendChain = friendChainActive || friendAceChainActive;
       int netExtra = extraGiruda - (hasFriendChain ? 1 : 0); // 프렌드 호출에 1장 사용
-      if (netExtra >= 2) {
+      // ★ 저액 기루다(2-9)는 후반 지배력이 약함: 상대 고액 기루다에 패배 가능
+      // DB 분석: 기루다 4장 중 고액 1장일 때 평균 7.18트릭 (고액 2장: 7.64)
+      // extraGiruda 중 고액(J+) 카드 수를 기준으로 할인
+      final extraHighCount = gc.where((c) =>
+          c.rank != Rank.ace && c.rank != Rank.king && c.rank != Rank.queen &&
+          c.rankValue >= 11).length; // J만 해당 (A/K/Q는 이미 체인에 포함)
+      // 고액 extra가 없고 netExtra가 2+이면 1로 할인 (저액만으로 2트릭은 비현실적)
+      if (netExtra >= 2 && extraHighCount == 0 && !hasMighty && !hasJoker) {
+        initTricks++; // 2 대신 1만 추가
+      } else if (netExtra >= 2) {
         initTricks += 2;
       } else if (netExtra >= 1) {
         initTricks++;
