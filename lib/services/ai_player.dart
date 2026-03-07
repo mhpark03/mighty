@@ -773,8 +773,8 @@ class AIPlayer {
           if (g10) { minTricks += 2; } else { minTricks++; }
         }
       }
-      // A+Q (K 없이): A 이후 Q가 차상위 → 최대에 포함
-      if (gA && gQ && !gK) { maxTricks++; }
+      // A+Q (K 없이): A 이후 Q가 차상위이나 K가 남아 있어 불확실 → 0.5
+      if (gA && gQ && !gK) { maxAdj += 0.5; }
       // K만 있고 A 없으면: A 소진 후 K 승리 가능
       if (gK && !gA) {
         maxTricks++;
@@ -916,11 +916,12 @@ class AIPlayer {
       }
     }
     // 마이티 보유 + 조커 미보유: 프렌드가 조커일 가능성 높음
-    // 마이티가 조커콜로부터 보호 → 프렌드 조커 확정 트릭 + 협력 보너스
+    // 마이티가 조커콜로부터 보호 → 프렌드 협력 보너스
+    // ※ 프렌드 조커 트릭 자체는 line 899에서 이미 +1 반영됨 → 여기선 협력만 추가
     if (hasMighty && !hasJoker && giruda != null) {
       bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
       if (hasGirudaAce && girudaLen >= 4) {
-        maxTricks += 2; // 프렌드 조커 트릭 + 프렌드 협력 트릭
+        maxTricks += 1; // 프렌드 협력 보너스 (조커 트릭은 line 899에서 반영 완료)
         minTricks += 1; // 프렌드 조커 보호됨 → 최소 1트릭
       } else if (hasGirudaAce) {
         maxTricks += 1; // 기루다 짧으면 약한 보너스
@@ -4676,6 +4677,19 @@ class AIPlayer {
           nonGirudaCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
           _lastLeadIntent = LeadIntent.waste;
           return nonGirudaCards.first;
+        }
+      }
+
+      // === 케이스 1.5: 상대 기루다 있고 프렌드 미공개 → 기루다 리드로 프렌드 유도 + 기루다 소진 ===
+      // 기루다 리드: 상대 기루다 소진 + 프렌드(조커) 출현 → 일거양득
+      // 비기루다 물패/마이티무늬 공격보다 전략적으로 우월
+      if (opponentGirudaRemaining > 0 && !state.friendRevealed) {
+        final lowGirudaForJF = nonMightyPlayable.where((c) =>
+            !c.isJoker && c.suit == state.giruda).toList();
+        if (lowGirudaForJF.isNotEmpty) {
+          lowGirudaForJF.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+          _lastLeadIntent = LeadIntent.lowGirudaFriendPass;
+          return lowGirudaForJF.first;
         }
       }
 
