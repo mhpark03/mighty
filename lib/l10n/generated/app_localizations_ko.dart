@@ -2430,7 +2430,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get trickEventHighCardAttack => '비기루다 최상위 선공';
 
   @override
-  String get trickEventHighCardAttackFailed => '추가 점수 공격 실패';
+  String get trickEventHighCardAttackFailed => '비기루다 선공 → 수비 최상위 카드 점수 방어';
 
   @override
   String trickResultAttack(int count) {

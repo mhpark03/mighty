@@ -1281,7 +1281,7 @@
   "trickEventGirudaQReclaimSuccess": "기루다 Q → 선 탈환 성공",
   "trickEventGirudaQReclaimFail": "기루다 Q 선 탈환 실패, 수비 승리",
   "trickEventHighCardAttack": "비기루다 최상위 선공",
-  "trickEventHighCardAttackFailed": "추가 점수 공격 실패",
+  "trickEventHighCardAttackFailed": "비기루다 선공 → 수비 최상위 카드 점수 방어",
   "trickResultAttack": "→ 공격 +{count}",
   "@trickResultAttack": {
     "placeholders": {

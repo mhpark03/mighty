@@ -2424,7 +2424,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trickEventHighCardAttack => '非切り札最上位先攻';
 
   @override
-  String get trickEventHighCardAttackFailed => '追加得点攻撃失敗';
+  String get trickEventHighCardAttackFailed => '非切り札先攻 → 守備が上位カードで得点防衛';
 
   @override
   String trickResultAttack(int count) {

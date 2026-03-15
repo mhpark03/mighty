@@ -1121,7 +1121,7 @@
   "trickEventGirudaQReclaimSuccess": "切り札Q → リード奪還成功",
   "trickEventGirudaQReclaimFail": "切り札Qリード奪還失敗、守備勝利",
   "trickEventHighCardAttack": "非切り札最上位先攻",
-  "trickEventHighCardAttackFailed": "追加得点攻撃失敗",
+  "trickEventHighCardAttackFailed": "非切り札先攻 → 守備が上位カードで得点防衛",
   "trickResultAttack": "→ 攻撃 +{count}",
   "@trickResultAttack": {
     "placeholders": {

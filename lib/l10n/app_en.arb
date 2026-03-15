@@ -1122,7 +1122,7 @@
   "trickEventGirudaQReclaimSuccess": "Trump Q → lead reclaimed",
   "trickEventGirudaQReclaimFail": "Trump Q reclaim failed, defense wins",
   "trickEventHighCardAttack": "Top non-trump lead",
-  "trickEventHighCardAttackFailed": "High card attack failed",
+  "trickEventHighCardAttackFailed": "Non-trump lead → defense won with higher card",
   "trickResultAttack": "→ Attack +{count}",
   "@trickResultAttack": {
     "placeholders": {

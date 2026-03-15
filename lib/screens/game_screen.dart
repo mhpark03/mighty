@@ -6565,7 +6565,51 @@ class _GameScreenState extends State<GameScreen> {
       }
     }
 
+    // === 초보자 조언: 힌트를 따르지 않은 경우만 ===
+    if (!isAutoPlay && parts.isNotEmpty) {
+      final advice = _getBeginnerAdvice(trick, state, l10n);
+      if (advice != null) {
+        parts.add(advice);
+      }
+    }
+
     return parts.isNotEmpty ? parts.join(' / ') : null;
+  }
+
+  /// 초보자 조언: 초구가 있는데도 다른 카드를 낸 경우
+  String? _getBeginnerAdvice(Trick trick, GameState state, AppLocalizations l10n) {
+    final mighty = state.mighty;
+    bool isMighty(PlayingCard c) => !c.isJoker && c.suit == mighty.suit && c.rank == mighty.rank;
+
+    if (trick.trickNumber != 1) return null;
+
+    final humanIsLeader = trick.leadPlayerId == 0;
+    if (!humanIsLeader) return null;
+
+    final humanIdx = trick.playerOrder.indexOf(0);
+    if (humanIdx < 0 || humanIdx >= trick.cards.length) return null;
+    final humanCard = trick.cards[humanIdx];
+
+    // 강한 카드를 냈으면 조언 불필요
+    if (humanCard.isJoker || isMighty(humanCard) || humanCard.rank == Rank.ace) return null;
+
+    // 플레이어의 전체 핸드(10장) 복원: 모든 트릭에서 낸 카드 수집
+    final allHumanCards = <PlayingCard>[];
+    for (final t in state.tricks) {
+      final idx = t.playerOrder.indexOf(0);
+      if (idx >= 0 && idx < t.cards.length) {
+        allHumanCards.add(t.cards[idx]);
+      }
+    }
+
+    // 에이스, 마이티, 조커가 있었는지 확인
+    final hadStrongCard = allHumanCards.any((c) =>
+        c.isJoker || isMighty(c) || c.rank == Rank.ace);
+    if (hadStrongCard) {
+      return l10n.adviceFirstTrickLowLead;
+    }
+
+    return null;
   }
 
   /// 현재 트릭 이전에 프렌드 카드가 이미 출현했는지 확인

@@ -1121,7 +1121,7 @@
   "trickEventGirudaQReclaimSuccess": "将牌Q → 夺回出牌权成功",
   "trickEventGirudaQReclaimFail": "将牌Q夺回失败，防守胜",
   "trickEventHighCardAttack": "非将牌最高先攻",
-  "trickEventHighCardAttackFailed": "高牌攻击失败",
+  "trickEventHighCardAttackFailed": "非将牌先攻 → 防守以高牌得分防御",
   "trickResultAttack": "→ 攻方 +{count}",
   "@trickResultAttack": {
     "placeholders": {

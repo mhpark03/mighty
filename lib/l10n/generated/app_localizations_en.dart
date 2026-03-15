@@ -2482,7 +2482,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trickEventHighCardAttack => 'Top non-trump lead';
 
   @override
-  String get trickEventHighCardAttackFailed => 'High card attack failed';
+  String get trickEventHighCardAttackFailed =>
+      'Non-trump lead → defense won with higher card';
 
   @override
   String trickResultAttack(int count) {

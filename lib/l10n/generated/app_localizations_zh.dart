@@ -2417,7 +2417,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trickEventHighCardAttack => '非将牌最高先攻';
 
   @override
-  String get trickEventHighCardAttackFailed => '高牌攻击失败';
+  String get trickEventHighCardAttackFailed => '非将牌先攻 → 防守以高牌得分防御';
 
   @override
   String trickResultAttack(int count) {
