@@ -175,7 +175,6 @@ class _GameScreenState extends State<GameScreen> {
                   _bidInitialized = false;
                   _showGameResult = false;
                   _showTrickDetails = true;
-                  _showHint = true;
                   controller.startNewGame();
                 },
                 onAdNotAvailable: () {
@@ -185,7 +184,6 @@ class _GameScreenState extends State<GameScreen> {
                   _bidInitialized = false;
                   _showGameResult = false;
                   _showTrickDetails = true;
-                  _showHint = true;
                   controller.startNewGame();
                 },
               );
@@ -3314,7 +3312,6 @@ class _GameScreenState extends State<GameScreen> {
                             _trackingSent = false;
                             _showGameResult = false;
                             _showTrickDetails = true;
-                            _showHint = true;
                           });
                           controller.reset();
                           controller.startNewGame();
@@ -5325,7 +5322,6 @@ class _GameScreenState extends State<GameScreen> {
                         _trackingSent = false;
                         _showGameResult = false;
                         _showTrickDetails = true;
-                        _showHint = true;
                       });
                       controller.reset();
                       controller.startNewGame();
@@ -6973,7 +6969,6 @@ class _GameScreenState extends State<GameScreen> {
                         _trackingSent = false;
                         _showGameResult = false;
                         _showTrickDetails = true;
-                        _showHint = true;
                       });
                       controller.reset();
                       controller.startNewGame();
