@@ -1304,6 +1304,11 @@ class GameController extends ChangeNotifier {
     return _aiPlayer.selectCard(humanPlayer, _state).card;
   }
 
+  /// 조커 선공 시 추천 무늬 반환
+  Suit getRecommendedJokerLeadSuit() {
+    return _aiPlayer.selectJokerLeadSuit(humanPlayer, _state);
+  }
+
   /// 사용자에게 추천할 배팅을 반환
   /// AI 로직을 사용하여 최적의 배팅을 선택
   Bid? getRecommendedBid() {

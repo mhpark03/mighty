@@ -4855,6 +4855,7 @@ class _GameScreenState extends State<GameScreen> {
 
   void _showJokerLeadSuitDialog(PlayingCard card, GameController controller) {
     final l10n = AppLocalizations.of(context)!;
+    final recommendedSuit = _showHint ? controller.getRecommendedJokerLeadSuit() : null;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -4878,12 +4879,17 @@ class _GameScreenState extends State<GameScreen> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: (suit == Suit.heart || suit == Suit.diamond)
-                          ? Colors.red[100]
-                          : Colors.grey[200],
+                      backgroundColor: suit == recommendedSuit
+                          ? Colors.amber[200]
+                          : (suit == Suit.heart || suit == Suit.diamond)
+                              ? Colors.red[100]
+                              : Colors.grey[200],
                       foregroundColor: (suit == Suit.heart || suit == Suit.diamond)
                           ? Colors.red
                           : Colors.black,
+                      side: suit == recommendedSuit
+                          ? const BorderSide(color: Colors.amber, width: 2)
+                          : null,
                     ),
                     child: Text(
                       _getSuitSymbol(suit),
