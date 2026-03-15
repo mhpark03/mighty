@@ -229,11 +229,6 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
 
             const SizedBox(height: 8),
 
-            // 초보자 팁
-            _buildBeginnerTips(l10n),
-
-            const SizedBox(height: 8),
-
             // 카드로 지정 섹션
             Expanded(
               child: Container(

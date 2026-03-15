@@ -243,11 +243,6 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
 
             SizedBox(height: compact ? 4 : 6),
 
-            // 초보자 팁
-            _buildBeginnerTips(l10n, compact),
-
-            SizedBox(height: compact ? 4 : 6),
-
             // 13장 카드 (3줄: 5+5+3)
             Expanded(
               child: Padding(
