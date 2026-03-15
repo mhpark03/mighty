@@ -2475,6 +2475,55 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get adviceFirstTrickLowLead => '💡 初手はエースやマイティで確実に勝ちましょう';
+
+  @override
+  String get adviceLowLeadPointLoss => '💡 勝てないカードでリードすると得点を失います';
+
+  @override
+  String get adviceAceBeatenByJoker => '💡 守備ジョーカーが残っている時のエースリードは危険です';
+
+  @override
+  String get advicePointCardToDefense =>
+      '💡 守備が勝つトリックには得点カード(A·K·10)を出さないでください';
+
+  @override
+  String get adviceMightyHighPointLoss => '💡 マイティが出る時に得点カードが多いと大きな損失になります';
+
+  @override
+  String get kittyTipTitle => '💡 キティ交換のコツ';
+
+  @override
+  String get kittyTipCreateVoid => 'スートを空にすると切り札で勝てます';
+
+  @override
+  String get kittyTipKeepGiruda => '切り札(ギルダ)カードはできるだけ残しましょう';
+
+  @override
+  String get kittyTipKeepTopCards => '最上位カード(エースなど)があるスートは残しましょう';
+
+  @override
+  String get kittyTipDiscardLowSingles => '枚数の少ないスートの低いカードから捨てましょう';
+
+  @override
+  String get kittyTipKeepMightySuitK => 'マイティがなければマイティスートのKはマイティに勝てるので残しましょう';
+
+  @override
+  String get friendTipTitle => '💡 フレンド宣言のコツ';
+
+  @override
+  String get friendTipMighty => 'マイティフレンド：最強カードを味方にします';
+
+  @override
+  String get friendTipJoker => 'ジョーカーフレンド：2番目に強いカードを味方にします';
+
+  @override
+  String get friendTipNoFriend => 'マイティとジョーカーを両方持っていればノーフレンドを検討しましょう';
+
+  @override
+  String get friendTipWhoIsFriend => '宣言したカードを持つプレイヤーが味方になります';
+
+  @override
   String estimatedMinWins(int count) {
     return '→ $count勝以上予想';
   }

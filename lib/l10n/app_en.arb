@@ -1149,6 +1149,26 @@
   "@trickEventGirudaAceHeldMightyGuard": { "placeholders": { "name": { "type": "String" } } },
   "trickEventGirudaAceHeld": "{name}: held trump A, not played",
   "@trickEventGirudaAceHeld": { "placeholders": { "name": { "type": "String" } } },
+
+  "adviceFirstTrickLowLead": "💡 Lead with an Ace or Mighty on the first trick to secure initiative",
+  "adviceLowLeadPointLoss": "💡 Leading with a card that can't win gives points to defense",
+  "adviceAceBeatenByJoker": "💡 Leading an Ace is risky when the defense Joker hasn't been played yet",
+  "advicePointCardToDefense": "💡 Play non-point cards when defense is winning the trick",
+  "adviceMightyHighPointLoss": "💡 When Mighty appears, minimize point cards in the trick",
+
+  "kittyTipTitle": "💡 Kitty Exchange Tips",
+  "kittyTipCreateVoid": "Void a suit to cut with giruda and steal tricks",
+  "kittyTipKeepGiruda": "Keep giruda (trump) cards whenever possible",
+  "kittyTipKeepTopCards": "Keep suits where you hold the top card (e.g. Ace)",
+  "kittyTipDiscardLowSingles": "Discard low cards from short suits first",
+  "kittyTipKeepMightySuitK": "Without Mighty, keep Mighty-suit K — it can beat Mighty",
+
+  "friendTipTitle": "💡 Friend Declaration Tips",
+  "friendTipMighty": "Mighty friend: makes the strongest card your ally",
+  "friendTipJoker": "Joker friend: makes the second strongest card your ally",
+  "friendTipNoFriend": "If you hold both Mighty and Joker, consider No Friend",
+  "friendTipWhoIsFriend": "The player holding the declared card becomes your ally",
+
   "estimatedMinWins": "→ {count}+ wins expected",
   "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
   "stepFirstAce": "Lead {card} to maintain initiative on first trick",

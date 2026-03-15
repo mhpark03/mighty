@@ -2468,6 +2468,54 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get adviceFirstTrickLowLead => '💡 首墩应用A或至尊确保先手';
+
+  @override
+  String get adviceLowLeadPointLoss => '💡 用无法获胜的牌先攻会导致失分';
+
+  @override
+  String get adviceAceBeatenByJoker => '💡 防守小丑未出时先攻A有被小丑夺取的风险';
+
+  @override
+  String get advicePointCardToDefense => '💡 防守获胜的回合不要出分数牌(A·K·10)';
+
+  @override
+  String get adviceMightyHighPointLoss => '💡 至尊出现时分数牌同时被拿走会造成巨大损失';
+
+  @override
+  String get kittyTipTitle => '💡 底牌交换技巧';
+
+  @override
+  String get kittyTipCreateVoid => '清空某花色后可以用王牌切入赢得回合';
+
+  @override
+  String get kittyTipKeepGiruda => '尽量保留王牌(主花色)卡牌';
+
+  @override
+  String get kittyTipKeepTopCards => '保留拥有最大牌(如A)的花色';
+
+  @override
+  String get kittyTipDiscardLowSingles => '优先丢弃张数少的花色的低牌';
+
+  @override
+  String get kittyTipKeepMightySuitK => '没有至尊时保留至尊花色K——它能击败至尊';
+
+  @override
+  String get friendTipTitle => '💡 朋友宣言技巧';
+
+  @override
+  String get friendTipMighty => '至尊朋友：让最强的牌成为你的盟友';
+
+  @override
+  String get friendTipJoker => '小丑朋友：让第二强的牌成为你的盟友';
+
+  @override
+  String get friendTipNoFriend => '同时拥有至尊和小丑时可以考虑无朋友';
+
+  @override
+  String get friendTipWhoIsFriend => '持有所宣言卡牌的玩家将成为你的盟友';
+
+  @override
   String estimatedMinWins(int count) {
     return '→ 预计$count胜以上';
   }

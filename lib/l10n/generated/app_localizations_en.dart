@@ -2534,6 +2534,68 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get adviceFirstTrickLowLead =>
+      '💡 Lead with an Ace or Mighty on the first trick to secure initiative';
+
+  @override
+  String get adviceLowLeadPointLoss =>
+      '💡 Leading with a card that can\'t win gives points to defense';
+
+  @override
+  String get adviceAceBeatenByJoker =>
+      '💡 Leading an Ace is risky when the defense Joker hasn\'t been played yet';
+
+  @override
+  String get advicePointCardToDefense =>
+      '💡 Play non-point cards when defense is winning the trick';
+
+  @override
+  String get adviceMightyHighPointLoss =>
+      '💡 When Mighty appears, minimize point cards in the trick';
+
+  @override
+  String get kittyTipTitle => '💡 Kitty Exchange Tips';
+
+  @override
+  String get kittyTipCreateVoid =>
+      'Void a suit to cut with giruda and steal tricks';
+
+  @override
+  String get kittyTipKeepGiruda =>
+      'Keep giruda (trump) cards whenever possible';
+
+  @override
+  String get kittyTipKeepTopCards =>
+      'Keep suits where you hold the top card (e.g. Ace)';
+
+  @override
+  String get kittyTipDiscardLowSingles =>
+      'Discard low cards from short suits first';
+
+  @override
+  String get kittyTipKeepMightySuitK =>
+      'Without Mighty, keep Mighty-suit K — it can beat Mighty';
+
+  @override
+  String get friendTipTitle => '💡 Friend Declaration Tips';
+
+  @override
+  String get friendTipMighty =>
+      'Mighty friend: makes the strongest card your ally';
+
+  @override
+  String get friendTipJoker =>
+      'Joker friend: makes the second strongest card your ally';
+
+  @override
+  String get friendTipNoFriend =>
+      'If you hold both Mighty and Joker, consider No Friend';
+
+  @override
+  String get friendTipWhoIsFriend =>
+      'The player holding the declared card becomes your ally';
+
+  @override
   String estimatedMinWins(int count) {
     return '→ $count+ wins expected';
   }

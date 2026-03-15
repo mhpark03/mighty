@@ -229,6 +229,11 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
 
             const SizedBox(height: 8),
 
+            // 초보자 팁
+            _buildBeginnerTips(l10n),
+
+            const SizedBox(height: 8),
+
             // 카드로 지정 섹션
             Expanded(
               child: Container(
@@ -518,6 +523,60 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
       return _isCardInHand(_getJokerCallCard());
     }
     return false;
+  }
+
+  Widget _buildBeginnerTips(AppLocalizations l10n) {
+    final hasMighty = widget.hand.any((c) => c.isMighty);
+    final hasJoker = widget.hand.any((c) => c.isJoker);
+
+    final tips = <String>[];
+    if (!hasMighty) {
+      tips.add(l10n.friendTipMighty);
+    }
+    if (!hasJoker) {
+      tips.add(l10n.friendTipJoker);
+    }
+    if (hasMighty && hasJoker) {
+      tips.add(l10n.friendTipNoFriend);
+    }
+    tips.add(l10n.friendTipWhoIsFriend);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.blue.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.friendTipTitle,
+              style: const TextStyle(
+                color: Colors.lightBlueAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 4),
+            ...tips.map((tip) => Padding(
+              padding: const EdgeInsets.only(bottom: 1),
+              child: Text(
+                '• $tip',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 11,
+                ),
+              ),
+            )),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildSuitSelector() {

@@ -805,7 +805,15 @@ class AIPlayer {
 
       // 5장+A: 상대 기루다 소진 후 남은 기루다가 전부 승리
       if (gc.length >= 5 && gA) maxTricks += mostlyLowGiruda ? 1 : 2;
-      else if (gc.length >= 4 && gA) maxTricks++;
+      // 4장+A: 저액 다수면 A 이후 남은 3장으로 후반 지배 어려움
+      // DB 분석: 4장+A, M/J없음, mostlyLow → 예측 14.5 vs 실제 12.3 (2.2점 과대)
+      else if (gc.length >= 4 && gA) {
+        if (mostlyLowGiruda) {
+          maxAdj += 0.5; // 저액 3장으로는 상대 K/Q/J에 패배 위험
+        } else {
+          maxTricks++; // 고액 2장+(A+K 등)이면 후반 지배 가능
+        }
+      }
       if (gc.length >= 6 && gA) maxTricks++;
 
       // A 없이 K 보유 시 기루다 장수 보너스
@@ -814,7 +822,12 @@ class AIPlayer {
           minTricks++;    // 5장+K: 상대 A 소진 후 K 거의 확실
           maxTricks += mostlyLowGiruda ? 1 : 2; // 저액 다수면 후반 지배 약화
         } else if (gc.length >= 4) {
-          maxTricks++;    // 4장+K: 일부 후반 지배
+          // 4장+K: 저액 다수면 K 이후 남은 저액으로 후반 지배 약화
+          if (mostlyLowGiruda) {
+            maxAdj += 0.5;
+          } else {
+            maxTricks++;
+          }
         }
         if (gc.length >= 6) maxTricks++;
       }
@@ -824,7 +837,12 @@ class AIPlayer {
         if (gc.length >= 5) {
           maxTricks += mostlyLowGiruda ? 1 : 2; // Q가 AK 이후 1트릭 + 장수 우위
         } else if (gc.length >= 4) {
-          maxTricks++; // Q가 AK 이후 1트릭
+          // 4장+Q: 저액 다수면 AK 소진 후에도 J에 패배 위험
+          if (mostlyLowGiruda) {
+            maxAdj += 0.3;
+          } else {
+            maxTricks++;
+          }
         }
         // 3장 Q: A,K 둘 다 소진되기 어려움 → 보너스 없음
       }
@@ -1474,6 +1492,7 @@ class AIPlayer {
 
     // 마이티 무늬 시너지: Mighty + Q 보유 시 해당 무늬 보호
     final mightySuit = state.mighty.suit;
+    final bool mightyIsAce = state.mighty.rank == Rank.ace;
     final hasMightyInHand = hand.any((c) => c.isMightyWith(state.giruda));
     final hasMightyQ = hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.queen);
     final mightySuitSynergy = hasMightyInHand && hasMightyQ;
@@ -1519,10 +1538,17 @@ class AIPlayer {
       // - A 없는 무늬의 K,Q,J,10: 빼앗길 확률 높음 → 적은 무늬 기준으로 버림
       // ★ 초구 카드(A)는 T1에서 소진되므로 보호자에서 제외
       //   예: ♥A가 초구 카드 → ♥10은 T1 이후 보호 불가 → 키티에 묻는 것이 유리
+      // ★ 마이티무늬 K (마이티 미보유 시): 해당 무늬 실질 최상위 → 보존
+      //   DB 분석: 마이티 미보유+MK 버림 4전 4패 vs 마이티 보유+MK 버림 5전 5승
+      //   ♠K 한 번 내면 바로 보이드 → 보이드 + ♠K 트릭 양쪽 확보 가능
       bool aProtected = !a.isJoker && a.isPointCard &&
-          (a.rank == Rank.ace || hand.any((c) => !c.isJoker && c.suit == a.suit && c.rank == Rank.ace && !identical(c, firstTrickCard)));
+          (a.rank == Rank.ace ||
+           (!hasMighty && mightyIsAce && a.suit == mightySuit && a.rank == Rank.king) ||
+           hand.any((c) => !c.isJoker && c.suit == a.suit && c.rank == Rank.ace && !identical(c, firstTrickCard)));
       bool bProtected = !b.isJoker && b.isPointCard &&
-          (b.rank == Rank.ace || hand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace && !identical(c, firstTrickCard)));
+          (b.rank == Rank.ace ||
+           (!hasMighty && mightyIsAce && b.suit == mightySuit && b.rank == Rank.king) ||
+           hand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace && !identical(c, firstTrickCard)));
       if (aProtected && !bProtected) return 1;
       if (!aProtected && bProtected) return -1;
 
@@ -1738,6 +1764,7 @@ class AIPlayer {
 
     // 마이티 무늬 시너지: Mighty + Q 보유 시 해당 무늬 보호
     final mightySuit = state.mighty.suit;
+    final bool mightyIsAce = state.mighty.rank == Rank.ace;
     final hasMightyInHand = hand.any((c) => isMightyCard(c));
     final hasMightyQ = hand.any((c) => !c.isJoker && c.suit == mightySuit && c.rank == Rank.queen);
     final mightySuitSynergy = hasMightyInHand && hasMightyQ;
@@ -1812,10 +1839,17 @@ class AIPlayer {
       // - A 없는 무늬의 K,Q,J,10: 빼앗길 확률 높음 → 적은 무늬 기준으로 버림
       // ★ 초구 카드(A)는 T1에서 소진되므로 보호자에서 제외
       //   예: ♥A가 초구 카드 → ♥10은 T1 이후 보호 불가 → 키티에 묻는 것이 유리
+      // ★ 마이티무늬 K (마이티 미보유 시): 해당 무늬 실질 최상위 → 보존
+      //   DB 분석: 마이티 미보유+MK 버림 4전 4패 vs 마이티 보유+MK 버림 5전 5승
+      //   ♠K 한 번 내면 바로 보이드 → 보이드 + ♠K 트릭 양쪽 확보 가능
       bool aProtected = !a.isJoker && a.isPointCard &&
-          (a.rank == Rank.ace || hand.any((c) => !c.isJoker && c.suit == a.suit && c.rank == Rank.ace && !identical(c, firstTrickCard)));
+          (a.rank == Rank.ace ||
+           (!hasMighty && mightyIsAce && a.suit == mightySuit && a.rank == Rank.king) ||
+           hand.any((c) => !c.isJoker && c.suit == a.suit && c.rank == Rank.ace && !identical(c, firstTrickCard)));
       bool bProtected = !b.isJoker && b.isPointCard &&
-          (b.rank == Rank.ace || hand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace && !identical(c, firstTrickCard)));
+          (b.rank == Rank.ace ||
+           (!hasMighty && mightyIsAce && b.suit == mightySuit && b.rank == Rank.king) ||
+           hand.any((c) => !c.isJoker && c.suit == b.suit && c.rank == Rank.ace && !identical(c, firstTrickCard)));
       if (aProtected && !bProtected) return 1;
       if (!aProtected && bProtected) return -1;
 

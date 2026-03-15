@@ -241,7 +241,12 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
               ),
             ),
 
-            SizedBox(height: compact ? 6 : 12),
+            SizedBox(height: compact ? 4 : 6),
+
+            // 초보자 팁
+            _buildBeginnerTips(l10n, compact),
+
+            SizedBox(height: compact ? 4 : 6),
 
             // 13장 카드 (3줄: 5+5+3)
             Expanded(
@@ -415,6 +420,57 @@ class _KittySelectionScreenState extends State<KittySelectionScreen> {
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBeginnerTips(AppLocalizations l10n, bool compact) {
+    final hasMighty = _allCards.any((c) => c.isMighty);
+    final mightyIsAce = widget.gameState.mighty.rank == Rank.ace;
+
+    final tips = <String>[
+      l10n.kittyTipCreateVoid,
+      l10n.kittyTipKeepGiruda,
+      l10n.kittyTipDiscardLowSingles,
+    ];
+    if (!hasMighty && mightyIsAce) {
+      tips.add(l10n.kittyTipKeepMightySuitK);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 10, vertical: compact ? 4 : 6),
+        decoration: BoxDecoration(
+          color: Colors.blue.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.kittyTipTitle,
+              style: TextStyle(
+                color: Colors.lightBlueAccent,
+                fontWeight: FontWeight.bold,
+                fontSize: compact ? 11 : 12,
+              ),
+            ),
+            SizedBox(height: compact ? 2 : 4),
+            ...tips.map((tip) => Padding(
+              padding: const EdgeInsets.only(bottom: 1),
+              child: Text(
+                '• $tip',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: compact ? 10 : 11,
+                ),
+              ),
+            )),
           ],
         ),
       ),

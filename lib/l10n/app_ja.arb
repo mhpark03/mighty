@@ -1148,6 +1148,26 @@
   "@trickEventGirudaAceHeldMightyGuard": { "placeholders": { "name": { "type": "String" } } },
   "trickEventGirudaAceHeld": "{name}: 切り札A保有、未使用",
   "@trickEventGirudaAceHeld": { "placeholders": { "name": { "type": "String" } } },
+
+  "adviceFirstTrickLowLead": "💡 初手はエースやマイティで確実に勝ちましょう",
+  "adviceLowLeadPointLoss": "💡 勝てないカードでリードすると得点を失います",
+  "adviceAceBeatenByJoker": "💡 守備ジョーカーが残っている時のエースリードは危険です",
+  "advicePointCardToDefense": "💡 守備が勝つトリックには得点カード(A·K·10)を出さないでください",
+  "adviceMightyHighPointLoss": "💡 マイティが出る時に得点カードが多いと大きな損失になります",
+
+  "kittyTipTitle": "💡 キティ交換のコツ",
+  "kittyTipCreateVoid": "スートを空にすると切り札で勝てます",
+  "kittyTipKeepGiruda": "切り札(ギルダ)カードはできるだけ残しましょう",
+  "kittyTipKeepTopCards": "最上位カード(エースなど)があるスートは残しましょう",
+  "kittyTipDiscardLowSingles": "枚数の少ないスートの低いカードから捨てましょう",
+  "kittyTipKeepMightySuitK": "マイティがなければマイティスートのKはマイティに勝てるので残しましょう",
+
+  "friendTipTitle": "💡 フレンド宣言のコツ",
+  "friendTipMighty": "マイティフレンド：最強カードを味方にします",
+  "friendTipJoker": "ジョーカーフレンド：2番目に強いカードを味方にします",
+  "friendTipNoFriend": "マイティとジョーカーを両方持っていればノーフレンドを検討しましょう",
+  "friendTipWhoIsFriend": "宣言したカードを持つプレイヤーが味方になります",
+
   "estimatedMinWins": "→ {count}勝以上予想",
   "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
   "stepFirstAce": "{card}で初手の先手を維持",

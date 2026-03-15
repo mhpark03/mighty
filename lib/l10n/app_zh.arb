@@ -1148,6 +1148,26 @@
   "@trickEventGirudaAceHeldMightyGuard": { "placeholders": { "name": { "type": "String" } } },
   "trickEventGirudaAceHeld": "{name}: 王牌A保有，未使用",
   "@trickEventGirudaAceHeld": { "placeholders": { "name": { "type": "String" } } },
+
+  "adviceFirstTrickLowLead": "💡 首墩应用A或至尊确保先手",
+  "adviceLowLeadPointLoss": "💡 用无法获胜的牌先攻会导致失分",
+  "adviceAceBeatenByJoker": "💡 防守小丑未出时先攻A有被小丑夺取的风险",
+  "advicePointCardToDefense": "💡 防守获胜的回合不要出分数牌(A·K·10)",
+  "adviceMightyHighPointLoss": "💡 至尊出现时分数牌同时被拿走会造成巨大损失",
+
+  "kittyTipTitle": "💡 底牌交换技巧",
+  "kittyTipCreateVoid": "清空某花色后可以用王牌切入赢得回合",
+  "kittyTipKeepGiruda": "尽量保留王牌(主花色)卡牌",
+  "kittyTipKeepTopCards": "保留拥有最大牌(如A)的花色",
+  "kittyTipDiscardLowSingles": "优先丢弃张数少的花色的低牌",
+  "kittyTipKeepMightySuitK": "没有至尊时保留至尊花色K——它能击败至尊",
+
+  "friendTipTitle": "💡 朋友宣言技巧",
+  "friendTipMighty": "至尊朋友：让最强的牌成为你的盟友",
+  "friendTipJoker": "小丑朋友：让第二强的牌成为你的盟友",
+  "friendTipNoFriend": "同时拥有至尊和小丑时可以考虑无朋友",
+  "friendTipWhoIsFriend": "持有所宣言卡牌的玩家将成为你的盟友",
+
   "estimatedMinWins": "→ 预计{count}胜以上",
   "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
   "stepFirstAce": "用{card}保持首墩先手",

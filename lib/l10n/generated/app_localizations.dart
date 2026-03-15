@@ -4402,6 +4402,102 @@ abstract class AppLocalizations {
   /// **'{name}: 기루다 A 보유, 미사용'**
   String trickEventGirudaAceHeld(String name);
 
+  /// No description provided for @adviceFirstTrickLowLead.
+  ///
+  /// In ko, this message translates to:
+  /// **'💡 초구에는 에이스나 마이티 등 확실히 이기는 카드로 선공하세요'**
+  String get adviceFirstTrickLowLead;
+
+  /// No description provided for @adviceLowLeadPointLoss.
+  ///
+  /// In ko, this message translates to:
+  /// **'💡 이길 수 없는 카드로 선공하면 점수를 빼앗깁니다'**
+  String get adviceLowLeadPointLoss;
+
+  /// No description provided for @adviceAceBeatenByJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'💡 수비 조커가 남아있을 때 에이스 리드는 조커에 당할 수 있습니다'**
+  String get adviceAceBeatenByJoker;
+
+  /// No description provided for @advicePointCardToDefense.
+  ///
+  /// In ko, this message translates to:
+  /// **'💡 수비가 이기는 트릭에는 점수카드(A·K·10) 대신 물패를 내세요'**
+  String get advicePointCardToDefense;
+
+  /// No description provided for @adviceMightyHighPointLoss.
+  ///
+  /// In ko, this message translates to:
+  /// **'💡 마이티가 나올 때 점수카드가 함께 나가면 큰 손실입니다'**
+  String get adviceMightyHighPointLoss;
+
+  /// No description provided for @kittyTipTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'💡 키티 교환 팁'**
+  String get kittyTipTitle;
+
+  /// No description provided for @kittyTipCreateVoid.
+  ///
+  /// In ko, this message translates to:
+  /// **'무늬를 비우면 기루다로 잘라서 트릭을 가져올 수 있습니다'**
+  String get kittyTipCreateVoid;
+
+  /// No description provided for @kittyTipKeepGiruda.
+  ///
+  /// In ko, this message translates to:
+  /// **'기루다 카드는 가능한 보존하세요'**
+  String get kittyTipKeepGiruda;
+
+  /// No description provided for @kittyTipKeepTopCards.
+  ///
+  /// In ko, this message translates to:
+  /// **'최상위 카드(에이스 등)가 있는 무늬는 보존하세요'**
+  String get kittyTipKeepTopCards;
+
+  /// No description provided for @kittyTipDiscardLowSingles.
+  ///
+  /// In ko, this message translates to:
+  /// **'장수가 적은 무늬의 낮은 카드를 우선 버리세요'**
+  String get kittyTipDiscardLowSingles;
+
+  /// No description provided for @kittyTipKeepMightySuitK.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티가 없다면 마이티 무늬 K는 마이티를 잡을 수 있으니 보존하세요'**
+  String get kittyTipKeepMightySuitK;
+
+  /// No description provided for @friendTipTitle.
+  ///
+  /// In ko, this message translates to:
+  /// **'💡 프렌드 선언 팁'**
+  String get friendTipTitle;
+
+  /// No description provided for @friendTipMighty.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티 프렌드: 가장 강한 카드를 아군으로 만듭니다'**
+  String get friendTipMighty;
+
+  /// No description provided for @friendTipJoker.
+  ///
+  /// In ko, this message translates to:
+  /// **'조커 프렌드: 두 번째로 강한 카드를 아군으로 만듭니다'**
+  String get friendTipJoker;
+
+  /// No description provided for @friendTipNoFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'마이티와 조커를 모두 가지고 있으면 노프렌드를 고려하세요'**
+  String get friendTipNoFriend;
+
+  /// No description provided for @friendTipWhoIsFriend.
+  ///
+  /// In ko, this message translates to:
+  /// **'선언한 카드를 가진 플레이어가 아군이 됩니다 (본인 포함 가능)'**
+  String get friendTipWhoIsFriend;
+
   /// No description provided for @estimatedMinWins.
   ///
   /// In ko, this message translates to:
