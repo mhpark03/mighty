@@ -4716,14 +4716,38 @@ class AIPlayer {
 
       // === 케이스 1.5: 상대 기루다 있고 프렌드 미공개 → 기루다 리드로 프렌드 유도 + 기루다 소진 ===
       // 기루다 리드: 상대 기루다 소진 + 프렌드(조커) 출현 → 일거양득
-      // 비기루다 물패/마이티무늬 공격보다 전략적으로 우월
+      // ★ 기루다 최상위(A/K 등 상대 최고보다 높은) 보유 시 → 최상위로 직접 승리
+      //   조커를 낭비하지 않고 확실히 이기면서 기루다 소진 동시 달성
+      // ★ 기루다 최상위 없을 때만 → 최저 기루다로 프렌드(조커) 유도
       if (opponentGirudaRemaining > 0 && !state.friendRevealed) {
-        final lowGirudaForJF = nonMightyPlayable.where((c) =>
+        final girudaForJF = nonMightyPlayable.where((c) =>
             !c.isJoker && c.suit == state.giruda).toList();
-        if (lowGirudaForJF.isNotEmpty) {
-          lowGirudaForJF.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+        if (girudaForJF.isNotEmpty) {
+          // 상대 최고 기루다 추정 (마이티 제외: A=14이므로 K=13부터)
+          final playedCardsJF = _getPlayedCards(state);
+          int opponentHighestJF = 0;
+          for (int rv = 13; rv >= 2; rv--) {
+            final rank = Rank.values[rv - 2];
+            bool inMyHand = girudaForJF.any((c) => c.rank == rank);
+            bool alreadyPlayed = playedCardsJF.any((c) =>
+                !c.isJoker && c.suit == state.giruda && c.rank == rank);
+            if (!inMyHand && !alreadyPlayed) {
+              opponentHighestJF = rv;
+              break;
+            }
+          }
+          // 내 기루다 중 상대 최고보다 높은 카드 (확정 승리)
+          final topGirudaJF = girudaForJF.where((c) =>
+              c.rankValue > opponentHighestJF).toList();
+          if (topGirudaJF.isNotEmpty) {
+            topGirudaJF.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+            _lastLeadIntent = LeadIntent.topGirudaLead;
+            return topGirudaJF.first;
+          }
+          // 최상위 없으면 최저 기루다로 프렌드(조커) 유도
+          girudaForJF.sort((a, b) => a.rankValue.compareTo(b.rankValue));
           _lastLeadIntent = LeadIntent.lowGirudaFriendPass;
-          return lowGirudaForJF.first;
+          return girudaForJF.first;
         }
       }
 
