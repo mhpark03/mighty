@@ -100,6 +100,54 @@ class KittySnapshot {
 class MightyTrackingService {
   static const String _defaultUrl = 'https://center.kaistory.net';
   static const String _prefsKeyUrl = 'mighty_tracking_server_url';
+  static const String _prefsKeyDeviceId = 'mighty_device_uuid';
+  static const String _prefsKeyPlayerId = 'mighty_player_id_v2';
+
+  static String? _cachedPlayerId;
+
+  /// 디바이스 UUID를 가져오거나 새로 생성
+  static Future<String> _getOrCreateDeviceId() async {
+    final prefs = await SharedPreferences.getInstance();
+    var deviceId = prefs.getString(_prefsKeyDeviceId);
+    if (deviceId == null) {
+      deviceId = generateUuid();
+      await prefs.setString(_prefsKeyDeviceId, deviceId);
+    }
+    return deviceId;
+  }
+
+  /// 서버에서 playerId를 등록/조회
+  static Future<String?> getPlayerId() async {
+    if (_cachedPlayerId != null) return _cachedPlayerId;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _cachedPlayerId = prefs.getString(_prefsKeyPlayerId);
+      if (_cachedPlayerId != null) return _cachedPlayerId;
+
+      // 서버에 등록
+      final deviceId = await _getOrCreateDeviceId();
+      final serverUrl = await _getServerUrl();
+      final url = Uri.parse('$serverUrl/api/mighty/players');
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'deviceId': deviceId, 'appType': 'mighty'}),
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        _cachedPlayerId = data['playerId'] as String?;
+        if (_cachedPlayerId != null) {
+          await prefs.setString(_prefsKeyPlayerId, _cachedPlayerId!);
+        }
+      }
+    } catch (_) {
+      // 실패 시 null 반환 (다음 기회에 재시도)
+    }
+    return _cachedPlayerId;
+  }
 
   static String generateUuid() {
     final rng = Random();
@@ -255,9 +303,12 @@ class MightyTrackingService {
         }
       }
 
+      final playerId = await getPlayerId();
+
       final body = {
         'gameId': gameUuid,
-        'appVersion': '1.0.99',
+        'appVersion': '1.2.11',
+        if (playerId != null) 'playerId': playerId,
         'allPassed': state.allPassed,
         'declarerId': state.declarerId,
         'giruda': _suitName(state.giruda),
