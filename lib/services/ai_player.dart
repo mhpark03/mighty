@@ -1935,7 +1935,7 @@ class AIPlayer {
     final targetTricks = state.currentBid?.tricks ?? 13;
 
     // === 1. 선공 유지 카드 수 계산 ===
-    // 마이티, 조커, 기루다 A/K, 비기루다 A, 실효가치 14+ 카드
+    // 마이티, 조커, 기루다 A/K, 비기루다 A, 기루다 체인, 마이티 무늬 고위
     int leadKeepingCards = 0;
 
     if (hasMighty) leadKeepingCards++;
@@ -1944,8 +1944,18 @@ class AIPlayer {
     if (hasGirudaKing) leadKeepingCards++;
     leadKeepingCards += nonGirudaAceCount;
 
-    // 기루다 Q 이상 카드 수 (A, K 제외)
-    if (state.giruda != null) {
+    // 기루다 체인: A+K 보유 시 Q도 최상위, Q도 있으면 J도 최상위 등
+    if (state.giruda != null && hasGirudaAce && hasGirudaKing) {
+      final chainRanks = [Rank.queen, Rank.jack, Rank.ten, Rank.nine];
+      for (final rank in chainRanks) {
+        if (_handContainsCard(hand, state.giruda, rank)) {
+          leadKeepingCards++;
+        } else {
+          break; // 체인 끊기면 중단
+        }
+      }
+    } else if (state.giruda != null) {
+      // 체인이 아니더라도 기루다 Q는 선공 유지에 기여
       int girudaHighCount = hand.where((c) =>
           !c.isJoker && !c.isMightyWith(state.giruda) &&
           c.suit == state.giruda &&
@@ -1953,6 +1963,24 @@ class AIPlayer {
           c.rankValue >= 12  // Q 이상
       ).length;
       leadKeepingCards += girudaHighCount;
+    }
+
+    // 마이티 무늬 고위카드: 에이스가 마이티로 빠져 K가 실질적 최상위
+    // 조커로 마이티 무늬 선언 가능하므로 선공 유지에 기여
+    if (hasMighty && hasJoker) {
+      final mightySuit = state.mighty.suit;
+      if (mightySuit != state.giruda && mightySuit != null) {
+        final mightySuitCards = hand.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) &&
+            c.suit == mightySuit
+        ).toList();
+        if (mightySuitCards.length >= 2) {
+          // 조커로 마이티 무늬 선언 시 상대 고위카드 소진 → 내 카드 승리 가능
+          // Q(12)+ 카드를 선공 유지 카드로 계산
+          final highCount = mightySuitCards.where((c) => c.rankValue >= 12).length;
+          leadKeepingCards += highCount;
+        }
+      }
     }
 
     // === 2. 선공 탈환 카드 수 계산 ===
@@ -2258,6 +2286,52 @@ class AIPlayer {
       }
     }
 
+    // === ★ 런 가능성 기반 마이티 무늬 K 프렌드 선언 (노프렌드 조건 이전) ===
+    // 마이티+조커+기루다 체인으로 기루다 소진 후, 마이티 무늬 물패로 프렌드(♠K) 유도 → 런
+    // 프렌드+런(4배) > 노프렌드(3배) → 런 가능 시 프렌드 선언이 유리
+    if (hasMighty && hasJoker && hasGirudaAce && hasGirudaKing && state.giruda != null) {
+      final mightySuit = state.mighty.suit;
+      if (mightySuit != state.giruda && mightySuit != null) {
+        // 마이티 무늬 K가 없어야 (프렌드로 부를 카드)
+        final hasMightySuitKing = _handContainsCard(hand, mightySuit, Rank.king);
+        if (!hasMightySuitKing) {
+          // 마이티 무늬 카드 2장 이상 (프렌드 유도용 물패 + 승리 카드)
+          final mightySuitCards = hand.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == mightySuit
+          ).toList();
+          if (mightySuitCards.length >= 2) {
+            // 기루다 체인 (A+K+Q+J+...) 연속 카운트
+            int girudaChain = 2; // A + K
+            final chainRanks = [Rank.queen, Rank.jack, Rank.ten, Rank.nine, Rank.eight];
+            for (final rank in chainRanks) {
+              if (_handContainsCard(hand, state.giruda, rank)) {
+                girudaChain++;
+              } else {
+                break;
+              }
+            }
+            // 기루다 총 장수
+            int girudaCount = hand.where((c) =>
+                !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).length;
+
+            // 런 트릭 계산:
+            // 마이티(1) + 조커(1) + 기루다(girudaCount) + 마이티 무늬 카드(mightySuitCards) + 프렌드K(1)
+            int totalTricks = 2 + girudaCount + mightySuitCards.length + 1; // +1 = 프렌드 ♠K
+            // ★ 정확히 10트릭이어야 함 (53장 / 5명 = 10장씩 + 키티 3장)
+            // 총 10트릭이면 런 가능
+            if (totalTricks >= 10 && girudaChain >= 4) {
+              // 기루다 체인 4장 이상 (A+K+Q+J) → 상대 기루다 소진 가능
+              // 마이티 무늬 고위카드(Q+)가 있으면 런 확률 상승
+              final hasHighMightySuit = mightySuitCards.any((c) => c.rankValue >= 12); // Q+
+              if (hasHighMightySuit || girudaCount >= 7) {
+                return FriendDeclaration.byCard(PlayingCard(suit: mightySuit, rank: Rank.king));
+              }
+            }
+          }
+        }
+      }
+    }
+
     // === 노 프렌드 조건 체크 ===
 
     // 비기루다 K 개수 확인
@@ -2327,20 +2401,36 @@ class AIPlayer {
       }
     }
 
-    // 4. 기루다 외 에이스 체크 (본인이 없는 카드만, 보유 카드 많은 무늬 우선)
-    // 해당 무늬를 많이 보유할수록 에이스 보유자와 시너지가 높음 (♣Q 물패→♣A 프렌드 등)
-    final candidateSuits = Suit.values.where((suit) {
-      if (suit == state.giruda) return false;
-      if (state.mighty.suit == suit && state.mighty.rank == Rank.ace) return false;
-      return !_handContainsCard(hand, suit, Rank.ace);
-    }).toList()
-      ..sort((a, b) {
-        final aCount = hand.where((c) => !c.isJoker && c.suit == a).length;
-        final bCount = hand.where((c) => !c.isJoker && c.suit == b).length;
-        return bCount.compareTo(aCount); // 보유 많은 무늬 우선
-      });
-    if (candidateSuits.isNotEmpty) {
-      return FriendDeclaration.byCard(PlayingCard(suit: candidateSuits.first, rank: Rank.ace));
+    // 4. 초구 승리 가능 프렌드 체크 (비기루다 A / 마이티 무늬 K)
+    // 마이티 무늬에서는 A가 마이티로 빠져 K가 해당 무늬 최상위 (초구 승리 카드)
+    // 해당 무늬를 많이 보유할수록 시너지가 높음 (물패→프렌드 승리)
+    {
+      List<PlayingCard> firstTrickFriendCandidates = [];
+      // 비기루다 A 후보 (마이티 무늬 제외)
+      for (final suit in Suit.values) {
+        if (suit == state.giruda) continue;
+        if (state.mighty.suit == suit && state.mighty.rank == Rank.ace) continue;
+        if (!_handContainsCard(hand, suit, Rank.ace)) {
+          firstTrickFriendCandidates.add(PlayingCard(suit: suit, rank: Rank.ace));
+        }
+      }
+      // 마이티 무늬 K 후보 (A가 마이티 → K가 해당 무늬 최상위)
+      if (state.mighty.rank == Rank.ace && state.mighty.suit != null &&
+          state.mighty.suit != state.giruda) {
+        if (!_handContainsCard(hand, state.mighty.suit!, Rank.king)) {
+          firstTrickFriendCandidates.add(
+              PlayingCard(suit: state.mighty.suit!, rank: Rank.king));
+        }
+      }
+      if (firstTrickFriendCandidates.isNotEmpty) {
+        // 보유 카드가 많은 무늬 우선
+        firstTrickFriendCandidates.sort((a, b) {
+          final aCount = hand.where((c) => !c.isJoker && c.suit == a.suit).length;
+          final bCount = hand.where((c) => !c.isJoker && c.suit == b.suit).length;
+          return bCount.compareTo(aCount);
+        });
+        return FriendDeclaration.byCard(firstTrickFriendCandidates.first);
+      }
     }
 
     // 5. 기루다 Q-J-10 체크 (본인이 없는 카드만)
@@ -3628,7 +3718,30 @@ class AIPlayer {
         }
       }
 
-      // ★ 확실한 최상위가 없고 마지막 순서가 아니면 → 마이티로 초구 선공
+      // ★ 확실한 최상위가 없을 때 → 프렌드가 초구 승리 카드이면 프렌드 무늬로 선공
+      // 프렌드가 비기루다 A 또는 마이티 무늬 K → 프렌드 무늬 저액 카드로 유도 (마이티 보존)
+      if (!hasFirstTrickWinner) {
+        final friendCard = state.friendDeclaration?.card;
+        if (friendCard != null && !friendCard.isJoker &&
+            !friendCard.isMightyWith(state.giruda) &&
+            friendCard.suit != null && friendCard.suit != state.giruda) {
+          bool friendIsFirstTrickWinner =
+              (friendCard.rank == Rank.ace && friendCard.suit != mightySuit) ||
+              (friendCard.rank == Rank.king && friendCard.suit == mightySuit);
+          if (friendIsFirstTrickWinner) {
+            final friendSuitCards = playableCards.where((c) =>
+                !c.isJoker && !c.isMightyWith(state.giruda) &&
+                c.suit == friendCard.suit).toList();
+            if (friendSuitCards.isNotEmpty) {
+              friendSuitCards.sort((a, b) => a.rankValue.compareTo(b.rankValue));
+              _lastLeadIntent = LeadIntent.firstTrickFriendBait;
+              return friendSuitCards.first;
+            }
+          }
+        }
+      }
+
+      // ★ 확실한 최상위가 없고 프렌드 유도도 불가 → 마이티로 초구 선공
       // 주공은 초구에 항상 선공(1번째)이므로 마지막 순서가 아님
       // 마이티로 선을 잡고 T2부터 기루다/비기루다 최상위 전략 수행
       if (!hasFirstTrickWinner) {
@@ -3713,6 +3826,26 @@ class AIPlayer {
             return topNonGiruda.first;
           }
           // 최상위 카드 없음 → 조커 보존, 아래 일반 전략으로 진행
+        }
+      }
+    }
+
+    // === 주공 트릭 2~3: 강한 기루다 체인 보유 시 기루다 최상위 리드 ===
+    // 기루다 실효 최상위 + 3장 이상 → 최상위 기루다부터 리드하여 수비팀 기루다 소진
+    // T2: 기루다 A 리드, T3: A 소진 후 K가 최상위 → K 리드 (체인 순서)
+    // 트릭 4+는 선 교환 전략에서 처리됨
+    if (state.giruda != null && state.currentTrickNumber >= 2 && state.currentTrickNumber <= 3) {
+      bool isAttackTeam = !_isPlayerOnDefenseTeam(player, state);
+      if (isAttackTeam && player.isDeclarer && _estimateDefenseTeamHasGiruda(player, state)) {
+        final myGirudaChain = playableCards.where((c) =>
+            !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
+        if (myGirudaChain.length >= 3) {
+          myGirudaChain.sort((a, b) =>
+              _getEffectiveCardValue(b, state).compareTo(_getEffectiveCardValue(a, state)));
+          if (_getEffectiveCardValue(myGirudaChain.first, state) >= 14) {
+            _lastLeadIntent = LeadIntent.topGirudaLead;
+            return myGirudaChain.first;
+          }
         }
       }
     }
