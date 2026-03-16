@@ -5368,6 +5368,73 @@ class AIPlayer {
           }
         }
 
+        // 조건 2b: 수비 선공 + 공격팀이 불안하게 이기는 중 → 마이티/조커로 확실히 확보
+        // 기루다 최상위나 무늬 최상위가 아닌 약한 카드(저기루다 컷, 비최상위)로 이기는 경우
+        // 후속 수비 플레이어가 더 높은 기루다나 상위 카드로 뒤집을 수 있으므로 확보 필요
+        if (attackTeamWinning &&
+            (friendCard.isMightyWith(state.giruda) || friendCard.isJoker) &&
+            (friendCard.isMightyWith(state.giruda) || state.currentTrickNumber > 1) &&
+            currentWinningCard != null) {
+          final declarerLed = state.currentTrick!.playerOrder.isNotEmpty &&
+              state.currentTrick!.playerOrder[0] == state.declarerId;
+          if (!declarerLed) {
+            final isLastInTrick =
+                state.currentTrick!.cards.length == state.players.length - 1;
+            if (!isLastInTrick) {
+              // 승리 카드의 안전성 판별
+              bool winSecure = false;
+
+              if (currentWinningCard.isJoker) {
+                // 조커 승리 + 마이티가 내 손 → 뒤집을 카드 없음 → 안전
+                winSecure = true;
+              } else if (currentWinningCard.isMightyWith(state.giruda)) {
+                winSecure = true;
+              } else {
+                final cardSuit = currentWinningCard.suit;
+                final allPlayed = _getPlayedCards(state);
+                final trickCards = state.currentTrick?.cards ?? [];
+
+                // 해당 무늬 최상위인지 판별
+                bool isTopOfSuit = true;
+                for (int rv = currentWinningCard.rankValue + 1; rv <= 14; rv++) {
+                  final gone =
+                      allPlayed.any((c) => !c.isJoker && c.suit == cardSuit && c.rankValue == rv) ||
+                      trickCards.any((c) => !c.isJoker && c.suit == cardSuit && c.rankValue == rv) ||
+                      player.hand.any((c) => !c.isJoker && c.suit == cardSuit && c.rankValue == rv);
+                  if (!gone) { isTopOfSuit = false; break; }
+                }
+
+                if (isTopOfSuit) {
+                  if (cardSuit == state.giruda) {
+                    // 기루다 최상위 → 마이티/조커만 이길 수 있으므로 안전
+                    winSecure = true;
+                  } else if (cardSuit == leadSuit && state.giruda != null) {
+                    // 리드 무늬 최상위 → 상대 기루다 컷 가능 여부 확인
+                    final opponentGirudaCount = _getRemainingGirudaCount(state, player);
+                    if (opponentGirudaCount == 0) {
+                      winSecure = true;
+                    }
+                  } else if (cardSuit == leadSuit && state.giruda == null) {
+                    // 노기루다에서 리드 무늬 최상위 → 안전
+                    winSecure = true;
+                  }
+                }
+              }
+
+              if (!winSecure) {
+                // 마이티와 조커를 모두 보유 시 조커 우선 (마이티는 트릭10용 보존)
+                if (friendCard.isMightyWith(state.giruda) && state.currentTrickNumber > 1) {
+                  final jokerAlt = playableCards.where((c) => c.isJoker).toList();
+                  if (jokerAlt.isNotEmpty && state.currentTrick?.jokerCall != JokerCallType.jokerCall) {
+                    return jokerAlt.first;
+                  }
+                }
+                return friendCard;
+              }
+            }
+          }
+        }
+
         // 조건 3: 주공 선공 + 프렌드 카드가 일반 카드 + 리드 무늬와 같음 → 프렌드 합류
         // 주공이 프렌드 카드 무늬로 선공하면 프렌드를 유도하는 신호
         if (state.currentTrick!.playerOrder.isNotEmpty &&
