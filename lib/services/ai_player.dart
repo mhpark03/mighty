@@ -4177,12 +4177,62 @@ class AIPlayer {
         final mighty = playableCards.where((c) => c.isMightyWith(giruda)).toList();
         guaranteedWinCards.addAll(mighty);
       }
-
-      final int neededWins = remainingTricks ~/ 2; // 교대에 필요한 승리 수
+      // ★ 마이티 미래 승리 카드 보정: T7 이전에도 마이티 보유 시 전략 계산에 반영
+      // guaranteedWinCards에는 미포함 (T7 전 사용 방지), 하지만 dumpGap 계산에 반영
+      // 예: T5에서 ♠K + Joker + ♦A(Mighty) = 실효 3장, 물패 불필요
+      final bool hasMightyNotCounted = state.currentTrickNumber < 7 &&
+          playableCards.any((c) => c.isMightyWith(giruda));
 
       // 비기루다 버림 카드
       final nonGirudaDumpCards = playableCards.where((c) =>
           !c.isJoker && !c.isMightyWith(giruda) && c.suit != giruda).toList();
+
+      // ★ 수비 기루다 소진 시, 비기루다 실효 최상위(EV 14+)도 확정 승리로 계산
+      // 기루다 컷 불가 → 비기루다 A/K(실효 최상위)는 해당 무늬에서 확정 승리
+      // 예: 수비 기루다 0 + ♦A(EV 14) → 리드하면 확정 승리
+      // ★ 연쇄 승격 보너스: 같은 무늬 2장(A+저카드) 보유 시
+      // A를 리드하면 나머지 상대 보유 카드도 소진 → 저카드가 승격 가능
+      // 예: ♦A+♦3 보유, 수비 잔여 ♦ 1~2장 → T9 ♦A → T10 ♦3 승리 가능
+      int nonGirudaTopWinCount = 0;
+      if (!defenseHasGirudaFL) {
+        final allPlayedForEV = _getPlayedCards(state);
+        // 무늬별 비기루다 카드 분석
+        Map<Suit, List<PlayingCard>> nonGirudaSuitGroups = {};
+        for (final c in nonGirudaDumpCards) {
+          if (c.suit != null) {
+            nonGirudaSuitGroups.putIfAbsent(c.suit!, () => []).add(c);
+          }
+        }
+        for (final entry in nonGirudaSuitGroups.entries) {
+          final suit = entry.key;
+          final cards = entry.value;
+          // 실효 최상위(EV 14+) 카드가 있는지 확인
+          final topCard = cards.reduce((a, b) =>
+              _getEffectiveCardValue(a, state) >= _getEffectiveCardValue(b, state) ? a : b);
+          if (_getEffectiveCardValue(topCard, state) >= 14) {
+            nonGirudaTopWinCount++; // 최상위 카드 자체 = 1승
+            // 연쇄 승격: 같은 무늬 2장+ 보유 시, 상대 잔여 카드 수 추정
+            if (cards.length >= 2) {
+              // 이 무늬에서 아직 안 나온 상대 보유 카드 수 추정
+              int totalInSuit = 13;
+              int played = allPlayedForEV.where((c) =>
+                  !c.isJoker && c.suit == suit).length;
+              int inMyHand = cards.length;
+              int opponentRemaining = totalInSuit - played - inMyHand;
+              // 상대 잔여 1~2장이면 최상위 리드로 소진 가능 → 다음 카드도 승리
+              // (4명 중 잔여 1~2장이면, 최상위 리드 시 대부분 소진됨)
+              if (opponentRemaining <= 2) {
+                nonGirudaTopWinCount++; // 연쇄 승격 승리 +1
+              }
+            }
+          }
+        }
+      }
+
+      final int effectiveWinCount = guaranteedWinCards.length +
+          (hasMightyNotCounted ? 1 : 0) + nonGirudaTopWinCount;
+
+      final int neededWins = remainingTricks ~/ 2; // 교대에 필요한 승리 수
 
       // 선 탈환 수단: 조커 보유 OR (기루다 카드 + void 무늬 ≥ 1) OR 마이티 보유
       final hasJokerForRecapture = playableCards.any((c) => c.isJoker);
@@ -4209,9 +4259,9 @@ class AIPlayer {
       // gap=2: 연속 승리 → 트릭 8 물패 → 트릭 9 탈환 → 트릭 10 선행 무늬 확보
       // gap≥3: 교대 전략 (기루다 실효 최상위 보유 시 기루다 선공 우선)
       // ★ 선을 탈환하지 못하면 끝까지 점수를 내주므로 물패는 최대한 후반에 배치
-      final int dumpGap = remainingTricks - guaranteedWinCards.length;
-      if (guaranteedWinCards.length >= 1 &&
-          guaranteedWinCards.length < remainingTricks &&
+      final int dumpGap = remainingTricks - effectiveWinCount;
+      if (effectiveWinCount >= 1 &&
+          effectiveWinCount < remainingTricks &&
           dumpGap >= 1 &&
           nonGirudaDumpCards.isNotEmpty &&
           hasRecaptureMeans) {
@@ -4236,7 +4286,7 @@ class AIPlayer {
             // 예: 남은 4트릭 + 보증 승리 1장 → 교대에 2장 필요 → 물패 먼저
             //     (물패로 상대에게 선 넘김 → 상대 선 시 void 무늬에서 기루다 컷으로 탈환)
             final int neededWins = (remainingTricks + 1) ~/ 2; // ceil(remainingTricks/2)
-            if (guaranteedWinCards.length >= neededWins) {
+            if (effectiveWinCount >= neededWins) {
               shouldDump = remainingTricks % 2 == 1;
             } else {
               shouldDump = true; // 승리 카드 부족: 물패 우선으로 기루다 컷 기회 확보
@@ -4341,9 +4391,14 @@ class AIPlayer {
         } else {
           // ★ 승리: 기루다 승리 카드 우선 (상위 카드부터), 조커는 후순위 (트릭 9 탈환용 보존)
           // ★ 수비팀 기루다 소진 시: 기루다 리드 회피 → 기루다는 컷용 보존, fall through
+          // ★ 예외: 기루다가 해당 무늬 실효 최상위(EV 14+)이면 리드 허용
+          //   아무도 이길 수 없는 확정 승리 카드를 컷용으로 남기기보다 리드로 선 유지
+          //   예: ♠K가 유일한 잔존 스페이드 → 리드하면 확정 승리 + 조커 보존
           final girudaWinCards = guaranteedWinCards.where((c) =>
               !c.isJoker && !c.isMightyWith(giruda)).toList();
-          if (girudaWinCards.isNotEmpty && defenseHasGirudaFL) {
+          final bool hasTopGirudaEV = girudaWinCards.any((c) =>
+              _getEffectiveCardValue(c, state) >= 14);
+          if (girudaWinCards.isNotEmpty && (defenseHasGirudaFL || hasTopGirudaEV)) {
             girudaWinCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
             _lastLeadIntent = LeadIntent.topGirudaLead;
             return girudaWinCards.first;
@@ -4361,7 +4416,21 @@ class AIPlayer {
             _lastLeadIntent = LeadIntent.jokerLeadSuit;
             return jokerGW.first;
           }
-          // 조커 없이 여기까지 온 경우(기루다+마이티 모두 없음): 다음 전략으로 위임
+          // ★ 비기루다 실효 최상위(EV 14+): 수비 기루다 소진 시 확정 승리
+          // 기루다/마이티/조커가 없거나 사용 조건 미충족 시, 비기루다 최상위로 승리
+          // 예: T9에서 ♦A(EV 14) 리드 → 확정 승리 + 상대 ♦ 소진 → T10 ♦3 승격
+          if (!defenseHasGirudaFL) {
+            final nonGirudaTopWin = nonGirudaDumpCards.where((c) =>
+                _getEffectiveCardValue(c, state) >= 14).toList();
+            if (nonGirudaTopWin.isNotEmpty) {
+              nonGirudaTopWin.sort((a, b) =>
+                  _getEffectiveCardValue(b, state).compareTo(
+                      _getEffectiveCardValue(a, state)));
+              _lastLeadIntent = LeadIntent.topNonGirudaLead;
+              return nonGirudaTopWin.first;
+            }
+          }
+          // 위 모든 조건 불충족: 다음 전략으로 위임
         }
       }
     }
@@ -5195,8 +5264,25 @@ class AIPlayer {
       }
 
       if (iAmUnrevealedFriend && _estimateDefenseTeamHasGiruda(player, state)) {
+        final remainingGirudaF = _getRemainingGirudaCount(state, player);
         final declarerVoidSuitsF = _getDeclarerVoidSuits(state);
         final declarerHoldingsF = _inferDeclarerSuitHoldings(state);
+
+        // ★ 마이티 프렌드 자기공개 전략: 기루다 잔존 ≤2 + 마이티 보유 시
+        // 숨어있을 이유가 없으므로 마이티 무늬 비마이티 카드로 리드
+        // → 수비가 이기더라도 다음 트릭 마이티 합류 준비 (1트릭 빠른 합류)
+        final hasMightyCard = player.hand.any((c) => c.isMightyWith(state.giruda));
+        if (hasMightyCard && remainingGirudaF <= 2) {
+          final Suit mightySuit = state.giruda == Suit.spade ? Suit.diamond : Suit.spade;
+          final mightySuitCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == mightySuit).toList();
+          if (mightySuitCards.isNotEmpty) {
+            mightySuitCards.sort((a, b) => b.rankValue.compareTo(a.rankValue));
+            _lastLeadIntent = LeadIntent.friendTopCardLead;
+            return mightySuitCards.first;
+          }
+        }
+
         // 주공이 보유할 가능성이 높은 비기루다 무늬의 카드만 추림
         // (주공 확정 void + 보유확률 낮은 무늬 제외)
         final safeCandidatesF = playableCards.where((c) {
@@ -5211,9 +5297,11 @@ class AIPlayer {
           safeCandidatesF.sort((a, b) =>
               _getEffectiveCardValue(b, state).compareTo(
                   _getEffectiveCardValue(a, state)));
-          // 실효가치 14+ (현재 최상위): 직접 승리 시도
+          // ★ 기루다 잔존 ≤2: 실효가치 13+ (K급)도 승리 가능 → 임계값 하향
+          // 기루다 컷 위험이 낮으므로 K급 카드로 적극 공격
+          final effectiveThreshold = remainingGirudaF <= 2 ? 13 : 14;
           final topSafeF = safeCandidatesF
-              .where((c) => _getEffectiveCardValue(c, state) >= 14).toList();
+              .where((c) => _getEffectiveCardValue(c, state) >= effectiveThreshold).toList();
           if (topSafeF.isNotEmpty) {
             _lastLeadIntent = LeadIntent.friendTopCardLead;
             return topSafeF.first;
@@ -5925,7 +6013,12 @@ class AIPlayer {
             final girudaCards = playableCards.where((c) =>
                 !c.isJoker && !c.isMightyWith(state.giruda) && c.suit == state.giruda).toList();
 
-            if (girudaCards.isNotEmpty) {
+            // ★ 프렌드 리드가 해당 무늬 실효 최상위(EV 14+)이면 기루다 컷 불필요
+            // 프렌드 확정 승리 트릭에 기루다를 낭비하지 않음
+            // 예: ♠9 리드인데 ♠A/K/Q/J/10/8 모두 소진 → ♠9가 최상위 → 컷 무의미
+            // 오버컷 위험도 회피 (낮은 기루다 컷 → 수비 고기루다 오버컷 가능)
+            final friendLeadEV = _getEffectiveCardValue(currentWinningCard, state);
+            if (girudaCards.isNotEmpty && friendLeadEV < 14) {
               // 상대가 낼 수 있는 기루다 중 가장 높은 것 찾기
               final playedCards = _getPlayedCards(state);
               PlayingCard? highestOpponentGiruda;
