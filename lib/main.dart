@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'services/game_controller.dart';
 import 'services/stats_service.dart';
@@ -26,6 +27,9 @@ void main() async {
     SystemUiMode.immersiveSticky,
     overlays: [],
   );
+
+  // Firebase 초기화
+  await Firebase.initializeApp();
 
   // AdMob 초기화 (비동기 — 앱 시작을 차단하지 않음)
   _initAds();

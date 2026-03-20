@@ -864,13 +864,19 @@ class AIPlayer {
       bool hasTopCard = hasAce || (suit == mightySuit && hasKing);
 
       if (hasTopCard) {
-        maxTricks++;
-        // 비기루다A 선 획득 확률: 마이티/조커 보유 시 ~86% → min 확정 트릭
-        // 마이티/조커 모두 없을 시 ~49% → 기루다컷/조커 낭비 위험으로 min 불확실 보정만
-        if (hasMighty || hasJoker) {
-          minTricks++;
+        // 기루다 3장 이하 + M/J 미보유: 상대 기루다컷 위험 높음 → max 할인
+        if (girudaLen <= 3 && !hasMighty && !hasJoker) {
+          maxAdj += 0.6; // maxTricks++ 대신 할인된 보정
+          minAdj += 0.3; // 기루다컷 위험으로 min도 낮춤
         } else {
-          minAdj += 0.5;
+          maxTricks++;
+          // 비기루다A 선 획득 확률: 마이티/조커 보유 시 ~86% → min 확정 트릭
+          // 마이티/조커 모두 없을 시 ~49% → 기루다컷/조커 낭비 위험으로 min 불확실 보정만
+          if (hasMighty || hasJoker) {
+            minTricks++;
+          } else {
+            minAdj += 0.5;
+          }
         }
       }
       if (hasAce && hasKing) { maxTricks++; }
@@ -1022,8 +1028,13 @@ class AIPlayer {
           !c.isJoker && c.suit == giruda &&
           c.rank != Rank.ace && c.rank != Rank.king && c.rank != Rank.queen &&
           c.rankValue >= 11).length; // J만 해당 (A/K/Q는 이미 체인에 포함)
+      // 기루다 3장 이하: extra giruda가 상대 10-11장 기루다의 고액에 패배 확률 높음
+      // 예: 기루다 2장(A,Q) → Q는 상대 K에 패배, extra로 +1 인정 부적절
+      if (girudaLen <= 3) {
+        // extra giruda 보너스 없음 (상대 기루다가 너무 많아 승리 불확실)
+      }
       // 고액 extra가 없고 netExtra가 2+이면 1로 할인 (저액만으로 2트릭은 비현실적)
-      if (netExtra >= 2 && extraHighCount == 0 && !hasMighty && !hasJoker) {
+      else if (netExtra >= 2 && extraHighCount == 0 && !hasMighty && !hasJoker) {
         initTricks++; // 2 대신 1만 추가
       } else if (netExtra >= 2) {
         initTricks += 2;
@@ -1051,6 +1062,20 @@ class AIPlayer {
     final double minPpt = minTricks >= 5 ? 1.8 : 1.5;
     int minPoints = ((minTricks + minAdj) * minPpt).floor().clamp(0, 20);
     int maxPoints = ((maxTricks + maxAdj) * 2.0).round().clamp(0, 20);
+
+    // === 기루다 극단적 부족 감점 (2-3장) ===
+    // 기루다 3장 이하: 후반 지배력 없음, 선 유지 불가, 상대 기루다컷에 취약
+    if (giruda != null && girudaLen <= 3) {
+      if (!hasMighty && !hasJoker) {
+        // M/J 없이 기루다 2장: 선 유지 수단 거의 없음
+        // M/J 없이 기루다 3장: 약간의 컷 가능하나 후반 지배 불가
+        int maxPenalty = girudaLen <= 2 ? 2 : 1;
+        maxPoints = (maxPoints - maxPenalty).clamp(0, 20);
+      } else if (girudaLen <= 2) {
+        // M/J 보유해도 기루다 2장은 후반 지배력 부족
+        maxPoints = (maxPoints - 1).clamp(0, 20);
+      }
+    }
 
     // Initiative Floor가 min을 끌어올릴 때 max도 최소한 min 이상 보장
     if (maxPoints < minPoints) maxPoints = minPoints;
