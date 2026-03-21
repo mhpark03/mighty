@@ -6859,6 +6859,8 @@ class _GameScreenState extends State<GameScreen> {
           }
         }
         return jcDesc;
+      case LeadIntent.nonGirudaTop:
+        return l10n.trickEventTopNonGirudaLead;
     }
   }
 

@@ -162,6 +162,7 @@ enum LeadIntent {
   waste,
   girudaPreExchange,      // 선교환 (기루다 보존, 비기루다 선공)
   jokerCallLead,
+  nonGirudaTop,            // 트릭9 기루다 보존: 비기루다 최상위 선공
 }
 
 class Trick {

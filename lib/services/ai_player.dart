@@ -810,6 +810,9 @@ class AIPlayer {
       else if (gc.length >= 4 && gA) {
         if (mostlyLowGiruda) {
           maxAdj += 0.5; // 저액 3장으로는 상대 K/Q/J에 패배 위험
+        } else if (!hasMighty && !hasJoker) {
+          // DB: 기루다 4장+A, M/J 없음 → 상대 9장 기루다에 후반 지배 약화
+          maxAdj += 0.7;
         } else {
           maxTricks++; // 고액 2장+(A+K 등)이면 후반 지배 가능
         }
@@ -825,6 +828,9 @@ class AIPlayer {
           // 4장+K: 저액 다수면 K 이후 남은 저액으로 후반 지배 약화
           if (mostlyLowGiruda) {
             maxAdj += 0.5;
+          } else if (!hasMighty && !hasJoker) {
+            // DB: 기루다 4장+K, M/J 없음 → 상대 9장에 후반 지배 약화
+            maxAdj += 0.7;
           } else {
             maxTricks++;
           }
@@ -868,6 +874,11 @@ class AIPlayer {
         if (girudaLen <= 3 && !hasMighty && !hasJoker) {
           maxAdj += 0.6; // maxTricks++ 대신 할인된 보정
           minAdj += 0.3; // 기루다컷 위험으로 min도 낮춤
+        } else if (girudaLen == 4 && !hasMighty && !hasJoker) {
+          // DB: 기루다 4장+M/J 없음 → 상대 9장 기루다로 컷 위험 여전히 높음
+          // 예측 14.41 vs 실제 12.00 (-2.41 과대), 공약 달성률 41.4%
+          maxAdj += 0.8;
+          minAdj += 0.4;
         } else {
           maxTricks++;
           // 비기루다A 선 획득 확률: 마이티/조커 보유 시 ~86% → min 확정 트릭
@@ -901,13 +912,30 @@ class AIPlayer {
     // === 보이드 컷 기회 (최대만) ===
     // 기루다 5장 이상이면 장수 보너스에 이미 컷 효과 포함 → 중복 방지
     if (giruda != null && girudaLen < 5) {
+      // ★ 컷에 사용할 기루다 = 전체 기루다 - A/K/Q 체인 카드 (이미 선공 트릭으로 계산됨)
+      // 예: 기루다 4장(A-K-Q-8) → 체인 3장, 컷 가용 1장 → 보이드 2개여도 컷 1회만
+      final gc = hand.where((c) => !c.isJoker && c.suit == giruda).toList();
+      bool gA = gc.any((c) => c.rank == Rank.ace);
+      bool gK = gc.any((c) => c.rank == Rank.king);
+      bool gQ = gc.any((c) => c.rank == Rank.queen);
+      int chainCount = (gA ? 1 : 0) + (gA && gK ? 1 : 0) + (gA && gK && gQ ? 1 : 0);
+      // K만 있고 A 없는 경우도 체인 (K가 선공 트릭으로 사용)
+      if (!gA && gK) chainCount++;
+      if (!gA && gK && gQ) chainCount++;
+      int girudaForCutting = girudaLen - chainCount;
+
+      int voidCount = 0;
       for (final suit in Suit.values) {
         if (suit == giruda) continue;
         final suitCount = hand.where((c) => !c.isJoker && c.suit == suit).length;
         if (suitCount == 0 && girudaLen >= 3) {
-          maxTricks++;
+          voidCount++;
         }
       }
+      // 보이드 수와 컷 가용 기루다 중 작은 값으로 제한
+      int voidCutBonus = voidCount < girudaForCutting ? voidCount : girudaForCutting;
+      if (voidCutBonus < 0) voidCutBonus = 0;
+      maxTricks += voidCutBonus;
     }
 
     // === 프렌드 기여 ===
@@ -1063,7 +1091,7 @@ class AIPlayer {
     int minPoints = ((minTricks + minAdj) * minPpt).floor().clamp(0, 20);
     int maxPoints = ((maxTricks + maxAdj) * 2.0).round().clamp(0, 20);
 
-    // === 기루다 극단적 부족 감점 (2-3장) ===
+    // === 기루다 부족 감점 (2-4장, M/J 없음) ===
     // 기루다 3장 이하: 후반 지배력 없음, 선 유지 불가, 상대 기루다컷에 취약
     if (giruda != null && girudaLen <= 3) {
       if (!hasMighty && !hasJoker) {
@@ -1076,6 +1104,11 @@ class AIPlayer {
         maxPoints = (maxPoints - 1).clamp(0, 20);
       }
     }
+    // 기루다 4장 + M/J 없음: 상대 9장 기루다로 후반 지배 약화
+    // DB: 29게임 평균 예측 14.41 vs 실제 12.00 (-2.41 과대), 공약 달성률 41.4%
+    if (giruda != null && girudaLen == 4 && !hasMighty && !hasJoker) {
+      maxPoints = (maxPoints - 1).clamp(0, 20);
+    }
 
     // Initiative Floor가 min을 끌어올릴 때 max도 최소한 min 이상 보장
     if (maxPoints < minPoints) maxPoints = minPoints;
@@ -1086,9 +1119,12 @@ class AIPlayer {
       if (hasGirudaAce && maxPoints < 20) { maxPoints = 20; }
     }
     // 마이티 보유 + 조커 미보유: 프렌드 조커 가정 시 런 가능
+    // ★ 기루다 K 필수: K 없으면 A 이후 J가 상대 Q에 패배하여 런 불가
+    // 프렌드 조커 협력이 보장되지 않으므로 A-K 체인이 있어야 런 현실적
     if (hasMighty && !hasJoker && giruda != null && girudaLen >= 5) {
       bool hasGirudaAce = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.ace);
-      if (hasGirudaAce && maxPoints < 20) { maxPoints = 20; }
+      bool hasGirudaKing = hand.any((c) => !c.isJoker && c.suit == giruda && c.rank == Rank.king);
+      if (hasGirudaAce && hasGirudaKing && maxPoints < 20) { maxPoints = 20; }
     }
     // === 런 감지 2단계: 키카드 2개+ & 기루다A & 기루다4장+ ===
     if (giruda != null && girudaLen >= 4) {
@@ -1700,11 +1736,30 @@ class AIPlayer {
     bool noGirudaCanAchieve = noGirudaOptimal >= newTargetPoints;
 
     // 기루다 변경 결정
+    // ★ 현재 기루다에 A-K 체인이 있으면 변경 임계값 상향
+    // A-K 체인은 기루다로서 확정 트릭이지만, 비기루다로 전환 시 기루다컷에 취약
+    // estimatePointRange가 비기루다 A-K 콤보를 과대평가하는 문제 보완
+    int changeThreshold = 2;
+    if (state.giruda != null) {
+      final currentGirudaCards = allCards.where((c) =>
+          !c.isJoker && c.suit == state.giruda).toList();
+      bool hasGirudaAce = currentGirudaCards.any((c) => c.rank == Rank.ace);
+      bool hasGirudaKing = currentGirudaCards.any((c) => c.rank == Rank.king);
+      if (hasGirudaAce && hasGirudaKing) {
+        changeThreshold = 4; // A-K 체인 보유 시 변경에 +4 차이 필요
+      }
+    }
+
     if (bestSuit != null && bestSuit != state.giruda && newCanAchieve) {
       if (!currentCanAchieve) {
-        return bestSuit;
+        // 현재 기루다로 목표 불가 시에도 A-K 체인이면 신중하게 판단
+        if (changeThreshold > 2 && bestOptimal < currentOptimal + changeThreshold) {
+          // A-K 체인인데 차이가 크지 않으면 변경하지 않음
+        } else {
+          return bestSuit;
+        }
       }
-      if (bestOptimal >= currentOptimal + 2) {
+      if (bestOptimal >= currentOptimal + changeThreshold) {
         return bestSuit;
       }
     }
@@ -2973,6 +3028,43 @@ class AIPlayer {
             return saveableCards.first;
           }
           // 아끼기 가능한 카드가 없으면 기존 로직으로 진행
+        }
+
+        // === 조커 미출현 + 마이티 미보유: 기루다 보존 (트릭 10용) ===
+        // 조커는 트릭 10에서 사용 불가 → 트릭 9에서 반드시 출현
+        // 조커가 누구에게 있든 트릭 9에서 소멸되므로 기루다를 아끼고 비기루다로 선공
+        // 트릭 10에서 기루다로 확실한 승리 확보
+        if (!hasMighty && state.giruda != null) {
+          final girudaCards = playableCards.where((c) =>
+              !c.isJoker && c.suit == state.giruda).toList();
+          final nonGirudaCards = playableCards.where((c) =>
+              !c.isJoker && !c.isMightyWith(state.giruda) &&
+              c.suit != state.giruda).toList();
+
+          if (girudaCards.isNotEmpty && nonGirudaCards.isNotEmpty) {
+            // 비기루다 중 최상위 카드 우선 (트릭 9 승리 시도)
+            // 없으면 가장 낮은 비점수 카드 (트릭 9 포기, 트릭 10 기루다로 승리)
+            final topCards = nonGirudaCards.where((c) =>
+                _getEffectiveCardValue(c, state) >= 14).toList();
+            if (topCards.isNotEmpty) {
+              topCards.sort((a, b) =>
+                  b.rankValue.compareTo(a.rankValue));
+              _lastLeadIntent = LeadIntent.nonGirudaTop;
+              return topCards.first;
+            }
+            final nonPointCards = nonGirudaCards
+                .where((c) => !c.isPointCard).toList();
+            if (nonPointCards.isNotEmpty) {
+              nonPointCards.sort((a, b) =>
+                  a.rankValue.compareTo(b.rankValue));
+              _lastLeadIntent = LeadIntent.waste;
+              return nonPointCards.first;
+            }
+            nonGirudaCards.sort((a, b) =>
+                a.rankValue.compareTo(b.rankValue));
+            _lastLeadIntent = LeadIntent.waste;
+            return nonGirudaCards.first;
+          }
         }
       }
     }
