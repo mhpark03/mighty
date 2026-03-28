@@ -2589,7 +2589,9 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     final compact = screenHeight < 700;
+    final veryCompact = screenHeight < 600;
     final maxBiddingHeight = compact ? screenHeight * 0.52 : screenHeight * 0.45;
 
     return Container(
@@ -2657,11 +2659,11 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     SizedBox(height: compact ? 2 : 4),
                     Wrap(
-                      spacing: compact ? 2 : 4,
-                      runSpacing: compact ? 2 : 4,
+                      spacing: veryCompact ? 1 : (compact ? 2 : 4),
+                      runSpacing: veryCompact ? 1 : (compact ? 2 : 4),
                       children: [
                         for (int i = 13; i <= 20; i++)
-                          _buildBidChip(i, state, l10n, compact: compact),
+                          _buildBidChip(i, state, l10n, compact: compact, veryCompact: veryCompact),
                       ],
                     ),
                     SizedBox(height: compact ? 4 : 8),
@@ -2671,17 +2673,33 @@ class _GameScreenState extends State<GameScreen> {
                       style: TextStyle(color: Colors.white70, fontSize: compact ? 10 : 11),
                     ),
                     SizedBox(height: compact ? 2 : 4),
-                    Wrap(
-                      spacing: compact ? 4 : 6,
-                      runSpacing: compact ? 2 : 4,
-                      children: [
-                        _buildSuitChip(Suit.spade, '♠', l10n.spadeName, compact: compact),
-                        _buildSuitChip(Suit.diamond, '♦', l10n.diamondName, compact: compact),
-                        _buildSuitChip(Suit.heart, '♥', l10n.heartName, compact: compact),
-                        _buildSuitChip(Suit.club, '♣', l10n.clubName, compact: compact),
-                        _buildSuitChip(null, '✕', l10n.noGiruda, compact: compact),
-                      ],
-                    ),
+                    // veryCompact: 심볼만 표시하여 5개를 한 줄에 배치
+                    veryCompact
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildSuitChip(Suit.spade, '♠', l10n.spadeName, compact: compact, symbolOnly: true),
+                            const SizedBox(width: 4),
+                            _buildSuitChip(Suit.diamond, '♦', l10n.diamondName, compact: compact, symbolOnly: true),
+                            const SizedBox(width: 4),
+                            _buildSuitChip(Suit.heart, '♥', l10n.heartName, compact: compact, symbolOnly: true),
+                            const SizedBox(width: 4),
+                            _buildSuitChip(Suit.club, '♣', l10n.clubName, compact: compact, symbolOnly: true),
+                            const SizedBox(width: 4),
+                            _buildSuitChip(null, '✕', l10n.noGiruda, compact: compact, symbolOnly: true),
+                          ],
+                        )
+                      : Wrap(
+                          spacing: compact ? 4 : 6,
+                          runSpacing: compact ? 2 : 4,
+                          children: [
+                            _buildSuitChip(Suit.spade, '♠', l10n.spadeName, compact: compact),
+                            _buildSuitChip(Suit.diamond, '♦', l10n.diamondName, compact: compact),
+                            _buildSuitChip(Suit.heart, '♥', l10n.heartName, compact: compact),
+                            _buildSuitChip(Suit.club, '♣', l10n.clubName, compact: compact),
+                            _buildSuitChip(null, '✕', l10n.noGiruda, compact: compact),
+                          ],
+                        ),
                   ] else ...[
                     if (controller.isProcessing)
                       const CircularProgressIndicator(color: Colors.white)
@@ -2748,7 +2766,7 @@ class _GameScreenState extends State<GameScreen> {
   Suit? _selectedBidSuit = Suit.spade;
   bool _suitManuallySelected = false;  // 사용자가 직접 기루다를 선택했는지
 
-  Widget _buildBidChip(int amount, GameState state, AppLocalizations l10n, {bool compact = false}) {
+  Widget _buildBidChip(int amount, GameState state, AppLocalizations l10n, {bool compact = false, bool veryCompact = false}) {
     final minBid = (state.currentBid?.tricks ?? 12) + 1;
     final isEnabled = amount >= minBid;
     final isSelected = _selectedBidAmount == amount;
@@ -2760,7 +2778,10 @@ class _GameScreenState extends State<GameScreen> {
       child: Opacity(
         opacity: isEnabled ? 1.0 : 0.4,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: compact ? 9 : 12, vertical: compact ? 5 : 8),
+          padding: EdgeInsets.symmetric(
+            horizontal: veryCompact ? 7 : (compact ? 9 : 12),
+            vertical: veryCompact ? 4 : (compact ? 5 : 8),
+          ),
           decoration: BoxDecoration(
             color: isSelected
                 ? Colors.amber
@@ -2776,7 +2797,7 @@ class _GameScreenState extends State<GameScreen> {
               color: isSelected
                   ? Colors.black
                   : (isEnabled ? Colors.white : Colors.grey[600]),
-              fontSize: compact ? 14 : 16,
+              fontSize: veryCompact ? 12 : (compact ? 14 : 16),
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               decoration: isEnabled ? null : TextDecoration.lineThrough,
               decorationColor: Colors.grey[500],
@@ -2787,7 +2808,7 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _buildSuitChip(Suit? suit, String symbol, String name, {bool compact = false}) {
+  Widget _buildSuitChip(Suit? suit, String symbol, String name, {bool compact = false, bool symbolOnly = false}) {
     // 사용자가 직접 선택했거나 AI가 배팅을 추천한 경우에만 선택 표시
     final isSelected = _suitManuallySelected && _selectedBidSuit == suit;
     final isRed = suit == Suit.diamond || suit == Suit.heart;
@@ -2807,37 +2828,50 @@ class _GameScreenState extends State<GameScreen> {
         _suitManuallySelected = true;
       }),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 12, vertical: compact ? 5 : 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: symbolOnly ? 10 : (compact ? 8 : 12),
+          vertical: symbolOnly ? 6 : (compact ? 5 : 8),
+        ),
         decoration: BoxDecoration(
           color: isSelected ? Colors.amber : Colors.white54,
           borderRadius: BorderRadius.circular(8),
           border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (symbol.isNotEmpty) ...[
-              Text(
-                symbol,
-                style: TextStyle(
-                  color: symbolColor,
-                  fontSize: compact ? 16 : 20,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Roboto',
-                ),
-              ),
-              SizedBox(width: compact ? 2 : 4),
-            ],
-            Text(
-              name,
+        child: symbolOnly
+          ? Text(
+              symbol,
               style: TextStyle(
-                color: isSelected ? Colors.black : Colors.white,
-                fontSize: compact ? 11 : 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: symbolColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Roboto',
               ),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (symbol.isNotEmpty) ...[
+                  Text(
+                    symbol,
+                    style: TextStyle(
+                      color: symbolColor,
+                      fontSize: compact ? 16 : 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Roboto',
+                    ),
+                  ),
+                  SizedBox(width: compact ? 2 : 4),
+                ],
+                Text(
+                  name,
+                  style: TextStyle(
+                    color: isSelected ? Colors.black : Colors.white,
+                    fontSize: compact ? 11 : 12,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
       ),
     );
   }
@@ -2868,11 +2902,14 @@ class _GameScreenState extends State<GameScreen> {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // 세로 모드에서 카드 크기와 배치 계산
+    // 세로 모드에서 카드 크기와 배치 계산 (화면 높이에 따라 반응형)
     final screenHeight = MediaQuery.of(context).size.height;
     final compact = screenHeight < 700;
-    final cardWidth = isPortrait ? (screenWidth - 32) / 6 - 4 : 55.0;
-    final cardHeight = cardWidth * (compact ? 1.2 : 1.4);
+    final cardWidthByScreen = isPortrait ? (screenWidth - 32) / 6 - 4 : 55.0;
+    // 저해상도: 카드 최대 크기를 화면 높이의 비율로 제한
+    final maxCardWidth = screenHeight * 0.065;
+    final cardWidth = cardWidthByScreen > maxCardWidth ? maxCardWidth : cardWidthByScreen;
+    final cardHeight = cardWidth * (compact ? 1.25 : 1.4);
 
     return Container(
       padding: const EdgeInsets.all(8),
