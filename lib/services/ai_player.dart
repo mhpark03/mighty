@@ -1078,9 +1078,47 @@ class AIPlayer {
       // 마이티 프렌드: 확실한 1트릭 (선공 하한에도 반영)
       if (!hasMighty) initTricks++;
 
+      // 수비 조커 위험: 조커 미보유 시 수비가 기루다 체인 1트릭 탈취 가능
+      // 일반 계산에서는 line 953에서 minTricks--로 반영하지만,
+      // initTricks가 minTricks를 덮어씌우면 이 감점이 사라지므로 여기서도 반영
+      //
+      // DB: M/J 없음 + Initiative Floor override 34게임 분석
+      // - 비기루다 고액(J+) 3개+: 과대평가 66% (선잡기 카드도 기루다컷에 취약)
+      // - 비기루다 고액 1개: 과소평가 14% (기루다 집중 핸드의 후반 지배력)
+      // → 고액 카드 수에 따라 조커 감점 강도 차등 적용
+      if (!hasJoker) {
+        int nonGirudaHigh = 0;
+        for (final suit in Suit.values) {
+          if (suit == giruda) continue;
+          for (final c in hand) {
+            if (!c.isJoker && c.suit == suit &&
+                (c.rank == Rank.jack || c.rank == Rank.queen ||
+                 c.rank == Rank.king || c.rank == Rank.ace) &&
+                !(c.suit == mightySuit && c.rank == Rank.ace)) {
+              nonGirudaHigh++;
+            }
+          }
+        }
+        // 고액 3개+: 기루다컷에 점수 손실 크고 선잡기 카드도 보호 불가
+        // 고액 2개: 표준 조커 위험
+        // 고액 0-1개: 기루다 집중형, 조커 1트릭 손실 외 피해 적음 → 감점 완화
+        if (nonGirudaHigh >= 3) {
+          initTricks -= 2;
+        } else if (nonGirudaHigh >= 2) {
+          initTricks--;
+        }
+        // 고액 0-1: 기루다 집중형 핸드는 조커 1트릭 손실만 감안
+        // initTricks 감점 없이 아래 minAdj로 부분 반영
+      }
+
       if (initTricks > minTricks) {
         minTricks = initTricks;
-        minAdj = 0; // 선공 확정 트릭이 더 크면 조커 보정 불필요
+        // 고액 0-1이어도 조커 위험은 존재 → minAdj로 부분 반영
+        if (!hasJoker) {
+          minAdj = -0.5; // 조커 1트릭 손실의 점수 영향 (약 1점 감소)
+        } else {
+          minAdj = 0;
+        }
       }
     }
 
