@@ -2600,85 +2600,104 @@ class _GameScreenState extends State<GameScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.green[600]!, width: 2),
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              isHumanTurn
-                  ? l10n.currentBidder(l10n.you)
-                  : l10n.currentBidder(_getLocalizedPlayerName(state.players[state.currentBidder], l10n)),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          // AI 추천 표시 (힌트 모드일 때만)
-          if (_showHint && isHumanTurn && recommendedBid != null) ...[
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.lightBlueAccent.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.lightBlueAccent, width: 1),
-              ),
-              child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 스크롤 가능 영역: 제목 + AI 추천 + 트릭/기루다 선택
+          Flexible(
+            child: SingleChildScrollView(
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
-                  const SizedBox(width: 6),
                   Text(
-                    recommendedBid.passed
-                        ? '${l10n.aiRecommendation}: ${l10n.pass}'
-                        : '${l10n.aiRecommendation}: ${recommendedBid.tricks} ${_getSuitName(recommendedBid.suit, l10n)}',
+                    isHumanTurn
+                        ? l10n.currentBidder(l10n.you)
+                        : l10n.currentBidder(_getLocalizedPlayerName(state.players[state.currentBidder], l10n)),
                     style: const TextStyle(
-                      color: Colors.lightBlueAccent,
-                      fontSize: 13,
+                      color: Colors.white,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  // AI 추천 표시 (힌트 모드일 때만)
+                  if (_showHint && isHumanTurn && recommendedBid != null) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.lightBlueAccent.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.lightBlueAccent, width: 1),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
+                          const SizedBox(width: 6),
+                          Text(
+                            recommendedBid.passed
+                                ? '${l10n.aiRecommendation}: ${l10n.pass}'
+                                : '${l10n.aiRecommendation}: ${recommendedBid.tricks} ${_getSuitName(recommendedBid.suit, l10n)}',
+                            style: const TextStyle(
+                              color: Colors.lightBlueAccent,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: compact ? 4 : 8),
+                  if (isHumanTurn) ...[
+                    // 트릭 수 선택
+                    Text(
+                      l10n.tricks,
+                      style: TextStyle(color: Colors.white70, fontSize: compact ? 10 : 11),
+                    ),
+                    SizedBox(height: compact ? 2 : 4),
+                    Wrap(
+                      spacing: compact ? 2 : 4,
+                      runSpacing: compact ? 2 : 4,
+                      children: [
+                        for (int i = 13; i <= 20; i++)
+                          _buildBidChip(i, state, l10n, compact: compact),
+                      ],
+                    ),
+                    SizedBox(height: compact ? 4 : 8),
+                    // 기루다 선택
+                    Text(
+                      l10n.giruda,
+                      style: TextStyle(color: Colors.white70, fontSize: compact ? 10 : 11),
+                    ),
+                    SizedBox(height: compact ? 2 : 4),
+                    Wrap(
+                      spacing: compact ? 4 : 6,
+                      runSpacing: compact ? 2 : 4,
+                      children: [
+                        _buildSuitChip(Suit.spade, '♠', l10n.spadeName, compact: compact),
+                        _buildSuitChip(Suit.diamond, '♦', l10n.diamondName, compact: compact),
+                        _buildSuitChip(Suit.heart, '♥', l10n.heartName, compact: compact),
+                        _buildSuitChip(Suit.club, '♣', l10n.clubName, compact: compact),
+                        _buildSuitChip(null, '✕', l10n.noGiruda, compact: compact),
+                      ],
+                    ),
+                  ] else ...[
+                    if (controller.isProcessing)
+                      const CircularProgressIndicator(color: Colors.white)
+                    else
+                      Text(
+                        l10n.otherPlayerTurn,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                  ],
                 ],
               ),
             ),
-          ],
-          SizedBox(height: compact ? 4 : 8),
+          ),
+          // 버튼 영역: 스크롤 밖에 고정
           if (isHumanTurn) ...[
-            // 트릭 수 선택
-            Text(
-              l10n.tricks,
-              style: TextStyle(color: Colors.white70, fontSize: compact ? 10 : 11),
-            ),
-            SizedBox(height: compact ? 2 : 4),
-            Wrap(
-              spacing: compact ? 2 : 4,
-              runSpacing: compact ? 2 : 4,
-              children: [
-                for (int i = 13; i <= 20; i++)
-                  _buildBidChip(i, state, l10n, compact: compact),
-              ],
-            ),
-            SizedBox(height: compact ? 4 : 8),
-            // 기루다 선택
-            Text(
-              l10n.giruda,
-              style: TextStyle(color: Colors.white70, fontSize: compact ? 10 : 11),
-            ),
-            SizedBox(height: compact ? 2 : 4),
-            Wrap(
-              spacing: compact ? 4 : 6,
-              runSpacing: compact ? 2 : 4,
-              children: [
-                _buildSuitChip(Suit.spade, '♠', l10n.spadeName, compact: compact),
-                _buildSuitChip(Suit.diamond, '♦', l10n.diamondName, compact: compact),
-                _buildSuitChip(Suit.heart, '♥', l10n.heartName, compact: compact),
-                _buildSuitChip(Suit.club, '♣', l10n.clubName, compact: compact),
-                _buildSuitChip(null, '✕', l10n.noGiruda, compact: compact),
-              ],
-            ),
             SizedBox(height: compact ? 6 : 10),
-            // 버튼들
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -2706,7 +2725,7 @@ class _GameScreenState extends State<GameScreen> {
             ),
             // 딜 미스 버튼
             if (controller.canHumanDeclareDealMiss) ...[
-              SizedBox(height: compact ? 6 : 12),
+              SizedBox(height: compact ? 4 : 8),
               ElevatedButton(
                 onPressed: () => _showDealMissDialog(controller),
                 style: ElevatedButton.styleFrom(
@@ -2719,17 +2738,8 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ],
-          ] else ...[
-            if (controller.isProcessing)
-              const CircularProgressIndicator(color: Colors.white)
-            else
-              Text(
-                l10n.otherPlayerTurn,
-                style: const TextStyle(color: Colors.white70),
-              ),
           ],
         ],
-      ),
       ),
     );
   }

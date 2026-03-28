@@ -119,6 +119,8 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    final compact = screenHeight < 700;
+
     // 반응형: 너비와 높이 모두 고려하여 카드 크기 계산
     final handCardWidthByWidth = (screenWidth - 32) / 6;
     final handCardWidthByHeight = (screenHeight - 400) / 8; // 높이 기준
@@ -133,20 +135,20 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
         backgroundColor: Colors.green[900],
         title: Text(l10n.declareFriend),
         automaticallyImplyLeading: false,
+        toolbarHeight: compact ? 40 : kToolbarHeight,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: screenHeight - MediaQuery.of(context).padding.top - kToolbarHeight - MediaQuery.of(context).padding.bottom,
-            ),
-            child: IntrinsicHeight(
-              child: Column(
-                children: [
+        child: Column(
+          children: [
+            // 스크롤 가능 영역: 내 카드 + 타입 선택 + 카드 그리드
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
             // 내 카드 표시
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: compact ? 4 : 6),
               color: Colors.black26,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +169,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            SizedBox(height: compact ? 6 : 12),
 
             // 빠른 선택 버튼들
             Padding(
@@ -227,56 +229,57 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
               ),
             ),
 
-            const SizedBox(height: 8),
+            SizedBox(height: compact ? 4 : 8),
 
             // 카드로 지정 섹션
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black26,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8, bottom: 4),
-                      child: Text(
-                        l10n.byCard,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8, bottom: 4),
+                    child: Text(
+                      l10n.byCard,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // 무늬 선택 버튼들
-                    _buildSuitSelector(),
-                    const SizedBox(height: 8),
-                    // 선택된 무늬의 카드들 (3열)
-                    Expanded(
-                      child: _buildCardGrid(),
-                    ),
+                  ),
+                  // 무늬 선택 버튼들
+                  _buildSuitSelector(),
+                  SizedBox(height: compact ? 4 : 8),
+                  // 선택된 무늬의 카드들 (3열)
+                  _buildCardGrid(),
+                ],
+              ),
+            ),
                   ],
                 ),
               ),
             ),
 
-            // 현재 선택 표시 및 확인 버튼
+            // 현재 선택 표시 및 확인 버튼 (스크롤 밖에 고정)
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(compact ? 8 : 12),
               decoration: BoxDecoration(
                 color: Colors.black38,
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
               ),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   // 현재 선택 표시
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    padding: EdgeInsets.symmetric(vertical: compact ? 4 : 8, horizontal: 12),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -290,7 +293,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: compact ? 6 : 12),
                   // 확인 버튼
                   SizedBox(
                     width: double.infinity,
@@ -298,7 +301,7 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
                       onPressed: _canConfirm() ? _onConfirm : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.amber,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding: EdgeInsets.symmetric(vertical: compact ? 10 : 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -317,9 +320,6 @@ class _FriendSelectionScreenState extends State<FriendSelectionScreen> {
               ),
             ),
           ],
-        ),
-            ),
-          ),
         ),
       ),
     );
