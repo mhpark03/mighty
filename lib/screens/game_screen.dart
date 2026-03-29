@@ -2615,17 +2615,17 @@ class _GameScreenState extends State<GameScreen> {
                     isHumanTurn
                         ? l10n.currentBidder(l10n.you)
                         : l10n.currentBidder(_getLocalizedPlayerName(state.players[state.currentBidder], l10n)),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: veryCompact ? 12 : 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   // AI 추천 표시 (힌트 모드일 때만)
                   if (_showHint && isHumanTurn && recommendedBid != null) ...[
-                    const SizedBox(height: 8),
+                    SizedBox(height: veryCompact ? 2 : 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: EdgeInsets.symmetric(horizontal: veryCompact ? 8 : 12, vertical: veryCompact ? 2 : 6),
                       decoration: BoxDecoration(
                         color: Colors.lightBlueAccent.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
@@ -2634,15 +2634,15 @@ class _GameScreenState extends State<GameScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: 16),
-                          const SizedBox(width: 6),
+                          Icon(Icons.lightbulb, color: Colors.lightBlueAccent, size: veryCompact ? 12 : 16),
+                          SizedBox(width: veryCompact ? 4 : 6),
                           Text(
                             recommendedBid.passed
                                 ? '${l10n.aiRecommendation}: ${l10n.pass}'
                                 : '${l10n.aiRecommendation}: ${recommendedBid.tricks} ${_getSuitName(recommendedBid.suit, l10n)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.lightBlueAccent,
-                              fontSize: 13,
+                              fontSize: veryCompact ? 11 : 13,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
