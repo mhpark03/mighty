@@ -572,6 +572,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get multiplierBackRun => '反满贯 ×2';
 
   @override
+  String get multiplierFullRun => '全满贯 ×2';
+
+  @override
   String get multiplierLabel => '倍数';
 
   @override

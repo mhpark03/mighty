@@ -572,6 +572,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get multiplierBackRun => '백런 ×2';
 
   @override
+  String get multiplierFullRun => '풀런 ×2';
+
+  @override
   String get multiplierLabel => '배수';
 
   @override

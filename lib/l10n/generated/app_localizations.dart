@@ -1134,6 +1134,12 @@ abstract class AppLocalizations {
   /// **'백런 ×2'**
   String get multiplierBackRun;
 
+  /// No description provided for @multiplierFullRun.
+  ///
+  /// In ko, this message translates to:
+  /// **'풀런 ×2'**
+  String get multiplierFullRun;
+
   /// No description provided for @multiplierLabel.
   ///
   /// In ko, this message translates to:

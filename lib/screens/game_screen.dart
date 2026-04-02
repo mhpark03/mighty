@@ -5056,6 +5056,11 @@ class _GameScreenState extends State<GameScreen> {
         specialMultiplier *= 2;
         multipliers.add(l10n.multiplierRun);
       }
+      // 풀런 (풀 선언 + 런 달성): x2
+      if (targetTricks == 20 && state.declarerTeamPoints >= 20) {
+        specialMultiplier *= 2;
+        multipliers.add(l10n.multiplierFullRun);
+      }
       if (isNoGiruda) {
         specialMultiplier *= 2;
         multipliers.add(l10n.multiplierNoGiruda);

@@ -1018,6 +1018,11 @@ class GameState {
         specialMultiplier *= 2;
       }
 
+      // 풀런 (풀 선언 + 런 달성): x2
+      if (targetTricks == 20 && declarerTeamPoints >= 20) {
+        specialMultiplier *= 2;
+      }
+
       // 노기루다: x2
       if (isNoGiruda) {
         specialMultiplier *= 2;
@@ -1053,11 +1058,6 @@ class GameState {
     }
 
     int finalScore = baseScore * roleMultiplier;
-
-    // 풀풀: 주공이 풀(20점)을 부르고 20점을 모두 획득했을 때 x2
-    if (targetTricks == 20 && declarerTeamPoints == 20) {
-      finalScore *= 2;
-    }
 
     return finalScore;
   }
