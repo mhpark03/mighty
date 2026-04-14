@@ -7,8 +7,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../widgets/banner_ad_widget.dart';
 import 'home_screen.dart';
-import 'seven_card/seven_card_home_screen.dart';
-import 'hi_lo/hi_lo_home_screen.dart';
 import 'hula/hula_home_screen.dart';
 import 'onecard/onecard_home_screen.dart';
 import 'hearts/hearts_home_screen.dart';
@@ -69,20 +67,6 @@ class _GameSelectionScreenState extends State<GameSelectionScreen> {
         icon: Icons.style,
         color: Colors.green[700]!,
         screen: const HomeScreen(),
-      ),
-      _GameInfo(
-        title: l10n.sevenCardTitle,
-        subtitle: l10n.sevenCardSubtitle,
-        icon: Icons.casino,
-        color: Colors.blue[700]!,
-        screen: const SevenCardHomeScreen(),
-      ),
-      _GameInfo(
-        title: l10n.hiLoTitle,
-        subtitle: l10n.hiLoSubtitle,
-        icon: Icons.swap_vert,
-        color: Colors.purple[700]!,
-        screen: const HiLoHomeScreen(),
       ),
       _GameInfo(
         title: l10n.hulaTitle,

@@ -2,20 +2,24 @@
   "@@locale": "ko",
   "appTitle": "마이티",
   "gameSubtitle": "한국의 전통 트릭테이킹 카드 게임",
-  "startGame": "게임 시작",
+  "startGame": "게임 시작하기",
   "newGame": "새 게임",
   "biddingPhase": "배팅 단계",
   "currentBidder": "현재 배팅: {name}",
   "@currentBidder": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "noBidYet": "아직 배팅 없음",
   "highestBid": "최고 배팅: {bid}",
   "@highestBid": {
     "placeholders": {
-      "bid": {"type": "String"}
+      "bid": {
+        "type": "String"
+      }
     }
   },
   "bid": "배팅",
@@ -36,7 +40,9 @@
   "selectKittyDesc": "버릴 카드 3장을 선택하세요 (선택됨: {count}/3)",
   "@selectKittyDesc": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "receivedKitty": "받은 카드:",
@@ -57,7 +63,9 @@
   "selectedCard": "선택한 카드: {card}",
   "@selectedCard": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "trickNumber": "트릭 번호:",
@@ -66,7 +74,9 @@
   "playerTurn": "{name}의 차례",
   "@playerTurn": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "contract": "계약",
@@ -76,7 +86,9 @@
   "cards": "카드: {count}",
   "@cards": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "aiSelectingKitty": "AI가 키티를 선택하고 있습니다...",
@@ -89,26 +101,34 @@
   "declarerTeamPoints": "주공 팀: {points}점",
   "@declarerTeamPoints": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "defenderTeamPoints": "수비 팀: {points}점",
   "@defenderTeamPoints": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "targetPoints": "목표: {points}점",
   "@targetPoints": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "score": "점수",
   "points": "{points}점",
   "@points": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "player": "플레이어",
@@ -121,20 +141,28 @@
   "bidWithAmount": "배팅 {amount}",
   "@bidWithAmount": {
     "placeholders": {
-      "amount": {"type": "int"}
+      "amount": {
+        "type": "int"
+      }
     }
   },
   "trickComplete": "트릭 {number} 완료",
   "@trickComplete": {
     "placeholders": {
-      "number": {"type": "int"}
+      "number": {
+        "type": "int"
+      }
     }
   },
   "winnerAnnouncement": "{name} 승리! ({team})",
   "@winnerAnnouncement": {
     "placeholders": {
-      "name": {"type": "String"},
-      "team": {"type": "String"}
+      "name": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
     }
   },
   "attackTeam": "공격팀",
@@ -152,7 +180,9 @@
   "jokerCallAnnouncement": "조커 콜! {suit}",
   "@jokerCallAnnouncement": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "wonCards": "획득:",
@@ -160,14 +190,18 @@
   "jokerCallQuestion": "{suit} 조커 콜을 선언하시겠습니까?",
   "@jokerCallQuestion": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "no": "아니오",
   "jokerCallButton": "{suit} 조커 콜!",
   "@jokerCallButton": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "jokerLeadSuitTitle": "조커 선공",
@@ -183,7 +217,9 @@
   "nthTrickShort": "{n}트릭",
   "@nthTrickShort": {
     "placeholders": {
-      "n": {"type": "int"}
+      "n": {
+        "type": "int"
+      }
     }
   },
   "recommendedFriend": "추천 프렌드:",
@@ -213,7 +249,6 @@
   "loss": "패",
   "resetStats": "초기화",
   "resetStatsConfirm": "광고를 시청하면 모든 통계가 초기화됩니다.\n계속하시겠습니까?",
-  "startGame": "게임 시작하기",
   "exitApp": "앱 종료",
   "exitAppConfirm": "앱을 종료하시겠습니까?",
   "gameGuide": "게임 방법",
@@ -246,7 +281,9 @@
   "dealMissAnnouncement": "{name} 딜 미스 선언!",
   "@dealMissAnnouncement": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "dealMissNewGame": "딜 미스로 게임을 다시 시작합니다.",
@@ -267,179 +304,28 @@
   "multiplierFullRun": "풀런 ×2",
   "multiplierLabel": "배수",
   "selectGame": "게임 선택",
-  "sevenCardTitle": "세븐 포커",
-  "sevenCardSubtitle": "7장 카드 포커 게임",
-  "sevenCardRules": "게임 규칙",
-  "sevenCardRulesText": "• 각 플레이어는 7장의 카드를 받습니다\n• 처음 3장은 비공개, 나머지 4장은 공개\n• 베팅 라운드를 거쳐 최종 5장으로 족보를 만듭니다\n• 가장 높은 족보를 가진 플레이어가 승리",
-  "pot": "팟",
-  "currentBet": "현재 베팅",
-  "betting": "라운드",
-  "chips": "칩",
-  "bet": "베팅",
-  "fold": "다이",
-  "call": "콜",
-  "raise": "레이즈",
-  "check": "체크",
-  "allIn": "올인",
-  "folded": "다이",
-  "wins": "승리",
-  "gameEnd": "게임 종료",
-  "hiLoTitle": "하이로우",
-  "hiLoSubtitle": "하이/로우 스플릿 포커",
-  "hi": "하이",
-  "lo": "로우",
-  "swing": "스윙",
-  "selectHiLo": "하이/로우 선택",
-  "selectHiLoDesc": "하이, 로우, 또는 스윙을 선택하세요",
-  "hiWinner": "하이 승자",
-  "loWinner": "로우 승자",
-  "swingSuccess": "스윙 성공!",
-  "swingFailed": "스윙 실패",
-  "hiPot": "하이 팟",
-  "loPot": "로우 팟",
-  "noLowHand": "로우 없음",
-  "bestLow": "베스트 로우",
-  "waitingForHiLo": "선택 대기 중...",
-  "selectedHi": "하이 선택",
-  "selectedLo": "로우 선택",
-  "selectedSwing": "스윙 선택",
-  "showdownTitle": "선언 현황",
-  "showdownDesc": "각 플레이어의 선택을 확인하세요",
-  "viewResults": "결과 보기",
-  "finalResults": "최종 결과",
-  "sevenCardGuideOverview": "게임 개요",
-  "sevenCardGuideOverviewText": "세븐 포커는 5명이 즐기는 포커 게임입니다. 7장의 카드 중 5장으로 가장 높은 족보를 만들어 승리하세요.",
-  "sevenCardGuideDealing": "카드 배분",
-  "sevenCardGuideDealingText": "• 처음에 4장을 받습니다 (3장 비공개, 1장 공개)\n• 베팅 후 한 장씩 공개 카드를 받습니다\n• 최종 7장 중 5장으로 족보를 만듭니다",
-  "sevenCardGuideBetting": "베팅 규칙",
-  "sevenCardGuideBettingText": "• 체크: 베팅 없이 넘기기\n• 콜: 현재 베팅에 맞추기\n• 레이즈: 베팅 금액 올리기\n• 다이: 게임 포기\n• 올인: 모든 칩 베팅",
-  "sevenCardGuideHands": "족보 순위",
-  "sevenCardGuideHandsText": "1. 로열 스트레이트 플러시\n2. 백 스트레이트 플러시\n3. 스트레이트 플러시\n4. 포카드\n5. 풀하우스\n6. 플러시\n7. 마운틴 (A-K-Q-J-10)\n8. 백스트레이트 (A-2-3-4-5)\n9. 스트레이트\n10. 트리플\n11. 투페어\n12. 원페어\n13. 하이카드",
-  "sevenCardGuideTips": "게임 팁",
-  "sevenCardGuideTipsText": "• 공개 카드로 상대방 족보를 예측하세요\n• 강한 핸드가 아니면 과도한 베팅을 피하세요\n• 블러핑도 전략입니다",
-  "sevenCardGuideBonus": "보너스 핸드",
-  "sevenCardGuideBonusText": "• 로열 스트레이트 플러시: 500칩\n• 백 스트레이트 플러시: 300칩\n• 스트레이트 플러시: 200칩\n• 포카드: 100칩\n\n보너스 핸드 달성 시 다른 모든 플레이어에게 보너스를 받습니다!",
-  "hiLoGuideOverview": "게임 개요",
-  "hiLoGuideOverviewText": "하이로우는 세븐 포커의 변형으로, 팟이 하이(높은 족보)와 로우(낮은 족보) 승자에게 나뉩니다.",
-  "hiLoGuideDealing": "카드 배분",
-  "hiLoGuideDealingText": "• 세븐 포커와 동일한 방식으로 진행\n• 7장의 카드 중 5장으로 족보를 만듭니다\n• 마지막 베팅 후 하이/로우/스윙 선택",
-  "hiLoGuideHiLo": "하이/로우 선택",
-  "hiLoGuideHiLoText": "• 하이: 가장 높은 족보로 경쟁\n• 로우: 가장 낮은 족보로 경쟁\n• 스윙: 하이와 로우 모두 도전\n\n팟의 50%는 하이 승자, 50%는 로우 승자가 가져갑니다.",
-  "hiLoGuideLow": "로우 족보",
-  "hiLoGuideLowText": "• 스트레이트/플러시 없는 핸드만 로우 자격\n• 낮을수록 좋음 (A가 가장 낮음)\n• 최강 로우: A-2-3-4-6\n• 페어가 없는 핸드가 유리",
-  "hiLoGuideSwing": "스윙 규칙",
-  "hiLoGuideSwingText": "• 7장을 두 개의 5장 핸드로 나눕니다\n• 하이와 로우 모두 1등해야 성공\n• 성공 시 전체 팟 획득\n• 실패 시 해당 부분은 다른 승자에게",
-  "hiLoGuideTips": "게임 팁",
-  "hiLoGuideTipsText": "• A-2-3-4 같은 낮은 카드는 로우에 유리\n• 스윙은 위험하지만 성공 시 큰 보상\n• 상대 카드를 보고 전략을 세우세요",
-  "hiLoGuideBonus": "보너스 핸드",
-  "hiLoGuideBonusText": "• 로열 스트레이트 플러시: 500칩\n• 백 스트레이트 플러시: 300칩\n• 스트레이트 플러시: 200칩\n• 포카드: 100칩\n\n보너스 핸드 달성 시 자동으로 전체 팟을 획득합니다!",
   "hulaTitle": "훌라",
   "hulaSubtitle": "4인용 러미 카드 게임",
   "heartsTitle": "하트",
   "heartsSubtitle": "4인 트릭 테이킹 게임",
-  "handRoyalStraightFlush": "로열 스트레이트 플러시",
-  "handBackStraightFlush": "백스트레이트 플러시",
-  "handStraightFlush": "스트레이트 플러시",
-  "handFourOfAKind": "포카드",
-  "handFullHouse": "풀하우스",
-  "handFlush": "플러시",
-  "handMountain": "마운틴",
-  "handBackStraight": "백스트레이트",
-  "handStraight": "스트레이트",
-  "handTriple": "트리플",
-  "handTwoPair": "투페어",
-  "handOnePair": "원페어",
-  "handHighCard": "하이카드",
-  "highCardTop": "{rank}탑",
-  "@highCardTop": {
-    "placeholders": {
-      "rank": {"type": "String"}
-    }
-  },
-  "noLow": "No Low",
-  "betPing": "삥",
-  "betCheck": "체크",
-  "betCall": "콜",
-  "betDdadang": "따당",
-  "betQuarter": "쿼터",
-  "betHalf": "하프",
-  "betFull": "풀",
-  "betDie": "다이",
-  "selectOpenCard": "공개할 카드를 선택하세요",
-  "selectOpenCardDesc": "선택한 카드가 상대에게 공개됩니다",
-  "aiSelectingCard": "AI가 카드를 선택하고 있습니다...",
-  "nthCard": "{n}번째 카드",
-  "@nthCard": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
-  "secondsCount": "{n}초",
-  "@secondsCount": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
-  "totalBetAmount": "총: {amount}",
-  "@totalBetAmount": {
-    "placeholders": {
-      "amount": {"type": "int"}
-    }
-  },
-  "bettingAmount": "베팅: {amount}",
-  "@bettingAmount": {
-    "placeholders": {
-      "amount": {"type": "int"}
-    }
-  },
-  "bonusHand": "보너스 핸드!",
-  "bonus": "보너스",
-  "total": "총",
-  "otherPlayersLose": "다른 플레이어: 각 -{amount}",
-  "@otherPlayersLose": {
-    "placeholders": {
-      "amount": {"type": "int"}
-    }
-  },
-  "thisGame": "이번 게임",
-  "cumulative": "누적",
-  "foldedSection": "다이",
-  "hiLoHi": "하이",
-  "hiLoLo": "로우",
-  "hiLoSwing": "스윙",
-  "roundComplete": "라운드 {n} 완료!",
-  "@roundComplete": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
-  "cardDistribution5": "5번째 카드가 배분됩니다.",
-  "cardDistribution6": "6번째 카드가 배분됩니다.",
-  "cardDistribution7": "마지막 7번째 카드가 배분됩니다.",
-  "goodLuck": "GOOD LUCK!",
-  "cardCount": "{count}장",
-  "@cardCount": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
   "suitSpade": "스페이드",
   "suitDiamond": "다이아몬드",
   "suitHeart": "하트",
   "suitClub": "클럽",
-  "noGiruda": "노기루다",
-  "noFriend": "노프렌드",
-  "firstTrickFriend": "초구 프렌드",
   "cardOwner": "{card} 소유자",
   "@cardOwner": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
-  "trickWinner": "{n}번째 트릭 획득자",
+  "trickWinner": "{n}트릭 승자",
   "@trickWinner": {
     "placeholders": {
-      "n": {"type": "int"}
+      "n": {
+        "type": "int"
+      }
     }
   },
   "hint": "힌트",
@@ -450,14 +336,15 @@
   "jokerLead": "조커 선공: {suit}",
   "@jokerLead": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "gameSelection": "게임 선택",
   "onecardTitle": "원카드",
   "onecardSubtitle": "4인 대전",
   "gameRules": "게임 규칙",
-  "confirm": "확인",
   "heartsGuideGoal": "목표",
   "heartsGuideGoalText": "하트 카드와 스페이드 퀸을 피해 가장 낮은 점수를 얻는 것이 목표입니다.",
   "heartsGuideHow": "진행 방법",
@@ -474,14 +361,18 @@
   "passLeftCount": "왼쪽으로 패스 ({count}/3)",
   "@passLeftCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "cardPass": "카드 패스",
   "trickProgress": "트릭 {current}/13",
   "@trickProgress": {
     "placeholders": {
-      "current": {"type": "int"}
+      "current": {
+        "type": "int"
+      }
     }
   },
   "heartBroken": "하트 브레이킹",
@@ -491,26 +382,36 @@
   "playerNameWins": "{name} 승리",
   "@playerNameWins": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "playerStartsWithClub2": "{name}가 클럽 2로 시작합니다",
   "@playerStartsWithClub2": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "playerWonTrick": "{name} 트릭 획득! (+{points}점)",
   "@playerWonTrick": {
     "placeholders": {
-      "name": {"type": "String"},
-      "points": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
     }
   },
   "playerShootMoonSuccess": "{name} 슈팅 더 문 성공!",
   "@playerShootMoonSuccess": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "hintActivated": "힌트가 활성화되었습니다!",
@@ -524,7 +425,9 @@
   "oneCardCallTimer": "원카드 ({seconds}초)",
   "@oneCardCallTimer": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "selectSuit": "무늬를 선택하세요",
@@ -533,8 +436,6 @@
   "discard": "버리기",
   "stop": "스톱",
   "handCards": "손패",
-  "score": "점수",
-  "close": "닫기",
   "cannotPlayCard": "이 카드는 낼 수 없습니다",
   "drawCard": "카드를 뽑으세요",
   "discardOrMeld": "카드를 버리거나 등록하세요",
@@ -543,20 +444,28 @@
   "thankYouMeldSolo": "땡큐! {suit}7 단독 등록",
   "@thankYouMeldSolo": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "thankYouMeldMyMeld": "땡큐! {card} 내 멜드에 붙이기",
   "@thankYouMeldMyMeld": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "thankYouMeldAiMeld": "땡큐! {card} {aiName} 멜드에 붙이기",
   "@thankYouMeldAiMeld": {
     "placeholders": {
-      "card": {"type": "String"},
-      "aiName": {"type": "String"}
+      "card": {
+        "type": "String"
+      },
+      "aiName": {
+        "type": "String"
+      }
     }
   },
   "addedToMeld": "멜드에 추가됨",
@@ -569,14 +478,18 @@
   "attackReceived": "공격으로 {count}장을 받았습니다",
   "@attackReceived": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "cardDrawn": "카드를 뽑았습니다",
   "bankrupt": "파산! ({count}장 보유)",
   "@bankrupt": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "restart": "다시 시작",
@@ -619,12 +532,15 @@
   "hulaGuideScoringText": "• 승자: 다른 플레이어 손패와의 차이 합계를 획득\n• 패자: 승자와의 손패 차이만큼 감점\n• 훌라(등록 없이 승리): 점수 2배",
   "hulaGuideStopPenalty": "스톱 실패 페널티",
   "hulaGuideStopPenaltyText": "스톱을 외쳤지만 최저 점수가 아닌 경우:\n• 승자가 받을 점수 전부를 스톱한 사람이 부담\n• 다른 플레이어는 감점 없음",
-
   "attackTotalCards": "+{power}! (총 {total}장 공격)",
   "@attackTotalCards": {
     "placeholders": {
-      "power": {"type": "int"},
-      "total": {"type": "int"}
+      "power": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "skipNextTurnMessage": "J! 다음 턴 건너뛰기",
@@ -633,93 +549,102 @@
   "changeSuitMessage": "7! 무늬 변경: {suit}",
   "@changeSuitMessage": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "playerPlayedCard": "{name}이(가) 카드를 냈습니다",
   "@playerPlayedCard": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
-  "continueGame": "이어하기",
   "onecardWithPlayers": "원카드 ({count}P)",
   "@onecardWithPlayers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-  "restart": "다시 시작",
-  "selectSuit": "무늬를 선택하세요",
   "blackWhiteJoker": "흑백 조커",
-  "colorJoker": "컬러 조커",
   "clockwiseDirection": "시계",
   "counterClockwiseDirection": "반시계",
   "aiTurnCountdown": "{name} ({seconds})",
   "@aiTurnCountdown": {
     "placeholders": {
-      "name": {"type": "String"},
-      "seconds": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "aiTurn": "{name} 차례",
   "@aiTurn": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "cannotPlayThisCard": "이 카드는 낼 수 없습니다",
   "bankruptWithCards": "파산! ({count}장 보유)",
   "@bankruptWithCards": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "gameRulesTitle": "게임 규칙",
-  "goal": "목표",
   "goalText": "손에 든 카드를 가장 먼저 모두 내려놓는 사람이 승리합니다.\n마지막 카드를 내기 전 \"원카드\"를 외쳐야 합니다.",
-  "howToPlay": "진행 방법",
   "howToPlayText": "같은 무늬 또는 같은 숫자의 카드를 낼 수 있습니다.\n낼 수 있는 카드가 없으면 덱에서 카드를 뽑습니다.",
-  "defense": "방어",
   "defenseText": "공격을 받으면 같은 공격 카드로 막을 수 있습니다.\n막으면 공격이 누적되어 다음 사람에게 넘어갑니다.",
-  "specialCards": "특수 카드",
   "gameTips": "게임 팁",
-  "close": "닫기",
-
   "drawCardMessage": "카드를 뽑으세요",
   "discardOrMeldMessage": "카드를 버리거나 등록하세요",
   "noCardsMessage": "카드가 없습니다",
-  "thankYouSelectMethod": "땡큐 방법을 선택하세요",
   "thankYouSolo": "땡큐! {suit}7 단독 등록",
   "@thankYouSolo": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "thankYouAddToMine": "땡큐! {card} 내 멜드에 붙이기",
   "@thankYouAddToMine": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "thankYouAddToAi": "땡큐! {card} {aiName} 멜드에 붙이기",
   "@thankYouAddToAi": {
     "placeholders": {
-      "card": {"type": "String"},
-      "aiName": {"type": "String"}
+      "card": {
+        "type": "String"
+      },
+      "aiName": {
+        "type": "String"
+      }
     }
   },
   "thankYouDesc": "땡큐! {desc}",
   "@thankYouDesc": {
     "placeholders": {
-      "desc": {"type": "String"}
+      "desc": {
+        "type": "String"
+      }
     }
   },
-  "addedToMeld": "멜드에 추가됨",
-  "noMeldToAttach": "붙일 멜드가 없습니다",
-  "invalidCombination": "유효하지 않은 조합입니다",
   "drawFirstMessage": "먼저 카드를 뽑으세요",
-  "selectCardToDiscard": "버릴 카드를 선택하세요",
   "hulaWinBonus": "훌라로 승리! (x2)",
   "handColumn": "손패",
   "scoreColumn": "점수",
@@ -727,16 +652,19 @@
   "hulaWithPlayers": "훌라 ({count}인)",
   "@hulaWithPlayers": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "hintOnOff": "힌트 {status}",
   "@hintOnOff": {
     "placeholders": {
-      "status": {"type": "String"}
+      "status": {
+        "type": "String"
+      }
     }
   },
-  "discardedCards": "버린 카드",
   "emptyDiscardPile": "버린 카드\n없음",
   "meldButton": "등록",
   "discardButton": "버리기",
@@ -744,62 +672,95 @@
   "thankYouMeld": "땡큐 멜드",
   "meldTypes": "멜드 종류",
   "ok": "확인",
-  "stop": "스톱",
   "aiThankYouDraw": "{aiName} 땡큐! {card}",
   "@aiThankYouDraw": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "aiDrawsCard": "{aiName}이 카드를 뽑음",
   "@aiDrawsCard": {
     "placeholders": {
-      "aiName": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      }
     }
   },
   "aiRegistersSeven": "{aiName}: 7 {type} 등록",
   "@aiRegistersSeven": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "type": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
     }
   },
   "aiRegistersMeld": "{aiName}: {meldType} 등록 {cards}",
   "@aiRegistersMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "meldType": {"type": "String"},
-      "cards": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "meldType": {
+        "type": "String"
+      },
+      "cards": {
+        "type": "String"
+      }
     }
   },
   "aiAttachesToMeld": "{aiName}: {card} 멜드에 붙임",
   "@aiAttachesToMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "aiAttachesToPlayerMeld": "{aiName}: {card} 플레이어 멜드에 붙임",
   "@aiAttachesToPlayerMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "aiAttachesToOtherAiMeld": "{aiName}: {card} {targetAi} 멜드에 붙임",
   "@aiAttachesToOtherAiMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"},
-      "targetAi": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      },
+      "targetAi": {
+        "type": "String"
+      }
     }
   },
   "aiDiscards": "{aiName}: {card} 버림",
   "@aiDiscards": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "group": "그룹",
@@ -809,13 +770,17 @@
   "drewCardWithCard": "{card}을 뽑았습니다",
   "@drewCardWithCard": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "playerDiscards": "{card} 버림",
   "@playerDiscards": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "inPossession": "(보유중)",
@@ -823,7 +788,9 @@
   "meldCount": "{count}개 멜드",
   "@meldCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "cannotPlayFirstTrickDeclarerGiruda": "첫 트릭에서 주공은 기루다로 선공할 수 없습니다",
@@ -834,7 +801,9 @@
   "mustFollowSuit": "{suit} 무늬를 내야 합니다",
   "@mustFollowSuit": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "fullDeclarationWarning": "풀 선언 시 공약이 20으로 올라갑니다",
@@ -847,18 +816,32 @@
   "bidExplanation": "{name}: 최적 기루다 {suit}, 예상 강도 {strength}",
   "@bidExplanation": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suit": {"type": "String"},
-      "strength": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "suit": {
+        "type": "String"
+      },
+      "strength": {
+        "type": "int"
+      }
     }
   },
   "bidExplanationBid": "{name}: {suit} {tricks} 배팅 (강도 {strength})",
   "@bidExplanationBid": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suit": {"type": "String"},
-      "tricks": {"type": "int"},
-      "strength": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "suit": {
+        "type": "String"
+      },
+      "tricks": {
+        "type": "int"
+      },
+      "strength": {
+        "type": "int"
+      }
     }
   },
   "passReasonNoSuit": "기루다 후보 없음 (4장 이상 무늬 없음)",
@@ -866,35 +849,51 @@
   "passReasonWeakHand": "핸드 강도 부족 (강도 {strength}, 필요 {needed})",
   "@passReasonWeakHand": {
     "placeholders": {
-      "strength": {"type": "int"},
-      "needed": {"type": "int"}
+      "strength": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
     }
   },
   "passReasonPowerWeak": "파워 카드 부족 (마이티/조커/에이스 5개 미만)",
   "passReasonLowPoints": "적정 {optimal}점 < 최소 13점",
   "@passReasonLowPoints": {
     "placeholders": {
-      "optimal": {"type": "int"}
+      "optimal": {
+        "type": "int"
+      }
     }
   },
   "passReasonOutbid": "적정 {optimal}점 < 필요 {needed}점",
   "@passReasonOutbid": {
     "placeholders": {
-      "optimal": {"type": "int"},
-      "needed": {"type": "int"}
+      "optimal": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
     }
   },
   "estimatedRange": "예상 {min}~{max}점",
   "@estimatedRange": {
     "placeholders": {
-      "min": {"type": "int"},
-      "max": {"type": "int"}
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
     }
   },
   "optimalScore": "적정 {optimal}점",
   "@optimalScore": {
     "placeholders": {
-      "optimal": {"type": "int"}
+      "optimal": {
+        "type": "int"
+      }
     }
   },
   "kittyScoreChange": "예상 점수 변화",
@@ -906,7 +905,9 @@
   "friendHeldBy": "{name} 보유",
   "@friendHeldBy": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "friendInKitty": "키티에 있을 수 있음",
@@ -937,21 +938,27 @@
   "bidSummaryEstMax": "최대 ({points}점)",
   "@bidSummaryEstMax": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "bidSummaryEstMaxDesc": "프렌드 포함, 선 유지 시",
   "bidSummaryEstMin": "최소 ({points}점)",
   "@bidSummaryEstMin": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "bidSummaryEstMinDesc": "프렌드 도움 없이 (조커콜 등)",
   "bidSummaryEstMinDescDynamic": "프렌드({friend}) 기본 기여만, 바닥패 가능",
   "@bidSummaryEstMinDescDynamic": {
     "placeholders": {
-      "friend": {"type": "String"}
+      "friend": {
+        "type": "String"
+      }
     }
   },
   "bidSummaryMultipliers": "주공 ×2, 프렌드 ×1, 야당 ×(-1)",
@@ -971,86 +978,100 @@
   "bidInfoGirudaKeys": "기루다 {keys}",
   "@bidInfoGirudaKeys": {
     "placeholders": {
-      "keys": {"type": "String"}
+      "keys": {
+        "type": "String"
+      }
     }
   },
   "bidInfoFriend": "프렌드: {card}",
   "@bidInfoFriend": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "bidInfoHasBoth": "{card1}·{card2} 보유",
   "@bidInfoHasBoth": {
     "placeholders": {
-      "card1": {"type": "String"},
-      "card2": {"type": "String"}
+      "card1": {
+        "type": "String"
+      },
+      "card2": {
+        "type": "String"
+      }
     }
   },
   "bidInfoHasCard": "{card} 보유",
   "@bidInfoHasCard": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "bidInfoFirstTrickAces": "초구 {aces}",
   "@bidInfoFirstTrickAces": {
     "placeholders": {
-      "aces": {"type": "String"}
+      "aces": {
+        "type": "String"
+      }
     }
   },
   "jokerOwner": "조커 소유자",
-  "cardOwner": "{card} 소유자",
-  "@cardOwner": {
-    "placeholders": {
-      "card": {"type": "String"}
-    }
-  },
-  "trickWinner": "{n}트릭 승자",
-  "@trickWinner": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
   "friendBadge": "프렌드",
   "kittyLabel": "바닥패 ",
   "kittyPointsWithFriend": " {points}점 (프렌드 바닥패)",
   "@kittyPointsWithFriend": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "kittyPoints": " {points}점",
   "@kittyPoints": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "friendWithName": "프렌드 {name} ",
   "@friendWithName": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adjustedPointsRange": "→ 조정 {min}~{max}점",
   "@adjustedPointsRange": {
     "placeholders": {
-      "min": {"type": "int"},
-      "max": {"type": "int"}
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
     }
   },
   "hasAceNote": " (A 보유)",
   "strategyFirstTrickAceLead": "초구: {card} 선공으로 확실한 트릭 획득",
   "@strategyFirstTrickAceLead": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "strategyFirstTrickPassFriendWin": "초구: 짧은 무늬 낮은 카드로 선 넘기기 (프렌드가 트릭 획득)",
   "strategyFirstTrickKingLead": "초구: {card} 선공으로 트릭 획득 시도",
   "@strategyFirstTrickKingLead": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "strategyFirstTrickPassFriend": "초구: 짧은 무늬 낮은 카드로 프렌드에게 선 넘기기",
@@ -1059,16 +1080,26 @@
   "strategyPassTrumpToFriend": "{passCard} 선공으로 프렌드({friendCard})에게 선 넘기기 → {rank} 단독 방지",
   "@strategyPassTrumpToFriend": {
     "placeholders": {
-      "passCard": {"type": "String"},
-      "friendCard": {"type": "String"},
-      "rank": {"type": "String"}
+      "passCard": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      },
+      "rank": {
+        "type": "String"
+      }
     }
   },
   "strategyPassSuitToFriend": "{card} 선공으로 프렌드({friendCard})에게 선 넘기기",
   "@strategyPassSuitToFriend": {
     "placeholders": {
-      "card": {"type": "String"},
-      "friendCard": {"type": "String"}
+      "card": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      }
     }
   },
   "strategySourceFriend": "프렌드 트릭 후,",
@@ -1076,27 +1107,39 @@
   "strategyTrumpDominate": "{source} {cards}로 지배 → 수비 기루다 소진",
   "@strategyTrumpDominate": {
     "placeholders": {
-      "source": {"type": "String"},
-      "cards": {"type": "String"}
+      "source": {
+        "type": "String"
+      },
+      "cards": {
+        "type": "String"
+      }
     }
   },
   "strategyTrumpExhaust": "{source} {cards}로 수비 기루다 소진",
   "@strategyTrumpExhaust": {
     "placeholders": {
-      "source": {"type": "String"},
-      "cards": {"type": "String"}
+      "source": {
+        "type": "String"
+      },
+      "cards": {
+        "type": "String"
+      }
     }
   },
   "strategyTrumpMidDraw": "{suit} 중간 기루다로 수비측 높은 기루다 유도",
   "@strategyTrumpMidDraw": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "strategyJokerCallSuits": "수비 기루다 소진 후, 약한 무늬({suits})에 조커 콜",
   "@strategyJokerCallSuits": {
     "placeholders": {
-      "suits": {"type": "String"}
+      "suits": {
+        "type": "String"
+      }
     }
   },
   "strategyJokerCallWeak": "수비 기루다 소진 후, 약한 무늬에 조커 콜",
@@ -1105,21 +1148,52 @@
   "strategyVoidTrumpCut": "{suits} 보이드 → 상대 선공 시 기루다 컷으로 트릭 회수",
   "@strategyVoidTrumpCut": {
     "placeholders": {
-      "suits": {"type": "String"}
+      "suits": {
+        "type": "String"
+      }
     }
   },
   "strategyTrumpExhaustCheckK": "{cards} 선출 → 기루다 최상위 공격, K 소진 확인",
-  "@strategyTrumpExhaustCheckK": { "placeholders": { "cards": { "type": "String" } } },
+  "@strategyTrumpExhaustCheckK": {
+    "placeholders": {
+      "cards": {
+        "type": "String"
+      }
+    }
+  },
   "strategyJokerAfterFriend": "프렌드 합류 후 조커 선출 → 점수 획득",
   "strategyJokerCallGiruda": "K 미소진 시 조커: {suit} 호출 → K 유도",
-  "@strategyJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "@strategyJokerCallGiruda": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      }
+    }
+  },
   "strategyLowGirudaFriendLure": "{card} 선출 → 프렌드에게 선 양보하여 유도",
-  "@strategyLowGirudaFriendLure": { "placeholders": { "card": { "type": "String" } } },
+  "@strategyLowGirudaFriendLure": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "strategyGirudaQReclaim": "{card} 선출 → 선 탈환",
-  "@strategyGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "@strategyGirudaQReclaim": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "strategyHighCardAttack": "{cards} 선출 → 추가 점수 공격",
-  "@strategyHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
-
+  "@strategyHighCardAttack": {
+    "placeholders": {
+      "cards": {
+        "type": "String"
+      }
+    }
+  },
   "trickDetails": "트릭 상세",
   "trickColumnGainLoss": "득실",
   "trickColumnGiruda": "기루다",
@@ -1131,21 +1205,93 @@
   "trickEventLastTrickGiruda": "기루다 마지막 트릭",
   "trickEventLastTrickMighty": "마이티 마지막 트릭",
   "trickEventLastTrickTopByExhaust": "무늬 소진 → {card} 최상위 선공",
-  "@trickEventLastTrickTopByExhaust": { "placeholders": { "card": { "type": "String" } } },
+  "@trickEventLastTrickTopByExhaust": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventGameVictory": "공격 승리 확정",
   "trickEventGameRunVictory": "공격 런(풀) 대승 확정",
   "trickEventGameDefeat": "공격 패배 확정",
   "trickEventSummaryRun": "총평: 전승 런 대승",
   "trickEventSummaryBackRun": "총평: 전패 백런 0/{bid}점 완패",
-  "@trickEventSummaryBackRun": { "placeholders": { "bid": { "type": "int" } } },
+  "@trickEventSummaryBackRun": {
+    "placeholders": {
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryBigWin": "총평: {wins}승{losses}패 {points}/{bid}점 대승",
-  "@trickEventSummaryBigWin": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryBigWin": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryWin": "총평: {wins}승{losses}패 {points}/{bid}점 승리",
-  "@trickEventSummaryWin": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryWin": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryNarrowLoss": "총평: {wins}승{losses}패 {points}/{bid}점 석패",
-  "@trickEventSummaryNarrowLoss": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryNarrowLoss": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryBigLoss": "총평: {wins}승{losses}패 {points}/{bid}점 대패",
-  "@trickEventSummaryBigLoss": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryBigLoss": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "summaryJokerCounter": "조커 반격",
   "summaryJokerUse": "조커 활용",
   "summaryWasteExploit": "물패 공략 성공",
@@ -1165,7 +1311,16 @@
   "summaryNineWinFirstTrickCut": "총평 : 9트릭 선방 / 초구 기루다 컷(저확률 불운)으로 런 달성 1트릭 부족",
   "summaryDefenseJokerGirudaCounter": "수비 조커 공세 → 기루다 반격",
   "summaryNarrative": "총평 : {events}으로 {result}",
-  "@summaryNarrative": { "placeholders": { "events": { "type": "String" }, "result": { "type": "String" } } },
+  "@summaryNarrative": {
+    "placeholders": {
+      "events": {
+        "type": "String"
+      },
+      "result": {
+        "type": "String"
+      }
+    }
+  },
   "summaryResultBigWin": "공격 대승",
   "summaryResultMinGoal": "최소 점수 달성",
   "summaryResultWin": "공격 성공",
@@ -1173,7 +1328,25 @@
   "summaryResultBigLoss": "수비 대승",
   "summaryAnd": "과 ",
   "summaryFallback": "총평 : {wins}승{losses}패 → {points}/{bid}점 {result}",
-  "@summaryFallback": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" }, "result": { "type": "String" } } },
+  "@summaryFallback": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      },
+      "result": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventLastCardDefenseWin": "수비 상위 카드 방어",
   "trickEventLastDefenseTopProtectFail": "수비 최상위 카드 보호 방어하나 방어 실패",
   "trickEventLastCardAttackWin": "공격 점수 획득",
@@ -1181,7 +1354,9 @@
   "trickEventJokerLeadSuit": "조커 선공 ({suit})",
   "@trickEventJokerLeadSuit": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "trickEventJokerGirudaExhaust": "수비팀 기루다 소진 유도",
@@ -1190,11 +1365,23 @@
   "trickEventTopGirudaLeadOpponentExhausted": "상대 기루다 소진 → 비기루다 공략, 기루다는 간용 보존",
   "trickEventMidGirudaMightyBait": "기루다 중간으로 마이티 유도",
   "trickEventMidGirudaMightyBaitForTop": "{topCard} 최상위 확보 위해 저액 기루다로 마이티 유도",
-  "@trickEventMidGirudaMightyBaitForTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventMidGirudaMightyBaitForTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventMidGirudaPassLead": "기루다 중간으로 선 넘김",
   "trickEventFriendAttackDeclarerReOvertake": "프렌드 공격 → 수비 역전 시도 → 주공 재역전 (행운)",
   "trickEventGirudaDepletionFail": "{card} 소진 실패",
-  "@trickEventGirudaDepletionFail": { "placeholders": { "card": { "type": "String" } } },
+  "@trickEventGirudaDepletionFail": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventDefenderGirudaWin": "수비팀 기루다 승리",
   "trickEventMidGirudaLead": "기루다 중간 선공",
   "trickEventMidGirudaExhaust": "기루다 소진 유도",
@@ -1209,7 +1396,13 @@
   "trickEventDefenseTopDeclarerCutTeamDefense": "수비 최상위 선공 → 주공 기루다 컷 → 수비 팀워크 기루다 방어",
   "trickEventDefenseLeadAttackCut": "수비 비기루다 최상위 선공 → 공격 기루다 컷 선 탈환",
   "trickEventDefenseTopAttackCutPointsFailed": "수비 최상위 선공 → 주공 기루다 컷 {count}점 방어 실패",
-  "@trickEventDefenseTopAttackCutPointsFailed": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventDefenseTopAttackCutPointsFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventAttackLeadDefenseCut": "공격 비기루다 최상위 선공 → 수비 기루다 컷",
   "trickEventTopNonGirudaLeadDefended": "비기루다 선공 → 수비 상위 카드 방어",
   "trickEventFirstTrickTopAttack": "초구 비기루다 최상위 선공",
@@ -1220,7 +1413,13 @@
   "trickEventFirstTrickWaste": "초구 부재 / 물패 처리",
   "trickEventAttackFailed": "공격 실패 → 수비 상위 카드에 패배",
   "trickEventAttackFailedWithTop": "공격 ({topCard} 최상위) 실패 → 수비에 패배",
-  "@trickEventAttackFailedWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventAttackFailedWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventWaste": "물패로 선 넘김",
   "trickEventWasteAttackFailed": "물패로 공격 실패",
   "trickEventPreExchange": "선교환 (기루다 보존)",
@@ -1228,33 +1427,81 @@
   "trickEventFriendPassLeadFailed": "선 넘기기 실패",
   "trickEventDefenseLead": "수비 선공",
   "trickEventWasteWithTop": "물패 ({topCard} 최상위)",
-  "@trickEventWasteWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventWasteWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventWasteDeclarerReclaim": "물패 → 주공 선 탈환",
   "trickEventWasteDeclarerReclaimWithTop": "물패 ({topCard} 최상위) → 주공 선 탈환",
   "trickEventFriendWasteDeclarerCutDefenseOvercut": "프렌드 물패 → 주공 기루다 컷 → 수비 기루다 재역전",
   "trickEventFriendWasteDeclarerCutDefenseOvercutPoints": "프렌드 물패 → 주공 기루다 컷 → 수비 기루다 재역전 {count}점 방어",
-  "@trickEventFriendWasteDeclarerCutDefenseOvercutPoints": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventFriendWasteDeclarerCutDefenseOvercutPoints": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventFriendWasteDeclarerHighDefenseReversal": "프렌드 물패 → 주공 하이카드 → 수비 역전",
   "trickEventDefenseWasteAttackReverseDefenseCut": "수비 물패 → 공격 역전 → 수비 간 재역전",
   "trickEventFriendLeadDefenseBeatDeclarerCut": "프렌드 선공 → 수비 역전 → 주공 기루다 컷 재역전",
-  "@trickEventWasteDeclarerReclaimWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventWasteDeclarerReclaimWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventDeclarerFriendLure": "프렌드 유도",
   "trickEventDeclarerFriendLureFailed": "프렌드 유도 실패",
   "trickEventFriendLureGirudaExhaust": "수비 기루다 {card} 소진 성공",
-  "@trickEventFriendLureGirudaExhaust": { "placeholders": { "card": { "type": "String" } } },
+  "@trickEventFriendLureGirudaExhaust": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventWasteFriendRescue": "물패 → 프렌드 기사회생!",
   "trickEventWasteFriendRescueWithTop": "물패 ({topCard} 최상위) → 프렌드 기사회생!",
-  "@trickEventWasteFriendRescueWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventWasteFriendRescueWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventFriendMightyReclaim": "물패 → 수비 공격을 마이티로 선 탈환",
   "trickEventFriendMightyReclaimWithTop": "물패 ({topCard} 최상위) → 수비 공격을 마이티로 선 탈환",
-  "@trickEventFriendMightyReclaimWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventFriendMightyReclaimWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventAttackGirudaCut": "공격 기루다 컷",
   "trickEventAttackGirudaCutCount": "공격 기루다 컷 {count}회",
-  "@trickEventAttackGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventAttackGirudaCutCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSameTeamGirudaCut": "같은팀 기루다 간 (불가피)",
   "trickEventDefenseGirudaCut": "수비 기루다 컷",
   "trickEventDefenseGirudaCutCount": "수비 기루다 컷 {count}회",
-  "@trickEventDefenseGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventDefenseGirudaCutCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventDefenseCutAttackOvercut": "수비 1차 간 → 공격 상위 기루다 컷",
   "trickEventAttackCutDefenseOvercut": "공격 1차 간 → 수비 상위 기루다 방어",
   "trickEventAttackNoGirudaDefenseHas": "공격팀 기루다 소진 / 수비만 기루다 보유",
@@ -1271,11 +1518,19 @@
   "trickEventDefenseMightySuitBaitSuccess": "마이티 무늬 선공 / 마이티 유도 성공",
   "trickEventDefenseMightySuitBaitFailed": "마이티 무늬 선공 / 마이티 유도 실패 (공격팀 선 탈환)",
   "trickEventDefenseMightyExhaustPoints": "수비 마이티 유도, {count}점 유출",
-  "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventDefenseMightyExhaustPoints": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventJokerAfterFriend": "프렌드 합류 후 조커 ({suit}) → 점수 획득",
   "@trickEventJokerAfterFriend": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "trickEventJokerAfterFriendGeneral": "프렌드 합류 후 조커 → 점수 획득",
@@ -1286,13 +1541,17 @@
   "trickResultAttack": "→ 공격 +{count}",
   "@trickResultAttack": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "trickResultDefense": "→ 수비 +{count}",
   "@trickResultDefense": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "trickResultNoScore": "→ 무득점",
@@ -1302,92 +1561,309 @@
   "trickEventFriendTopCardWin": "프렌드 최상위 카드 승리",
   "trickEventFriendGirudaKDeclarerA": "프렌드 기루다 K 승리, 주공 A 보유 공격팀 기루다 장악",
   "trickEventFriendTrickContribution": "프렌드 도움 {count}트릭 공격 성공",
-  "@trickEventFriendTrickContribution": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventFriendTrickContribution": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventJokerSkipNoPoints": "{name}: 조커 보유, 무득점 트릭 스킵",
-  "@trickEventJokerSkipNoPoints": { "placeholders": { "name": { "type": "String" } } },
+  "@trickEventJokerSkipNoPoints": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventGirudaAceHeldMightyGuard": "{name}: 기루다 A 보유, 마이티 경계로 미사용",
-  "@trickEventGirudaAceHeldMightyGuard": { "placeholders": { "name": { "type": "String" } } },
+  "@trickEventGirudaAceHeldMightyGuard": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventGirudaAceHeld": "{name}: 기루다 A 보유, 미사용",
-  "@trickEventGirudaAceHeld": { "placeholders": { "name": { "type": "String" } } },
-
+  "@trickEventGirudaAceHeld": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "adviceFirstTrickLowLead": "💡 초구에는 에이스나 마이티 등 확실히 이기는 카드로 선공하세요",
   "adviceLowLeadPointLoss": "💡 이길 수 없는 카드로 선공하면 점수를 빼앗깁니다",
   "adviceAceBeatenByJoker": "💡 수비 조커가 남아있을 때 에이스 리드는 조커에 당할 수 있습니다",
   "advicePointCardToDefense": "💡 수비가 이기는 트릭에는 점수카드(A·K·10) 대신 물패를 내세요",
   "adviceMightyHighPointLoss": "💡 마이티가 나올 때 점수카드가 함께 나가면 큰 손실입니다",
-
   "kittyTipTitle": "💡 키티 교환 팁",
   "kittyTipCreateVoid": "무늬를 비우면 기루다로 잘라서 트릭을 가져올 수 있습니다",
   "kittyTipKeepGiruda": "기루다 카드는 가능한 보존하세요",
   "kittyTipKeepTopCards": "최상위 카드(에이스 등)가 있는 무늬는 보존하세요",
   "kittyTipDiscardLowSingles": "장수가 적은 무늬의 낮은 카드를 우선 버리세요",
   "kittyTipKeepMightySuitK": "마이티가 없다면 마이티 무늬 K는 마이티를 잡을 수 있으니 보존하세요",
-
   "friendTipTitle": "💡 프렌드 선언 팁",
   "friendTipMighty": "마이티 프렌드: 가장 강한 카드를 아군으로 만듭니다",
   "friendTipJoker": "조커 프렌드: 두 번째로 강한 카드를 아군으로 만듭니다",
   "friendTipNoFriend": "마이티와 조커를 모두 가지고 있으면 노프렌드를 고려하세요",
   "friendTipWhoIsFriend": "선언한 카드를 가진 플레이어가 아군이 됩니다 (본인 포함 가능)",
-
   "estimatedMinWins": "→ {count}승 이상 예상",
-  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
+  "@estimatedMinWins": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "stepFirstAce": "{card}로 초구 선 유지",
-  "@stepFirstAce": { "placeholders": { "card": { "type": "String" } } },
+  "@stepFirstAce": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepFirstKing": "{card}로 초구 선 유지 (마이티 무늬 최상위)",
-  "@stepFirstKing": { "placeholders": { "card": { "type": "String" } } },
+  "@stepFirstKing": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepFirstMighty": "마이티로 초구 선 확보",
   "stepFirstJoker": "조커로 초구 선 확보",
   "stepJokerCallExhaust": "초구 성공 후 {card}로 조커콜 → 조커 소진",
-  "@stepJokerCallExhaust": { "placeholders": { "card": { "type": "String" } } },
+  "@stepJokerCallExhaust": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaAce": "{card}로 기루다 공격",
-  "@stepGirudaAce": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaAce": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaAceCheckK": "{card}로 기루다 공격 (K 소진 확인)",
-  "@stepGirudaAceCheckK": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaAceCheckK": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaKing": "{card}로 기루다 추가 공격",
-  "@stepGirudaKing": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaKing": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerCallGiruda": "K 미소진 시 조커로 {suit} 호출하여 K 유도",
-  "@stepJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "@stepJokerCallGiruda": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerAfterFriend": "프렌드 합류 후 조커로 점수 획득",
   "stepFriendMightyJoin": "마이티 프렌드 → 초구에서 합류",
   "stepFriendJokerJoin": "조커 프렌드 → 기루다 리드 시 자연 합류",
   "stepLowGirudaFriendLure": "{highCards} 미출현 시 {card}로 마이티({mightyCard}) 유도하면서 기루다 공격",
-  "@stepLowGirudaFriendLure": { "placeholders": { "highCards": { "type": "String" }, "card": { "type": "String" }, "mightyCard": { "type": "String" } } },
+  "@stepLowGirudaFriendLure": {
+    "placeholders": {
+      "highCards": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      },
+      "mightyCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaQReclaim": "{card}로 선 탈환",
-  "@stepGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaQReclaim": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaLeadFriend": "기루다 리드로 {friendCard} 유도",
-  "@stepGirudaLeadFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "@stepGirudaLeadFriend": {
+    "placeholders": {
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerCallFriend": "{friendCard} 미출현 시 조커로 기루다 호출하여 프렌드 유도",
-  "@stepJokerCallFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "@stepJokerCallFriend": {
+    "placeholders": {
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepLureWithGiruda": "그래도 미출현 시 {card}로 프렌드({friendCard}) 유도",
-  "@stepLureWithGiruda": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "@stepLureWithGiruda": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepSuitLeadFriend": "{card}로 리드하여 프렌드({friendCard}) 유도",
-  "@stepSuitLeadFriend": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "@stepSuitLeadFriend": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerCall": "조커로 {suits} 호출하여 점수 카드 확보",
-  "@stepJokerCall": { "placeholders": { "suits": { "type": "String" } } },
+  "@stepJokerCall": {
+    "placeholders": {
+      "suits": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerOptimal": "조커를 최적 타이밍에 사용하여 점수 획득",
   "stepHighCardAttack": "{cards}로 추가 점수 획득",
-  "@stepHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
+  "@stepHighCardAttack": {
+    "placeholders": {
+      "cards": {
+        "type": "String"
+      }
+    }
+  },
   "stepMightyTiming": "마이티를 기루다 소진 후 사용하여 확실한 트릭 확보",
   "stepVoidCut": "{suits} 보이드를 활용하여 기루다 컷으로 점수 획득",
-  "@stepVoidCut": { "placeholders": { "suits": { "type": "String" } } },
+  "@stepVoidCut": {
+    "placeholders": {
+      "suits": {
+        "type": "String"
+      }
+    }
+  },
   "stepEndgameScoring": "간(間)을 통해 최대한 많은 점수 획득 시도",
   "breakdownLowCards": "하위",
   "breakdownGirudaPart": "{suit}{top}({count}장) {tricks}트릭",
-  "@breakdownGirudaPart": { "placeholders": { "suit": {"type": "String"}, "top": {"type": "String"}, "count": {"type": "int"}, "tricks": {"type": "String"} } },
+  "@breakdownGirudaPart": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "top": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownMightyJokerPart": "마이티+조커 {tricks}트릭",
-  "@breakdownMightyJokerPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownMightyJokerPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownMightyPart": "마이티 {tricks}트릭",
-  "@breakdownMightyPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownMightyPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownJokerPart": "조커 {tricks}트릭",
-  "@breakdownJokerPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownJokerPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownAcePart": "{suit}A {tricks}트릭",
-  "@breakdownAcePart": { "placeholders": { "suit": {"type": "String"}, "tricks": {"type": "String"} } },
+  "@breakdownAcePart": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownFriendMightyPart": "프렌드({suit}A) {tricks}트릭",
-  "@breakdownFriendMightyPart": { "placeholders": { "suit": {"type": "String"}, "tricks": {"type": "String"} } },
+  "@breakdownFriendMightyPart": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownFriendJokerPart": "프렌드(조커) {tricks}트릭",
-  "@breakdownFriendJokerPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownFriendJokerPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "suitChangeRecommend": "{suit} +{diff}점 (변경 시 패널티 +2)",
-  "@suitChangeRecommend": { "placeholders": { "suit": {"type": "String"}, "diff": {"type": "int"} } },
+  "@suitChangeRecommend": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "diff": {
+        "type": "int"
+      }
+    }
+  },
   "suitKeepRecommend": "{suit} +{diff}점 (변경 패널티 감안 시 유지 적절)",
-  "@suitKeepRecommend": { "placeholders": { "suit": {"type": "String"}, "diff": {"type": "int"} } }
+  "@suitKeepRecommend": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "diff": {
+        "type": "int"
+      }
+    }
+  },
+  "cardCount": "{count}장",
+  "@cardCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

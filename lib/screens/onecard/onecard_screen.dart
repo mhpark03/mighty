@@ -1670,98 +1670,84 @@ class _OneCardScreenState extends State<OneCardScreen> with TickerProviderStateM
         ],
       ),
       child: card.isJoker
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.star,
-                    color: card.isBlackJoker ? Colors.grey.shade800 : Colors.red,
-                    size: 20 * sizeRatio,
-                  ),
-                  Text(
-                    'JOKER',
-                    style: TextStyle(
-                      color: card.isBlackJoker ? Colors.grey.shade800 : Colors.red,
-                      fontSize: 8 * sizeRatio,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    card.isBlackJoker ? AppLocalizations.of(context)!.blackWhiteJoker : AppLocalizations.of(context)!.colorJoker,
-                    style: TextStyle(
-                      color: card.isBlackJoker ? Colors.grey.shade600 : Colors.red.shade400,
-                      fontSize: 6 * sizeRatio,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+          ? Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8 * sizeRatio),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF7B1FA2), Color(0xFFAB47BC)],
+                ),
               ),
-            )
-          : Stack(
-              children: [
-                // 좌상단
-                Positioned(
-                  left: 4 * sizeRatio,
-                  top: 4 * sizeRatio,
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
+                      Icon(
+                        Icons.auto_awesome,
+                        color: Colors.yellowAccent,
+                        size: 28 * sizeRatio,
+                      ),
+                      const SizedBox(height: 2),
                       Text(
-                        card.rankString,
+                        'JOKER',
+                        softWrap: false,
                         style: TextStyle(
-                          color: card.suitColor,
-                          fontSize: 14 * sizeRatio,
+                          color: Colors.white,
+                          fontSize: 11 * sizeRatio,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                          shadows: const [Shadow(color: Colors.black54, blurRadius: 2)],
                         ),
                       ),
                       Text(
-                        card.suitSymbol,
+                        card.isBlackJoker ? AppLocalizations.of(context)!.blackWhiteJoker : AppLocalizations.of(context)!.colorJoker,
                         style: TextStyle(
-                          color: card.suitColor,
-                          fontSize: 12 * sizeRatio,
+                          color: Colors.white70,
+                          fontSize: 6 * sizeRatio,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                 ),
-                // 중앙
-                Center(
-                  child: Text(
-                    card.suitSymbol,
-                    style: TextStyle(
-                      color: card.suitColor,
-                      fontSize: 28 * sizeRatio,
+              ),
+            )
+          : Padding(
+              padding: EdgeInsets.all(2 * sizeRatio),
+              child: Column(
+                children: [
+                  // 상단 왼쪽: 숫자와 무늬
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      '${card.rankString}\n${card.suitSymbol}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: height * 0.12,
+                        fontWeight: FontWeight.bold,
+                        color: card.suitColor,
+                        height: 1.0,
+                      ),
                     ),
                   ),
-                ),
-                // 우하단 (뒤집힌)
-                Positioned(
-                  right: 4 * sizeRatio,
-                  bottom: 4 * sizeRatio,
-                  child: Transform.rotate(
-                    angle: 3.14159,
-                    child: Column(
-                      children: [
-                        Text(
-                          card.rankString,
-                          style: TextStyle(
-                            color: card.suitColor,
-                            fontSize: 14 * sizeRatio,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  // 중앙: 큰 무늬
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        card.suitSymbol,
+                        style: TextStyle(
+                          color: card.suitColor,
+                          fontSize: height * 0.30,
                         ),
-                        Text(
-                          card.suitSymbol,
-                          style: TextStyle(
-                            color: card.suitColor,
-                            fontSize: 12 * sizeRatio,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
     );
   }

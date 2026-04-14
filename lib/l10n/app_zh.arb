@@ -31,7 +31,7 @@
   "declareFriend": "宣布朋友",
   "friendDeclarationType": "朋友宣布方式:",
   "byCard": "按牌指定",
-  "firstTrickFriend": "首墩朋友",
+  "firstTrickFriend": "首轮朋友",
   "firstTrickFriendDesc": "赢得第一墩的人",
   "nthTrickFriend": "第N墩朋友",
   "noFriend": "无朋友",
@@ -175,179 +175,28 @@
   "multiplierFullRun": "全满贯 ×2",
   "multiplierLabel": "倍数",
   "selectGame": "选择游戏",
-  "sevenCardTitle": "七张扑克",
-  "sevenCardSubtitle": "7张牌扑克游戏",
-  "sevenCardRules": "游戏规则",
-  "sevenCardRulesText": "• 每位玩家获得7张牌\n• 前3张为暗牌，其余4张为明牌\n• 通过下注回合，用最佳5张牌决胜负\n• 牌型最大的玩家获胜",
-  "pot": "底池",
-  "currentBet": "当前下注",
-  "betting": "回合",
-  "chips": "筹码",
-  "bet": "下注",
-  "fold": "弃牌",
-  "call": "跟注",
-  "raise": "加注",
-  "check": "过牌",
-  "allIn": "全押",
-  "folded": "弃牌",
-  "wins": "获胜",
-  "gameEnd": "游戏结束",
-  "hiLoTitle": "高低",
-  "hiLoSubtitle": "高/低分池扑克",
-  "hi": "高",
-  "lo": "低",
-  "swing": "双向",
-  "selectHiLo": "选择高/低",
-  "selectHiLoDesc": "选择高、低或双向",
-  "hiWinner": "高牌赢家",
-  "loWinner": "低牌赢家",
-  "swingSuccess": "双向成功！",
-  "swingFailed": "双向失败",
-  "hiPot": "高牌底池",
-  "loPot": "低牌底池",
-  "noLowHand": "无低牌",
-  "bestLow": "最佳低牌",
-  "waitingForHiLo": "等待选择...",
-  "selectedHi": "已选高",
-  "selectedLo": "已选低",
-  "selectedSwing": "已选双向",
-  "showdownTitle": "声明状况",
-  "showdownDesc": "确认各玩家的选择",
-  "viewResults": "查看结果",
-  "finalResults": "最终结果",
-  "sevenCardGuideOverview": "游戏概述",
-  "sevenCardGuideOverviewText": "七张扑克是5人扑克游戏。用7张牌中的5张组成最好的牌型来获胜。",
-  "sevenCardGuideDealing": "发牌",
-  "sevenCardGuideDealingText": "• 首先收到4张牌（3张暗牌，1张明牌）\n• 每轮下注后收到一张明牌\n• 最终用7张中的5张组成牌型",
-  "sevenCardGuideBetting": "下注规则",
-  "sevenCardGuideBettingText": "• 过牌: 不下注跳过\n• 跟注: 匹配当前下注\n• 加注: 提高下注金额\n• 弃牌: 放弃本局\n• 全押: 下注所有筹码",
-  "sevenCardGuideHands": "牌型排名",
-  "sevenCardGuideHandsText": "1. 皇家同花顺\n2. 反向同花顺\n3. 同花顺\n4. 四条\n5. 葫芦\n6. 同花\n7. 山 (A-K-Q-J-10)\n8. 反向顺子 (A-2-3-4-5)\n9. 顺子\n10. 三条\n11. 两对\n12. 一对\n13. 高牌",
-  "sevenCardGuideTips": "游戏技巧",
-  "sevenCardGuideTipsText": "• 从明牌预测对手的牌型\n• 没有强牌时避免过度下注\n• 虚张声势也是策略",
-  "sevenCardGuideBonus": "奖励牌型",
-  "sevenCardGuideBonusText": "• 皇家同花顺: 500筹码\n• 反向同花顺: 300筹码\n• 同花顺: 200筹码\n• 四条: 100筹码\n\n达成奖励牌型时，从所有其他玩家获得奖励！",
-  "hiLoGuideOverview": "游戏概述",
-  "hiLoGuideOverviewText": "高低是七张扑克的变体，底池分给高牌（最高牌型）和低牌（最低牌型）赢家。",
-  "hiLoGuideDealing": "发牌",
-  "hiLoGuideDealingText": "• 与七张扑克相同的方式进行\n• 用7张牌中的5张组成牌型\n• 最后下注后选择高/低/双向",
-  "hiLoGuideHiLo": "高/低选择",
-  "hiLoGuideHiLoText": "• 高: 用最高牌型竞争\n• 低: 用最低牌型竞争\n• 双向: 同时挑战高和低\n\n底池的50%归高牌赢家，50%归低牌赢家。",
-  "hiLoGuideLow": "低牌规则",
-  "hiLoGuideLowText": "• 只有没有顺子/同花的牌才有资格\n• 越低越好（A最低）\n• 最强低牌: A-2-3-4-6\n• 没有对子的牌更有利",
-  "hiLoGuideSwing": "双向规则",
-  "hiLoGuideSwingText": "• 将7张牌分成两个5张的牌\n• 必须同时赢得高和低才能成功\n• 成功: 赢得整个底池\n• 失败: 该部分归其他赢家",
-  "hiLoGuideTips": "游戏技巧",
-  "hiLoGuideTipsText": "• A-2-3-4这样的低牌对低牌有利\n• 双向有风险但成功则回报丰厚\n• 观察对手的牌制定策略",
-  "hiLoGuideBonus": "奖励牌型",
-  "hiLoGuideBonusText": "• 皇家同花顺: 500筹码\n• 反向同花顺: 300筹码\n• 同花顺: 200筹码\n• 四条: 100筹码\n\n达成奖励牌型时，自动赢得整个底池！",
   "hulaTitle": "胡拉",
   "hulaSubtitle": "4人拉米纸牌游戏",
   "heartsTitle": "红心大战",
   "heartsSubtitle": "4人吃墩游戏",
-  "handRoyalStraightFlush": "皇家同花顺",
-  "handBackStraightFlush": "反向同花顺",
-  "handStraightFlush": "同花顺",
-  "handFourOfAKind": "四条",
-  "handFullHouse": "葫芦",
-  "handFlush": "同花",
-  "handMountain": "山",
-  "handBackStraight": "反向顺子",
-  "handStraight": "顺子",
-  "handTriple": "三条",
-  "handTwoPair": "两对",
-  "handOnePair": "一对",
-  "handHighCard": "高牌",
-  "highCardTop": "{rank}高",
-  "@highCardTop": {
-    "placeholders": {
-      "rank": {"type": "String"}
-    }
-  },
-  "noLow": "无低牌",
-  "betPing": "平",
-  "betCheck": "过牌",
-  "betCall": "跟注",
-  "betDdadang": "加倍",
-  "betQuarter": "四分之一",
-  "betHalf": "一半",
-  "betFull": "全部",
-  "betDie": "弃牌",
-  "selectOpenCard": "选择要公开的牌",
-  "selectOpenCardDesc": "选中的牌将向对手公开",
-  "aiSelectingCard": "AI正在选择牌...",
-  "nthCard": "第{n}张牌",
-  "@nthCard": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
-  "secondsCount": "{n}秒",
-  "@secondsCount": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
-  "totalBetAmount": "总计: {amount}",
-  "@totalBetAmount": {
-    "placeholders": {
-      "amount": {"type": "int"}
-    }
-  },
-  "bettingAmount": "下注: {amount}",
-  "@bettingAmount": {
-    "placeholders": {
-      "amount": {"type": "int"}
-    }
-  },
-  "bonusHand": "奖励牌型！",
-  "bonus": "奖励",
-  "total": "总计",
-  "otherPlayersLose": "其他玩家: 各 -{amount}",
-  "@otherPlayersLose": {
-    "placeholders": {
-      "amount": {"type": "int"}
-    }
-  },
-  "thisGame": "本局",
-  "cumulative": "累计",
-  "foldedSection": "弃牌",
-  "hiLoHi": "高",
-  "hiLoLo": "低",
-  "hiLoSwing": "双向",
-  "roundComplete": "第 {n} 轮完成！",
-  "@roundComplete": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
-  "cardDistribution5": "正在发第5张牌。",
-  "cardDistribution6": "正在发第6张牌。",
-  "cardDistribution7": "正在发最后第7张牌。",
-  "goodLuck": "祝好运！",
-  "cardCount": "{count}张",
-  "@cardCount": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
   "suitSpade": "黑桃",
   "suitDiamond": "方块",
   "suitHeart": "红心",
   "suitClub": "梅花",
-  "noGiruda": "无王牌",
-  "noFriend": "无朋友",
-  "firstTrickFriend": "首轮朋友",
-  "cardOwner": "{card}持有者",
+  "cardOwner": "{card} 持有者",
   "@cardOwner": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
-  "trickWinner": "第{n}轮获胜者",
+  "trickWinner": "第{n}墩赢家",
   "@trickWinner": {
     "placeholders": {
-      "n": {"type": "int"}
+      "n": {
+        "type": "int"
+      }
     }
   },
   "hint": "提示",
@@ -358,14 +207,15 @@
   "jokerLead": "小丑先攻: {suit}",
   "@jokerLead": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "gameSelection": "游戏选择",
   "onecardTitle": "单牌",
   "onecardSubtitle": "4人对战",
   "gameRules": "游戏规则",
-  "confirm": "确认",
   "heartsGuideGoal": "目标",
   "heartsGuideGoalText": "目标是避开红心牌和黑桃皇后，获得最低分数。",
   "heartsGuideHow": "玩法",
@@ -382,14 +232,18 @@
   "passLeftCount": "向左传 ({count}/3)",
   "@passLeftCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "cardPass": "传牌",
   "trickProgress": "轮次 {current}/13",
   "@trickProgress": {
     "placeholders": {
-      "current": {"type": "int"}
+      "current": {
+        "type": "int"
+      }
     }
   },
   "heartBroken": "红心破冰",
@@ -399,26 +253,36 @@
   "playerNameWins": "{name} 获胜",
   "@playerNameWins": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "playerStartsWithClub2": "{name}以梅花2开始",
   "@playerStartsWithClub2": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "playerWonTrick": "{name}赢得本轮！(+{points}分)",
   "@playerWonTrick": {
     "placeholders": {
-      "name": {"type": "String"},
-      "points": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
     }
   },
   "playerShootMoonSuccess": "{name}全收成功！",
   "@playerShootMoonSuccess": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "hintActivated": "提示已激活！",
@@ -432,17 +296,17 @@
   "oneCardCallTimer": "单张 ({seconds}秒)",
   "@oneCardCallTimer": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
-  "selectSuit": "选择花色",
-  "discardedCards": "弃牌堆",
+  "selectSuit": "请选择花色",
+  "discardedCards": "弃牌",
   "meld": "组合",
   "discard": "弃牌",
   "stop": "停止",
   "handCards": "手牌",
-  "score": "分数",
-  "close": "关闭",
   "cannotPlayCard": "不能出这张牌",
   "drawCard": "请抽牌",
   "discardOrMeld": "请弃牌或组合",
@@ -451,40 +315,52 @@
   "thankYouMeldSolo": "谢谢！ {suit}7 单独组合",
   "@thankYouMeldSolo": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "thankYouMeldMyMeld": "谢谢！ 将 {card} 加入我的组合",
   "@thankYouMeldMyMeld": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "thankYouMeldAiMeld": "谢谢！ 将 {card} 加入 {aiName} 的组合",
   "@thankYouMeldAiMeld": {
     "placeholders": {
-      "card": {"type": "String"},
-      "aiName": {"type": "String"}
+      "card": {
+        "type": "String"
+      },
+      "aiName": {
+        "type": "String"
+      }
     }
   },
-  "addedToMeld": "已加入组合",
-  "noMeldToAttach": "没有可加入的组合",
-  "invalidCombination": "无效组合",
+  "addedToMeld": "已添加到组合",
+  "noMeldToAttach": "没有可添加的组合",
+  "invalidCombination": "无效的组合",
   "drawCardFirst": "请先抽牌",
-  "selectCardToDiscard": "选择要弃的牌",
+  "selectCardToDiscard": "请选择要弃的牌",
   "hulaWin": "Hula胜利！ (x2)",
   "continue_": "继续",
   "attackReceived": "受到攻击，抽了{count}张牌",
   "@attackReceived": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "cardDrawn": "抽了牌",
   "bankrupt": "破产！ ({count}张牌)",
   "@bankrupt": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "restart": "重新开始",
@@ -527,19 +403,14 @@
   "hulaGuideScoringText": "• 赢家: 获得与其他玩家手牌差值总和\n• 输家: 扣除与赢家的手牌差值\n• 胡拉(无组合获胜): 双倍得分",
   "hulaGuideStopPenalty": "停止失败惩罚",
   "hulaGuideStopPenaltyText": "喊停止但不是最低分时:\n• 喊停止的人承担赢家应得的全部分数\n• 其他玩家不扣分",
-
   "attackTotalCards": "+{power}! (共{total}张攻击)",
   "skipNextTurnMessage": "J! 跳过下一回合",
   "reverseDirectionMessage": "Q! 反转方向",
   "skipTwoTurnsMessage": "K! 跳过2回合",
   "changeSuitMessage": "7! 更换花色: {suit}",
   "playerPlayedCard": "{name}出了一张牌",
-  "continueGame": "继续",
   "onecardWithPlayers": "单卡 ({count}P)",
-  "restart": "重新开始",
-  "selectSuit": "请选择花色",
   "blackWhiteJoker": "黑白小丑",
-  "colorJoker": "彩色小丑",
   "clockwiseDirection": "顺时针",
   "counterClockwiseDirection": "逆时针",
   "aiTurnCountdown": "{name} ({seconds})",
@@ -547,36 +418,24 @@
   "cannotPlayThisCard": "这张牌无法出",
   "bankruptWithCards": "破产! ({count}张)",
   "gameRulesTitle": "游戏规则",
-  "goal": "目标",
   "goalText": "最先出完所有手牌的玩家获胜。\n出最后一张牌前必须喊\"单卡\"。",
-  "howToPlay": "玩法",
   "howToPlayText": "可以出相同花色或相同数字的牌。\n没有可出的牌时从牌堆抽牌。",
-  "defense": "防御",
   "defenseText": "被攻击时可以用相同的攻击牌防御。\n防御后攻击会累积给下一位玩家。",
-  "specialCards": "特殊牌",
   "gameTips": "游戏提示",
-  "close": "关闭",
-
   "drawCardMessage": "请抽一张牌",
   "discardOrMeldMessage": "请弃牌或组合",
   "noCardsMessage": "没有牌",
-  "thankYouSelectMethod": "选择谢谢方式",
   "thankYouSolo": "谢谢! {suit}7 单独组合",
   "thankYouAddToMine": "谢谢! {card} 添加到我的组合",
   "thankYouAddToAi": "谢谢! {card} 添加到{aiName}的组合",
   "thankYouDesc": "谢谢! {desc}",
-  "addedToMeld": "已添加到组合",
-  "noMeldToAttach": "没有可添加的组合",
-  "invalidCombination": "无效的组合",
   "drawFirstMessage": "请先抽牌",
-  "selectCardToDiscard": "请选择要弃的牌",
   "hulaWinBonus": "胡拉获胜! (x2)",
   "handColumn": "手牌",
   "scoreColumn": "得分",
   "cumulativeColumn": "累计",
   "hulaWithPlayers": "胡拉 ({count}人)",
   "hintOnOff": "提示 {status}",
-  "discardedCards": "弃牌",
   "emptyDiscardPile": "无\n弃牌",
   "meldButton": "组合",
   "discardButton": "弃牌",
@@ -584,62 +443,95 @@
   "thankYouMeld": "谢谢组合",
   "meldTypes": "组合类型",
   "ok": "确定",
-  "stop": "停止",
   "aiThankYouDraw": "{aiName} 谢谢! {card}",
   "@aiThankYouDraw": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "aiDrawsCard": "{aiName}抽牌",
   "@aiDrawsCard": {
     "placeholders": {
-      "aiName": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      }
     }
   },
   "aiRegistersSeven": "{aiName}: 7 {type}登记",
   "@aiRegistersSeven": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "type": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
     }
   },
   "aiRegistersMeld": "{aiName}: {meldType}登记 {cards}",
   "@aiRegistersMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "meldType": {"type": "String"},
-      "cards": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "meldType": {
+        "type": "String"
+      },
+      "cards": {
+        "type": "String"
+      }
     }
   },
   "aiAttachesToMeld": "{aiName}: {card}加入组合",
   "@aiAttachesToMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "aiAttachesToPlayerMeld": "{aiName}: {card}加入玩家组合",
   "@aiAttachesToPlayerMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "aiAttachesToOtherAiMeld": "{aiName}: {card}加入{targetAi}组合",
   "@aiAttachesToOtherAiMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"},
-      "targetAi": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      },
+      "targetAi": {
+        "type": "String"
+      }
     }
   },
   "aiDiscards": "{aiName}: 弃{card}",
   "@aiDiscards": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "group": "组",
@@ -649,13 +541,17 @@
   "drewCardWithCard": "抽到{card}",
   "@drewCardWithCard": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "playerDiscards": "弃{card}",
   "@playerDiscards": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "inPossession": "（已拥有）",
@@ -663,7 +559,9 @@
   "meldCount": "{count}组",
   "@meldCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "cannotPlayFirstTrickDeclarerGiruda": "第一轮庄家不能用王牌先出",
@@ -674,7 +572,9 @@
   "mustFollowSuit": "你必须出{suit}花色",
   "@mustFollowSuit": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "fullDeclarationWarning": "宣布满分后合约将提升至20",
@@ -687,18 +587,32 @@
   "bidExplanation": "{name}: 最佳王牌 {suit}，强度 {strength}",
   "@bidExplanation": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suit": {"type": "String"},
-      "strength": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "suit": {
+        "type": "String"
+      },
+      "strength": {
+        "type": "int"
+      }
     }
   },
   "bidExplanationBid": "{name}: {suit} {tricks} 叫牌 (强度 {strength})",
   "@bidExplanationBid": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suit": {"type": "String"},
-      "tricks": {"type": "int"},
-      "strength": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "suit": {
+        "type": "String"
+      },
+      "tricks": {
+        "type": "int"
+      },
+      "strength": {
+        "type": "int"
+      }
     }
   },
   "passReasonNoSuit": "无王牌候选 (无4张以上花色)",
@@ -706,35 +620,51 @@
   "passReasonWeakHand": "牌力不足 (强度 {strength}，需要 {needed})",
   "@passReasonWeakHand": {
     "placeholders": {
-      "strength": {"type": "int"},
-      "needed": {"type": "int"}
+      "strength": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
     }
   },
   "passReasonPowerWeak": "力量牌不足（Mighty/Joker/A不到5张）",
   "passReasonLowPoints": "适当 {optimal}分 < 最低 13分",
   "@passReasonLowPoints": {
     "placeholders": {
-      "optimal": {"type": "int"}
+      "optimal": {
+        "type": "int"
+      }
     }
   },
   "passReasonOutbid": "适当 {optimal}分 < 需要 {needed}分",
   "@passReasonOutbid": {
     "placeholders": {
-      "optimal": {"type": "int"},
-      "needed": {"type": "int"}
+      "optimal": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
     }
   },
   "estimatedRange": "预计 {min}~{max}分",
   "@estimatedRange": {
     "placeholders": {
-      "min": {"type": "int"},
-      "max": {"type": "int"}
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
     }
   },
   "optimalScore": "适当 {optimal}分",
   "@optimalScore": {
     "placeholders": {
-      "optimal": {"type": "int"}
+      "optimal": {
+        "type": "int"
+      }
     }
   },
   "kittyScoreChange": "预期分数变化",
@@ -746,7 +676,9 @@
   "friendHeldBy": "{name} 持有",
   "@friendHeldBy": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "friendInKitty": "可能在底牌中",
@@ -777,21 +709,27 @@
   "bidSummaryEstMax": "最大 ({points}分)",
   "@bidSummaryEstMax": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "bidSummaryEstMaxDesc": "含朋友，保持先手时",
   "bidSummaryEstMin": "最小 ({points}分)",
   "@bidSummaryEstMin": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "bidSummaryEstMinDesc": "无朋友帮助（Joker Call等）",
   "bidSummaryEstMinDescDynamic": "朋友({friend})仅基本贡献，可能在底牌中",
   "@bidSummaryEstMinDescDynamic": {
     "placeholders": {
-      "friend": {"type": "String"}
+      "friend": {
+        "type": "String"
+      }
     }
   },
   "bidSummaryMultipliers": "庄家 ×2、朋友 ×1、防守 ×(-1)",
@@ -811,86 +749,100 @@
   "bidInfoGirudaKeys": "王牌 {keys}",
   "@bidInfoGirudaKeys": {
     "placeholders": {
-      "keys": {"type": "String"}
+      "keys": {
+        "type": "String"
+      }
     }
   },
   "bidInfoFriend": "朋友: {card}",
   "@bidInfoFriend": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "bidInfoHasBoth": "持有 {card1}·{card2}",
   "@bidInfoHasBoth": {
     "placeholders": {
-      "card1": {"type": "String"},
-      "card2": {"type": "String"}
+      "card1": {
+        "type": "String"
+      },
+      "card2": {
+        "type": "String"
+      }
     }
   },
   "bidInfoHasCard": "持有 {card}",
   "@bidInfoHasCard": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "bidInfoFirstTrickAces": "首墩 {aces}",
   "@bidInfoFirstTrickAces": {
     "placeholders": {
-      "aces": {"type": "String"}
+      "aces": {
+        "type": "String"
+      }
     }
   },
   "jokerOwner": "小丑持有者",
-  "cardOwner": "{card} 持有者",
-  "@cardOwner": {
-    "placeholders": {
-      "card": {"type": "String"}
-    }
-  },
-  "trickWinner": "第{n}墩赢家",
-  "@trickWinner": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
   "friendBadge": "搭档",
   "kittyLabel": "底牌 ",
   "kittyPointsWithFriend": " {points}分 (搭档底牌)",
   "@kittyPointsWithFriend": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "kittyPoints": " {points}分",
   "@kittyPoints": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "friendWithName": "搭档 {name} ",
   "@friendWithName": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adjustedPointsRange": "→ 调整 {min}~{max}分",
   "@adjustedPointsRange": {
     "placeholders": {
-      "min": {"type": "int"},
-      "max": {"type": "int"}
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
     }
   },
   "hasAceNote": " (有A)",
   "strategyFirstTrickAceLead": "首墩: 出{card}确保赢墩",
   "@strategyFirstTrickAceLead": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "strategyFirstTrickPassFriendWin": "首墩: 出短花色低牌让搭档赢墩（搭档获得首墩）",
   "strategyFirstTrickKingLead": "首墩: 出{card}尝试赢墩",
   "@strategyFirstTrickKingLead": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "strategyFirstTrickPassFriend": "首墩: 出短花色低牌将首攻权交给搭档",
@@ -899,16 +851,26 @@
   "strategyPassTrumpToFriend": "出{passCard}将首攻权交给搭档({friendCard}) → 防止{rank}单打",
   "@strategyPassTrumpToFriend": {
     "placeholders": {
-      "passCard": {"type": "String"},
-      "friendCard": {"type": "String"},
-      "rank": {"type": "String"}
+      "passCard": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      },
+      "rank": {
+        "type": "String"
+      }
     }
   },
   "strategyPassSuitToFriend": "出{card}将首攻权交给搭档({friendCard})",
   "@strategyPassSuitToFriend": {
     "placeholders": {
-      "card": {"type": "String"},
-      "friendCard": {"type": "String"}
+      "card": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      }
     }
   },
   "strategySourceFriend": "搭档赢墩后，",
@@ -916,27 +878,39 @@
   "strategyTrumpDominate": "{source}用{cards}压制 → 消耗防守方将牌",
   "@strategyTrumpDominate": {
     "placeholders": {
-      "source": {"type": "String"},
-      "cards": {"type": "String"}
+      "source": {
+        "type": "String"
+      },
+      "cards": {
+        "type": "String"
+      }
     }
   },
   "strategyTrumpExhaust": "{source}用{cards}消耗防守方将牌",
   "@strategyTrumpExhaust": {
     "placeholders": {
-      "source": {"type": "String"},
-      "cards": {"type": "String"}
+      "source": {
+        "type": "String"
+      },
+      "cards": {
+        "type": "String"
+      }
     }
   },
   "strategyTrumpMidDraw": "用{suit}中等将牌逼出防守方高将牌",
   "@strategyTrumpMidDraw": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "strategyJokerCallSuits": "消耗防守方将牌后，对弱花色({suits})叫Joker",
   "@strategyJokerCallSuits": {
     "placeholders": {
-      "suits": {"type": "String"}
+      "suits": {
+        "type": "String"
+      }
     }
   },
   "strategyJokerCallWeak": "消耗防守方将牌后，对弱花色叫Joker",
@@ -945,21 +919,52 @@
   "strategyVoidTrumpCut": "{suits}缺门 → 对手首攻时用将牌切入夺墩",
   "@strategyVoidTrumpCut": {
     "placeholders": {
-      "suits": {"type": "String"}
+      "suits": {
+        "type": "String"
+      }
     }
   },
   "strategyTrumpExhaustCheckK": "出{cards} → 将牌最高攻击，确认K消耗",
-  "@strategyTrumpExhaustCheckK": { "placeholders": { "cards": { "type": "String" } } },
+  "@strategyTrumpExhaustCheckK": {
+    "placeholders": {
+      "cards": {
+        "type": "String"
+      }
+    }
+  },
   "strategyJokerAfterFriend": "朋友合流后出王牌 → 得分",
   "strategyJokerCallGiruda": "K未消耗时王牌: 叫{suit} → 引出K",
-  "@strategyJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "@strategyJokerCallGiruda": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      }
+    }
+  },
   "strategyLowGirudaFriendLure": "出{card} → 让出牌权引诱朋友",
-  "@strategyLowGirudaFriendLure": { "placeholders": { "card": { "type": "String" } } },
+  "@strategyLowGirudaFriendLure": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "strategyGirudaQReclaim": "出{card} → 夺回出牌权",
-  "@strategyGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "@strategyGirudaQReclaim": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "strategyHighCardAttack": "出{cards} → 追加得分攻击",
-  "@strategyHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
-
+  "@strategyHighCardAttack": {
+    "placeholders": {
+      "cards": {
+        "type": "String"
+      }
+    }
+  },
   "trickDetails": "墩详情",
   "trickColumnGainLoss": "得失",
   "trickColumnGiruda": "将牌",
@@ -971,21 +976,93 @@
   "trickEventLastTrickGiruda": "将牌最后一墩",
   "trickEventLastTrickMighty": "Mighty最后一墩",
   "trickEventLastTrickTopByExhaust": "花色消耗 → {card} 最高牌首攻",
-  "@trickEventLastTrickTopByExhaust": { "placeholders": { "card": { "type": "String" } } },
+  "@trickEventLastTrickTopByExhaust": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventGameVictory": "进攻胜利确定",
   "trickEventGameRunVictory": "进攻全胜(Run)大胜确定",
   "trickEventGameDefeat": "进攻败北确定",
   "trickEventSummaryRun": "总评: 全胜Run 大胜",
   "trickEventSummaryBackRun": "总评: 全败BackRun 0/{bid}分 完败",
-  "@trickEventSummaryBackRun": { "placeholders": { "bid": { "type": "int" } } },
+  "@trickEventSummaryBackRun": {
+    "placeholders": {
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryBigWin": "总评: {wins}胜{losses}败 {points}/{bid}分 大胜",
-  "@trickEventSummaryBigWin": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryBigWin": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryWin": "总评: {wins}胜{losses}败 {points}/{bid}分 胜利",
-  "@trickEventSummaryWin": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryWin": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryNarrowLoss": "总评: {wins}胜{losses}败 {points}/{bid}分 惜败",
-  "@trickEventSummaryNarrowLoss": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryNarrowLoss": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryBigLoss": "总评: {wins}胜{losses}败 {points}/{bid}分 大败",
-  "@trickEventSummaryBigLoss": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryBigLoss": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "summaryJokerCounter": "小丑反击",
   "summaryJokerUse": "小丑发挥",
   "summaryWasteExploit": "弃牌攻略成功",
@@ -1005,7 +1082,16 @@
   "summaryNineWinFirstTrickCut": "总评 : 9墩善战 / 首墩将牌截断(低概率)差一墩横扫",
   "summaryDefenseJokerGirudaCounter": "防守小丑攻势 → 将牌反击",
   "summaryNarrative": "总评 : {events} → {result}",
-  "@summaryNarrative": { "placeholders": { "events": { "type": "String" }, "result": { "type": "String" } } },
+  "@summaryNarrative": {
+    "placeholders": {
+      "events": {
+        "type": "String"
+      },
+      "result": {
+        "type": "String"
+      }
+    }
+  },
   "summaryResultBigWin": "攻方大胜",
   "summaryResultMinGoal": "最低目标达成",
   "summaryResultWin": "攻方成功",
@@ -1013,7 +1099,25 @@
   "summaryResultBigLoss": "守方大胜",
   "summaryAnd": "与",
   "summaryFallback": "总评 : {wins}胜{losses}负 → {points}/{bid}分 {result}",
-  "@summaryFallback": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" }, "result": { "type": "String" } } },
+  "@summaryFallback": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      },
+      "result": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventLastCardDefenseWin": "守方高牌防御",
   "trickEventLastDefenseTopProtectFail": "守方最高牌保护防御但防守失败",
   "trickEventLastCardAttackWin": "攻方得分获取",
@@ -1021,7 +1125,9 @@
   "trickEventJokerLeadSuit": "Joker首攻 ({suit})",
   "@trickEventJokerLeadSuit": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "trickEventJokerGirudaExhaust": "诱导守方消耗将牌",
@@ -1030,11 +1136,23 @@
   "trickEventTopGirudaLeadOpponentExhausted": "对方无将牌 → 出非将牌攻略，将牌留作切入用",
   "trickEventMidGirudaMightyBait": "中位将牌诱导Mighty",
   "trickEventMidGirudaMightyBaitForTop": "为{topCard}最高位确保用低位将牌诱导Mighty",
-  "@trickEventMidGirudaMightyBaitForTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventMidGirudaMightyBaitForTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventMidGirudaPassLead": "中位将牌让先",
   "trickEventFriendAttackDeclarerReOvertake": "朋友进攻 → 防守逆转尝试 → 庄家再逆转（幸运）",
   "trickEventGirudaDepletionFail": "{card} 清除失败",
-  "@trickEventGirudaDepletionFail": { "placeholders": { "card": { "type": "String" } } },
+  "@trickEventGirudaDepletionFail": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventDefenderGirudaWin": "守方将牌胜",
   "trickEventMidGirudaLead": "中位将牌首攻",
   "trickEventMidGirudaExhaust": "将牌消耗诱导",
@@ -1049,7 +1167,13 @@
   "trickEventDefenseTopDeclarerCutTeamDefense": "守方最高首攻 → 庄家将牌切 → 守方团队将牌防御",
   "trickEventDefenseLeadAttackCut": "守方非将牌最高出牌 → 进攻将牌切入夺先",
   "trickEventDefenseTopAttackCutPointsFailed": "守方最高首攻 → 庄家将牌切 {count}分防御失败",
-  "@trickEventDefenseTopAttackCutPointsFailed": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventDefenseTopAttackCutPointsFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventAttackLeadDefenseCut": "进攻非将牌最高出牌 → 守方将牌切入",
   "trickEventTopNonGirudaLeadDefended": "非将牌出牌 → 守方高牌防御",
   "trickEventFirstTrickTopAttack": "首墩 非将牌最高出牌",
@@ -1060,7 +1184,13 @@
   "trickEventFirstTrickWaste": "首墩缺牌 / 弃牌",
   "trickEventAttackFailed": "攻击失败 → 败于守方高牌",
   "trickEventAttackFailedWithTop": "攻击 ({topCard} 最高) 失败 → 败于守方",
-  "@trickEventAttackFailedWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventAttackFailedWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventWaste": "弃牌让先手",
   "trickEventWasteAttackFailed": "弃牌攻击失败",
   "trickEventPreExchange": "先手交换 (保留王牌)",
@@ -1068,33 +1198,81 @@
   "trickEventFriendPassLeadFailed": "传递先手失败",
   "trickEventDefenseLead": "防守先攻",
   "trickEventWasteWithTop": "弃牌 ({topCard} 最高)",
-  "@trickEventWasteWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventWasteWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventWasteDeclarerReclaim": "弃牌 → 庄家夺回先手",
   "trickEventWasteDeclarerReclaimWithTop": "弃牌 ({topCard} 最高) → 庄家夺回先手",
-  "@trickEventWasteDeclarerReclaimWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventWasteDeclarerReclaimWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventFriendWasteDeclarerCutDefenseOvercut": "朋友垫牌 → 庄家将牌切 → 守方高将牌逆转",
   "trickEventFriendWasteDeclarerCutDefenseOvercutPoints": "朋友垫牌 → 庄家将牌切 → 守方高将牌逆转 防御{count}分",
-  "@trickEventFriendWasteDeclarerCutDefenseOvercutPoints": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventFriendWasteDeclarerCutDefenseOvercutPoints": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventFriendWasteDeclarerHighDefenseReversal": "盟友垫牌 → 庄家高牌 → 防守逆转",
   "trickEventDefenseWasteAttackReverseDefenseCut": "防守垫牌 → 进攻逆转 → 防守切牌再逆转",
   "trickEventFriendLeadDefenseBeatDeclarerCut": "朋友先攻 → 守方逆转 → 庄家将牌再逆转",
   "trickEventDeclarerFriendLure": "朋友诱导",
   "trickEventDeclarerFriendLureFailed": "朋友诱导失败",
   "trickEventFriendLureGirudaExhaust": "守方将牌{card}消耗成功",
-  "@trickEventFriendLureGirudaExhaust": { "placeholders": { "card": { "type": "String" } } },
+  "@trickEventFriendLureGirudaExhaust": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventWasteFriendRescue": "弃牌 → 朋友救场!",
   "trickEventWasteFriendRescueWithTop": "弃牌 ({topCard} 最高) → 朋友救场!",
-  "@trickEventWasteFriendRescueWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventWasteFriendRescueWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventFriendMightyReclaim": "弃牌 → 朋友用至尊夺回先手",
   "trickEventFriendMightyReclaimWithTop": "弃牌 ({topCard} 最高) → 朋友用至尊夺回先手",
-  "@trickEventFriendMightyReclaimWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventFriendMightyReclaimWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventAttackGirudaCut": "攻方将牌切入",
   "trickEventAttackGirudaCutCount": "攻方将牌切入 {count}次",
-  "@trickEventAttackGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventAttackGirudaCutCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSameTeamGirudaCut": "同队将牌切入（不可避免）",
   "trickEventDefenseGirudaCut": "守方将牌切入",
   "trickEventDefenseGirudaCutCount": "守方将牌切入 {count}次",
-  "@trickEventDefenseGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventDefenseGirudaCutCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventDefenseCutAttackOvercut": "守方首次切入 → 攻方高阶将牌反切",
   "trickEventAttackCutDefenseOvercut": "攻方首次切入 → 守方高阶将牌防御",
   "trickEventAttackNoGirudaDefenseHas": "进攻方将牌耗尽 / 仅守方持有将牌",
@@ -1111,11 +1289,19 @@
   "trickEventDefenseMightySuitBaitSuccess": "Mighty花色出牌 / Mighty诱导成功",
   "trickEventDefenseMightySuitBaitFailed": "Mighty花色出牌 / Mighty诱导失败 (攻击方夺回先手)",
   "trickEventDefenseMightyExhaustPoints": "防守逼出Mighty，流失{count}分",
-  "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventDefenseMightyExhaustPoints": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventJokerAfterFriend": "朋友合流后王牌 ({suit}) → 得分",
   "@trickEventJokerAfterFriend": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "trickEventJokerAfterFriendGeneral": "朋友合流后王牌 → 得分",
@@ -1126,13 +1312,17 @@
   "trickResultAttack": "→ 攻方 +{count}",
   "@trickResultAttack": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "trickResultDefense": "→ 守方 +{count}",
   "@trickResultDefense": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "trickResultNoScore": "→ 无得分",
@@ -1142,92 +1332,309 @@
   "trickEventFriendTopCardWin": "朋友最高牌胜利",
   "trickEventFriendGirudaKDeclarerA": "朋友王牌K胜利，庄家持有A，攻击队王牌掌控",
   "trickEventFriendTrickContribution": "朋友助攻{count}墩攻击成功",
-  "@trickEventFriendTrickContribution": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventFriendTrickContribution": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventJokerSkipNoPoints": "{name}: Joker保有，无得分墩跳过",
-  "@trickEventJokerSkipNoPoints": { "placeholders": { "name": { "type": "String" } } },
+  "@trickEventJokerSkipNoPoints": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventGirudaAceHeldMightyGuard": "{name}: 王牌A保有，警惕Mighty未使用",
-  "@trickEventGirudaAceHeldMightyGuard": { "placeholders": { "name": { "type": "String" } } },
+  "@trickEventGirudaAceHeldMightyGuard": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventGirudaAceHeld": "{name}: 王牌A保有，未使用",
-  "@trickEventGirudaAceHeld": { "placeholders": { "name": { "type": "String" } } },
-
+  "@trickEventGirudaAceHeld": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "adviceFirstTrickLowLead": "💡 首墩应用A或至尊确保先手",
   "adviceLowLeadPointLoss": "💡 用无法获胜的牌先攻会导致失分",
   "adviceAceBeatenByJoker": "💡 防守小丑未出时先攻A有被小丑夺取的风险",
   "advicePointCardToDefense": "💡 防守获胜的回合不要出分数牌(A·K·10)",
   "adviceMightyHighPointLoss": "💡 至尊出现时分数牌同时被拿走会造成巨大损失",
-
   "kittyTipTitle": "💡 底牌交换技巧",
   "kittyTipCreateVoid": "清空某花色后可以用王牌切入赢得回合",
   "kittyTipKeepGiruda": "尽量保留王牌(主花色)卡牌",
   "kittyTipKeepTopCards": "保留拥有最大牌(如A)的花色",
   "kittyTipDiscardLowSingles": "优先丢弃张数少的花色的低牌",
   "kittyTipKeepMightySuitK": "没有至尊时保留至尊花色K——它能击败至尊",
-
   "friendTipTitle": "💡 朋友宣言技巧",
   "friendTipMighty": "至尊朋友：让最强的牌成为你的盟友",
   "friendTipJoker": "小丑朋友：让第二强的牌成为你的盟友",
   "friendTipNoFriend": "同时拥有至尊和小丑时可以考虑无朋友",
   "friendTipWhoIsFriend": "持有所宣言卡牌的玩家将成为你的盟友",
-
   "estimatedMinWins": "→ 预计{count}胜以上",
-  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
+  "@estimatedMinWins": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "stepFirstAce": "用{card}保持首墩先手",
-  "@stepFirstAce": { "placeholders": { "card": { "type": "String" } } },
+  "@stepFirstAce": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepFirstKing": "用{card}保持首墩先手（至尊花色最高）",
-  "@stepFirstKing": { "placeholders": { "card": { "type": "String" } } },
+  "@stepFirstKing": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepFirstMighty": "用至尊确保首墩先手",
   "stepFirstJoker": "用王牌确保首墩先手",
   "stepJokerCallExhaust": "首墩成功后用{card}叫王牌 → 消耗小丑",
-  "@stepJokerCallExhaust": { "placeholders": { "card": { "type": "String" } } },
+  "@stepJokerCallExhaust": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaAce": "用{card}进行将牌攻击",
-  "@stepGirudaAce": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaAce": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaAceCheckK": "用{card}进行将牌攻击（确认K消耗）",
-  "@stepGirudaAceCheckK": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaAceCheckK": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaKing": "用{card}追加将牌攻击",
-  "@stepGirudaKing": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaKing": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerCallGiruda": "K未消耗时，用王牌叫{suit}引出K",
-  "@stepJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "@stepJokerCallGiruda": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerAfterFriend": "朋友合流后用王牌得分",
   "stepFriendMightyJoin": "至尊朋友 → 首墩合流",
   "stepFriendJokerJoin": "王牌朋友 → 将牌引领时自然合流",
   "stepLowGirudaFriendLure": "{highCards}未出现时，用{card}引诱至尊({mightyCard})同时进行将牌攻击",
-  "@stepLowGirudaFriendLure": { "placeholders": { "highCards": { "type": "String" }, "card": { "type": "String" }, "mightyCard": { "type": "String" } } },
+  "@stepLowGirudaFriendLure": {
+    "placeholders": {
+      "highCards": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      },
+      "mightyCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaQReclaim": "用{card}夺回出牌权",
-  "@stepGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaQReclaim": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaLeadFriend": "将牌引领引出{friendCard}",
-  "@stepGirudaLeadFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "@stepGirudaLeadFriend": {
+    "placeholders": {
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerCallFriend": "{friendCard}未出现时，用王牌叫将牌引诱朋友",
-  "@stepJokerCallFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "@stepJokerCallFriend": {
+    "placeholders": {
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepLureWithGiruda": "仍未出现时，用{card}引诱朋友({friendCard})",
-  "@stepLureWithGiruda": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "@stepLureWithGiruda": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepSuitLeadFriend": "用{card}引领引诱朋友({friendCard})",
-  "@stepSuitLeadFriend": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "@stepSuitLeadFriend": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerCall": "用王牌叫{suits}确保得分牌",
-  "@stepJokerCall": { "placeholders": { "suits": { "type": "String" } } },
+  "@stepJokerCall": {
+    "placeholders": {
+      "suits": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerOptimal": "在最佳时机使用王牌获得分数",
   "stepHighCardAttack": "用{cards}获得额外分数",
-  "@stepHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
+  "@stepHighCardAttack": {
+    "placeholders": {
+      "cards": {
+        "type": "String"
+      }
+    }
+  },
   "stepMightyTiming": "将牌消耗后使用至尊确保赢墩",
   "stepVoidCut": "利用{suits}缺门进行将牌切入得分",
-  "@stepVoidCut": { "placeholders": { "suits": { "type": "String" } } },
+  "@stepVoidCut": {
+    "placeholders": {
+      "suits": {
+        "type": "String"
+      }
+    }
+  },
   "stepEndgameScoring": "通过间（カン）尽量获得更多分数",
   "breakdownLowCards": "低牌",
   "breakdownGirudaPart": "{suit}{top}({count}张) {tricks}墩",
-  "@breakdownGirudaPart": { "placeholders": { "suit": {"type": "String"}, "top": {"type": "String"}, "count": {"type": "int"}, "tricks": {"type": "String"} } },
+  "@breakdownGirudaPart": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "top": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownMightyJokerPart": "王牌+小丑 {tricks}墩",
-  "@breakdownMightyJokerPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownMightyJokerPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownMightyPart": "王牌 {tricks}墩",
-  "@breakdownMightyPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownMightyPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownJokerPart": "小丑 {tricks}墩",
-  "@breakdownJokerPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownJokerPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownAcePart": "{suit}A {tricks}墩",
-  "@breakdownAcePart": { "placeholders": { "suit": {"type": "String"}, "tricks": {"type": "String"} } },
+  "@breakdownAcePart": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownFriendMightyPart": "盟友({suit}A) {tricks}墩",
-  "@breakdownFriendMightyPart": { "placeholders": { "suit": {"type": "String"}, "tricks": {"type": "String"} } },
+  "@breakdownFriendMightyPart": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownFriendJokerPart": "盟友(小丑) {tricks}墩",
-  "@breakdownFriendJokerPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownFriendJokerPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "suitChangeRecommend": "{suit} +{diff}分 (变更罚分 +2)",
-  "@suitChangeRecommend": { "placeholders": { "suit": {"type": "String"}, "diff": {"type": "int"} } },
+  "@suitChangeRecommend": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "diff": {
+        "type": "int"
+      }
+    }
+  },
   "suitKeepRecommend": "{suit} +{diff}分 (考虑罚分后维持更合适)",
-  "@suitKeepRecommend": { "placeholders": { "suit": {"type": "String"}, "diff": {"type": "int"} } }
+  "@suitKeepRecommend": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "diff": {
+        "type": "int"
+      }
+    }
+  },
+  "cardCount": "{count}张",
+  "@cardCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

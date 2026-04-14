@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -8,10 +10,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'services/game_controller.dart';
 import 'services/stats_service.dart';
-import 'services/seven_card/seven_card_controller.dart';
-import 'services/seven_card/seven_card_stats_service.dart';
-import 'services/hi_lo/hi_lo_controller.dart';
-import 'services/hi_lo/hi_lo_stats_service.dart';
 import 'services/hula/hula_stats_service.dart';
 import 'services/onecard/onecard_stats_service.dart';
 import 'services/hearts/hearts_stats_service.dart';
@@ -28,11 +26,15 @@ void main() async {
     overlays: [],
   );
 
-  // Firebase 초기화
-  await Firebase.initializeApp();
+  // Firebase 초기화 (모바일/웹만)
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    await Firebase.initializeApp();
+  }
 
-  // AdMob 초기화 (비동기 — 앱 시작을 차단하지 않음)
-  _initAds();
+  // AdMob 초기화 (모바일만)
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    _initAds();
+  }
 
   runApp(const MightyApp());
 }
@@ -54,14 +56,10 @@ class MightyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => StatsService()..loadStats()),
-        ChangeNotifierProvider(create: (context) => SevenCardStatsService()..loadStats()),
-        ChangeNotifierProvider(create: (context) => HiLoStatsService()..loadStats()),
         ChangeNotifierProvider(create: (context) => HulaStatsService()..loadStats()),
         ChangeNotifierProvider(create: (context) => OneCardStatsService()..loadStats()),
         ChangeNotifierProvider(create: (context) => HeartsStatsService()..loadStats()),
         ChangeNotifierProvider(create: (context) => GameController()),
-        ChangeNotifierProvider(create: (context) => SevenCardController()),
-        ChangeNotifierProvider(create: (context) => HiLoController()),
       ],
       child: MaterialApp(
         title: 'Mighty',

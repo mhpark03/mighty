@@ -13,7 +13,7 @@
   "pass": "Pass",
   "tricks": "Target Score",
   "giruda": "Trump",
-  "noGiruda": "No Trump",
+  "noGiruda": "No Giruda",
   "spade": "Spade",
   "diamond": "Diamond",
   "heart": "Heart",
@@ -27,7 +27,7 @@
   "receivedKitty": "Received Cards:",
   "myCards": "My Cards:",
   "changeGiruda": "Change Trump (Optional):",
-  "confirm": "Confirm",
+  "confirm": "OK",
   "declareFriend": "Declare Friend",
   "friendDeclarationType": "Friend Declaration Type:",
   "byCard": "By Card",
@@ -127,7 +127,6 @@
   "loss": "L",
   "resetStats": "Reset",
   "resetStatsConfirm": "Watch an ad to reset all statistics.\nContinue?",
-  "startGame": "Start Game",
   "exitApp": "Exit App",
   "exitAppConfirm": "Exit the app?",
   "gameGuide": "How to Play",
@@ -176,179 +175,28 @@
   "multiplierFullRun": "Full Run ×2",
   "multiplierLabel": "Multiplier",
   "selectGame": "Select Game",
-  "sevenCardTitle": "Seven Poker",
-  "sevenCardSubtitle": "7-Card Poker Game",
-  "sevenCardRules": "Game Rules",
-  "sevenCardRulesText": "• Each player receives 7 cards\n• First 3 cards are hidden, remaining 4 are shown\n• Betting rounds determine the winner with best 5 cards\n• Player with the highest hand wins",
-  "pot": "Pot",
-  "currentBet": "Current Bet",
-  "betting": "Round",
-  "chips": "Chips",
-  "bet": "Bet",
-  "fold": "Die",
-  "call": "Call",
-  "raise": "Raise",
-  "check": "Check",
-  "allIn": "All In",
-  "folded": "Die",
-  "wins": "Wins",
-  "gameEnd": "Game End",
-  "hiLoTitle": "Hi-Lo",
-  "hiLoSubtitle": "Hi/Lo Split Poker",
-  "hi": "Hi",
-  "lo": "Lo",
-  "swing": "Swing",
-  "selectHiLo": "Select Hi/Lo",
-  "selectHiLoDesc": "Choose Hi, Lo, or Swing",
-  "hiWinner": "Hi Winner",
-  "loWinner": "Lo Winner",
-  "swingSuccess": "Swing Success!",
-  "swingFailed": "Swing Failed",
-  "hiPot": "Hi Pot",
-  "loPot": "Lo Pot",
-  "noLowHand": "No Low",
-  "bestLow": "Best Low",
-  "waitingForHiLo": "Waiting for selection...",
-  "selectedHi": "Selected Hi",
-  "selectedLo": "Selected Lo",
-  "selectedSwing": "Selected Swing",
-  "showdownTitle": "Declaration Status",
-  "showdownDesc": "Check each player's choice",
-  "viewResults": "View Results",
-  "finalResults": "Final Results",
-  "sevenCardGuideOverview": "Game Overview",
-  "sevenCardGuideOverviewText": "Seven Card Poker is a poker game for 5 players. Create the best hand using 5 of your 7 cards to win.",
-  "sevenCardGuideDealing": "Card Dealing",
-  "sevenCardGuideDealingText": "• Initially receive 4 cards (3 hidden, 1 open)\n• Receive one open card after each betting round\n• Make a hand with 5 of your final 7 cards",
-  "sevenCardGuideBetting": "Betting Rules",
-  "sevenCardGuideBettingText": "• Check: Pass without betting\n• Call: Match current bet\n• Raise: Increase bet amount\n• Fold: Give up the hand\n• All In: Bet all chips",
-  "sevenCardGuideHands": "Hand Rankings",
-  "sevenCardGuideHandsText": "1. Royal Straight Flush\n2. Back Straight Flush\n3. Straight Flush\n4. Four of a Kind\n5. Full House\n6. Flush\n7. Mountain (A-K-Q-J-10)\n8. Back Straight (A-2-3-4-5)\n9. Straight\n10. Three of a Kind\n11. Two Pair\n12. One Pair\n13. High Card",
-  "sevenCardGuideTips": "Game Tips",
-  "sevenCardGuideTipsText": "• Predict opponent hands from open cards\n• Avoid excessive betting without strong hands\n• Bluffing is also a strategy",
-  "sevenCardGuideBonus": "Bonus Hands",
-  "sevenCardGuideBonusText": "• Royal Straight Flush: 500 chips\n• Back Straight Flush: 300 chips\n• Straight Flush: 200 chips\n• Four of a Kind: 100 chips\n\nBonus hands earn bonus from all other players!",
-  "hiLoGuideOverview": "Game Overview",
-  "hiLoGuideOverviewText": "Hi-Lo is a variation of Seven Card Poker where the pot is split between the highest and lowest hand.",
-  "hiLoGuideDealing": "Card Dealing",
-  "hiLoGuideDealingText": "• Same dealing as Seven Card Poker\n• Make a hand with 5 of your 7 cards\n• Choose Hi/Lo/Swing after final betting",
-  "hiLoGuideHiLo": "Hi/Lo Selection",
-  "hiLoGuideHiLoText": "• Hi: Compete with highest hand\n• Lo: Compete with lowest hand\n• Swing: Challenge both Hi and Lo\n\n50% of pot goes to Hi winner, 50% to Lo winner.",
-  "hiLoGuideLow": "Low Hand Rules",
-  "hiLoGuideLowText": "• Only hands without straights/flushes qualify\n• Lower is better (A is lowest)\n• Best low: A-2-3-4-6\n• No pair hands are advantageous",
-  "hiLoGuideSwing": "Swing Rules",
-  "hiLoGuideSwingText": "• Split 7 cards into two 5-card hands\n• Must win both Hi and Lo to succeed\n• Success: Win entire pot\n• Failure: That portion goes to other winner",
-  "hiLoGuideTips": "Game Tips",
-  "hiLoGuideTipsText": "• Low cards like A-2-3-4 favor Lo\n• Swing is risky but rewarding if successful\n• Observe opponent cards for strategy",
-  "hiLoGuideBonus": "Bonus Hands",
-  "hiLoGuideBonusText": "• Royal Straight Flush: 500 chips\n• Back Straight Flush: 300 chips\n• Straight Flush: 200 chips\n• Four of a Kind: 100 chips\n\nBonus hands automatically win the entire pot!",
   "hulaTitle": "Hula",
   "hulaSubtitle": "4-Player Rummy Card Game",
   "heartsTitle": "Hearts",
   "heartsSubtitle": "4-Player Trick-Taking Game",
-  "handRoyalStraightFlush": "Royal Straight Flush",
-  "handBackStraightFlush": "Back Straight Flush",
-  "handStraightFlush": "Straight Flush",
-  "handFourOfAKind": "Four of a Kind",
-  "handFullHouse": "Full House",
-  "handFlush": "Flush",
-  "handMountain": "Mountain",
-  "handBackStraight": "Back Straight",
-  "handStraight": "Straight",
-  "handTriple": "Three of a Kind",
-  "handTwoPair": "Two Pair",
-  "handOnePair": "One Pair",
-  "handHighCard": "High Card",
-  "highCardTop": "{rank} High",
-  "@highCardTop": {
-    "placeholders": {
-      "rank": {"type": "String"}
-    }
-  },
-  "noLow": "No Low",
-  "betPing": "Ping",
-  "betCheck": "Check",
-  "betCall": "Call",
-  "betDdadang": "Double",
-  "betQuarter": "Quarter",
-  "betHalf": "Half",
-  "betFull": "Full",
-  "betDie": "Fold",
-  "selectOpenCard": "Select a card to reveal",
-  "selectOpenCardDesc": "The selected card will be shown to opponents",
-  "aiSelectingCard": "AI is selecting a card...",
-  "nthCard": "Card #{n}",
-  "@nthCard": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
-  "secondsCount": "{n}s",
-  "@secondsCount": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
-  "totalBetAmount": "Total: {amount}",
-  "@totalBetAmount": {
-    "placeholders": {
-      "amount": {"type": "int"}
-    }
-  },
-  "bettingAmount": "Bet: {amount}",
-  "@bettingAmount": {
-    "placeholders": {
-      "amount": {"type": "int"}
-    }
-  },
-  "bonusHand": "Bonus Hand!",
-  "bonus": "Bonus",
-  "total": "Total",
-  "otherPlayersLose": "Other players: -{amount} each",
-  "@otherPlayersLose": {
-    "placeholders": {
-      "amount": {"type": "int"}
-    }
-  },
-  "thisGame": "This Game",
-  "cumulative": "Total",
-  "foldedSection": "Folded",
-  "hiLoHi": "Hi",
-  "hiLoLo": "Lo",
-  "hiLoSwing": "Swing",
-  "roundComplete": "Round {n} Complete!",
-  "@roundComplete": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
-  "cardDistribution5": "The 5th card is being dealt.",
-  "cardDistribution6": "The 6th card is being dealt.",
-  "cardDistribution7": "The final 7th card is being dealt.",
-  "goodLuck": "GOOD LUCK!",
-  "cardCount": "{count} cards",
-  "@cardCount": {
-    "placeholders": {
-      "count": {"type": "int"}
-    }
-  },
   "suitSpade": "Spade",
   "suitDiamond": "Diamond",
   "suitHeart": "Heart",
   "suitClub": "Club",
-  "noGiruda": "No Giruda",
-  "noFriend": "No Friend",
-  "firstTrickFriend": "First Trick Friend",
   "cardOwner": "{card} Owner",
   "@cardOwner": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "trickWinner": "Trick {n} Winner",
   "@trickWinner": {
     "placeholders": {
-      "n": {"type": "int"}
+      "n": {
+        "type": "int"
+      }
     }
   },
   "hint": "Hint",
@@ -359,14 +207,15 @@
   "jokerLead": "Joker lead: {suit}",
   "@jokerLead": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "gameSelection": "Game Selection",
   "onecardTitle": "One Card",
   "onecardSubtitle": "4-Player Game",
   "gameRules": "Game Rules",
-  "confirm": "OK",
   "heartsGuideGoal": "Goal",
   "heartsGuideGoalText": "The goal is to get the lowest score by avoiding heart cards and the Queen of Spades.",
   "heartsGuideHow": "How to Play",
@@ -383,14 +232,18 @@
   "passLeftCount": "Pass left ({count}/3)",
   "@passLeftCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "cardPass": "Card Pass",
   "trickProgress": "Trick {current}/13",
   "@trickProgress": {
     "placeholders": {
-      "current": {"type": "int"}
+      "current": {
+        "type": "int"
+      }
     }
   },
   "heartBroken": "Heart Breaking",
@@ -400,26 +253,36 @@
   "playerNameWins": "{name} wins",
   "@playerNameWins": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "playerStartsWithClub2": "{name} starts with Club 2",
   "@playerStartsWithClub2": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "playerWonTrick": "{name} won the trick! (+{points} points)",
   "@playerWonTrick": {
     "placeholders": {
-      "name": {"type": "String"},
-      "points": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
     }
   },
   "playerShootMoonSuccess": "{name} shot the moon!",
   "@playerShootMoonSuccess": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "hintActivated": "Hint activated!",
@@ -433,17 +296,17 @@
   "oneCardCallTimer": "One Card ({seconds}s)",
   "@oneCardCallTimer": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "selectSuit": "Select a suit",
-  "discardedCards": "Discarded",
+  "discardedCards": "Discarded cards",
   "meld": "Meld",
   "discard": "Discard",
   "stop": "Stop",
   "handCards": "Hand",
-  "score": "Score",
-  "close": "Close",
   "cannotPlayCard": "Cannot play this card",
   "drawCard": "Draw a card",
   "discardOrMeld": "Discard or meld a card",
@@ -452,20 +315,28 @@
   "thankYouMeldSolo": "Thank You! Meld {suit}7 solo",
   "@thankYouMeldSolo": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "thankYouMeldMyMeld": "Thank You! Add {card} to my meld",
   "@thankYouMeldMyMeld": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "thankYouMeldAiMeld": "Thank You! Add {card} to {aiName}'s meld",
   "@thankYouMeldAiMeld": {
     "placeholders": {
-      "card": {"type": "String"},
-      "aiName": {"type": "String"}
+      "card": {
+        "type": "String"
+      },
+      "aiName": {
+        "type": "String"
+      }
     }
   },
   "addedToMeld": "Added to meld",
@@ -478,14 +349,18 @@
   "attackReceived": "Received {count} cards from attack",
   "@attackReceived": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "cardDrawn": "Card drawn",
   "bankrupt": "Bankrupt! ({count} cards)",
   "@bankrupt": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "restart": "Restart",
@@ -528,19 +403,14 @@
   "hulaGuideScoringText": "• Winner: Gets sum of point differences from other players\n• Loser: Loses points based on difference with winner\n• Hula (win without melding): Double points",
   "hulaGuideStopPenalty": "Stop Failure Penalty",
   "hulaGuideStopPenaltyText": "If you call Stop but don't have the lowest score:\n• The stopper pays all points the winner would receive\n• Other players lose no points",
-
   "attackTotalCards": "+{power}! ({total} cards attack)",
   "skipNextTurnMessage": "J! Skip next turn",
   "reverseDirectionMessage": "Q! Reverse direction",
   "skipTwoTurnsMessage": "K! Skip 2 turns",
   "changeSuitMessage": "7! Change suit: {suit}",
   "playerPlayedCard": "{name} played a card",
-  "continueGame": "Continue",
   "onecardWithPlayers": "One Card ({count}P)",
-  "restart": "Restart",
-  "selectSuit": "Select a suit",
   "blackWhiteJoker": "B&W Joker",
-  "colorJoker": "Color Joker",
   "clockwiseDirection": "Clockwise",
   "counterClockwiseDirection": "Counter-clockwise",
   "aiTurnCountdown": "{name} ({seconds})",
@@ -548,36 +418,24 @@
   "cannotPlayThisCard": "This card cannot be played",
   "bankruptWithCards": "Bankrupt! ({count} cards)",
   "gameRulesTitle": "Game Rules",
-  "goal": "Goal",
   "goalText": "Be the first to play all your cards.\nYou must call \"One Card\" before playing your last card.",
-  "howToPlay": "How to Play",
   "howToPlayText": "Play a card with the same suit or number.\nIf you can't play, draw from the deck.",
-  "defense": "Defense",
   "defenseText": "When attacked, defend with the same attack card.\nDefending stacks the attack to the next player.",
-  "specialCards": "Special Cards",
   "gameTips": "Game Tips",
-  "close": "Close",
-
   "drawCardMessage": "Draw a card",
   "discardOrMeldMessage": "Discard or meld a card",
   "noCardsMessage": "No cards",
-  "thankYouSelectMethod": "Select Thank You method",
   "thankYouSolo": "Thank You! {suit}7 solo meld",
   "thankYouAddToMine": "Thank You! Add {card} to my meld",
   "thankYouAddToAi": "Thank You! Add {card} to {aiName}'s meld",
   "thankYouDesc": "Thank You! {desc}",
-  "addedToMeld": "Added to meld",
-  "noMeldToAttach": "No meld to attach",
-  "invalidCombination": "Invalid combination",
   "drawFirstMessage": "Draw a card first",
-  "selectCardToDiscard": "Select a card to discard",
   "hulaWinBonus": "Hula win! (x2)",
   "handColumn": "Hand",
   "scoreColumn": "Score",
   "cumulativeColumn": "Total",
   "hulaWithPlayers": "Hula ({count}P)",
   "hintOnOff": "Hint {status}",
-  "discardedCards": "Discarded cards",
   "emptyDiscardPile": "No\nDiscards",
   "meldButton": "Meld",
   "discardButton": "Discard",
@@ -585,62 +443,95 @@
   "thankYouMeld": "Thank You Meld",
   "meldTypes": "Meld Types",
   "ok": "OK",
-  "stop": "Stop",
   "aiThankYouDraw": "{aiName} Thank You! {card}",
   "@aiThankYouDraw": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "aiDrawsCard": "{aiName} draws a card",
   "@aiDrawsCard": {
     "placeholders": {
-      "aiName": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      }
     }
   },
   "aiRegistersSeven": "{aiName}: Registers 7 {type}",
   "@aiRegistersSeven": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "type": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
     }
   },
   "aiRegistersMeld": "{aiName}: Registers {meldType} {cards}",
   "@aiRegistersMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "meldType": {"type": "String"},
-      "cards": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "meldType": {
+        "type": "String"
+      },
+      "cards": {
+        "type": "String"
+      }
     }
   },
   "aiAttachesToMeld": "{aiName}: Attaches {card} to meld",
   "@aiAttachesToMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "aiAttachesToPlayerMeld": "{aiName}: Attaches {card} to player meld",
   "@aiAttachesToPlayerMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "aiAttachesToOtherAiMeld": "{aiName}: Attaches {card} to {targetAi} meld",
   "@aiAttachesToOtherAiMeld": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"},
-      "targetAi": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      },
+      "targetAi": {
+        "type": "String"
+      }
     }
   },
   "aiDiscards": "{aiName}: Discards {card}",
   "@aiDiscards": {
     "placeholders": {
-      "aiName": {"type": "String"},
-      "card": {"type": "String"}
+      "aiName": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      }
     }
   },
   "group": "Group",
@@ -650,13 +541,17 @@
   "drewCardWithCard": "Drew {card}",
   "@drewCardWithCard": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "playerDiscards": "{card} discarded",
   "@playerDiscards": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "inPossession": "(Owned)",
@@ -664,7 +559,9 @@
   "meldCount": "{count} melds",
   "@meldCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "cannotPlayFirstTrickDeclarerGiruda": "Declarer cannot lead with trump on the first trick",
@@ -675,7 +572,9 @@
   "mustFollowSuit": "You must follow {suit}",
   "@mustFollowSuit": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "fullDeclarationWarning": "Declaring Full raises the contract to 20",
@@ -688,18 +587,32 @@
   "bidExplanation": "{name}: Best trump {suit}, Strength {strength}",
   "@bidExplanation": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suit": {"type": "String"},
-      "strength": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "suit": {
+        "type": "String"
+      },
+      "strength": {
+        "type": "int"
+      }
     }
   },
   "bidExplanationBid": "{name}: {suit} {tricks} bid (Strength {strength})",
   "@bidExplanationBid": {
     "placeholders": {
-      "name": {"type": "String"},
-      "suit": {"type": "String"},
-      "tricks": {"type": "int"},
-      "strength": {"type": "int"}
+      "name": {
+        "type": "String"
+      },
+      "suit": {
+        "type": "String"
+      },
+      "tricks": {
+        "type": "int"
+      },
+      "strength": {
+        "type": "int"
+      }
     }
   },
   "passReasonNoSuit": "No trump candidate (no suit with 4+ cards)",
@@ -707,35 +620,51 @@
   "passReasonWeakHand": "Weak hand (strength {strength}, need {needed})",
   "@passReasonWeakHand": {
     "placeholders": {
-      "strength": {"type": "int"},
-      "needed": {"type": "int"}
+      "strength": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
     }
   },
   "passReasonPowerWeak": "Not enough power cards (Mighty/Joker/Aces < 5)",
   "passReasonLowPoints": "Opt. {optimal}pts < min 13pts",
   "@passReasonLowPoints": {
     "placeholders": {
-      "optimal": {"type": "int"}
+      "optimal": {
+        "type": "int"
+      }
     }
   },
   "passReasonOutbid": "Opt. {optimal}pts < need {needed}pts",
   "@passReasonOutbid": {
     "placeholders": {
-      "optimal": {"type": "int"},
-      "needed": {"type": "int"}
+      "optimal": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
     }
   },
   "estimatedRange": "Est. {min}~{max}pts",
   "@estimatedRange": {
     "placeholders": {
-      "min": {"type": "int"},
-      "max": {"type": "int"}
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
     }
   },
   "optimalScore": "Opt. {optimal}pts",
   "@optimalScore": {
     "placeholders": {
-      "optimal": {"type": "int"}
+      "optimal": {
+        "type": "int"
+      }
     }
   },
   "kittyScoreChange": "Expected Score Change",
@@ -747,7 +676,9 @@
   "friendHeldBy": "held by {name}",
   "@friendHeldBy": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "friendInKitty": "may be in kitty",
@@ -778,21 +709,27 @@
   "bidSummaryEstMax": "Max ({points} pts)",
   "@bidSummaryEstMax": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "bidSummaryEstMaxDesc": "With friend, maintaining lead",
   "bidSummaryEstMin": "Min ({points} pts)",
   "@bidSummaryEstMin": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "bidSummaryEstMinDesc": "Without friend help (joker called, etc.)",
   "bidSummaryEstMinDescDynamic": "Friend ({friend}) basic only, may be in kitty",
   "@bidSummaryEstMinDescDynamic": {
     "placeholders": {
-      "friend": {"type": "String"}
+      "friend": {
+        "type": "String"
+      }
     }
   },
   "bidSummaryMultipliers": "Declarer ×2, Friend ×1, Defender ×(-1)",
@@ -812,86 +749,100 @@
   "bidInfoGirudaKeys": "Trump {keys}",
   "@bidInfoGirudaKeys": {
     "placeholders": {
-      "keys": {"type": "String"}
+      "keys": {
+        "type": "String"
+      }
     }
   },
   "bidInfoFriend": "Friend: {card}",
   "@bidInfoFriend": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "bidInfoHasBoth": "Has {card1}·{card2}",
   "@bidInfoHasBoth": {
     "placeholders": {
-      "card1": {"type": "String"},
-      "card2": {"type": "String"}
+      "card1": {
+        "type": "String"
+      },
+      "card2": {
+        "type": "String"
+      }
     }
   },
   "bidInfoHasCard": "Has {card}",
   "@bidInfoHasCard": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "bidInfoFirstTrickAces": "1st trick {aces}",
   "@bidInfoFirstTrickAces": {
     "placeholders": {
-      "aces": {"type": "String"}
+      "aces": {
+        "type": "String"
+      }
     }
   },
   "jokerOwner": "Joker Owner",
-  "cardOwner": "{card} Owner",
-  "@cardOwner": {
-    "placeholders": {
-      "card": {"type": "String"}
-    }
-  },
-  "trickWinner": "Trick {n} Winner",
-  "@trickWinner": {
-    "placeholders": {
-      "n": {"type": "int"}
-    }
-  },
   "friendBadge": "Friend",
   "kittyLabel": "Kitty ",
   "kittyPointsWithFriend": " {points}pts (friend kitty)",
   "@kittyPointsWithFriend": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "kittyPoints": " {points}pts",
   "@kittyPoints": {
     "placeholders": {
-      "points": {"type": "int"}
+      "points": {
+        "type": "int"
+      }
     }
   },
   "friendWithName": "Friend {name} ",
   "@friendWithName": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "adjustedPointsRange": "→ Adj. {min}~{max}pts",
   "@adjustedPointsRange": {
     "placeholders": {
-      "min": {"type": "int"},
-      "max": {"type": "int"}
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
     }
   },
   "hasAceNote": " (Has Ace)",
   "strategyFirstTrickAceLead": "1st trick: Lead {card} for a guaranteed trick win",
   "@strategyFirstTrickAceLead": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "strategyFirstTrickPassFriendWin": "1st trick: Lead low in a short suit to pass lead to friend (friend wins trick)",
   "strategyFirstTrickKingLead": "1st trick: Lead {card} to attempt a trick win",
   "@strategyFirstTrickKingLead": {
     "placeholders": {
-      "card": {"type": "String"}
+      "card": {
+        "type": "String"
+      }
     }
   },
   "strategyFirstTrickPassFriend": "1st trick: Lead low in a short suit to pass lead to friend",
@@ -900,16 +851,26 @@
   "strategyPassTrumpToFriend": "Lead {passCard} to pass to friend ({friendCard}) → prevent {rank} solo",
   "@strategyPassTrumpToFriend": {
     "placeholders": {
-      "passCard": {"type": "String"},
-      "friendCard": {"type": "String"},
-      "rank": {"type": "String"}
+      "passCard": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      },
+      "rank": {
+        "type": "String"
+      }
     }
   },
   "strategyPassSuitToFriend": "Lead {card} to pass to friend ({friendCard})",
   "@strategyPassSuitToFriend": {
     "placeholders": {
-      "card": {"type": "String"},
-      "friendCard": {"type": "String"}
+      "card": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      }
     }
   },
   "strategySourceFriend": "After friend trick,",
@@ -917,27 +878,39 @@
   "strategyTrumpDominate": "{source} dominate with {cards} → exhaust defenders' trumps",
   "@strategyTrumpDominate": {
     "placeholders": {
-      "source": {"type": "String"},
-      "cards": {"type": "String"}
+      "source": {
+        "type": "String"
+      },
+      "cards": {
+        "type": "String"
+      }
     }
   },
   "strategyTrumpExhaust": "{source} use {cards} to exhaust defenders' trumps",
   "@strategyTrumpExhaust": {
     "placeholders": {
-      "source": {"type": "String"},
-      "cards": {"type": "String"}
+      "source": {
+        "type": "String"
+      },
+      "cards": {
+        "type": "String"
+      }
     }
   },
   "strategyTrumpMidDraw": "Use {suit} mid-trumps to draw out defenders' high trumps",
   "@strategyTrumpMidDraw": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "strategyJokerCallSuits": "After exhausting defenders' trumps, call Joker on weak suit ({suits})",
   "@strategyJokerCallSuits": {
     "placeholders": {
-      "suits": {"type": "String"}
+      "suits": {
+        "type": "String"
+      }
     }
   },
   "strategyJokerCallWeak": "After exhausting defenders' trumps, call Joker on a weak suit",
@@ -946,21 +919,52 @@
   "strategyVoidTrumpCut": "{suits} void → trump cut to reclaim tricks when opponents lead",
   "@strategyVoidTrumpCut": {
     "placeholders": {
-      "suits": {"type": "String"}
+      "suits": {
+        "type": "String"
+      }
     }
   },
   "strategyTrumpExhaustCheckK": "Lead {cards} → top trump attack, check K exhaustion",
-  "@strategyTrumpExhaustCheckK": { "placeholders": { "cards": { "type": "String" } } },
+  "@strategyTrumpExhaustCheckK": {
+    "placeholders": {
+      "cards": {
+        "type": "String"
+      }
+    }
+  },
   "strategyJokerAfterFriend": "After friend joins, lead Joker → score points",
   "strategyJokerCallGiruda": "If K not exhausted, Joker: call {suit} → draw out K",
-  "@strategyJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "@strategyJokerCallGiruda": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      }
+    }
+  },
   "strategyLowGirudaFriendLure": "Lead {card} → yield lead to lure friend",
-  "@strategyLowGirudaFriendLure": { "placeholders": { "card": { "type": "String" } } },
+  "@strategyLowGirudaFriendLure": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "strategyGirudaQReclaim": "Lead {card} → reclaim lead",
-  "@strategyGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "@strategyGirudaQReclaim": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "strategyHighCardAttack": "Lead {cards} → additional score attack",
-  "@strategyHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
-
+  "@strategyHighCardAttack": {
+    "placeholders": {
+      "cards": {
+        "type": "String"
+      }
+    }
+  },
   "trickDetails": "Trick Details",
   "trickColumnGainLoss": "Gain/\nLoss",
   "trickColumnGiruda": "Trump",
@@ -972,21 +976,93 @@
   "trickEventLastTrickGiruda": "Trump last trick",
   "trickEventLastTrickMighty": "Mighty last trick",
   "trickEventLastTrickTopByExhaust": "Suit exhausted → {card} top card lead",
-  "@trickEventLastTrickTopByExhaust": { "placeholders": { "card": { "type": "String" } } },
+  "@trickEventLastTrickTopByExhaust": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventGameVictory": "Attack victory",
   "trickEventGameRunVictory": "Attack run (sweep) victory!",
   "trickEventGameDefeat": "Attack defeat",
   "trickEventSummaryRun": "Review: Sweep run, dominant win",
   "trickEventSummaryBackRun": "Review: Swept back-run 0/{bid}pts, shutout",
-  "@trickEventSummaryBackRun": { "placeholders": { "bid": { "type": "int" } } },
+  "@trickEventSummaryBackRun": {
+    "placeholders": {
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryBigWin": "Review: {wins}W{losses}L {points}/{bid}pts, dominant win",
-  "@trickEventSummaryBigWin": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryBigWin": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryWin": "Review: {wins}W{losses}L {points}/{bid}pts, victory",
-  "@trickEventSummaryWin": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryWin": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryNarrowLoss": "Review: {wins}W{losses}L {points}/{bid}pts, narrow loss",
-  "@trickEventSummaryNarrowLoss": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryNarrowLoss": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSummaryBigLoss": "Review: {wins}W{losses}L {points}/{bid}pts, big loss",
-  "@trickEventSummaryBigLoss": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" } } },
+  "@trickEventSummaryBigLoss": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      }
+    }
+  },
   "summaryJokerCounter": "Joker counter",
   "summaryJokerUse": "Joker play",
   "summaryWasteExploit": "Waste exploit success",
@@ -1006,7 +1082,16 @@
   "summaryNineWinFirstTrickCut": "Review: 9 tricks secured / run missed by 1 trick due to unlucky first-trick trump cut",
   "summaryDefenseJokerGirudaCounter": "Defense joker assault → trump counterattack",
   "summaryNarrative": "Review: {events} → {result}",
-  "@summaryNarrative": { "placeholders": { "events": { "type": "String" }, "result": { "type": "String" } } },
+  "@summaryNarrative": {
+    "placeholders": {
+      "events": {
+        "type": "String"
+      },
+      "result": {
+        "type": "String"
+      }
+    }
+  },
   "summaryResultBigWin": "attack dominant win",
   "summaryResultMinGoal": "minimum goal achieved",
   "summaryResultWin": "attack success",
@@ -1014,7 +1099,25 @@
   "summaryResultBigLoss": "defense dominates",
   "summaryAnd": " & ",
   "summaryFallback": "Review: {wins}W{losses}L → {points}/{bid}pts {result}",
-  "@summaryFallback": { "placeholders": { "wins": { "type": "int" }, "losses": { "type": "int" }, "points": { "type": "int" }, "bid": { "type": "int" }, "result": { "type": "String" } } },
+  "@summaryFallback": {
+    "placeholders": {
+      "wins": {
+        "type": "int"
+      },
+      "losses": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bid": {
+        "type": "int"
+      },
+      "result": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventLastCardDefenseWin": "Defense higher card guard",
   "trickEventLastDefenseTopProtectFail": "Defense top card saved but defense failed",
   "trickEventLastCardAttackWin": "Attack points gained",
@@ -1022,7 +1125,9 @@
   "trickEventJokerLeadSuit": "Joker lead ({suit})",
   "@trickEventJokerLeadSuit": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "trickEventJokerGirudaExhaust": "Forcing defenders to spend trump",
@@ -1031,11 +1136,23 @@
   "trickEventTopGirudaLeadOpponentExhausted": "Opponents out of trumps → lead non-trump, save trump for cutting",
   "trickEventMidGirudaMightyBait": "Mid trump to bait Mighty",
   "trickEventMidGirudaMightyBaitForTop": "Low trump to bait Mighty, securing {topCard} dominance",
-  "@trickEventMidGirudaMightyBaitForTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventMidGirudaMightyBaitForTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventMidGirudaPassLead": "Mid trump to pass lead",
   "trickEventFriendAttackDeclarerReOvertake": "Friend attacks → Defense overtake attempt → Declarer re-overtakes (lucky)",
   "trickEventGirudaDepletionFail": "Failed to flush {card}",
-  "@trickEventGirudaDepletionFail": { "placeholders": { "card": { "type": "String" } } },
+  "@trickEventGirudaDepletionFail": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventDefenderGirudaWin": "Defender trump win",
   "trickEventMidGirudaLead": "Mid trump lead",
   "trickEventMidGirudaExhaust": "Trump exhaustion play",
@@ -1050,7 +1167,13 @@
   "trickEventDefenseTopDeclarerCutTeamDefense": "Defense top lead → Declarer trump cut → Defense team trump guard",
   "trickEventDefenseLeadAttackCut": "Defense non-trump top lead → Attack trump cut reclaim",
   "trickEventDefenseTopAttackCutPointsFailed": "Defense top lead → Declarer trump cut, {count}pts defense failed",
-  "@trickEventDefenseTopAttackCutPointsFailed": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventDefenseTopAttackCutPointsFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventAttackLeadDefenseCut": "Attack non-trump top lead → Defense trump cut",
   "trickEventTopNonGirudaLeadDefended": "Non-trump lead → defense higher card",
   "trickEventFirstTrickTopAttack": "1st trick top non-trump lead",
@@ -1061,7 +1184,13 @@
   "trickEventFirstTrickWaste": "No lead in 1st trick / Waste",
   "trickEventAttackFailed": "Attack failed → lost to higher defense card",
   "trickEventAttackFailedWithTop": "Attack ({topCard} top) failed → lost to defense",
-  "@trickEventAttackFailedWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventAttackFailedWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventWaste": "Passing lead with waste",
   "trickEventWasteAttackFailed": "Waste attack failed",
   "trickEventPreExchange": "Lead exchange (preserve trump)",
@@ -1069,33 +1198,81 @@
   "trickEventFriendPassLeadFailed": "Lead pass failed",
   "trickEventDefenseLead": "Defense lead",
   "trickEventWasteWithTop": "Waste ({topCard} is top)",
-  "@trickEventWasteWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventWasteWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventWasteDeclarerReclaim": "Waste → Declarer reclaim",
   "trickEventWasteDeclarerReclaimWithTop": "Waste ({topCard} top) → Declarer reclaim",
-  "@trickEventWasteDeclarerReclaimWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventWasteDeclarerReclaimWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventFriendWasteDeclarerCutDefenseOvercut": "Friend waste → Declarer trump cut → Defense higher trump reversal",
   "trickEventFriendWasteDeclarerCutDefenseOvercutPoints": "Friend waste → Declarer trump cut → Defense higher trump reversal, {count}pts defended",
-  "@trickEventFriendWasteDeclarerCutDefenseOvercutPoints": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventFriendWasteDeclarerCutDefenseOvercutPoints": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventFriendWasteDeclarerHighDefenseReversal": "Friend waste → Declarer high card → Defense reversal",
   "trickEventDefenseWasteAttackReverseDefenseCut": "Defense waste → Attack reversal → Defense cut re-reversal",
   "trickEventFriendLeadDefenseBeatDeclarerCut": "Friend lead → Defense beats → Declarer trump cut reversal",
   "trickEventDeclarerFriendLure": "Friend lure",
   "trickEventDeclarerFriendLureFailed": "Friend lure failed",
   "trickEventFriendLureGirudaExhaust": "Defense trump {card} exhausted",
-  "@trickEventFriendLureGirudaExhaust": { "placeholders": { "card": { "type": "String" } } },
+  "@trickEventFriendLureGirudaExhaust": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventWasteFriendRescue": "Waste → Friend rescue!",
   "trickEventWasteFriendRescueWithTop": "Waste ({topCard} top) → Friend rescue!",
-  "@trickEventWasteFriendRescueWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventWasteFriendRescueWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventFriendMightyReclaim": "Waste → Friend reclaims lead with Mighty",
   "trickEventFriendMightyReclaimWithTop": "Waste ({topCard} top) → Friend reclaims lead with Mighty",
-  "@trickEventFriendMightyReclaimWithTop": { "placeholders": { "topCard": { "type": "String" } } },
+  "@trickEventFriendMightyReclaimWithTop": {
+    "placeholders": {
+      "topCard": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventAttackGirudaCut": "Attack trump cut",
   "trickEventAttackGirudaCutCount": "Attack trump cut x{count}",
-  "@trickEventAttackGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventAttackGirudaCutCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventSameTeamGirudaCut": "Same-team trump cut (forced)",
   "trickEventDefenseGirudaCut": "Defense trump cut",
   "trickEventDefenseGirudaCutCount": "Defense trump cut x{count}",
-  "@trickEventDefenseGirudaCutCount": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventDefenseGirudaCutCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventDefenseCutAttackOvercut": "Defense 1st cut → Attack higher trump overcut",
   "trickEventAttackCutDefenseOvercut": "Attack 1st cut → Defense higher trump defense",
   "trickEventAttackNoGirudaDefenseHas": "Attack out of trump / Defense still has trump",
@@ -1112,11 +1289,19 @@
   "trickEventDefenseMightySuitBaitSuccess": "Mighty suit lead / mighty bait success",
   "trickEventDefenseMightySuitBaitFailed": "Mighty suit lead / mighty bait failed (attack reclaimed)",
   "trickEventDefenseMightyExhaustPoints": "Defense mighty exhaust, {count}pts lost",
-  "@trickEventDefenseMightyExhaustPoints": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventDefenseMightyExhaustPoints": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventJokerAfterFriend": "Joker after friend joined ({suit}) → score",
   "@trickEventJokerAfterFriend": {
     "placeholders": {
-      "suit": {"type": "String"}
+      "suit": {
+        "type": "String"
+      }
     }
   },
   "trickEventJokerAfterFriendGeneral": "Joker after friend joined → score",
@@ -1127,13 +1312,17 @@
   "trickResultAttack": "→ Attack +{count}",
   "@trickResultAttack": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "trickResultDefense": "→ Defense +{count}",
   "@trickResultDefense": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "trickResultNoScore": "→ No score",
@@ -1143,92 +1332,309 @@
   "trickEventFriendTopCardWin": "Friend top card win",
   "trickEventFriendGirudaKDeclarerA": "Friend giruda K win, declarer has A - attack giruda dominance",
   "trickEventFriendTrickContribution": "Friend helped {count} attack tricks",
-  "@trickEventFriendTrickContribution": { "placeholders": { "count": { "type": "int" } } },
+  "@trickEventFriendTrickContribution": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "trickEventJokerSkipNoPoints": "{name}: held Joker, skipped (no points)",
-  "@trickEventJokerSkipNoPoints": { "placeholders": { "name": { "type": "String" } } },
+  "@trickEventJokerSkipNoPoints": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventGirudaAceHeldMightyGuard": "{name}: held trump A, guarding against Mighty",
-  "@trickEventGirudaAceHeldMightyGuard": { "placeholders": { "name": { "type": "String" } } },
+  "@trickEventGirudaAceHeldMightyGuard": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "trickEventGirudaAceHeld": "{name}: held trump A, not played",
-  "@trickEventGirudaAceHeld": { "placeholders": { "name": { "type": "String" } } },
-
+  "@trickEventGirudaAceHeld": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "adviceFirstTrickLowLead": "💡 Lead with an Ace or Mighty on the first trick to secure initiative",
   "adviceLowLeadPointLoss": "💡 Leading with a card that can't win gives points to defense",
   "adviceAceBeatenByJoker": "💡 Leading an Ace is risky when the defense Joker hasn't been played yet",
   "advicePointCardToDefense": "💡 Play non-point cards when defense is winning the trick",
   "adviceMightyHighPointLoss": "💡 When Mighty appears, minimize point cards in the trick",
-
   "kittyTipTitle": "💡 Kitty Exchange Tips",
   "kittyTipCreateVoid": "Void a suit to cut with giruda and steal tricks",
   "kittyTipKeepGiruda": "Keep giruda (trump) cards whenever possible",
   "kittyTipKeepTopCards": "Keep suits where you hold the top card (e.g. Ace)",
   "kittyTipDiscardLowSingles": "Discard low cards from short suits first",
   "kittyTipKeepMightySuitK": "Without Mighty, keep Mighty-suit K — it can beat Mighty",
-
   "friendTipTitle": "💡 Friend Declaration Tips",
   "friendTipMighty": "Mighty friend: makes the strongest card your ally",
   "friendTipJoker": "Joker friend: makes the second strongest card your ally",
   "friendTipNoFriend": "If you hold both Mighty and Joker, consider No Friend",
   "friendTipWhoIsFriend": "The player holding the declared card becomes your ally",
-
   "estimatedMinWins": "→ {count}+ wins expected",
-  "@estimatedMinWins": { "placeholders": { "count": { "type": "int" } } },
+  "@estimatedMinWins": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "stepFirstAce": "Lead {card} to maintain initiative on first trick",
-  "@stepFirstAce": { "placeholders": { "card": { "type": "String" } } },
+  "@stepFirstAce": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepFirstKing": "Lead {card} to maintain initiative (highest in Mighty suit)",
-  "@stepFirstKing": { "placeholders": { "card": { "type": "String" } } },
+  "@stepFirstKing": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepFirstMighty": "Lead Mighty to secure first trick",
   "stepFirstJoker": "Lead Joker to secure first trick",
   "stepJokerCallExhaust": "After first trick, lead {card} for Joker Call → exhaust Joker",
-  "@stepJokerCallExhaust": { "placeholders": { "card": { "type": "String" } } },
+  "@stepJokerCallExhaust": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaAce": "Attack with {card} as trump",
-  "@stepGirudaAce": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaAce": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaAceCheckK": "Attack with {card} as trump (check K exhaustion)",
-  "@stepGirudaAceCheckK": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaAceCheckK": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaKing": "Additional trump attack with {card}",
-  "@stepGirudaKing": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaKing": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerCallGiruda": "If K not exhausted, call {suit} with Joker to draw out K",
-  "@stepJokerCallGiruda": { "placeholders": { "suit": { "type": "String" } } },
+  "@stepJokerCallGiruda": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerAfterFriend": "Score points with Joker after friend joins",
   "stepFriendMightyJoin": "Mighty friend joins on first trick",
   "stepFriendJokerJoin": "Joker friend naturally joins on trump lead",
   "stepLowGirudaFriendLure": "If {highCards} not appeared, lure Mighty({mightyCard}) with {card} while attacking trump",
-  "@stepLowGirudaFriendLure": { "placeholders": { "highCards": { "type": "String" }, "card": { "type": "String" }, "mightyCard": { "type": "String" } } },
+  "@stepLowGirudaFriendLure": {
+    "placeholders": {
+      "highCards": {
+        "type": "String"
+      },
+      "card": {
+        "type": "String"
+      },
+      "mightyCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaQReclaim": "Reclaim lead with {card}",
-  "@stepGirudaQReclaim": { "placeholders": { "card": { "type": "String" } } },
+  "@stepGirudaQReclaim": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      }
+    }
+  },
   "stepGirudaLeadFriend": "Lead trump to draw out {friendCard}",
-  "@stepGirudaLeadFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "@stepGirudaLeadFriend": {
+    "placeholders": {
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerCallFriend": "If {friendCard} not appeared, call trump with Joker to lure friend",
-  "@stepJokerCallFriend": { "placeholders": { "friendCard": { "type": "String" } } },
+  "@stepJokerCallFriend": {
+    "placeholders": {
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepLureWithGiruda": "Still not appeared, lead {card} to lure friend({friendCard})",
-  "@stepLureWithGiruda": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "@stepLureWithGiruda": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepSuitLeadFriend": "Lead {card} to lure friend({friendCard})",
-  "@stepSuitLeadFriend": { "placeholders": { "card": { "type": "String" }, "friendCard": { "type": "String" } } },
+  "@stepSuitLeadFriend": {
+    "placeholders": {
+      "card": {
+        "type": "String"
+      },
+      "friendCard": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerCall": "Call {suits} with Joker to secure point cards",
-  "@stepJokerCall": { "placeholders": { "suits": { "type": "String" } } },
+  "@stepJokerCall": {
+    "placeholders": {
+      "suits": {
+        "type": "String"
+      }
+    }
+  },
   "stepJokerOptimal": "Use Joker at optimal timing to score points",
   "stepHighCardAttack": "Score additional points with {cards}",
-  "@stepHighCardAttack": { "placeholders": { "cards": { "type": "String" } } },
+  "@stepHighCardAttack": {
+    "placeholders": {
+      "cards": {
+        "type": "String"
+      }
+    }
+  },
   "stepMightyTiming": "Use Mighty after trump exhaustion to secure trick",
   "stepVoidCut": "Use {suits} void for trump cut scoring",
-  "@stepVoidCut": { "placeholders": { "suits": { "type": "String" } } },
+  "@stepVoidCut": {
+    "placeholders": {
+      "suits": {
+        "type": "String"
+      }
+    }
+  },
   "stepEndgameScoring": "Maximize point collection through endgame play",
   "breakdownLowCards": "low",
   "breakdownGirudaPart": "{suit}{top}({count} cards) {tricks} tricks",
-  "@breakdownGirudaPart": { "placeholders": { "suit": {"type": "String"}, "top": {"type": "String"}, "count": {"type": "int"}, "tricks": {"type": "String"} } },
+  "@breakdownGirudaPart": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "top": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownMightyJokerPart": "Mighty+Joker {tricks} tricks",
-  "@breakdownMightyJokerPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownMightyJokerPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownMightyPart": "Mighty {tricks} trick",
-  "@breakdownMightyPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownMightyPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownJokerPart": "Joker {tricks} trick",
-  "@breakdownJokerPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownJokerPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownAcePart": "{suit}A {tricks} trick",
-  "@breakdownAcePart": { "placeholders": { "suit": {"type": "String"}, "tricks": {"type": "String"} } },
+  "@breakdownAcePart": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownFriendMightyPart": "Friend({suit}A) {tricks} trick",
-  "@breakdownFriendMightyPart": { "placeholders": { "suit": {"type": "String"}, "tricks": {"type": "String"} } },
+  "@breakdownFriendMightyPart": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "breakdownFriendJokerPart": "Friend(Joker) {tricks} trick",
-  "@breakdownFriendJokerPart": { "placeholders": { "tricks": {"type": "String"} } },
+  "@breakdownFriendJokerPart": {
+    "placeholders": {
+      "tricks": {
+        "type": "String"
+      }
+    }
+  },
   "suitChangeRecommend": "{suit} +{diff} pts (penalty +2 on change)",
-  "@suitChangeRecommend": { "placeholders": { "suit": {"type": "String"}, "diff": {"type": "int"} } },
+  "@suitChangeRecommend": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "diff": {
+        "type": "int"
+      }
+    }
+  },
   "suitKeepRecommend": "{suit} +{diff} pts (keep is better considering penalty)",
-  "@suitKeepRecommend": { "placeholders": { "suit": {"type": "String"}, "diff": {"type": "int"} } }
+  "@suitKeepRecommend": {
+    "placeholders": {
+      "suit": {
+        "type": "String"
+      },
+      "diff": {
+        "type": "int"
+      }
+    }
+  },
+  "cardCount": "{count} cards",
+  "@cardCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

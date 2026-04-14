@@ -92,12 +92,12 @@ class _HeartsResponsiveSizes {
     final widthUnit = screenWidth / 100;
 
     // 중앙 트릭 영역 카드
-    centerCardWidth = (widthUnit * 12).clamp(40.0, 70.0);
-    centerCardHeight = (baseUnit * 11).clamp(58.0, 95.0);
+    centerCardWidth = (widthUnit * 16).clamp(50.0, 90.0);
+    centerCardHeight = (baseUnit * 14).clamp(70.0, 120.0);
 
     // 플레이어 카드
-    playerCardWidth = (widthUnit * 8).clamp(32.0, 55.0);
-    playerCardHeight = (baseUnit * 9).clamp(45.0, 75.0);
+    playerCardWidth = (widthUnit * 6).clamp(28.0, 45.0);
+    playerCardHeight = (baseUnit * 7).clamp(38.0, 60.0);
 
     // AI 카드 (상단)
     aiCardWidth = (widthUnit * 7).clamp(24.0, 40.0);
@@ -1743,12 +1743,11 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
     final hand = hands[playerIndex];
     final cardWidth = sizes.aiCardWidth;
     final cardHeight = sizes.aiCardHeight;
-    final overlap = sizes.aiCardOverlap * 0.75; // 세로 배치시 더 촘촘하게
     final l10n = AppLocalizations.of(context)!;
     final playerNames = _getPlayerNames(context);
 
     return Container(
-      width: sizes.aiCardWidth * 2,
+      width: cardHeight + 8, // 회전 후 가로 크기 = 원래 세로 + 여백
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1764,21 +1763,39 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: hand.length * overlap + cardHeight,
-            child: Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                for (int i = 0; i < hand.length; i++)
-                  Positioned(
-                    top: i * overlap,
-                    child: Transform.rotate(
-                      angle: playerIndex == 1 ? -pi / 2 : pi / 2,
-                      child: _buildCardBack(cardWidth, cardHeight),
-                    ),
+          const SizedBox(height: 4),
+          Flexible(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final availableHeight = constraints.maxHeight;
+                final rotatedCardHeight = cardWidth;
+                final overlap = hand.length > 1
+                    ? ((availableHeight - rotatedCardHeight) / (hand.length - 1))
+                        .clamp(0.0, cardWidth * 0.45)
+                    : 0.0;
+                final stackHeight = hand.length > 1
+                    ? ((hand.length - 1) * overlap + rotatedCardHeight)
+                        .clamp(0.0, availableHeight)
+                    : rotatedCardHeight;
+
+                return SizedBox(
+                  height: stackHeight,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.topCenter,
+                    children: [
+                      for (int i = 0; i < hand.length; i++)
+                        Positioned(
+                          top: i * overlap,
+                          child: Transform.rotate(
+                            angle: playerIndex == 1 ? -pi / 2 : pi / 2,
+                            child: _buildCardBack(cardWidth, cardHeight),
+                          ),
+                        ),
+                    ],
                   ),
-              ],
+                );
+              },
             ),
           ),
         ],
@@ -2020,25 +2037,31 @@ class _HeartsScreenState extends State<HeartsScreen> with TickerProviderStateMix
               ),
             ],
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                card.suitSymbol,
-                style: TextStyle(
-                  color: card.color,
-                  fontSize: width * 0.4,
-                ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    card.suitSymbol,
+                    style: TextStyle(
+                      color: card.color,
+                      fontSize: width * 0.4,
+                    ),
+                  ),
+                  Text(
+                    card.rankSymbol,
+                    style: TextStyle(
+                      color: card.color,
+                      fontSize: width * 0.35,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                card.rankSymbol,
-                style: TextStyle(
-                  color: card.color,
-                  fontSize: width * 0.35,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
         // ★ 추천 카드 표시
