@@ -27,7 +27,7 @@ String getPlayerName(BuildContext context, int playerIndex) {
   }
 }
 
-/// 5명 플레이어 이름 목록 반환 (마이티, 세븐포커, 하이로우 등)
+/// 5명 플레이어 이름 목록 반환 (마이티 등)
 List<String> getPlayerNames5(BuildContext context) {
   final l10n = getL10n(context);
   return [l10n.player, l10n.aiPlayer1, l10n.aiPlayer2, l10n.aiPlayer3, l10n.aiPlayer4];
